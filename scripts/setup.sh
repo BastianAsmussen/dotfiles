@@ -8,6 +8,7 @@ sudo pacman -S --noconfirm \
 	git \
 	stow \
 	zsh \
+	neovim \
 	starship
 
 stow --adopt .
