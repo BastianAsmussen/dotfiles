@@ -7,6 +7,7 @@ sudo pacman -Syy
 sudo pacman -S --noconfirm \
 	git \
 	stow \
+  ripgrep \
 	ttf-jetbrains-mono-nerd \
 	neovim \
 	zsh \
