@@ -7,8 +7,9 @@ sudo pacman -Syy
 sudo pacman -S --noconfirm \
 	git \
 	stow \
-	zsh \
+	ttf-jetbrains-mono-nerd \
 	neovim \
+	zsh \
 	starship
 
 stow --adopt .
