@@ -11,6 +11,7 @@ sudo pacman -S --noconfirm \
 	ttf-jetbrains-mono-nerd \
 	neovim \
 	zsh \
-	starship
+	starship \
+  kitty
 
 stow --adopt .
