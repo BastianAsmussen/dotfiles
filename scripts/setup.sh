@@ -5,13 +5,13 @@ sudo pacman -Syy
 
 # Install required tools.
 sudo pacman -S --noconfirm \
-	git \
-	stow \
+  git \
+  stow \
   ripgrep \
-	ttf-jetbrains-mono-nerd \
-	neovim \
-	zsh \
-	starship \
+  ttf-jetbrains-mono-nerd \
+  neovim \
+  zsh \
+  starship \
   kitty \
   curl
 
