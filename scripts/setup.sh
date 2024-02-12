@@ -10,6 +10,7 @@ sudo pacman -S --noconfirm \
   ripgrep \
   ttf-jetbrains-mono-nerd \
   neovim \
+  lldb \
   zsh \
   alacritty \
   starship \
