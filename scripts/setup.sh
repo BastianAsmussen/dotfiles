@@ -13,7 +13,9 @@ sudo pacman -S --noconfirm \
   zsh \
   alacritty \
   starship \
-  curl
+  curl \
+  zoxide \
+  fzf
 
 # Install Rust toolchain.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
