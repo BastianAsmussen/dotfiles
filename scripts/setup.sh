@@ -11,7 +11,7 @@ sudo pacman -S --noconfirm \
   ttf-jetbrains-mono-nerd \
   neovim \
   zsh \
-  alacritty
+  alacritty \
   starship \
   curl
 
