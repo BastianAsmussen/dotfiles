@@ -1,5 +1,6 @@
 [build]
-jobs = 24
+rustc-wrapper = "/home/bastian/.cargo/bin/sccache"
+jobs = 4
 
 rustflags = [
     "-Wclippy::pedantic",
@@ -10,3 +11,4 @@ rustflags = [
 
 [term]
 color = "always"
+
