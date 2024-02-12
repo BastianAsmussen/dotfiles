@@ -11,5 +11,8 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
+# Initialize zoxide.
+eval "$(zoxide init zsh)"
+
 # Initialize Starship prompt.
 eval "$(starship init zsh)"
