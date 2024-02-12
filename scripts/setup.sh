@@ -13,7 +13,6 @@ sudo pacman -S --noconfirm \
   zsh \
   alacritty
   starship \
-  kitty \
   curl
 
 # Install Rust toolchain.
