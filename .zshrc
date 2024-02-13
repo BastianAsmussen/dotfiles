@@ -16,3 +16,10 @@ eval "$(zoxide init zsh)"
 
 # Initialize Starship prompt.
 eval "$(starship init zsh)"
+
+# Add Cargo's bin directory to the PATH.
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# Add alias for nvim.
+alias vim=nvim
+
