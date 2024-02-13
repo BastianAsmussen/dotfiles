@@ -26,8 +26,8 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 rustup component add rust-analyzer
 
-stow --adopt .
-
 # Install additional tools.
 ./scripts/tools.sh
+
+stow --adopt .
 
