@@ -20,6 +20,8 @@ eval "$(starship init zsh)"
 # Add Cargo's bin directory to the PATH.
 export PATH="$HOME/.cargo/bin:$PATH"
 
-# Add alias for nvim.
+# Add aliases.
 alias vim=nvim
+alias cat="bat --paging=never"
+alias ls="eza"
 
