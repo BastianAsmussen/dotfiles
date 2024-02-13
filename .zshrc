@@ -23,5 +23,5 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Add aliases.
 alias vim=nvim
 alias cat="bat --paging=never"
-alias ls="eza"
+alias ls="eza -1"
 
