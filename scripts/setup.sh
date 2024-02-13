@@ -16,7 +16,11 @@ sudo pacman -S --noconfirm \
   starship \
   curl \
   zoxide \
-  fzf
+  fzf \
+  tmux
+
+# Install tmux plugin manager.
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Install Rust toolchain.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
