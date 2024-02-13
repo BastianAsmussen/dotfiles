@@ -5,8 +5,9 @@ sudo pacman -Syy
 
 # Install additional tools.
 sudo pacman -S --noconfirm \
-  grex \
   bat \
   eza \
+  ripgrep \
+  grex \
   tokei
 
