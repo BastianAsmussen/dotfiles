@@ -7,7 +7,7 @@ M.general = {
       "Left Window"
     },
     ["<C-l>"] = {
-      "<cmd> TmuxNavigaRight <CR>",
+      "<cmd> TmuxNavigateRight <CR>",
       "Right Window"
     },
     ["<C-j>"] = {
