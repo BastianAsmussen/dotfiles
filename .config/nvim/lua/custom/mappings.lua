@@ -1,5 +1,25 @@
----@type MappingsTable
 local M = {}
+
+M.general = {
+  n = {
+    ["<C-h>"] = {
+      "<cmd> TmuxNavigateLeft <CR>",
+      "Left Window"
+    },
+    ["<C-l>"] = {
+      "<cmd> TmuxNavigaRight <CR>",
+      "Right Window"
+    },
+    ["<C-j>"] = {
+      "<cmd> TmuxNavigateUp <CR>",
+      "Upper Window"
+    },
+    ["<C-k>"] = {
+      "<cmd> TmuxNavigateDown <CR>",
+      "Lower Window"
+    },
+  },
+}
 
 M.dap = {
    n = {
