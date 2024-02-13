@@ -7,5 +7,6 @@ sudo pacman -Syy
 sudo pacman -S --noconfirm \
   grex \
   bat \
-  eza
+  eza \
+  tokei
 
