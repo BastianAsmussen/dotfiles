@@ -11,3 +11,6 @@ sudo pacman -S --noconfirm \
   grex \
   tokei
 
+# Install sccache.
+cargo install --locked sccache
+
