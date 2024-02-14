@@ -34,7 +34,15 @@ Host GitHub
 EOF
 ```
 
-## Usage
+## Optional
+
+1. Clean out old Neovim config.
+```sh
+rm -rf ~/.config/nvim
+rm -rf ~/.local/share/nvim
+```
+
+## Setup
 
 1. Clone the repository:
 ```sh
@@ -51,5 +59,26 @@ cd ~/dotfiles
 ./scripts/setup.sh
 ```
 
-3. Finished!
+### Tmux
+
+#### Install Plugins
+
+1. Start a Tmux session:
+```sh
+tmux
+```
+
+2. Install the plugins:
+```sh
+<C-Space>I
+```
+
+### Neovim
+
+#### Install Plugins
+
+1. Open Neovim:
+```sh
+nvim
+```
 
