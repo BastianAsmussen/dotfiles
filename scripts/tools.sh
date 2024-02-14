@@ -8,6 +8,7 @@ sudo pacman -S --noconfirm \
   bat \
   eza \
   ripgrep \
+  gitui \
   grex \
   tokei
 
