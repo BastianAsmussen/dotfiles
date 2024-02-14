@@ -10,8 +10,9 @@ sudo pacman -S --noconfirm \
   ripgrep \
   gitui \
   grex \
-  tokei
+  tokei \
+  discord
 
 # Install sccache.
-cargo install --locked sccache
+cargo install sccache
 
