@@ -12,8 +12,8 @@ sudo pacman -S --noconfirm \
   neovim \
   lldb \
   zsh \
-  alacritty \
   starship \
+  alacritty \
   curl \
   zoxide \
   fzf \
