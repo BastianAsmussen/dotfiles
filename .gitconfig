@@ -1,0 +1,7 @@
+[user]
+	name = Bastian Asmussen
+	email = bastian@asmussen.tech
+[core]
+	autocrlf = input
+[push]
+	autoSetupRemote = true
