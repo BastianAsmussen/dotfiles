@@ -12,7 +12,7 @@ compinit
 # End of lines added by compinstall
 
 # Initialize zoxide.
-eval "$(zoxide init zsh)"
+eval "$(zoxide init --cmd cd zsh)"
 
 # Initialize Starship prompt.
 eval "$(starship init zsh)"
