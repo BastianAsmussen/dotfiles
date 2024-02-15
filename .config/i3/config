@@ -189,5 +189,6 @@ bar {
         status_command i3status
 }
 
+# Update keyboard layout.
 exec "setxkbmap -layout dk"
 
