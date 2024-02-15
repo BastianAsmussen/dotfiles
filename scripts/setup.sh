@@ -17,7 +17,14 @@ sudo pacman -S --noconfirm \
   curl \
   zoxide \
   fzf \
-  tmux
+  tmux \
+  xorg \
+  lightdm \
+  lightdm-gtk-greeter \
+  i3
+
+# Enable LightDM.
+sudo systemctl enable lightdm.service
 
 # Install tmux plugin manager.
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
