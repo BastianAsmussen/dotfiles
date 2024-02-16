@@ -6,35 +6,17 @@ sudo pacman -Syy
 # Install required tools.
 sudo pacman -S --noconfirm \
   git \
-  stow \
-  ripgrep \
-  ttf-jetbrains-mono-nerd \
-  neovim \
-  lldb \
-  zsh \
-  starship \
-  alacritty \
-  curl \
-  zoxide \
-  fzf \
-  tmux \
-  xorg \
-  lightdm \
-  lightdm-gtk-greeter \
-  i3
+  stow
 
-# Enable LightDM.
-sudo systemctl enable lightdm.service
-
-# Install tmux plugin manager.
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-
-# Install Rust toolchain.
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-rustup component add rust-analyzer
+# Install tools.
+./scripts/hyprland.sh
+./scripts/terminal.sh
+./scripts/tmux.sh
+./scripts/neovim.sh
+./scripts/toolchain.sh
 
 # Install additional tools.
-./scripts/tools.sh
+./scripts/extra.sh
 
 stow --adopt .
 
