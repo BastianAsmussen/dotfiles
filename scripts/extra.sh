@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Sync package repos.
-sudo pacman -Syy
-
 # Install additional tools.
 sudo pacman -S --noconfirm \
   bat \
@@ -12,7 +9,4 @@ sudo pacman -S --noconfirm \
   grex \
   tokei \
   discord
-
-# Install sccache.
-cargo install sccache
 
