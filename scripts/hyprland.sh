@@ -3,8 +3,9 @@
 # Install hyprland.
 sudo pacman -S --noconfirm \
   sddm \
-  xorg-xwayland \
-  hyprland
+  hyprland \
+  swaylock \
+  xorg-xwayland
 
 # Enable SDDM.
 sudo systemctl enable sddm.service
