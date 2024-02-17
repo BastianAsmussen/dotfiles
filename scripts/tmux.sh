@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install Tmux.
-sudo pacman -S --nocornfirm \
+sudo pacman -S --noconfirm \
   tmux
 
 # Install Tmux Plugin Manager.
