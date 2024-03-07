@@ -7,7 +7,7 @@ sudo pacman -S --noconfirm \
   dolphin \
   swaylock \
   waybar \
-  wofi
+  wofi \
   xorg-xwayland
 
 # Enable SDDM.
