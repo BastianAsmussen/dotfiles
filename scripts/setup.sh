@@ -8,7 +8,8 @@ sudo pacman -S --noconfirm \
   git \
   stow
 
-# Install tools.
+# Install dependencies.
+./scripts/gnome.sh
 ./scripts/terminal.sh
 ./scripts/tmux.sh
 ./scripts/neovim.sh
