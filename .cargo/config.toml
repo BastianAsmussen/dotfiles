@@ -1,13 +1,5 @@
 [build]
-rustc-wrapper = "/home/bastian/.cargo/bin/sccache"
-jobs = 4
-
-rustflags = [
-    "-Wclippy::pedantic",
-    "-Wclippy::nursery",
-    "-Wclippy::unwrap_used",
-    "-Wclippy::expect_used",
-]
+jobs = 24
 
 [term]
 color = "always"
