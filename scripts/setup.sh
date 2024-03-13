@@ -9,7 +9,7 @@ sudo pacman -S --noconfirm \
   stow
 
 # Install tools.
-./scripts/hyprland.sh
+# ./scripts/hyprland.sh
 ./scripts/terminal.sh
 ./scripts/tmux.sh
 ./scripts/neovim.sh
