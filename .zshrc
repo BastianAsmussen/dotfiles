@@ -17,11 +17,35 @@ eval "$(zoxide init --cmd cd zsh)"
 # Initialize Starship prompt.
 eval "$(starship init zsh)"
 
-# Add Cargo's bin directory to the PATH.
-export PATH="$HOME/.cargo/bin:$PATH"
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+# Download Zinit, if it's not there yet
+if [ ! -d "$ZINIT_HOME" ]; then
+   mkdir -p "$(dirname $ZINIT_HOME)"
+   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+
+source "${ZINIT_HOME}/zinit.zsh"
+
+# Load zinit modules.
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+
+# Set locale.
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# Add direcftories to the PATH.
+export PATH="$HOME/.cargo/bin:$PATH" # Cargo.
+export PATH="/usr/local/bin:/usr/bin:$PATH" # Local binaries.
 
 # Add aliases.
 alias vim=nvim
 alias cat="bat --paging=never"
 alias ls="eza -1"
+
+# Start tmux by default.
+if [ -z "$TMUX" ]; then
+    tmux attach || tmux new
+fi
 
