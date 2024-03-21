@@ -8,5 +8,6 @@ sudo pacman -S --noconfirm \
   gitui \
   grex \
   tokei \
+  kubectl \
   discord
 

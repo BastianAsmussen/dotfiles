@@ -31,6 +31,9 @@ zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-syntax-highlighting
 
+# Source other auto-completions.
+source <(kubectl completion zsh)
+
 # Set locale.
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
