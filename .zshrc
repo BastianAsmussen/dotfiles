@@ -44,8 +44,3 @@ alias vim=nvim
 alias cat="bat --paging=never"
 alias ls="eza -1"
 
-# Start tmux by default.
-if [ -z "$TMUX" ]; then
-    tmux attach || tmux new
-fi
-
