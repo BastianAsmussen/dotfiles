@@ -9,5 +9,6 @@ sudo pacman -S --noconfirm \
   grex \
   tokei \
   kubectl \
+  minikube \
   discord
 
