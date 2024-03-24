@@ -9,7 +9,8 @@ local plugins = {
     "williamboman/mason.nvim",
     opts = {
       ensure_insalled = {
-        "rust-analyzer",
+        "rust-analyzer", -- Rust
+        "clangd", -- C/C++
       },
     },
   },
