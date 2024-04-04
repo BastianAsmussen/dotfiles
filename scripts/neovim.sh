@@ -1,7 +1,5 @@
 #!/bin/bash
 
 # Install neovim.
-sudo pacman -S --noconfirm \
-  neovim \
-  ttf-jetbrains-mono-nerd
+sudo pacman -S --noconfirm neovim
 
