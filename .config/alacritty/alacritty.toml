@@ -56,13 +56,7 @@ mouse = "Middle"
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
 
 [shell]
-program = "/bin/tmux"
-args = [
-  "new-session", # Create a new session.
-  "-A",          # Attach to the session if it exists.
-  "-D",          # Don't start the default command.
-  "-s", "main"   # Set the session name to main.
-]
+program = "/bin/nu"
 
 [window]
 decorations = "full"

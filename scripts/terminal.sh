@@ -1,9 +1,10 @@
 #!/bin/bash
 
 sudo pacman -S --noconfirm \
-  zsh \
+  nushell \
   starship \
-  alacritty \
+  ttf-jetbrains-mono-nerd \
   zoxide \
-  fzf
+  fzf \
+  alacritty
 
