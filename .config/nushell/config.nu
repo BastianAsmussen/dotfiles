@@ -77,6 +77,10 @@ $env.config = {
     show_banner: false # true or false to enable or disable the welcome banner at startup
 
     color_config: $theme
+    cursor_shape: {
+        vi_normal: block
+        vi_insert: line
+    }
 
     ls: {
         use_ls_colors: true # use the LS_COLORS environment variable to colorize output
@@ -151,12 +155,6 @@ $env.config = {
     filesize: {
         metric: false # true => KB, MB, GB (ISO standard), false => KiB, MiB, GiB (Windows standard)
         format: "auto" # b, kb, kib, mb, mib, gb, gib, tb, tib, pb, pib, eb, eib, auto
-    }
-
-    cursor_shape: {
-        emacs: line # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (line is the default)
-        vi_insert: block # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (block is the default)
-        vi_normal: underscore # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
     }
 
     use_grid_icons: true
