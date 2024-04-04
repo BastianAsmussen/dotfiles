@@ -1,139 +1,70 @@
-# Nushell Config File
-#
-# version = "0.92.0"
-
-# For more information on defining custom themes, see
-# https://www.nushell.sh/book/coloring_and_theming.html
-# And here is the theme collection
-# https://github.com/nushell/nu_scripts/tree/main/themes
-let dark_theme = {
-    # color for nushell primitives
-    separator: white
-    leading_trailing_space_bg: { attr: n } # no fg, no bg, attr none effectively turns this off
-    header: green_bold
-    empty: blue
-    # Closures can be used to choose colors for specific values.
-    # The value (in this case, a bool) is piped into the closure.
-    # eg) {|| if $in { 'light_cyan' } else { 'light_gray' } }
-    bool: light_cyan
-    int: white
-    filesize: cyan
-    duration: white
-    date: purple
-    range: white
-    float: white
-    string: white
-    nothing: white
-    binary: white
-    cell-path: white
-    row_index: green_bold
-    record: white
-    list: white
-    block: white
-    hints: dark_gray
-    search_result: { bg: red fg: white }
-    shape_and: purple_bold
-    shape_binary: purple_bold
-    shape_block: blue_bold
-    shape_bool: light_cyan
-    shape_closure: green_bold
-    shape_custom: green
-    shape_datetime: cyan_bold
-    shape_directory: cyan
-    shape_external: cyan
-    shape_externalarg: green_bold
-    shape_external_resolved: light_yellow_bold
-    shape_filepath: cyan
-    shape_flag: blue_bold
-    shape_float: purple_bold
-    # shapes are used to change the cli syntax highlighting
-    shape_garbage: { fg: white bg: red attr: b}
-    shape_globpattern: cyan_bold
-    shape_int: purple_bold
-    shape_internalcall: cyan_bold
-    shape_keyword: cyan_bold
-    shape_list: cyan_bold
-    shape_literal: blue
-    shape_match_pattern: green
-    shape_matching_brackets: { attr: u }
-    shape_nothing: light_cyan
-    shape_operator: yellow
-    shape_or: purple_bold
-    shape_pipe: purple_bold
-    shape_range: yellow_bold
-    shape_record: cyan_bold
-    shape_redirection: purple_bold
-    shape_signature: green_bold
-    shape_string: green
-    shape_string_interpolation: cyan_bold
-    shape_table: blue_bold
-    shape_variable: purple
-    shape_vardecl: purple
+let catppuccin = {
+    mocha: {
+        rosewater: "#f5e0dc"
+        flamingo: "#f2cdcd"
+        pink: "#f5c2e7"
+        mauve: "#cba6f7"
+        red: "#f38ba8"
+        maroon: "#eba0ac"
+        peach: "#fab387"
+        yellow: "#f9e2af"
+        green: "#a6e3a1"
+        teal: "#94e2d5"
+        sky: "#89dceb"
+        sapphire: "#74c7ec"
+        blue: "#89b4fa"
+        lavender: "#b4befe"
+        text: "#cdd6f4"
+        subtext0: "#a6adc8"
+        subtext1: "#bac2de"
+        overlay0: "#6c7086"
+        overlay1: "#7f849c"
+        overlay2: "#9399b2"
+        surface2: "#585b70"
+        surface1: "#45475a"
+        surface0: "#313244"
+        base: "#1e1e2e"
+        mantle: "#181825"
+        crust: "#11111b"
+    }
 }
 
-let light_theme = {
-    # color for nushell primitives
-    separator: dark_gray
-    leading_trailing_space_bg: { attr: n } # no fg, no bg, attr none effectively turns this off
-    header: green_bold
-    empty: blue
-    # Closures can be used to choose colors for specific values.
-    # The value (in this case, a bool) is piped into the closure.
-    # eg) {|| if $in { 'dark_cyan' } else { 'dark_gray' } }
-    bool: dark_cyan
-    int: dark_gray
-    filesize: cyan_bold
-    duration: dark_gray
-    date: purple
-    range: dark_gray
-    float: dark_gray
-    string: dark_gray
-    nothing: dark_gray
-    binary: dark_gray
-    cell-path: dark_gray
-    row_index: green_bold
-    record: dark_gray
-    list: dark_gray
-    block: dark_gray
+let theme = $catppuccin.mocha
+let theme = {
+    separator: $theme.overlay0
+    leading_trailing_space_bg: $theme.overlay0
+    header: $theme.green
+    date: $theme.mauve
+    filesize: $theme.blue
+    row_index: $theme.pink
+    bool: $theme.peach
+    int: $theme.peach
+    duration: $theme.peach
+    range: $theme.peach
+    float: $theme.peach
+    string: $theme.green
+    nothing: $theme.peach
+    binary: $theme.peach
+    cellpath: $theme.peach
     hints: dark_gray
-    search_result: { fg: white bg: red }
-    shape_and: purple_bold
-    shape_binary: purple_bold
-    shape_block: blue_bold
-    shape_bool: light_cyan
-    shape_closure: green_bold
-    shape_custom: green
-    shape_datetime: cyan_bold
-    shape_directory: cyan
-    shape_external: cyan
-    shape_externalarg: green_bold
-    shape_external_resolved: light_purple_bold
-    shape_filepath: cyan
-    shape_flag: blue_bold
-    shape_float: purple_bold
-    # shapes are used to change the cli syntax highlighting
-    shape_garbage: { fg: white bg: red attr: b}
-    shape_globpattern: cyan_bold
-    shape_int: purple_bold
-    shape_internalcall: cyan_bold
-    shape_keyword: cyan_bold
-    shape_list: cyan_bold
-    shape_literal: blue
-    shape_match_pattern: green
-    shape_matching_brackets: { attr: u }
-    shape_nothing: light_cyan
-    shape_operator: yellow
-    shape_or: purple_bold
-    shape_pipe: purple_bold
-    shape_range: yellow_bold
-    shape_record: cyan_bold
-    shape_redirection: purple_bold
-    shape_signature: green_bold
-    shape_string: green
-    shape_string_interpolation: cyan_bold
-    shape_table: blue_bold
-    shape_variable: purple
-    shape_vardecl: purple
+    
+    shape_garbage: { fg: $theme.crust bg: $theme.red attr: b }
+    shape_bool: $theme.blue
+    shape_int: { fg: $theme.mauve attr: b}
+    shape_float: { fg: $theme.mauve attr: b}
+    shape_range: { fg: $theme.yellow attr: b}
+    shape_internalcall: { fg: $theme.blue attr: b}
+    shape_external: { fg: $theme.blue attr: b}
+    shape_externalarg: $theme.text 
+    shape_literal: $theme.blue
+    shape_operator: $theme.yellow
+    shape_signature: { fg: $theme.green attr: b}
+    shape_string: $theme.green
+    shape_filepath: $theme.yellow
+    shape_globpattern: { fg: $theme.blue attr: b}
+    shape_variable: $theme.text
+    shape_flag: { fg: $theme.blue attr: b}
+    shape_custom: {attr: b}
 }
 
 # External completer example
@@ -144,6 +75,8 @@ let light_theme = {
 # The default config record. This is where much of your global configuration is setup.
 $env.config = {
     show_banner: false # true or false to enable or disable the welcome banner at startup
+
+    color_config: $theme
 
     ls: {
         use_ls_colors: true # use the LS_COLORS environment variable to colorize output
@@ -226,7 +159,6 @@ $env.config = {
         vi_normal: underscore # block, underscore, line, blink_block, blink_underscore, blink_line, inherit to skip setting cursor shape (underscore is the default)
     }
 
-    color_config: $dark_theme # if you want a more interesting theme, you can replace the empty record with `$dark_theme`, `$light_theme` or another custom record
     use_grid_icons: true
     footer_mode: "25" # always, never, number_of_rows, auto
     float_precision: 2 # the precision for displaying floats in tables
