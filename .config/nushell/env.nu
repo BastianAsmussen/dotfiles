@@ -1,6 +1,6 @@
 # Nushell Environment Config File
 #
-# version = "0.92.0"
+# version = "0.92.2"
 
 def create_left_prompt [] {
     let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
@@ -95,6 +95,12 @@ $env.NU_PLUGIN_DIRS = [
 # path add ($env.CARGO_HOME | path join "bin")
 # path add ($env.HOME | path join ".local" "bin")
 # $env.PATH = ($env.PATH | uniq)
+
+use std *
+
+path add /usr/local/bin
+path add ($env.HOME | path join .local bin)
+path add ($env.HOME | path join .cargo/bin)
 
 # To load from a custom file you can use:
 # source ($nu.default-config-dir | path join 'custom.nu')
