@@ -9,11 +9,13 @@ sudo pacman -S --noconfirm \
   stow
 
 # Install dependencies.
+./scripts/yay.sh
 ./scripts/gnome.sh
 ./scripts/terminal.sh
 ./scripts/tmux.sh
 ./scripts/neovim.sh
 ./scripts/toolchain.sh
+./scripts/docker.sh
 
 # Install additional tools.
 ./scripts/extra.sh
