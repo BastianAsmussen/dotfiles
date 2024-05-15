@@ -15,6 +15,14 @@ lspconfig.rust_analyzer.setup({
       cargo = {
         allFeatures = true,
       },
+      procMacro = {
+        ignored = {
+            leptos_macro = {
+                "component",
+                "server",
+            },
+        },
+      },
     },
   },
 })
