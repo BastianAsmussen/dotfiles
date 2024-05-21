@@ -2,7 +2,6 @@
 jobs = 24
 
 rustflags = [
-    "-Funsafe_code",           # Forbid unsafe code.
     "-Dclippy::enum_glob_use", # Disallow use of `use` of all enums.
     "-Dclippy::pedantic",      # Enable all pedantic lints.
     "-Dclippy::nursery",       # Enable all nursery lints.
