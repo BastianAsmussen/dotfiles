@@ -1,8 +1,7 @@
 #!/bin/bash
 
 sudo pacman -S --noconfirm \
-  nushell \
-  starship \
+  zsh \
   ttf-jetbrains-mono-nerd \
   zoxide \
   fzf \
