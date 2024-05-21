@@ -56,7 +56,7 @@ mouse = "Middle"
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
 
 [shell]
-program = "/bin/nu"
+program = "/bin/zsh"
 
 [window]
 decorations = "full"
