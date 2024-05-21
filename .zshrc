@@ -32,5 +32,19 @@ autoload -U compinit && compinit
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Set up keybindings.
-bindkey -e
+bindkey -e # Use Emacs bindings.
+bindkey "^p" history-search-backward
+bindkey "^n" history-search-forward
+
+# Enable history.
+HISTSIZE=4096
+HISTFILE=~/.zsh_history
+SAVEHIST=$HISTSIZE
+HISTDUP=erase
+
+setopt appendhistory
+setopt sharehistory
+setopt hist_ignore_space
+setopt hist_ignore_all_dups
+setopt hist_save_no_dups
 
