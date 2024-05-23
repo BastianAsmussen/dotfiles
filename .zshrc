@@ -72,7 +72,7 @@ setopt auto_cd
 
 # Aliases.
 alias ls='ls --color'
-alias nvim='nvim'
+alias vim='nvim'
 alias c='clear'
 
 # Shell integrations.
