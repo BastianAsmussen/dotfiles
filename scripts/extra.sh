@@ -9,5 +9,6 @@ sudo pacman -S --noconfirm \
   dust \
   kubectl \
   minikube \
-  discord
+  discord \
+  qbittorrent
 
