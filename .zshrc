@@ -45,6 +45,9 @@ zinit cdreplay -q
 
 # Set up keybindings.
 bindkey -e # Use Emacs bindings.
+bindkey '^[[1;5C' emacs-forward-word
+bindkey '^[[1;5D' emacs-backward-word
+
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 
