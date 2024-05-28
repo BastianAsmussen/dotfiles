@@ -3,5 +3,7 @@
   "MINIMIZE_TO_TRAY": true,
   "IS_MAXIMIZED": true,
   "IS_MINIMIZED": false,
-  "SKIP_HOST_UPDATE": true
+  "SKIP_HOST_UPDATE": true,
+  "chromiumSwitches": {}
 }
+
