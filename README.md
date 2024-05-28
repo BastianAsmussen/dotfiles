@@ -54,7 +54,7 @@ git clone GitHub:BastianAsmussen/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ```
 
-2. Run the [setup](scripts/setup.sh) script to set every thing else up:
+2. Run the [setup](scripts/install.sh) script to set every thing else up:
 ```sh
 ./scripts/setup.sh
 ```
