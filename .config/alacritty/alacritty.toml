@@ -1,7 +1,8 @@
 live_config_reload = true
 
 import = [
-  "~/.config/alacritty/catppuccin-mocha.toml",
+# "~/.config/alacritty/themes/catppuccin-mocha.toml",
+  "~/.config/alacritty/themes/tokyo-night.toml",
 ]
 
 [bell]
@@ -71,4 +72,3 @@ lines = 80
 [window.padding]
 x = 4
 y = 4
-
