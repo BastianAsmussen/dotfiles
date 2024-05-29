@@ -1,5 +1,4 @@
 local M = {}
-local utils = require "core.utils"
 
 M.blankline = {
   indentLine_enabled = 1,
@@ -19,7 +18,7 @@ M.blankline = {
   show_trailing_blankline_indent = false,
   show_first_indent_level = false,
   show_current_context = true,
-  show_current_context_start = true,
+  show_current_context_start = false,
 }
 
 M.luasnip = function(opts)
@@ -58,9 +57,6 @@ M.gitsigns = {
     changedelete = { text = "~" },
     untracked = { text = "│" },
   },
-  on_attach = function(bufnr)
-    utils.load_mappings("gitsigns", { buffer = bufnr })
-  end,
 }
 
 return M
