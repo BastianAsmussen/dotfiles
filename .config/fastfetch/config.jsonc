@@ -39,6 +39,10 @@
             "type": "kernel"
         },
         {
+            "key": "│           │\u001b[11D{#34} packages",
+            "type": "packages"
+        },
+        {
             "key": "│           │\u001b[11D{#36}󰇄 desktop",
             "type": "de"
         },
@@ -53,14 +57,14 @@
         {
             "key": "│           │\u001b[11D{#33}󰍛 cpu",
             "type": "cpu",
-            "showPeCoreCount": true
+            "showPeCoreCount": true,
+            "temp": true
         },
         {
             "key": "│           │\u001b[11D{#39}󰢮 gpu",
-            "type": "gpu"
+            "type": "gpu",
+            "temp": true
         },
-
-
         {
             "key": "│           │\u001b[11D{#34}󰉉 disk",
             "type": "disk",
