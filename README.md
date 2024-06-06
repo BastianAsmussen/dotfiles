@@ -23,7 +23,7 @@ rm -rf ~/.local/share/nvim
 
 1. Clone the repository:
 ```sh
-git clone https://BastianAsmussen/dotfiles.git ~/dotfiles
+git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
 ```
 
 2. Enter the repository:
