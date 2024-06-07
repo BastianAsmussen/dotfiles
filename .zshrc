@@ -32,7 +32,7 @@ autoload -Uz compinit && compinit
 zinit cdreplay -q
 
 # Initialize prompt.
-eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/zen.toml)"
+eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/theme.toml)"
 
 # Set up keybindings.
 bindkey -e # Use Emacs bindings.
