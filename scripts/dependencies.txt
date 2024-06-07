@@ -25,3 +25,4 @@ discord
 qbittorrent
 nix
 fastfetch
+mpv
