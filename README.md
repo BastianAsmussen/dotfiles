@@ -36,6 +36,12 @@ cd ~/dotfiles
 ./scripts/install.sh
 ```
 
+3. Install [oh-my-posh](https://ohmyposh.dev/) from the AUR.
+
+```sh
+yay -S oh-my-posh
+```
+
 ### Tmux
 
 #### Install Plugins
