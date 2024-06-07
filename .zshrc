@@ -80,10 +80,22 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 setopt auto_cd
 
 # Aliases.
-alias ls='ls --color'
+alias pwd='pwd && pwd | xclip -sel clipboard'
+
+## Fix typos.
+alias pdw='pwd'
+alias cd..='cd ..'
+
 alias vim='nvim'
+alias vi='vim'
+
+alias ls='ls --color'
 alias c='clear'
+
 alias neofetch='fastfetch'
+
+alias cp='cp -r'
+alias rm='rm -r'
 
 # Shell integrations.
 eval "$(fzf --zsh)"
