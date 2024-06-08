@@ -12,8 +12,8 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
   [[blocks.segments]]
     type = 'path'
     style = 'plain'
-    background = 'transparent'
     foreground = 'blue'
+    background = 'transparent'
     template = '{{ .Path }}'
 
     [blocks.segments.properties]
@@ -40,10 +40,11 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
     style = 'plain'
     foreground = 'yellow'
     background = 'transparent'
-    template = '{{ .FormattedMs }}'
+    template = '{{ div .Ms 1000 }}s'
 
     [blocks.segments.properties]
       threshold = 5000
+
 
 [[blocks]]
   type = 'prompt'
@@ -72,3 +73,6 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
   foreground = 'magenta'
   background = 'transparent'
   template = '❯❯ '
+
+[palette]
+grey = '#6c6c6c'
