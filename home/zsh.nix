@@ -16,8 +16,6 @@
   initExtra = ''
     bindkey -e
 
-    [[ ! -f ${./p10k.zsh} ]] || source ${./p10k.zsh}
-
     # disable sort when completing `git checkout`
     zstyle ':completion:*:git-checkout:*' sort false
     # set descriptions format to enable group support
@@ -57,15 +55,9 @@
       file = "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh";
     }
     {
-      name = "powerlevel10k";
-      src = pkgs.zsh-powerlevel10k;
-      file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-    }
-    {
       name = "fzf-tab";
       src = pkgs.zsh-fzf-tab;
       file = "share/fzf-tab/fzf-tab.plugin.zsh";
     }
   ];
-}
 }
