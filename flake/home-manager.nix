@@ -1,4 +1,4 @@
-{ inputs, ... }: {
+{inputs, ...}: {
   flake.homeConfigurations.limitless = inputs.home-manager.lib.homeManagerConfiguration {
     pkgs = import inputs.nixpkgs {
       system = "x86_64-linux";
@@ -12,4 +12,3 @@
     ];
   };
 }
-

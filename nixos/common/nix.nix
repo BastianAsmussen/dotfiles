@@ -1,6 +1,6 @@
 {
   nixpkgs.config.allowUnfree = true;
-  
+
   nix = {
     settings = {
       experimental-features = "nix-command flakes";
@@ -19,7 +19,7 @@
       max-free = 1000000000; # 1 GB
 
       auto-optimise-store = true;
-      
+
       warn-dirty = false;
 
       connect-timeout = 5;

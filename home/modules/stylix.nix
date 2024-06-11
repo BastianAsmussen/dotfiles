@@ -1,5 +1,8 @@
-{ inputs, pkgs, ... }:
 {
+  inputs,
+  pkgs,
+  ...
+}: {
   imports = [
     inputs.stylix.homeManagerModules.stylix
   ];
@@ -15,7 +18,7 @@
 
   stylix.fonts = {
     monospace = {
-      package = pkgs.nerdfonts.override { fonts = ["JetBrainsMono"]; };
+      package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
       name = "JetbrainsMono Nerd Font Mono";
     };
     sansSerif = {
@@ -30,4 +33,3 @@
 
   stylix.polarity = "dark";
 }
-

@@ -1,5 +1,9 @@
-{ pkgs, lib, inputs, ... }:
 {
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: {
   imports = [
     ./firefox.nix
     ./fzf.nix
@@ -30,4 +34,3 @@
     ];
   };
 }
-
