@@ -13,6 +13,7 @@ let
 
 in
 {
+  programs.tmux = {
   enable = true;
 
   aggressiveResize = true;
@@ -26,7 +27,6 @@ in
   terminal = "screen-256color";
 
   plugins = with pkgs.tmuxPlugins; [
-    rose-pine
     tokyo-night
     yank
     sensible
@@ -86,4 +86,6 @@ in
     bind % split-window -h -c "#{pane_current_path}"
     bind c new-window -c "#{pane_current_path}"
   '';
+  };
 }
+
