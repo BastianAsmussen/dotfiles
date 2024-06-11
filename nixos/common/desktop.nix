@@ -1,4 +1,9 @@
 {
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: {
   services.xserver = {
     enable = true;
 

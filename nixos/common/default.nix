@@ -8,8 +8,8 @@
 
     ./audio.nix
     ./boot.nix
+    ./desktop.nix
     ./gaming.nix
-    ./gnome.nix
     ./nix.nix
     ./nvidia.nix
     ./security.nix
