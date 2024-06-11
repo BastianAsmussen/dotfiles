@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 {
+  programs.zsh = {
   enable = true;
 
   history = {
@@ -60,4 +61,5 @@
       file = "share/fzf-tab/fzf-tab.plugin.zsh";
     }
   ];
+  };
 }
