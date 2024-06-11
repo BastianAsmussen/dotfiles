@@ -21,11 +21,15 @@
 
     stylix.url = "github:danth/stylix";
 
-    nixvim.url = "github:nix-community/nixvim";
-    nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-    firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -34,9 +38,8 @@
     nixpkgs,
     ...
   } @ inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+    flake-parts.lib.mkFlake {inherit inputs;} {
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [./flake];
     };
 }
-

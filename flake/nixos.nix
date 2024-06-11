@@ -1,4 +1,4 @@
-{ inputs, ... }: {
+{inputs, ...}: {
   flake.nixosConfigurations = let
     mkHost = hostname:
       inputs.nixpkgs.lib.nixosSystem {
@@ -10,7 +10,7 @@
 
           # Home Manager configuration.
           inputs.home-manager.nixosModules.home-manager
-	  {
+          {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
@@ -25,4 +25,3 @@
     limitless = mkHost "limitless";
   };
 }
-

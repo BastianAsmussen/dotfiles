@@ -30,9 +30,9 @@
           modesetting.enable = true;
 
           powerManagement = {
-	    enable = false;
+            enable = false;
             finegrained = false;
-	  };
+          };
 
           open = false;
           nvidiaSettings = true;
@@ -40,4 +40,3 @@
       };
     };
 }
-

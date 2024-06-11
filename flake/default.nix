@@ -8,4 +8,3 @@
     formatter = pkgs.alejandra;
   };
 }
-

@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   programs.git = {
     enable = true;
     lfs.enable = true;
@@ -13,4 +16,3 @@
     };
   };
 }
-

@@ -4,4 +4,3 @@
     support32Bit = true;
   };
 }
-

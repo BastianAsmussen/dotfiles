@@ -1,8 +1,12 @@
-{ lib, pkgs, ... }: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   imports = [
     ./hardware.nix
     ./disko.nix
-    
+
     ../common
   ];
 
@@ -27,4 +31,3 @@
     cachix
   ];
 }
-

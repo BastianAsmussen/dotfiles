@@ -1,9 +1,8 @@
-{ inputs, ... }:
-{
+{inputs, ...}: {
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
   ];
-  
+
   home.shellAliases.v = "nvim";
 
   programs.nixvim = {
@@ -16,4 +15,3 @@
     luaLoader.enable = true;
   };
 }
-

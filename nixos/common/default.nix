@@ -1,4 +1,8 @@
-{ inputs, pkgs, ... }: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   imports = [
     inputs.disko.nixosModules.disko
 
@@ -25,4 +29,3 @@
     firewall.enable = true;
   };
 }
-
