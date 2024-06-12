@@ -2,7 +2,13 @@
   lib,
   pkgs,
   ...
-}: {
+}: 
+let
+  goxlr-rules = builtins.fetchurl {
+    url = "https://raw.githubusercontent.com/GoXLR-on-Linux/goxlr-utility/main/50-goxlr.rules";
+    sha256 = "0cr2ky1hd0p3d4zqqvi7axn952gyiljgvrrqcnlnjcy9h7zwx5cm";
+  };
+in {
   imports = [
     ./hardware.nix
     ./disko.nix
@@ -29,5 +35,9 @@
   environment.systemPackages = with pkgs; [
     git
     cachix
+    goxlr-utility
   ];
+
+  services.udev.extraRules = builtins.readFile goxlr-rules;
 }
+
