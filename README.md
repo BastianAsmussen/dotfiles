@@ -31,12 +31,12 @@ git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ```
 
-2. Run the [install](scripts/install.sh) script to set every thing else up:
+3. Run the [install](scripts/install.sh) script to set every thing else up:
 ```sh
 ./scripts/install.sh
 ```
 
-3. Install [oh-my-posh](https://ohmyposh.dev/) from the AUR.
+4. Install [oh-my-posh](https://ohmyposh.dev/) from the AUR.
 
 ```sh
 yay -S oh-my-posh
