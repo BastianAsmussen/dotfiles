@@ -26,3 +26,4 @@ qbittorrent
 nix
 fastfetch
 mpv
+ttf-jetbrains-mono-nerd
