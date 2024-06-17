@@ -91,6 +91,8 @@ alias rm='rm -r'
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
+export GPG_TTY=$(tty)
+
 # Ripgrep config.
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
