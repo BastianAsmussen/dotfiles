@@ -38,36 +38,6 @@
           };
         };
       };
-      home = {
-        type = "disk";
-        device = "/dev/nvme1n1";
-        content = {
-          type = "gpt";
-          partitions = {
-            home = {
-              size = "100%";
-              content = {
-                type = "luks";
-                name = "nix-home";
-                passwordFile = "/tmp/secret.key";
-                settings = {
-                  allowDiscards = true;
-                };
-                content = {
-                  type = "btrfs";
-                  extraArgs = ["-f"];
-                  subvolumes = {
-                    "/home" = {
-                      mountpoint = "/home";
-                      mountOptions = ["compress=zstd" "noatime"];
-                    };
-                  };
-                };
-              };
-            };
-          };
-        };
-      };
     };
     lvm_vg = {
       nix = {
@@ -90,11 +60,15 @@
                   mountpoint = "/";
                   mountOptions = ["compress=zstd" "noatime"];
                 };
-                "/nix" = {
+                 "/nix" = {
                   mountpoint = "/nix";
                   mountOptions = ["compress=zstd" "noatime"];
                 };
-              };
+                "/home" = {
+                  mountpoint = "/home";
+                  mountOptions = ["compress=zstd" "noatime"];
+                };
+             };
             };
           };
         };
