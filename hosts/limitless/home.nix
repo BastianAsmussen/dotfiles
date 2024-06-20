@@ -2,6 +2,7 @@
 {
   imports = [
     ../../modules/home-manager/git.nix
+    ../../modules/home-manager/firefox.nix
   ];
   
   home.username = "bastian";
