@@ -10,11 +10,13 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     
+    stylix.url = "github:danth/stylix";
+    
     firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
     firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
   };
   
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -27,6 +29,7 @@
           
           inputs.disko.nixosModules.disko
           inputs.home-manager.nixosModules.default
+          inputs.stylix.nixosModules.stylix
         ];
       };
     };
