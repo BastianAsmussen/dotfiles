@@ -135,8 +135,19 @@
     openmoji-color
   ];
   
-  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-  stylix.image = ../../modules/wallpapers/wallpaper.png;
+  stylix = {
+    enable = true;
+    
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+    image = ../../modules/wallpapers/wallpaper.png;
+    
+    polarity = "dark";
+    
+    cursor = {
+      package = pkgs.bibata-cursors;
+      name = "Bibata-Modern-Ice";
+    };
+  };
   
   system.stateVersion = "24.05";
 }
