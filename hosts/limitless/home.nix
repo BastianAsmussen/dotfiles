@@ -1,8 +1,9 @@
 { pkgs, lib, ... }:
 {
   imports = [
-    ../../modules/home-manager/git.nix
     ../../modules/home-manager/firefox.nix
+    ../../modules/home-manager/git.nix
+    ../../modules/home-manager/alacritty.nix
   ];
   
   home.username = "bastian";
