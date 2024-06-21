@@ -11,5 +11,7 @@
   
   home.stateVersion = "24.05";
   
+  environment.pathsToLink = [ "/share/zsh" ];
+  
   programs.home-manager.enable = true;
 }
