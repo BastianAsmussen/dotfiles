@@ -116,6 +116,9 @@
     neovim
     git
     gitui
+    mullvad-vpn
+    qbittorrent
+    mpv
   ];
   
   virtualisation = {
@@ -129,6 +132,9 @@
     enable = true;
     enableSSHSupport = true;
   };
+  
+  services.mullvad-vpn.enable = true;
+  services.resolved.enable = true;
   
   fonts.packages = with pkgs; [
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
