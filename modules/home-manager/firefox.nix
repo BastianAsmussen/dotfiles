@@ -41,6 +41,7 @@
       };
       
       settings = {
+        "signon.rememberSignons" = false;
         "privacy.globalprivacycontrol.enabled" = true;
         "privacy.donottrackheader.enabled" = true;
       };
