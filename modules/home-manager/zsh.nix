@@ -51,12 +51,10 @@
       plugins = [
         "git"
         "sudo"
-        "golang"
         "kubectl"
         "kubectx"
         "rust"
         "command-not-found"
-        "pass"
       ];
     };
   };
