@@ -121,6 +121,7 @@
     git
     gitui
     eza
+    ripgrep
     mullvad-vpn
     qbittorrent
     mpv
