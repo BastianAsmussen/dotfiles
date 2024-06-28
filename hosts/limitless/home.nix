@@ -4,9 +4,10 @@
   ...
 }: {
   imports = [
+    ../../modules/home-manager/alacritty.nix
     ../../modules/home-manager/firefox.nix
     ../../modules/home-manager/git.nix
-    ../../modules/home-manager/alacritty.nix
+    ../../modules/home-manager/zsh.nix
   ];
 
   home.username = "bastian";

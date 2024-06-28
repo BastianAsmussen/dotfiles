@@ -9,13 +9,10 @@
 
     history = {
       size = 10000;
-      history.path = "${config.xdg.dataHome}/zsh/history";
+      path = "${config.xdg.dataHome}/zsh/history";
     };
 
     shellAliases = {
-      vi = "vim";
-      vim = "nvim";
-
       ls = "ls --color";
       c = "clear";
 

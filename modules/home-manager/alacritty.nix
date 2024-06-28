@@ -70,6 +70,7 @@
       selection.semantic_escape_chars = ",│`|:\"' ()[]{}<>";
 
       # TODO: Open tmux on launch.
+      shell.program = "${pkgs.zsh}/bin/zsh";
 
       window = {
         decorations = "full";
