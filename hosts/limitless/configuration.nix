@@ -120,6 +120,7 @@
     neovim
     git
     gitui
+    eza
     mullvad-vpn
     qbittorrent
     mpv

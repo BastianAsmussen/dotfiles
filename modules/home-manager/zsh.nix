@@ -12,6 +12,29 @@
       path = "${config.xdg.dataHome}/zsh/history";
     };
 
+    initExtra = ''
+      # Keybindings.
+      bindkey -e # Use Emacs bindings.
+
+      bindkey '^[[1;5C' emacs-forward-word
+      bindkey '^[[1;5D' emacs-backward-word
+      bindkey '^[[3~' delete-char
+
+      bindkey '^p' history-search-backward
+      bindkey '^n' history-search-forward
+
+      # Previews.
+      zstyle ':completion:*:git-checkout:*' sort false
+      zstyle ':completion:*:descriptions' format '[%d]'
+      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+      zstyle ':completion:*' menu no
+
+      zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
+      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+      zstyle ':fzf-tab:complete:ls:*' fzf-preview 'cat $realpath'
+    '';
+
     shellAliases = {
       vim = "nvim";
       vi = "vim";
