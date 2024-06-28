@@ -103,6 +103,7 @@
   # };
 
   users.users.bastian = {
+    shell = pkgs.zsh;
     isNormalUser = true;
     extraGroups = ["wheel" "docker" "libvirt"];
   };
@@ -131,11 +132,13 @@
     libvirtd.enable = true;
   };
 
-  programs.virt-manager.enable = true;
-
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
+  programs = {
+    zsh.enable = true;
+    virt-manager.enable = true;
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
   };
 
   services.mullvad-vpn.enable = true;
