@@ -23,20 +23,6 @@
       rm = "rm -r";
     };
 
-    oh-my-zsh = {
-      enable = true;
-      plugins = [
-        "git"
-        "sudo"
-        "golang"
-        "kubectl"
-        "kubectx"
-        "rust"
-        "command-not-found"
-        "pass"
-      ];
-    };
-
     plugins = [
       {
         name = "zsh-syntax-highlighting";
@@ -59,5 +45,19 @@
         file = "share/fzf-tab/fzf-tab.plugin.zsh";
       }
     ];
+
+    oh-my-zsh = {
+      enable = true;
+      plugins = [
+        "git"
+        "sudo"
+        "golang"
+        "kubectl"
+        "kubectx"
+        "rust"
+        "command-not-found"
+        "pass"
+      ];
+    };
   };
 }
