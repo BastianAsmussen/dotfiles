@@ -69,8 +69,10 @@
 
       selection.semantic_escape_chars = ",│`|:\"' ()[]{}<>";
 
-      # TODO: Open tmux on launch.
-      shell.program = "${pkgs.zsh}/bin/zsh";
+      shell = {
+        program = "${pkgs.tmux}/bin/tmux";
+        args = ["attach"];
+      };
 
       window = {
         decorations = "full";
