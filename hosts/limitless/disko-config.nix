@@ -60,7 +60,7 @@
                   mountpoint = "/";
                   mountOptions = ["compress=zstd" "noatime"];
                 };
-                 "/nix" = {
+                "/nix" = {
                   mountpoint = "/nix";
                   mountOptions = ["compress=zstd" "noatime"];
                 };
@@ -68,7 +68,7 @@
                   mountpoint = "/home";
                   mountOptions = ["compress=zstd" "noatime"];
                 };
-             };
+              };
             };
           };
         };
