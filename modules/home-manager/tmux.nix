@@ -14,11 +14,11 @@
     secureSocket = true;
 
     prefix = "C-Space";
+    mouse = true;
 
     plugins = with pkgs.tmuxPlugins; [
       catppuccin
       yank
-      sensible
       vim-tmux-navigator
     ];
 
