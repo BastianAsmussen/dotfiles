@@ -128,6 +128,7 @@
     mpv
     discord
     spotify
+    neofetch
   ];
 
   virtualisation = {
