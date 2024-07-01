@@ -21,16 +21,10 @@
     nixpkgs,
     ...
   } @ inputs: let
-    systems = [
-      "aarch64-linux"
-      "i686-linux"
-      "x86_64-linux"
-      "aarch64-darwin"
-      "x86_64-darwin"
-    ];
-    forAllSystems = nixpkgs.lib.genAttrs systems;
+    system = "x86_64-linux";
+    pkgs = nixpkgs.legacyPackages.${system};
   in {
-    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+    formatter.${system} = pkgs.alejandra;
 
     nixosConfigurations.limitless = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
@@ -42,5 +36,9 @@
         inputs.stylix.nixosModules.stylix
       ];
     };
+
+    devShells.${system}.default =
+      pkgs.mkShell {
+      };
   };
 }
