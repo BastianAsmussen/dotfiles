@@ -129,6 +129,7 @@
     discord
     spotify
     neofetch
+    bitwarden
   ];
 
   virtualisation = {
