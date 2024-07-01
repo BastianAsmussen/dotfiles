@@ -37,8 +37,12 @@
       ];
     };
 
-    devShells.${system}.default =
-      pkgs.mkShell {
+    devShells.${system} = {
+      python = pkgs.mkShell {
+        nativeBuildInputs = with pkgs; [
+          python3
+        ];
       };
+    };
   };
 }
