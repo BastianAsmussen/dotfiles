@@ -70,8 +70,12 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.hostName = "limitless";
-  networking.networkmanager.enable = true;
+  networking = {
+    hostName = "limitless";
+    networkmanager.enable = true;
+
+    firewall.allowedTCPPorts = [22];
+  };
 
   time.timeZone = "Europe/Copenhagen";
 
@@ -104,9 +108,13 @@
   # };
 
   users.users.bastian = {
-    shell = pkgs.zsh;
     isNormalUser = true;
     extraGroups = ["wheel" "docker" "libvirt"];
+
+    shell = pkgs.zsh;
+    openssh.authorizedKeys.keys = [
+      "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIPc8Md/RuoiNaFIieZ2hTQ6z2R+bE8xealvVhs4omoq3AAAABHNzaDo= bastian@asmussen"
+    ];
   };
 
   home-manager = {
@@ -146,8 +154,18 @@
     };
   };
 
-  services.mullvad-vpn.enable = true;
-  services.resolved.enable = true;
+  services = {
+    mullvad-vpn.enable = true;
+    resolved.enable = true;
+
+    openssh = {
+      enable = true;
+      settings = {
+        PasswordAuthentication = false;
+        PermitRootLogin = "no";
+      };
+    };
+  };
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
