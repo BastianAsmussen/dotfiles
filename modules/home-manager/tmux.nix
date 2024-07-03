@@ -40,7 +40,11 @@
       bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
       bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
 
-      bind L send-keys '^L' # Clear screen.
+      # Clear screen.
+      bind L send-keys '^L'
+
+      # Automatically renumber windows.
+      set-option -g renumber-windows on
 
       # Open panes in current directory.
       bind '"' split-window -v -c "#{pane_current_path}"
