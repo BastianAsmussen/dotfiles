@@ -4,9 +4,7 @@
   config,
   ...
 }: {
-  options = {
-    nvidia.enable = lib.mkEnableOption "Enables NVIDIA drivers.";
-  };
+  options.nvidia.enable = lib.mkEnableOption "Enables NVIDIA drivers.";
 
   config = lib.mkIf config.nvidia.enable {
     hardware = {
