@@ -78,14 +78,6 @@
     ];
   };
 
-  home-manager = {
-    backupFileExtension = "backup";
-    extraSpecialArgs = {inherit inputs;};
-    users = {
-      "bastian" = import ./home.nix;
-    };
-  };
-
   environment.systemPackages = with pkgs; [
     neovim
     git

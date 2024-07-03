@@ -33,10 +33,11 @@
         ./modules/nixos
 
         inputs.disko.nixosModules.disko
-        inputs.home-manager.nixosModules.default
         inputs.stylix.nixosModules.stylix
       ];
     };
+
+    homeManagerModules.default = ./modules/home-manager;
 
     devShells.${system} = {
       python = pkgs.mkShell {
