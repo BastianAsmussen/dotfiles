@@ -5,9 +5,10 @@
   ...
 }: {
   options = {
-    gpg.enable = lib.mkEnableOption "Enables GPG services.";
-    ssh.enable = lib.mkEnableOption "Enables SSH server.";
-    vpn.enable = lib.mkEnableOption "Enables MullvadVPN.";
+    gpg.enable = lib.mkEnableOption "Enable GPG services.";
+    ssh.enable = lib.mkEnableOption "Enable SSH server.";
+    vpn.enable = lib.mkEnableOption "Enable MullvadVPN.";
+    yubiKey.enable = lib.mkEnableOption "Enable YubiKey support.";
   };
 
   config = lib.mkMerge [
@@ -34,6 +35,11 @@
         mullvad-vpn.enable = true;
         resolved.enable = true;
       };
+    })
+
+    (lib.mkIf config.yubiKey.enable {
+      gpg.enable = true; # Make sure GPG is enabled.
+      services.udev.packages = [pkgs.yubikey-personalization];
     })
   ];
 }
