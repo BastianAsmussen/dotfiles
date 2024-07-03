@@ -1,11 +1,5 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ./nvidia.nix
   ];
-
-  nvidia.enable = lib.mkDefault false;
 }
