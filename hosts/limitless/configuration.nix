@@ -27,14 +27,13 @@
     };
   };
 
-  # Enable OpenGL
-  hardware.opengl = {
+  # Enable OpenGL.
+  hardware.graphics = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
+    enable32Bit = true;
   };
 
-  # Load nvidia driver for Xorg and Wayland
+  # Load nvidia driver for Xorg and Wayland.
   services.xserver.videoDrivers = ["nvidia"];
 
   hardware.nvidia = {
