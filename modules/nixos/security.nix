@@ -39,7 +39,11 @@
 
     (lib.mkIf config.yubiKey.enable {
       gpg.enable = true; # Make sure GPG is enabled.
-      services.udev.packages = [pkgs.yubikey-personalization];
+
+      services = {
+        udev.packages = [pkgs.yubikey-personalization];
+        pcscd.enable = true;
+      };
     })
   ];
 }
