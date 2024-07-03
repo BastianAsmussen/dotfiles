@@ -1,4 +1,4 @@
-{ inputs, ... }: {
+{inputs, ...}: {
   home-manager."bastian" = {
     extraSpecialArgs = {inherit inputs;};
     users.modules = [
