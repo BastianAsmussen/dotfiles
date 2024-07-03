@@ -30,6 +30,7 @@
       specialArgs = {inherit inputs;};
       modules = [
         ./hosts/limitless/configuration.nix
+        ./modules/nixos
 
         inputs.disko.nixosModules.disko
         inputs.home-manager.nixosModules.default
