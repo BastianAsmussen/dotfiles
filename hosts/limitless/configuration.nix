@@ -8,8 +8,6 @@
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
-
-    inputs.home-manager.nixosModules.default
   ];
 
   nvidia.enable = true;
@@ -107,20 +105,6 @@
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
     openmoji-color
   ];
-
-  stylix = {
-    enable = true;
-
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-    image = ../../modules/wallpapers/wallpaper.png;
-
-    polarity = "dark";
-
-    cursor = {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Ice";
-    };
-  };
 
   system.stateVersion = "24.05";
 }
