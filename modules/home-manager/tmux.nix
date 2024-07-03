@@ -5,8 +5,9 @@
     shell = "${pkgs.zsh}/bin/zsh";
 
     aggressiveResize = true;
-    baseIndex = 1;
     disableConfirmationPrompt = true;
+
+    baseIndex = 1;
 
     terminal = "screen-256color"; # Fix terminal colors.
     keyMode = "vi";
@@ -40,15 +41,18 @@
       bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
       bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
 
-      # Clear screen.
-      bind L send-keys '^L'
+      # Start window and pane indexing at 1.
+      set -g pane-base-index 1
 
-      # Automatically renumber windows.
+      set-window-option -g pane-base-index 1
       set-option -g renumber-windows on
 
       # Open panes in current directory.
       bind '"' split-window -v -c "#{pane_current_path}"
       bind % split-window -h -c "#{pane_current_path}"
+
+      # Clear screen.
+      bind L send-keys '^L'
     '';
   };
 }
