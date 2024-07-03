@@ -9,12 +9,11 @@
     ./hardware-configuration.nix
     ./disko-config.nix
 
-    ./../../modules/nixos
-
     inputs.home-manager.nixosModules.default
   ];
 
   nvidia.enable = true;
+  ssh.enable = true;
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
   nixpkgs.config.allowUnfree = true;
@@ -110,23 +109,6 @@
   programs = {
     zsh.enable = true;
     virt-manager.enable = true;
-    gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
-    };
-  };
-
-  services = {
-    mullvad-vpn.enable = true;
-    resolved.enable = true;
-
-    openssh = {
-      enable = true;
-      settings = {
-        PasswordAuthentication = false;
-        PermitRootLogin = "no";
-      };
-    };
   };
 
   fonts.packages = with pkgs; [
