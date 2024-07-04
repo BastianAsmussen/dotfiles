@@ -39,6 +39,8 @@
 
     (lib.mkIf config.yubiKey.enable {
       gpg.enable = true; # Make sure GPG is enabled.
+      
+      programs.ssh.startAgent = false;
 
       services = {
         udev.packages = [pkgs.yubikey-personalization];
