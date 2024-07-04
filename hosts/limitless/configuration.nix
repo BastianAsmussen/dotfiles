@@ -89,6 +89,7 @@
     spotify
     neofetch
     bitwarden
+    wget
   ];
 
   virtualisation = {
