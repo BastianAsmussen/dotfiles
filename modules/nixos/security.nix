@@ -44,6 +44,17 @@
         udev.packages = [pkgs.yubikey-personalization];
         pcscd.enable = true;
       };
+
+      environment = {
+        systemPackages = with pkgs; [
+          yubikey-personalization
+        ];
+
+        shellInit = ''
+          gpg-connect-agent /bye
+          export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+        '';
+      };
     })
   ];
 }
