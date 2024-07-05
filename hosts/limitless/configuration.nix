@@ -61,6 +61,7 @@
     bitwarden
     wget
     deadnix
+    btop
   ];
 
   virtualisation = {
