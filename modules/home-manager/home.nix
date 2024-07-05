@@ -4,6 +4,7 @@
     ./firefox.nix
     ./fzf.nix
     ./git.nix
+    ./nixvim.nix
     ./oh-my-posh.nix
     ./tmux.nix
     ./zoxide.nix

@@ -1,10 +1,13 @@
 {lib, ...}: {
   imports = [
     ./home-manager.nix
+    ./nix.nix
     ./nvidia.nix
     ./security.nix
     ./stylix.nix
   ];
+
+  nix.enable = lib.mkDefault true;
 
   home-manager.enable = lib.mkDefault true;
 
