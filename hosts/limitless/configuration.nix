@@ -77,6 +77,4 @@
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
     openmoji-color
   ];
-
-  system.stateVersion = "24.05";
 }
