@@ -11,9 +11,6 @@
   nvidia.enable = true;
   ssh.enable = true;
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
-  nixpkgs.config.allowUnfree = true;
-
   boot.loader = {
     efi = {
       canTouchEfiVariables = true;
@@ -74,7 +71,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    neovim
     git
     gitui
     eza
