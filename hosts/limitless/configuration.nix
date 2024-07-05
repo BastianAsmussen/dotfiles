@@ -1,8 +1,6 @@
 {
   config,
-  lib,
   pkgs,
-  inputs,
   ...
 }: {
   imports = [
@@ -89,6 +87,7 @@
     neofetch
     bitwarden
     wget
+    deadnix
   ];
 
   virtualisation = {
