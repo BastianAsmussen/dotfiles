@@ -32,8 +32,6 @@
   networking = {
     hostName = "limitless";
     networkmanager.enable = true;
-
-    firewall.allowedTCPPorts = [22];
   };
 
   time.timeZone = "Europe/Copenhagen";
