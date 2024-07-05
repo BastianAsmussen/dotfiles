@@ -4,16 +4,22 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
 
-    disko.url = "github:nix-community/disko";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     stylix.url = "github:danth/stylix";
 
-    firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-    firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {nixpkgs, ...} @ inputs: let
@@ -31,16 +37,6 @@
         inputs.disko.nixosModules.disko
         inputs.stylix.nixosModules.stylix
       ];
-    };
-
-    homeManagerModules.default = ./modules/home-manager;
-
-    devShells.${system} = {
-      python = pkgs.mkShell {
-        nativeBuildInputs = with pkgs; [
-          python3
-        ];
-      };
     };
   };
 }
