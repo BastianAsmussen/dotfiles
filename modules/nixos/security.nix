@@ -22,14 +22,10 @@
     (lib.mkIf config.ssh.enable {
       services.openssh = {
         enable = true;
-	openFirewall = true;
 
         settings = {
           PasswordAuthentication = false;
           PermitRootLogin = "no";
-	  AllowUsers = [
-	    "bastian"
-	  ];
         };
       };
     })
@@ -43,7 +39,7 @@
 
     (lib.mkIf config.yubiKey.enable {
       gpg.enable = true; # Make sure GPG is enabled.
-      
+
       programs.ssh.startAgent = false;
 
       services = {
