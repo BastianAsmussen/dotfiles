@@ -5,9 +5,8 @@
     ./nvidia.nix
     ./security.nix
     ./stylix.nix
+    ./user.nix
   ];
-
-  nix.enable = lib.mkDefault true;
 
   home-manager.enable = lib.mkDefault true;
 
