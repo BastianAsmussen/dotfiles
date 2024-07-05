@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   users.users.bastian = {
     isNormalUser = true;
-    extraGroups = ["wheel" "docker" "libvirt"];
+    extraGroups = ["wheel" "docker" "libvirtd"];
     shell = pkgs.zsh;
     description = "Bastian Asmussen";
 
