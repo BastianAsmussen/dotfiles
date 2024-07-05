@@ -9,7 +9,7 @@
           partitions = {
             boot = {
               size = "512M";
-              type = "EF02"; # for grub MBR
+              type = "EF02"; # For GRUB MBR.
             };
             ESP = {
               size = "4G";
@@ -26,9 +26,9 @@
                 type = "luks";
                 name = "luks_lvm";
                 passwordFile = "/tmp/secret.key";
-                settings = {
-                  allowDiscards = true;
-                };
+
+                settings.allowDiscards = true;
+
                 content = {
                   type = "lvm_pv";
                   vg = "nix";
