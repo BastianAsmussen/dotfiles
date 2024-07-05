@@ -10,7 +10,7 @@
       image = ./../wallpapers/wallpaper.png;
 
       targets.grub.useImage = true;
-      
+
       polarity = "dark";
 
       cursor = {

@@ -1,5 +1,4 @@
-{pkgs, ...}:
-{
+{pkgs, ...}: {
   users.users.bastian = {
     isNormalUser = true;
     extraGroups = ["wheel" "docker" "libvirt"];
@@ -12,4 +11,3 @@
     ];
   };
 }
-
