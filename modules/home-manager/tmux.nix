@@ -33,9 +33,6 @@
       bind k select-pane -U
       bind l select-pane -R
 
-      # Set Catppuccin theme.
-      set -g @catppuccin_flavour 'mocha'
-
       # Keybindings.
       bind-key -T copy-mode-vi v send-keys -X begin-selection
       bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
