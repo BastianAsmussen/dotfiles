@@ -28,10 +28,18 @@
   };
 
   outputs = {nixpkgs, ...} @ inputs: let
-    system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
+    systems = [
+      "aarch64-linux"
+      "i686-linux"
+      "x86_64-linux"
+      "aarch64-darwin"
+      "x86_64-darwin"
+    ];
+
+    forAllSystems = nixpkgs.lib.genAttrs systems;
   in {
-    formatter.${system} = pkgs.alejandra;
+    packages = forAllSystems (system: nixpkgs.legacyPackages.${system});
+    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
     nixosConfigurations.limitless = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
