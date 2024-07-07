@@ -40,15 +40,13 @@
     LC_TIME = "en_DK.UTF-8";
   };
 
+  console.keyMap = "dk";
+
   services.xserver = {
     enable = true;
+    xkb.layout = "dk";
 
-    displayManager.gdm = {
-      enable = true;
-
-      autoSuspend = false;
-    };
-
+    displayManager.gdm.enable = true;
     desktopManager.gnome.enable = true;
   };
 
