@@ -23,7 +23,7 @@
 
       monitor = [
         "DP-1, 1920x1080@240, 0x0, 1"
-        "HDMI-A-1, 1920x1080, -1920x0, 1"
+        "HDMI-A-1, 1920x1080, 1920x0, 1"
         ", preferred, auto, 1" # Recommended rule for quickly plugging in random monitors.
       ];
 
