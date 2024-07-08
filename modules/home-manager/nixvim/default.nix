@@ -1,6 +1,7 @@
 {inputs, ...}: {
   imports = [
     ./plugins
+    ./remaps.nix
 
     inputs.nixvim.homeManagerModules.nixvim
   ];
@@ -25,16 +26,5 @@
     };
 
     luaLoader.enable = true;
-
-    keymaps = [
-      {
-        key = ";";
-        action = ":";
-      }
-      {
-        key = "<C-s>";
-        action = ":w<CR>";
-      }
-    ];
   };
 }
