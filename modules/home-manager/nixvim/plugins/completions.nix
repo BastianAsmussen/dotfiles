@@ -1,11 +1,9 @@
 {
   programs.nixvim.plugins = {
     luasnip.enable = true;
-    cmp.enable = true;
-    lspkind = {
+    cmp = {
       enable = true;
-      cmp.enable = true;
+      autoEnableSources = true;
     };
-    friendly-snippets.enable = true;
   };
 }
