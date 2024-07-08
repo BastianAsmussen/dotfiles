@@ -6,6 +6,7 @@
     ./firefox.nix
     ./fzf.nix
     ./git.nix
+    ./hyprland.nix
     ./tmux.nix
     ./zoxide.nix
     ./zsh.nix
