@@ -6,5 +6,10 @@
       left = "|";
       right = "|";
     };
+
+    sectionSeparators = {
+      left = "";
+      right = "";
+    };
   };
 }
