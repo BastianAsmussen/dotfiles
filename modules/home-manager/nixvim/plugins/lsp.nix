@@ -12,6 +12,7 @@
       };
 
       nixd.enable = true;
+      tsserver.enable = true;
     };
   };
 }
