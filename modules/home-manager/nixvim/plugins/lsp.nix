@@ -10,6 +10,8 @@
         installRustc = false;
         installCargo = false;
       };
+
+      nixd.enable = true;
     };
   };
 }
