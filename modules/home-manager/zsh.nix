@@ -37,9 +37,6 @@
     '';
 
     shellAliases = {
-      vim = "nvim";
-      vi = "vim";
-
       ls = "ls --color";
       c = "clear";
 
