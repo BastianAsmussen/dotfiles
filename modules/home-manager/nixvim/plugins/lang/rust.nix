@@ -1,7 +1,25 @@
 {
   programs.nixvim = {
-    globals.rustfmt_autosave = 1; # Format on save.
+    plugins = {
+      rustaceanvim = {
+        enable = true;
 
-    plugins.crates-nvim.enable = true;
+        settings.server = {
+          cmd = [
+            "rustup"
+            "run"
+            "nightly"
+            "rust-analyzer"
+          ];
+
+          settings.rust-analyzer = {
+            check.command = "clippy";
+            inlayHints.lifetimeElisionHints.enable = "always";
+          };
+        };
+      };
+
+      crates-nvim.enable = true;
+    };
   };
 }
