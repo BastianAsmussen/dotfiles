@@ -1,11 +1,11 @@
 {...}: {
   imports = [
+    ./nixvim
+    ./oh-my-posh
     ./alacritty.nix
     ./firefox.nix
     ./fzf.nix
     ./git.nix
-    ./nixvim.nix
-    ./oh-my-posh.nix
     ./tmux.nix
     ./zoxide.nix
     ./zsh.nix
