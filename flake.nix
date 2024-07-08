@@ -36,10 +36,11 @@
       "x86_64-darwin"
     ];
 
-    forAllSystems = nixpkgs.lib.genAttrs systems;
+    forAllSystems = fn:
+      nixpkgs.lib.genAttrs systems
+      (system: fn {pkgs = import nixpkgs {inherit system;};});
   in {
-    packages = forAllSystems (system: nixpkgs.legacyPackages.${system});
-    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+    formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
     nixosConfigurations.limitless = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
@@ -51,5 +52,9 @@
         inputs.stylix.nixosModules.stylix
       ];
     };
+
+    devShells = forAllSystems ({pkgs}: {
+      rust = import ./shells/rust;
+    });
   };
 }
