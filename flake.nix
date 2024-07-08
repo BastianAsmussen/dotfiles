@@ -53,8 +53,8 @@
       ];
     };
 
-    devShells = forAllSystems {
-      rust = import ./shells/rust;
-    };
+    devShells = forAllSystems ({pkgs}: {
+      rust = import ./shells/rust {inherit pkgs;};
+    });
   };
 }
