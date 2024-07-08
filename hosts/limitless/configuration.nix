@@ -42,14 +42,6 @@
 
   console.keyMap = "dk";
 
-  services.xserver = {
-    enable = true;
-    xkb.layout = "dk";
-
-    displayManager.gdm.enable = true;
-    desktopManager.gnome.enable = true;
-  };
-
   environment.systemPackages = with pkgs; [
     eza
     ripgrep
