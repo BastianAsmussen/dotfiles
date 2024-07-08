@@ -31,6 +31,10 @@
         key = ";";
         action = ":";
       }
+      {
+        key = "<C-s>";
+        action = ":w<CR>";
+      }
     ];
   };
 }
