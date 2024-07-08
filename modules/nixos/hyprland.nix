@@ -3,16 +3,16 @@
   config,
   ...
 }: {
+  imports = [
+    ./audio.nix
+    ./sddm.nix
+  ];
+
   options.hyprland.enable = lib.mkEnableOption "Enables Hyprland.";
 
   config = lib.mkIf config.hyprland.enable {
-    services.displayManager.sddm = {
-      enable = true;
-
-      wayland.enable = true;
-    };
-
-    security.polkit.enable = true;
+    audio.enable = true;
+    sddm.enable = true;
 
     programs.hyprland.enable = true;
   };
