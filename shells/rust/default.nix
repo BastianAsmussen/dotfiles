@@ -19,12 +19,21 @@ in
       export PATH=$PATH:''${RUSTUP_HOME:-~/.rustup}/toolchains/$RUSTC_VERSION-x86_64-unknown-linux-gnu/bin/
     '';
 
-    # Add precompiled library to rustc search path.
-    RUSTFLAGS = builtins.map (a: ''-L ${a}/lib'') [];
+    RUSTFLAGS =
+      # Add precompiled library to rustc search path.
+      (builtins.map (a: ''-L ${a}/lib'') [])
+      # Set compiler lints.
+      ++ [
+        ''-Dclippy::enum_glob_use'' # Disallow use of `use` of all enums.
+        ''-Dclippy::pedantic'' # Enable all pedantic lints.
+        ''-Dclippy::nursery'' # Enable all nursery lints.
+        ''-Dclippy::unwrap_used'' # Disallow use of `unwrap`.
+      ];
+
+    # Enable backtracing.
+    RUST_BACKTRACE = 1;
 
     LD_LIBRARY_PATH = libPath;
-
-    # Add glibc, clang, glib, and other headers to bindgen search path.
     BINDGEN_EXTRA_CLANG_ARGS =
       # Includes normal include path.
       (builtins.map (a: ''-I"${a}/include"'') [
