@@ -53,8 +53,8 @@
       ];
     };
 
-    devShells = forAllSystems ({pkgs}: {
+    devShells = forAllSystems {
       rust = import ./shells/rust;
-    });
+    };
   };
 }
