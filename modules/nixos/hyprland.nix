@@ -6,11 +6,10 @@
   options.hyprland.enable = lib.mkEnableOption "Enables Hyprland.";
 
   config = lib.mkIf config.hyprland.enable {
-    services.xserver = {
+    services.displayManager.sddm = {
       enable = true;
-      xkb.layout = "dk";
 
-      displayManager.gdm.enable = true;
+      wayland.enable = true;
     };
 
     programs.hyprland.enable = true;
