@@ -62,7 +62,7 @@
       ];
 
       exec-once = [
-        "${pkgs.ags}/bin/ags"
+        "ags"
       ];
 
       general = with config.lib.stylix.colors; {
