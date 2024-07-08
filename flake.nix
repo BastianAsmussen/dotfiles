@@ -35,7 +35,6 @@
       "aarch64-darwin"
       "x86_64-darwin"
     ];
-
     forAllSystems = fn:
       nixpkgs.lib.genAttrs systems
       (system: fn {pkgs = import nixpkgs {inherit system;};});
