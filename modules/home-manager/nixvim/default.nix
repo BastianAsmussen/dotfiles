@@ -24,6 +24,8 @@
       maplocalleader = " ";
     };
 
+    luaLoader.enable = true;
+
     keymaps = [
       {
         key = ";";
