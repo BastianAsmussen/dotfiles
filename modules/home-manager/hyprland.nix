@@ -61,6 +61,10 @@
         "$mod ALT, mouse:272, resizewindow"
       ];
 
+      exec-once = [
+        "${pkgs.ags}/bin/ags"
+      ];
+
       general = with config.lib.stylix.colors; {
         "col.active_border" = lib.mkForce "rgba(${base0E}ff) rgba(${base09}ff) 60deg";
         "col.inactive_border" = lib.mkForce "rgba(${base00}ff)";
