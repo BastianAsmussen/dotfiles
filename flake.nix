@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    
+
     stylix.url = "github:danth/stylix";
     hyprland.url = "github:hyprwm/Hyprland";
     ags.url = "github:Aylur/ags";
