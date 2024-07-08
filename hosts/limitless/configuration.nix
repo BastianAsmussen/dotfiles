@@ -51,20 +51,18 @@
   };
 
   environment.systemPackages = with pkgs; [
-    git
-    gitui
     eza
     ripgrep
+    gitui
     mullvad-vpn
+    bitwarden
     qbittorrent
-    mpv
     discord
     spotify
-    neofetch
-    bitwarden
+    mpv
     wget
-    deadnix
     btop
+    neofetch
   ];
 
   virtualisation = {
