@@ -1,6 +1,7 @@
 {
   imports = [
     ./lang
+    ./bufferline.nix
     ./cellular-automaton.nix
     ./completions.nix
     ./lsp.nix
