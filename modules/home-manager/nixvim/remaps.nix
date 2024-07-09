@@ -1,14 +1,17 @@
 {
   programs.nixvim.keymaps = [
-    # Correct `;` to `:`.
     {
       key = ";";
       action = ":";
     }
-    # Save on `<C-s>`.
     {
       key = "<C-s>";
       action = ":w<CR>";
+    }
+    {
+      mode = "n";
+      key = "<leader>e";
+      action = ":Ex<CR>";
     }
 
     {
