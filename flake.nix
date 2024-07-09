@@ -44,15 +44,28 @@
   in {
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
-    nixosConfigurations.limitless = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
-      modules = [
-        ./hosts/limitless/configuration.nix
-        ./modules/nixos
+    nixosConfigurations = {
+      limitless = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./hosts/limitless/configuration.nix
+          ./modules/nixos
 
-        inputs.disko.nixosModules.disko
-        inputs.stylix.nixosModules.stylix
-      ];
+          inputs.disko.nixosModules.disko
+          inputs.stylix.nixosModules.stylix
+        ];
+      };
+
+      judgeman = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./hosts/judgeman/configuration.nix
+          ./modules/nixos
+
+          inputs.disko.nixosModules.disko
+          inputs.stylix.nixosModules.stylix
+        ];
+      };
     };
 
     devShells = forAllSystems ({pkgs}: {
