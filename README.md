@@ -25,3 +25,8 @@ sudo nix --experimental-features "nix-command flakes" run github:nix-community/d
 sudo nixos-install --flake ~/dotfiles#limitless
 ```
 
+4. Import GPG keys.
+```sh
+gpg --import ~/dotfiles/keys/*.asc
+```
+
