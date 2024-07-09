@@ -3,17 +3,32 @@
   lib,
   config,
   ...
-}: {
+}: let
+  startupScript = pkgs.pkgs.writeShellScript "start" ''
+    ${pkgs.ags}/bin/ags &
+  '';
+in {
   imports = [
     ./ags
   ];
 
-  wayland.windowManager.hyprland = {
+  options.hyprland.monitors = lib.mkOption {
+    default = [
+      "DP-1, 1920x1080@240, 0x0, 1"
+      "HDMI-A-1, 1920x1080, 1920x0, 1"
+      ", preferred, auto, 1" # Recommended rule for quickly plugging in random monitors.
+    ];
+    description = "The monitors to use for Hyprland.";
+  };
+
+  config.wayland.windowManager.hyprland = {
     enable = true;
 
     xwayland.enable = true;
 
     settings = {
+      exec-once = ''${startupScript}/bin/start'';
+
       "$mod" = "SUPER";
 
       "$terminal" = "${pkgs.alacritty}/bin/alacritty";
@@ -21,11 +36,7 @@
 
       input.kb_layout = "dk";
 
-      monitor = [
-        "DP-1, 1920x1080@240, 0x0, 1"
-        "HDMI-A-1, 1920x1080, 1920x0, 1"
-        ", preferred, auto, 1" # Recommended rule for quickly plugging in random monitors.
-      ];
+      monitor = config.hyprland.monitors;
 
       bind =
         [
@@ -59,10 +70,6 @@
         "$mod, mouse:272, movewindow"
         "$mod, mouse:273, resizewindow"
         "$mod ALT, mouse:272, resizewindow"
-      ];
-
-      exec-once = [
-        "ags"
       ];
 
       general = with config.lib.stylix.colors; {
