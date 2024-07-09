@@ -13,7 +13,6 @@
     grub = {
       efiSupport = true;
       device = "nodev";
-      useOSProber = true;
     };
   };
 
