@@ -45,7 +45,7 @@ in {
 
           "$mod, Q, killactive"
           "$mod, M, exit"
-          "$mod CONTROL, F, fullscreen, 1"
+          "$mod SHIFT, F, fullscreen, 1"
 
           "$mod, H, movefocus, l"
           "$mod, L, movefocus, r"

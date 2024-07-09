@@ -8,12 +8,12 @@
   ];
 
   home.packages = with pkgs; [
+    inputs.matugen.packages.${system}.default
     bun
     dart-sass
     fd
     brightnessctl
     swww
-    inputs.matugen.packages.${system}.default
     slurp
     wf-recorder
     wl-clipboard
