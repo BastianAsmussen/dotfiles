@@ -14,7 +14,8 @@ nix run --experimental-features "nix-command flakes" run nixpkgs#git -- \
 
 2. Set up the disk configuration, e.g. for `limitless`.
 ```sh
-echo 'password123' > /tmp/secret.key
+echo "password123" > /tmp/secret.key
+
 sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
   --mode disko ~/dotfiles/hosts/limitless/disko-config.nix
 ```
