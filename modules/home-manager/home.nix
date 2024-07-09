@@ -1,4 +1,4 @@
-{...}: {
+{username, ...}: {
   imports = [
     ./nixvim
     ./oh-my-posh
@@ -13,8 +13,8 @@
   ];
 
   home = {
-    username = "bastian";
-    homeDirectory = "/home/bastian";
+    username = "${username}";
+    homeDirectory = "/home/${username}";
 
     stateVersion = "24.05";
   };
