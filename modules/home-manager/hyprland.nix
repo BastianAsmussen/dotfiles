@@ -3,11 +3,7 @@
   lib,
   config,
   ...
-}: let
-  startupScript = pkgs.pkgs.writeShellScript "start" ''
-    ${pkgs.ags}/bin/ags &
-  '';
-in {
+}: {
   imports = [
     ./ags
   ];
@@ -27,7 +23,7 @@ in {
     xwayland.enable = true;
 
     settings = {
-      exec-once = ''${startupScript}/bin/start'';
+      exec-once = "ags";
 
       "$mod" = "SUPER";
 
