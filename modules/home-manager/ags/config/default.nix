@@ -56,7 +56,7 @@
 
   desktop = writeShellScript name ''
     export PATH=$PATH:${addBins dependencies}
-    ${ags}/bin/ags -b ${name} -c ${config}/config.js $@
+    ags -b ${name} -c ${config}/config.js $@
   '';
 
   config = stdenv.mkDerivation {
