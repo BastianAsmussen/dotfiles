@@ -6,10 +6,11 @@ This is a repository for my NixOS configuration.
 
 1. Clone the Git repository.
 ```sh
-nix run --experimental-features "nix-command flakes" run nixpkgs#git -- \
-  git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && \
-  cd ~/dotfiles && \
-  git checkout nixos
+nix-shell -p git
+
+git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+git checkout nixos
 ```
 
 2. Set up the disk configuration, e.g. for `limitless`.
