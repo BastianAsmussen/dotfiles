@@ -1,4 +1,8 @@
-{username, ...}: {
+{
+  lib,
+  username,
+  ...
+}: {
   imports = [
     ./nixvim
     ./oh-my-posh
@@ -6,11 +10,14 @@
     ./firefox.nix
     ./fzf.nix
     ./git.nix
+    ./gpg.nix
     ./hyprland.nix
     ./tmux.nix
     ./zoxide.nix
     ./zsh.nix
   ];
+
+  gpg.enable = lib.mkDefault true;
 
   home = {
     username = "${username}";
