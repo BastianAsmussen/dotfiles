@@ -12,7 +12,11 @@
       };
 
       nixd.enable = true;
+
       tsserver.enable = true;
+      html.enable = true;
+      cssls.enable = true;
+      svelte.enable = true;
     };
   };
 }
