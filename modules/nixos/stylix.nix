@@ -7,6 +7,7 @@
   options.stylix.colorScheme = lib.mkOption {
     default = "catppuccin-mocha";
     description = "The Base16 theme to use.";
+    type = lib.types.str;
   };
 
   config = lib.mkIf config.stylix.enable {
