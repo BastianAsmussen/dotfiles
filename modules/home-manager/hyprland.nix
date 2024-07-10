@@ -6,6 +6,7 @@
 }: {
   imports = [
     ./ags
+    ./eww
   ];
 
   options.hyprland.monitors = lib.mkOption {
@@ -15,6 +16,7 @@
       ", preferred, auto, 1" # Recommended rule for quickly plugging in random monitors.
     ];
     description = "The monitors to use for Hyprland.";
+    type = with lib.types; listOf str;
   };
 
   config.wayland.windowManager.hyprland = {
