@@ -4,6 +4,7 @@
   ...
 }: let
   keyDir = ../../keys;
+
   getAllKeys = keyDir: builtins.attrNames (builtins.readDir keyDir);
   isKeyAllowed = keyName: disallowedKeys: builtins.elem keyName disallowedKeys;
   filterAllowedKeys = allKeys: disallowedKeys: builtins.filter (key: !isKeyAllowed key disallowedKeys) allKeys;
