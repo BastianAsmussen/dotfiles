@@ -1,6 +1,7 @@
 {lib, ...}: {
   imports = [
     ./audio.nix
+    ./gnome.nix
     ./home-manager.nix
     ./hyprland.nix
     ./nix.nix
@@ -12,6 +13,8 @@
   ];
 
   audio.enable = lib.mkDefault true;
+
+  gnome.enable = lib.mkDefault true;
 
   home-manager.enable = lib.mkDefault true;
 
