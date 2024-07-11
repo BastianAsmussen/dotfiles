@@ -29,6 +29,8 @@ sudo nix --experimental-features "nix-command flakes" run github:nix-community/d
 sudo nixos-install --flake ~/dotfiles#limitless
 ```
 
+4. Remember to change the password of the user!
+
 ## Maintenance Guide
 
 1. Update the `flake.lock` file about once per week.
