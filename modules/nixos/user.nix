@@ -4,6 +4,7 @@
     extraGroups = ["wheel" "docker" "libvirtd"];
     shell = pkgs.zsh;
     description = "Bastian Asmussen";
+    initialPassword = "Password123!";
 
     openssh.authorizedKeys.keys = [
       "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIPc8Md/RuoiNaFIieZ2hTQ6z2R+bE8xealvVhs4omoq3AAAABHNzaDo= bastian@asmussen"
