@@ -12,7 +12,7 @@
             "rust-analyzer"
           ];
 
-          settings.rust-analyzer = {
+          default_settings.rust-analyzer = {
             check.command = "clippy";
             inlayHints.lifetimeElisionHints.enable = "always";
           };
