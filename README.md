@@ -5,6 +5,7 @@ This is a repository for my NixOS configuration.
 ## Installation Guide
 
 1. Clone the Git repository.
+
 ```sh
 nix-shell -p git
 
@@ -14,6 +15,7 @@ git checkout nixos
 ```
 
 2. Set up the disk configuration, e.g. for `limitless`.
+
 ```sh
 echo "password123" > /tmp/secret.key
 
@@ -21,8 +23,30 @@ sudo nix --experimental-features "nix-command flakes" run github:nix-community/d
   --mode disko ~/dotfiles/hosts/limitless/disko-config.nix
 ```
 
-3. Install NixOS with the given profile, e.g. `limitless`.
+3. Install NixOS with the given configuration, e.g. `limitless`.
+
 ```sh
 sudo nixos-install --flake ~/dotfiles#limitless
+```
+
+## Maintenance Guide
+
+1. Update the `flake.lock` file about once per week.
+
+```sh
+cd ~/dotfiles
+nix flake update
+```
+
+2. Make sure it can compile.
+
+```sh
+sudo nixos-rebuild switch --flake ~/dotfiles#<CONFIGURATION>
+```
+
+- If it can't compile, roll back to a previous version.
+
+```sh
+git reset --hard HEAD~1
 ```
 
