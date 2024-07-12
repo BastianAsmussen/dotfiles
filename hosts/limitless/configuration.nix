@@ -4,8 +4,14 @@
     ./disko-config.nix
   ];
 
+  sshServer.enable = true;
+
   nvidia.enable = true;
-  ssh.enable = true;
+  sddm.enable = true;
+  gnome.enable = true;
+
+  pipewire.enable = true;
+  hardware.pulseaudio.enable = false;
 
   boot.loader = {
     efi = {
