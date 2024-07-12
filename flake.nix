@@ -8,6 +8,7 @@
     hyprland.url = "github:hyprwm/Hyprland";
     ags.url = "github:Aylur/ags";
     matugen.url = "github:InioX/matugen";
+    monero.url = "github:nixos/nixpkgs/080a4a27f206d07724b88da096e27ef63401a504";
 
     disko = {
       url = "github:nix-community/disko";
