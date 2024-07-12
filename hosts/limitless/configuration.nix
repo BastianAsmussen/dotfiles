@@ -19,7 +19,7 @@
     mining = {
       enable = true;
       wallet = "4977HG2wAcf4MJzM5Q5eK3CY1W6tEYmytQxR96gHhdMPWGZ95mwEiWiBo1vEyJxEynMYXBvCTTwzBGPtq24A9pDM1CXx55Y";
-      maxUsagePercentage = 10;
+      maxUsagePercentage = 25;
     };
   };
 
