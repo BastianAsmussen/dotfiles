@@ -17,6 +17,7 @@
   home-manager.enable = lib.mkDefault true;
   stylix.enable = lib.mkDefault true;
 
+  programs.zsh.enable = true;
   users.users.bastian = {
     isNormalUser = true;
     description = "Bastian Asmussen";
