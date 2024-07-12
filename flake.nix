@@ -43,6 +43,7 @@
       nixpkgs.lib.genAttrs systems
       (system: fn {pkgs = import nixpkgs {inherit system;};});
   in {
+    packages = forAllSystems ({pkgs}: import ./pkgs nixpkgs.legacyPackages.${pkgs.system});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
     nixosConfigurations = {
