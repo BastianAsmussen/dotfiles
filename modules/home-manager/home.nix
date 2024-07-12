@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./hyprland
     ./nixvim
     ./oh-my-posh
     ./alacritty.nix
@@ -11,7 +12,6 @@
     ./fzf.nix
     ./git.nix
     ./gpg.nix
-    ./hyprland.nix
     ./tmux.nix
     ./zoxide.nix
     ./zsh.nix
