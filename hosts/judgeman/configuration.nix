@@ -47,7 +47,6 @@
     eza
     ripgrep
     gitui
-    mullvad-vpn
     bitwarden
     qbittorrent
     discord
@@ -58,15 +57,7 @@
     neofetch
   ];
 
-  virtualisation = {
-    docker.enable = true;
-    libvirtd.enable = true;
-  };
-
-  programs = {
-    zsh.enable = true;
-    virt-manager.enable = true;
-  };
+  programs.zsh.enable = true;
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono"];})

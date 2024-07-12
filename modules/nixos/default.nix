@@ -7,6 +7,7 @@
     ./crypto
     ./desktop
     ./security
+    ./virtualization
     ./home-manager.nix
     ./nix.nix
     ./nvidia.nix
