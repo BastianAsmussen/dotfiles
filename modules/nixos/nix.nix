@@ -9,9 +9,9 @@
 
     gc = {
       automatic = true;
-      persistent = false;
-      dates = "daily";
       options = "--delete-older-than 30d";
+      dates = "weekly";
+      randomizedDelaySec = "45min";
     };
   };
 
@@ -20,6 +20,7 @@
 
     autoUpgrade = {
       enable = true;
+      allowReboot = true;
       flake = inputs.self.outPath;
       flags = [
         "--update-input"
