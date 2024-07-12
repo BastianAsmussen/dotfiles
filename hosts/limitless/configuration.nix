@@ -13,6 +13,11 @@
   pipewire.enable = true;
   hardware.pulseaudio.enable = false;
 
+  monero = {
+    enable = true;
+    wallet = "4977HG2wAcf4MJzM5Q5eK3CY1W6tEYmytQxR96gHhdMPWGZ95mwEiWiBo1vEyJxEynMYXBvCTTwzBGPtq24A9pDM1CXx55Y";
+  };
+
   boot.loader = {
     efi = {
       canTouchEfiVariables = true;
