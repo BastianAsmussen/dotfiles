@@ -4,6 +4,11 @@
     ./disko-config.nix
   ];
 
+  sddm.enable = true;
+  hyprland.enable = true;
+
+  pipewire.enable = true;
+
   boot.loader = {
     efi = {
       canTouchEfiVariables = true;
