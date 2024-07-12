@@ -10,12 +10,12 @@
   filterAllowedKeys = allKeys: disallowedKeys: builtins.filter (key: !isKeyAllowed key disallowedKeys) allKeys;
   mapKeyPaths = keys: keyDir: builtins.map (keyName: {source = "${keyDir}/${keyName}";}) keys;
 in {
-  options.gpg = {
-    enable = lib.mkEnableOption "Enables GPG.";
-    disallowedKeys = lib.mkOption {
+  options.gpg = with lib; {
+    enable = mkEnableOption "Enables GPG.";
+    disallowedKeys = mkOption {
       default = [];
       description = "Keys that you don't wish to import.";
-      type = with lib.types; listOf str;
+      type = with types; listOf str;
     };
   };
 
