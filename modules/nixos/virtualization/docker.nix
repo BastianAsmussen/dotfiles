@@ -12,15 +12,23 @@
     };
   };
 
-  config = lib.mkIf config.docker.enable {
-    virtualisation.docker = {
-      enable = true;
-
-      storageDriver = config.docker.storageDriver;
-      rootless = {
+  config = lib.mkMerge [
+    (lib.mkIf config.docker.enable {
+      virtualisation.docker = {
         enable = true;
-        setSocketVariable = true;
+
+        storageDriver = config.docker.storageDriver;
+        rootless = {
+          enable = true;
+          setSocketVariable = true;
+        };
       };
-    };
-  };
+    })
+    (lib.mkIf config.nvidia.enable {
+      virtualisation.docker = {
+        enableNvidia = true;
+        extraOptions = "--default-runtime=nvidia";
+      };
+    })
+  ];
 }
