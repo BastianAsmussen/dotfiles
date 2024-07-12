@@ -7,13 +7,13 @@
   options.monero = {
     enable = lib.mkEnableOption "Enables XMRig mining.";
 
-    pool = {
+    pool = lib.mkOption {
       default = "pool.supportxmr.com:443";
       description = "The URL of the Monero pool to use.";
       type = lib.types.str;
     };
 
-    wallet = {
+    wallet = lib.mkOption {
       description = "The wallet address to use.";
       type = lib.types.str;
     };
