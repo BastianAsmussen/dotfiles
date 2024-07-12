@@ -606,6 +606,22 @@
         "type": "github"
       }
     },
+    "monero": {
+      "locked": {
+        "lastModified": 1712026416,
+        "narHash": "sha256-N/3VR/9e1NlN49p7kCiATiEY6Tzdo+CbrAG8kqCQKcI=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "080a4a27f206d07724b88da096e27ef63401a504",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "080a4a27f206d07724b88da096e27ef63401a504",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -741,6 +757,7 @@
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "matugen": "matugen",
+        "monero": "monero",
         "nixpkgs": "nixpkgs_4",
         "nixvim": "nixvim",
         "stylix": "stylix"

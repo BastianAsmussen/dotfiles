@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  inputs,
   ...
 }: {
   options.monero = {
@@ -20,8 +21,8 @@
   };
 
   config = lib.mkIf config.monero.enable {
-    environment.systemPackages = with pkgs; [
-      monero-gui
+    environment.systemPackages = [
+      inputs.monero.legacyPackages.${pkgs.system}.monero-gui
     ];
 
     services.xmrig = {
