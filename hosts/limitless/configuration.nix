@@ -66,6 +66,7 @@
     wget
     btop
     neofetch
+    rustup
   ];
 
   virtualisation = {
