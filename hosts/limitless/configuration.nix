@@ -15,7 +15,12 @@
 
   monero = {
     enable = true;
-    wallet = "4977HG2wAcf4MJzM5Q5eK3CY1W6tEYmytQxR96gHhdMPWGZ95mwEiWiBo1vEyJxEynMYXBvCTTwzBGPtq24A9pDM1CXx55Y";
+
+    mining = {
+      enable = true;
+      wallet = "4977HG2wAcf4MJzM5Q5eK3CY1W6tEYmytQxR96gHhdMPWGZ95mwEiWiBo1vEyJxEynMYXBvCTTwzBGPtq24A9pDM1CXx55Y";
+      maxUsagePercentage = 10;
+    };
   };
 
   boot.loader = {
@@ -57,7 +62,6 @@
     eza
     ripgrep
     gitui
-    mullvad-vpn
     bitwarden
     qbittorrent
     discord
@@ -68,17 +72,10 @@
     neofetch
     rustup
     go
+    manix
   ];
 
-  virtualisation = {
-    docker.enable = true;
-    libvirtd.enable = true;
-  };
-
-  programs = {
-    zsh.enable = true;
-    virt-manager.enable = true;
-  };
+  programs.zsh.enable = true;
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono"];})

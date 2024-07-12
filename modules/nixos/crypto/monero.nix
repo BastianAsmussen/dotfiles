@@ -5,44 +5,61 @@
   inputs,
   ...
 }: {
-  options.monero = {
-    enable = lib.mkEnableOption "Enables XMRig mining.";
+  options.monero = with lib; {
+    enable = mkEnableOption "Enables Monero application.";
 
-    pool = lib.mkOption {
-      default = "pool.supportxmr.com:443";
-      description = "The URL of the Monero pool to use.";
-      type = lib.types.str;
-    };
+    mining = {
+      enable = mkEnableOption "Enables XMRig service.";
 
-    wallet = lib.mkOption {
-      description = "The wallet address to use.";
-      type = lib.types.str;
-    };
-  };
+      pool = mkOption {
+        default = "pool.supportxmr.com:443";
+        description = "The URL of the Monero pool to use.";
+        type = types.str;
+      };
 
-  config = lib.mkIf config.monero.enable {
-    environment.systemPackages = [
-      inputs.monero.legacyPackages.${pkgs.system}.monero-gui
-    ];
+      wallet = mkOption {
+        description = "The wallet address to use.";
+        type = types.str;
+      };
 
-    services.xmrig = {
-      enable = true;
-
-      settings = {
-        autosave = true;
-        cpu = true;
-        opencl = false;
-        cuda = false;
-
-        pools = [
-          {
-            url = config.monero.pool;
-            user = config.monero.wallet;
-            keepalive = true;
-            tls = true;
-          }
-        ];
+      maxUsagePercentage = mkOption {
+        default = 100;
+        description = "This option is just a hint for automatic configuration and can't precisely define CPU usage.";
+        type = types.int;
       };
     };
   };
+
+  config = lib.mkMerge [
+    (lib.mkIf config.monero.enable {
+      environment.systemPackages = [
+        inputs.monero.legacyPackages.${pkgs.system}.monero-gui
+      ];
+    })
+
+    (lib.mkIf config.monero.mining.enable {
+      services.xmrig = with config.monero.mining; {
+        enable = true;
+
+        settings = {
+          autosave = true;
+          opencl = false;
+          cuda = false;
+          cpu = {
+            enabled = true;
+            max-threads-hint = maxUsagePercentage;
+          };
+
+          pools = [
+            {
+              url = pool;
+              user = wallet;
+              keepalive = true;
+              tls = true;
+            }
+          ];
+        };
+      };
+    })
+  ];
 }
