@@ -3,9 +3,9 @@
   config,
   ...
 }: {
-  options.audio.enable = lib.mkEnableOption "Enable audio drivers.";
+  options.pipewire.enable = lib.mkEnableOption "Enable PipeWire audio drivers.";
 
-  config = lib.mkIf config.audio.enable {
+  config = lib.mkIf config.pipewire.enable {
     security.rtkit.enable = true;
 
     services.pipewire = {

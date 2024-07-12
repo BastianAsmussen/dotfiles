@@ -13,6 +13,7 @@
     username = lib.mkOption {
       default = "bastian";
       description = "The username of the user.";
+      type = lib.types.str;
     };
   };
 

@@ -1,0 +1,47 @@
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}: {
+  options.monero = {
+    enable = lib.mkEnableOption "Enables XMRig mining.";
+
+    pool = {
+      default = "pool.supportxmr.com:443";
+      description = "The URL of the Monero pool to use.";
+      type = lib.types.str;
+    };
+
+    wallet = {
+      description = "The wallet address to use.";
+      type = lib.types.str;
+    };
+  };
+
+  config = lib.mkIf config.monero.enable {
+    environment.systemPackages = with pkgs; [
+      monero-gui
+    ];
+
+    services.xmrig = {
+      enable = true;
+
+      settings = {
+        autosave = true;
+        cpu = true;
+        opencl = false;
+        cuda = false;
+
+        pools = [
+          {
+            url = config.monero.pool;
+            user = config.monero.wallet;
+            keepalive = true;
+            tls = true;
+          }
+        ];
+      };
+    };
+  };
+}

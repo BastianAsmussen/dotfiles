@@ -7,7 +7,6 @@
 
   config = lib.mkIf config.nvidia.enable {
     hardware = {
-      # Enable NVIDIA drivers.
       nvidia = {
         modesetting.enable = true;
 
