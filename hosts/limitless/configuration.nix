@@ -67,6 +67,7 @@
     btop
     neofetch
     rustup
+    go
   ];
 
   virtualisation = {

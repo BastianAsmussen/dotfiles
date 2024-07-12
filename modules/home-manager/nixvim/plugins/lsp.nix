@@ -17,6 +17,8 @@
       html.enable = true;
       cssls.enable = true;
       svelte.enable = true;
+      
+      gopls.enable = true;
     };
   };
 }
