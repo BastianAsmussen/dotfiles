@@ -4,11 +4,6 @@
   config,
   ...
 }: {
-  imports = [
-    ./ags
-    ./eww
-  ];
-
   options.hyprland.monitors = with lib;
     mkOption {
       default = [
