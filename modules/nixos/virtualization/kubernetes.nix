@@ -16,7 +16,6 @@ in {
       kompose
       kubectl
       kubernetes
-      minikube
     ];
 
     services.kubernetes = {
