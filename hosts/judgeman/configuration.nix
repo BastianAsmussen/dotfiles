@@ -53,8 +53,11 @@
     spotify
     mpv
     wget
-    btop
     neofetch
+    rustup
+    go
+    manix
+    btop
   ];
 
   fonts.packages = with pkgs; [
