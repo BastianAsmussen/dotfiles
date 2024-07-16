@@ -7,7 +7,7 @@
   sshServer.enable = true;
 
   nvidia.enable = true;
-  sddm.enable = true;
+  gdm.enable = true;
   gnome.enable = true;
 
   pipewire.enable = true;
