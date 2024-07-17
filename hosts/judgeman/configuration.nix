@@ -4,10 +4,11 @@
     ./disko-config.nix
   ];
 
-  sddm.enable = true;
-  hyprland.enable = true;
+  gdm.enable = true;
+  gnome.enable = true;
 
   pipewire.enable = true;
+  hardware.pulseaudio.enable = false;
 
   boot.loader = {
     efi = {
