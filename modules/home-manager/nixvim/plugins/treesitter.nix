@@ -3,8 +3,12 @@
     treesitter = {
       enable = true;
 
-      nixvimInjections = true;
-      settings.highlight.enable = true;
+      settings = {
+        auto_install = true;
+        indent.enable = true;
+
+        highlight.enable = true;
+      };
     };
 
     hmts.enable = true;
