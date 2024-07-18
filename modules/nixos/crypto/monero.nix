@@ -37,6 +37,13 @@
     })
 
     (lib.mkIf config.monero.mining.enable {
+      assertions = [
+        {
+          assertion = config.monero.mining.maxUsagePercentage >= 1 && config.monero.mining.maxUsagePercentage <= 100;
+          message = "`maxUsagePercentage` must be between 1 and 100!";
+        }
+      ];
+
       services.xmrig = with config.monero.mining; {
         enable = true;
 
