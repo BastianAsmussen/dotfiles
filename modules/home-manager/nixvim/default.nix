@@ -15,6 +15,8 @@
 
     opts = {
       number = true;
+      relativenumber = true;
+
       shiftwidth = 4;
 
       updatetime = 100; # Faster completion.
