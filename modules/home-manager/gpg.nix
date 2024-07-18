@@ -27,7 +27,7 @@ in {
       if builtins.length missingKeys > 0
       then [
         ''
-          The following keys specified in disallowedKeys are not present in "${keyDir}":
+          The following keys specified in `disallowedKeys` are not present in "${keyDir}":
           ${builtins.concatStringsSep "\n" (builtins.map (key: " - ${key}") missingKeys)}
         ''
       ]
