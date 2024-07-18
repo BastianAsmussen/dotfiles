@@ -13,7 +13,17 @@
   pipewire.enable = true;
   hardware.pulseaudio.enable = false;
 
-  monero.enable = true;
+  monero = {
+    enable = true;
+
+    mining = {
+      enable = true;
+
+      pool = "pool.hashvault.pro:80";
+      wallet = "85nQVpR41z5TJZiPskbeeaG9rHpKf6UXn9HVufYCg2XFVoKHj1VeKSfgrGTmi9CLg3XYiuLCPmxhcGu5xZx7rgM3RYS1H87";
+      maxUsagePercentage = 25;
+    };
+  };
 
   boot.loader = {
     efi = {
