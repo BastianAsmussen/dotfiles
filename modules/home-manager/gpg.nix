@@ -20,6 +20,13 @@ in {
   };
 
   config = lib.mkIf config.gpg.enable {
+    assertions = [
+      {
+        assertion = builtins.all (key: builtins.pathExists "${keyDir}/${key}") config.gpg.disallowedKeys;
+        message = ''Please ensure all disallowed keys are present in "${keyDir}"!'';
+      }
+    ];
+
     programs.gpg = {
       enable = true;
 
