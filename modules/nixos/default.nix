@@ -8,11 +8,14 @@
     ./desktop
     ./security
     ./virtualization
+    ./btrfs.nix
     ./home-manager.nix
     ./nix.nix
     ./nvidia.nix
     ./stylix.nix
   ];
+
+  btrfs.enable = lib.mkDefault true;
 
   home-manager.enable = lib.mkDefault true;
   stylix.enable = lib.mkDefault true;
