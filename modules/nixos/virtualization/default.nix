@@ -6,6 +6,5 @@
   ];
 
   docker.enable = lib.mkDefault true;
-  kubernetes.enable = lib.mkDefault true;
   qemu.enable = lib.mkDefault true;
 }
