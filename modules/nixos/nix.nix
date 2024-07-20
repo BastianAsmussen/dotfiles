@@ -3,16 +3,23 @@
 
   nix = {
     settings = {
-      warn-dirty = false;
       experimental-features = ["nix-command" "flakes"];
+
+      warn-dirty = false;
+      auto-optimise-store = true;
+      sandbox = "relaxed";
+
+      http-connections = 64;
+      log-lines = 64;
     };
 
     gc = {
       automatic = true;
-      options = "--delete-older-than 30d";
+      options = "--delete-older-than 7d";
       dates = "weekly";
-      randomizedDelaySec = "45min";
     };
+
+    optimise.automatic = true;
   };
 
   system = {
@@ -26,7 +33,7 @@
         "nixpkgs"
         "-L" # Print build logs.
       ];
-      dates = "daily";
+      dates = "weekly";
       randomizedDelaySec = "45min";
     };
   };
