@@ -7,7 +7,7 @@ This is a repository for my NixOS configuration.
 1. Clone the Git repository.
 
 ```sh
-nix run nixpkgs#git -- \
+nix --experimental-features "nix-command flakes" run nixpkgs#git -- \
   clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && \
   cd ~/dotfiles
 ```
