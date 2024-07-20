@@ -20,7 +20,7 @@
       enable = true;
 
       pool = "pool.hashvault.pro:80";
-      wallet = "85nQVpR41z5TJZiPskbeeaG9rHpKf6UXn9HVufYCg2XFVoKHj1VeKSfgrGTmi9CLg3XYiuLCPmxhcGu5xZx7rgM3RYS1H87";
+      wallet = "8AzWTLBtPhkBqAU1m9TQW42LTtPwoKb4s4Sgo4uYY6TY1pNrrKYj2vFgGW9D5sBqi8VStmgViAZC82GfVcsqqLq77uJtWE7";
       maxUsagePercentage = 25;
     };
   };
