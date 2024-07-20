@@ -8,6 +8,7 @@
     ./nixvim
     ./oh-my-posh
     ./alacritty.nix
+    ./eza.nix
     ./firefox.nix
     ./fzf.nix
     ./git.nix
