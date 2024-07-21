@@ -17,7 +17,7 @@
     enable = true;
 
     mining = {
-      enable = true;
+      enable = false;
 
       pool = "pool.hashvault.pro:80";
       wallet = "8AzWTLBtPhkBqAU1m9TQW42LTtPwoKb4s4Sgo4uYY6TY1pNrrKYj2vFgGW9D5sBqi8VStmgViAZC82GfVcsqqLq77uJtWE7";
@@ -70,7 +70,6 @@
     spotify
     mpv
     wget
-    neofetch
     rustup
     go
     manix

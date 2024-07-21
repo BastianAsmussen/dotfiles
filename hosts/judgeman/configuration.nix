@@ -54,7 +54,6 @@
     spotify
     mpv
     wget
-    neofetch
     rustup
     go
     manix
