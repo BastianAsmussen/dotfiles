@@ -3,8 +3,6 @@
     enable = true;
 
     settings = {
-      logo.padding.top = 1;
-
       display = {
         separator = "";
         keyWidth = 15;
