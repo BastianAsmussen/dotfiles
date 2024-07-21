@@ -43,6 +43,8 @@
 
       cp = "cp -r";
       rm = "rm -r";
+
+      neofetch = "fastfetch";
     };
 
     plugins = with pkgs; [
