@@ -9,6 +9,7 @@
     ./oh-my-posh
     ./alacritty.nix
     ./eza.nix
+    ./fastfetch.nix
     ./firefox.nix
     ./fzf.nix
     ./git.nix
