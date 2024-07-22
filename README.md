@@ -30,6 +30,10 @@ sudo nixos-install --flake ~/dotfiles#limitless
 
 4. Remember to change the password of the user!
 
+> [!NOTE]
+> After installation it may be a requirement to update the [channel](https://nixos.wiki/wiki/Nix_channels) to get `command-not-found` working properly.  
+> To do so run `sudo nix-channel --update`.
+
 ## Maintenance Guide
 
 1. Update the `flake.lock` file about once per week.
