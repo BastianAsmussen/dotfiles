@@ -29,7 +29,7 @@
           type = "uptime";
         }
         {
-          key = "│ {#34}󰟾 distro  {#keys}│";
+          key = "│ {#39}󰟾 distro  {#keys}│";
           type = "os";
         }
         {
