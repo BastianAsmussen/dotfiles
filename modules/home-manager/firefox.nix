@@ -5,6 +5,7 @@
 }: {
   programs.firefox = {
     enable = true;
+
     policies = {
       DisableTelemetry = true;
       DisableFirefoxStudies = true;
@@ -41,7 +42,7 @@
             urls = [{template = "https://wiki.nixos.org/w/index.php?search={searchTerms}";}];
 
             iconUpdateURL = "https://wiki.nixos.org/favicon.ico";
-            updateInterval = 24 * 60 * 60 * 1000; # every day
+            updateInterval = 24 * 60 * 60 * 1000; # Once every day.
             definedAliases = ["@nw"];
           };
 
@@ -58,9 +59,9 @@
         "extensions.pocket.enabled" = false;
       };
 
-      bookmarks = [];
+      bookmarks = [{}];
 
-      extensions = with inputs.firefox-addons.packages."x86_64-linux"; [
+      extensions = with inputs.firefox-addons.packages.${pkgs.system}; [
         bitwarden
         ublock-origin
         clearurls
