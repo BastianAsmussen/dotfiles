@@ -20,31 +20,14 @@
     services.kanata = {
       enable = true;
 
-      keyboards = {
-        internalKeyboard = {
-          devices = config.keyboard.keyboards;
-          config = ''
-            (defsrc
-              f1   f2   f3   f4   f5   f6   f7   f8   f9   f10   f11   f12
-              caps
-            )
-
-            ;; Definine two aliases, one for esc/control to other for function key.
-            (defalias
-              escctrl (tap-hold 100 150 esc lctl)
-            )
-
-            (deflayer base
-              brdn  brup  _    _    _    _   prev  pp  next  mute  vold  volu
-              @escctrl
-            )
-
-            (deflayer fn
-              f1   f2   f3   f4   f5   f6   f7   f8   f9   f10   f11   f12
-              @escctrl
-            )
-          '';
-        };
+      keyboards.internalKeyboard = {
+        devices = config.keyboard.keyboards;
+        extraDefCfg = "process-unmapped-keys yes";
+        config = ''
+          (defsrc caps)
+          (defalias escctrl (tap-hold 100 150 esc lctl))
+          (deflayer base @escctrl)
+        '';
       };
     };
   };
