@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  inputs,
   ...
 }: {
   options.monero = with lib; {
@@ -32,7 +33,7 @@
   config = lib.mkMerge [
     (lib.mkIf config.monero.enable {
       environment.systemPackages = [
-        pkgs.monero-gui
+        inputs.old-monero.legacyPackages.${pkgs.system}.monero-gui
       ];
     })
 
