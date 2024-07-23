@@ -10,6 +10,7 @@
     ./virtualization
     ./btrfs.nix
     ./home-manager.nix
+    ./keyboard.nix
     ./nix.nix
     ./nvidia.nix
     ./stylix.nix
@@ -18,6 +19,7 @@
   btrfs.enable = lib.mkDefault true;
 
   home-manager.enable = lib.mkDefault true;
+  keyboard.enable = lib.mkDefault true;
   stylix.enable = lib.mkDefault true;
 
   programs.zsh.enable = true;
