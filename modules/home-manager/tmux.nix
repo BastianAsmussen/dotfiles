@@ -14,6 +14,8 @@
     newSession = true;
     secureSocket = true;
 
+    escapeTime = 0; # Make pressing escape instant.
+
     prefix = "C-Space";
     mouse = true;
 
