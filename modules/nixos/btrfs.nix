@@ -20,11 +20,15 @@
   };
 
   config = lib.mkIf config.btrfs.enable {
-    services.btrfs.autoScrub = {
-      enable = true;
+    services = {
+      fstrim.enable = true;
 
-      interval = config.btrfs.scrub.interval;
-      fileSystems = config.btrfs.scrub.fileSystems;
+      btrfs.autoScrub = {
+        enable = true;
+
+        interval = config.btrfs.scrub.interval;
+        fileSystems = config.btrfs.scrub.fileSystems;
+      };
     };
   };
 }
