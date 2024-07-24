@@ -8,6 +8,7 @@
     ./desktop
     ./security
     ./virtualization
+    ./bootloader.nix
     ./btrfs.nix
     ./home-manager.nix
     ./keyboard.nix
