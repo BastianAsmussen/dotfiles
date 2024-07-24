@@ -30,11 +30,10 @@
       zstyle ':completion:*:git-checkout:*' sort false
       zstyle ':completion:*:descriptions' format '[%d]'
       zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-      zstyle ':completion:*' menu noz
+      zstyle ':completion:*' menu no
 
-      zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 $realpath'
-      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 $realpath'
-      zstyle ':fzf-tab:complete:ls:*' fzf-preview 'cat $realpath'
+      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+      zstyle ':fzf-tab:*' switch-group '<' '>'
     '';
 
     shellAliases = {
@@ -45,6 +44,19 @@
       rm = "rm -r";
 
       neofetch = "fastfetch";
+    };
+
+    oh-my-zsh = {
+      enable = true;
+
+      plugins = [
+        "git"
+        "sudo"
+        "command-not-found"
+        "kubectl"
+        "kubectx"
+        "rust"
+      ];
     };
 
     plugins = with pkgs; [
@@ -69,18 +81,5 @@
         file = "share/fzf-tab/fzf-tab.plugin.zsh";
       }
     ];
-
-    oh-my-zsh = {
-      enable = true;
-
-      plugins = [
-        "git"
-        "sudo"
-        "command-not-found"
-        "kubectl"
-        "kubectx"
-        "rust"
-      ];
-    };
   };
 }
