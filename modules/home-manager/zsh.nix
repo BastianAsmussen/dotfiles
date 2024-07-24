@@ -5,12 +5,13 @@
 }: {
   programs.zsh = {
     enable = true;
+
     enableCompletion = true;
     autosuggestion.enable = true;
     autocd = true;
 
     history = {
-      size = 10000;
+      size = 16 * 1024;
       path = "${config.xdg.dataHome}/zsh/history";
     };
 
