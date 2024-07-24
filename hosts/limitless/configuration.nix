@@ -61,7 +61,6 @@
   console.keyMap = "dk";
 
   environment.systemPackages = with pkgs; [
-    eza
     ripgrep
     gitui
     bitwarden
