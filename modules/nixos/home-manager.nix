@@ -21,6 +21,9 @@
     home-manager = with config.home-manager; {
       extraSpecialArgs = {inherit inputs username;};
 
+      useGlobalPkgs = true;
+      useUserPackages = true;
+
       users."${username}" = import ../home-manager/home.nix;
     };
   };
