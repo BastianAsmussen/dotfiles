@@ -11,7 +11,7 @@
         modesetting.enable = true;
 
         powerManagement = {
-          enable = false;
+          enable = true;
           finegrained = false;
         };
 
@@ -21,7 +21,7 @@
         package = config.boot.kernelPackages.nvidiaPackages.production;
       };
 
-      # Enable OpenGL.
+      # Enable graphics driver.
       graphics = {
         enable = true;
         enable32Bit = true;
