@@ -25,18 +25,7 @@
     };
   };
 
-  boot.loader = {
-    efi = {
-      canTouchEfiVariables = true;
-      efiSysMountPoint = "/boot";
-    };
-
-    grub = {
-      efiSupport = true;
-      device = "nodev";
-      useOSProber = true;
-    };
-  };
+  bootloader.isMultiboot = true;
 
   networking = {
     hostName = "limitless";

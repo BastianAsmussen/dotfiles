@@ -10,18 +10,6 @@
   pipewire.enable = true;
   hardware.pulseaudio.enable = false;
 
-  boot.loader = {
-    efi = {
-      canTouchEfiVariables = true;
-      efiSysMountPoint = "/boot";
-    };
-
-    grub = {
-      efiSupport = true;
-      device = "nodev";
-    };
-  };
-
   networking = {
     hostName = "judgeman";
     networkmanager.enable = true;
