@@ -29,9 +29,8 @@
       # Previews.
       zstyle ':completion:*:git-checkout:*' sort false
       zstyle ':completion:*:descriptions' format '[%d]'
-      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
       zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-      zstyle ':completion:*' menu no
+      zstyle ':completion:*' menu noz
 
       zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 $realpath'
       zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 $realpath'
@@ -77,10 +76,10 @@
       plugins = [
         "git"
         "sudo"
+        "command-not-found"
         "kubectl"
         "kubectx"
         "rust"
-        "command-not-found"
       ];
     };
   };
