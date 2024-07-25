@@ -69,6 +69,7 @@
         sponsorblock
         return-youtube-dislikes
         darkreader
+        wayback-machine
       ];
     };
   };
