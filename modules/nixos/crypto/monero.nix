@@ -6,7 +6,7 @@
   ...
 }: {
   options.monero = with lib; {
-    enable = mkEnableOption "Enables Monero application.";
+    gui.enable = mkEnableOption "Enables Monero application.";
 
     mining = {
       enable = mkEnableOption "Enables XMRig service.";
@@ -31,7 +31,7 @@
   };
 
   config = lib.mkMerge [
-    (lib.mkIf config.monero.enable {
+    (lib.mkIf config.monero.gui.enable {
       environment.systemPackages = [
         inputs.old-monero.legacyPackages.${pkgs.system}.monero-gui
       ];

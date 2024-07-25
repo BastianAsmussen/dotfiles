@@ -14,7 +14,7 @@
   hardware.pulseaudio.enable = false;
 
   monero = {
-    enable = true;
+    gui.enable = true;
 
     mining = {
       enable = false;
