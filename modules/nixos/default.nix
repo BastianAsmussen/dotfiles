@@ -17,6 +17,19 @@
     ./stylix.nix
   ];
 
+  environment.systemPackages = with pkgs; [
+    ripgrep
+    gitui
+    bitwarden
+    qbittorrent
+    discord
+    spotify
+    mpv
+    wget
+    go
+    manix
+  ];
+
   btrfs.enable = lib.mkDefault true;
 
   home-manager.enable = lib.mkDefault true;
