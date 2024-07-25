@@ -49,20 +49,6 @@
 
   console.keyMap = "dk";
 
-  environment.systemPackages = with pkgs; [
-    ripgrep
-    gitui
-    bitwarden
-    qbittorrent
-    discord
-    spotify
-    mpv
-    wget
-    go
-    manix
-    btop
-  ];
-
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
     openmoji-color
