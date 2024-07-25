@@ -3,14 +3,6 @@
     enable = true;
 
     servers = {
-      rust-analyzer = {
-        enable = true;
-
-        # Provided by dev environments.
-        installRustc = false;
-        installCargo = false;
-      };
-
       nixd.enable = true;
 
       tsserver.enable = true;
@@ -20,6 +12,7 @@
 
       gopls.enable = true;
       pyright.enable = true;
+      clangd.enable = true;
     };
   };
 }
