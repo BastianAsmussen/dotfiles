@@ -58,7 +58,6 @@
     spotify
     mpv
     wget
-    rustup
     go
     manix
     btop
