@@ -5,7 +5,7 @@
     settings = {
       display = {
         separator = "";
-        keyWidth = 15;
+        key.width = 15;
       };
 
       modules = [
