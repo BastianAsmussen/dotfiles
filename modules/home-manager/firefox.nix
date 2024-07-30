@@ -1,6 +1,7 @@
 {
   pkgs,
   inputs,
+  username,
   ...
 }: {
   programs.firefox = {
@@ -11,7 +12,7 @@
       DisableFirefoxStudies = true;
     };
 
-    profiles.bastian = {
+    profiles."${username}" = {
       search = {
         default = "DuckDuckGo";
         force = true;
@@ -54,12 +55,22 @@
 
       settings = {
         "signon.rememberSignons" = false;
+        "identity.fxaccounts.enabled" = false;
+        "extensions.pocket.enabled" = false;
         "privacy.globalprivacycontrol.enabled" = true;
         "privacy.donottrackheader.enabled" = true;
-        "extensions.pocket.enabled" = false;
       };
 
-      bookmarks = [{}];
+      bookmarks = [
+        {
+          name = "Mail";
+          url = "https://mail.proton.me/u/0/inbox";
+        }
+        {
+          name = "GitHub";
+          url = "https://github.com";
+        }
+      ];
 
       extensions = with inputs.firefox-addons.packages.${pkgs.system}; [
         bitwarden
@@ -70,6 +81,7 @@
         return-youtube-dislikes
         darkreader
         wayback-machine
+        i-dont-care-about-cookies
       ];
     };
   };
