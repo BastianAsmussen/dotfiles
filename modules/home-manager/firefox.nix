@@ -12,7 +12,7 @@
       DisableFirefoxStudies = true;
     };
 
-    profiles."${username}" = {
+    profiles.${username} = {
       search = {
         default = "DuckDuckGo";
         force = true;
