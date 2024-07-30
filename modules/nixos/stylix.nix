@@ -4,17 +4,24 @@
   config,
   ...
 }: {
-  options.stylix.colorScheme = with lib;
-    mkOption {
+  options.stylix = with lib; {
+    colorScheme = mkOption {
       default = "catppuccin-mocha";
       description = "The Base16 theme to use.";
       type = types.str;
     };
 
+    wallpaper = mkOption {
+      default = ./../../wallpapers/tokyo.png;
+      description = "The wallpaper image to use.";
+      type = types.path;
+    };
+  };
+
   config = lib.mkIf config.stylix.enable {
     stylix = {
       base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.stylix.colorScheme}.yaml";
-      image = ./../wallpapers/wallpaper.png;
+      image = config.stylix.wallpaper;
 
       targets.grub.useImage = true;
 
