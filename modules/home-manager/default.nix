@@ -31,10 +31,6 @@
     packages = with pkgs; [
       ripgrep
       gitui
-      bitwarden
-      qbittorrent
-      spotify
-      mpv
       wget
       go
       manix
