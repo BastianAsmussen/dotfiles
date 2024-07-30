@@ -31,6 +31,7 @@
   };
 
   console.keyMap = "dk";
+  services.xserver.xkb.layout = "dk";
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
