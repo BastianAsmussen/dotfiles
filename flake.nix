@@ -9,6 +9,7 @@
     hyprland.url = "github:hyprwm/Hyprland";
     ags.url = "github:Aylur/ags";
     matugen.url = "github:InioX/matugen";
+    nixcord.url = "github:kaylorben/nixcord";
 
     disko = {
       url = "github:nix-community/disko";
@@ -29,8 +30,6 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    nixcord.url = "github:kaylorben/nixcord";
   };
 
   outputs = {nixpkgs, ...} @ inputs: let
