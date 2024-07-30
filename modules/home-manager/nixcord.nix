@@ -17,6 +17,7 @@
         betterGifAltText.enable = true;
         betterNotesBox = {
           enable = true;
+
           hide = true;
         };
         callTimer.enable = true;
@@ -38,6 +39,7 @@
         relationshipNotifier.enable = true;
         replaceGoogleSearch = {
           enable = true;
+
           customEngineName = "DuckDuckGo";
           customEngineURL = "https://duckduckgo.com/?q=";
         };
