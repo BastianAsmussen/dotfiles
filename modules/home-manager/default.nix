@@ -1,6 +1,7 @@
 {
   lib,
   username,
+  pkgs,
   ...
 }: {
   imports = [
@@ -15,6 +16,7 @@
     ./fzf.nix
     ./git.nix
     ./gpg.nix
+    ./nixcord.nix
     ./tmux.nix
     ./zoxide.nix
     ./zsh.nix
@@ -25,6 +27,18 @@
   home = {
     username = "${username}";
     homeDirectory = "/home/${username}";
+
+    packages = with pkgs; [
+      ripgrep
+      gitui
+      bitwarden
+      qbittorrent
+      spotify
+      mpv
+      wget
+      go
+      manix
+    ];
 
     stateVersion = "24.05";
   };

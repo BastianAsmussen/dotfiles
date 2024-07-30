@@ -12,22 +12,10 @@
     ./btrfs.nix
     ./home-manager.nix
     ./keyboard.nix
+    ./language.nix
     ./nix.nix
     ./nvidia.nix
     ./stylix.nix
-  ];
-
-  environment.systemPackages = with pkgs; [
-    ripgrep
-    gitui
-    bitwarden
-    qbittorrent
-    discord
-    spotify
-    mpv
-    wget
-    go
-    manix
   ];
 
   btrfs.enable = lib.mkDefault true;
