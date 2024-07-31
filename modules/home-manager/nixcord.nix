@@ -14,11 +14,13 @@
       plugins = {
         alwaysAnimate.enable = true;
         betterGifAltText.enable = true;
+
         betterNotesBox = {
           enable = true;
 
           hide = true;
         };
+
         callTimer.enable = true;
         clearURLs.enable = true;
         copyEmojiMarkdown.enable = true;
@@ -34,14 +36,15 @@
         memberCount.enable = true;
         noOnboardingDelay.enable = true;
         permissionsViewer.enable = true;
-        platformIndicators.enable = true;
         relationshipNotifier.enable = true;
+
         replaceGoogleSearch = {
           enable = true;
 
           customEngineName = "DuckDuckGo";
           customEngineURL = "https://duckduckgo.com/?q=";
         };
+
         reverseImageSearch.enable = true;
         summaries.enable = true;
         serverInfo.enable = true;
