@@ -6,8 +6,6 @@
   programs.nixcord = {
     enable = true;
 
-    vesktop.enable = true;
-
     config = {
       themeLinks = [
         "https://catppuccin.github.io/discord/dist/catppuccin-mocha.theme.css"
