@@ -5,6 +5,9 @@
     settings = {
       experimental-features = ["nix-command" "flakes"];
 
+      trusted-users = ["root" "@wheel"];
+      substituters = ["https://cache.nixos.org" "https://devenv.cachix.org"];
+
       warn-dirty = false;
       auto-optimise-store = true;
       sandbox = "relaxed";

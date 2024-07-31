@@ -10,6 +10,7 @@
     ./oh-my-posh
     ./alacritty.nix
     ./btop.nix
+    ./development.nix
     ./eza.nix
     ./fastfetch.nix
     ./firefox.nix

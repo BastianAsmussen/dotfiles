@@ -70,9 +70,5 @@
         ];
       };
     };
-
-    devShells = forAllSystems ({pkgs}: {
-      rust = import ./shells/rust {inherit pkgs;};
-    });
   };
 }
