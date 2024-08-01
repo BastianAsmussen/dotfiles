@@ -8,6 +8,7 @@
     ./hyprland
     ./nixvim
     ./oh-my-posh
+    ./zsh
     ./alacritty.nix
     ./btop.nix
     ./development.nix
@@ -20,7 +21,6 @@
     ./nixcord.nix
     ./tmux.nix
     ./zoxide.nix
-    ./zsh.nix
   ];
 
   gpg.enable = lib.mkDefault true;
