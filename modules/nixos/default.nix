@@ -10,6 +10,7 @@
     ./virtualization
     ./bootloader.nix
     ./btrfs.nix
+    ./goxlr.nix
     ./home-manager.nix
     ./keyboard.nix
     ./language.nix
