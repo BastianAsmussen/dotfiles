@@ -7,6 +7,8 @@
   ssh.server.enable = true;
 
   nvidia.enable = true;
+  goxlr.enable = true;
+
   gdm.enable = true;
   gnome.enable = true;
 
