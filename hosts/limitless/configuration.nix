@@ -4,7 +4,7 @@
     ./disko-config.nix
   ];
 
-  sshServer.enable = true;
+  ssh.server.enable = true;
 
   nvidia.enable = true;
   gdm.enable = true;

@@ -1,7 +1,7 @@
 {lib, ...}: {
   imports = [
     ./gpg.nix
-    ./sshServer.nix
+    ./ssh.nix
     ./vpn.nix
     ./yubiKey.nix
   ];
