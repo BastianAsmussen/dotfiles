@@ -67,9 +67,18 @@
             definedAliases = ["@nw"];
           };
 
+          "Urban Dictionary" = {
+            urls = [{template = "https://www.urbandictionary.com/define.php?term={searchTerms}";}];
+
+            iconUpdateURL = "https://www.urbandictionary.com/favicon-32x32.png";
+            updateInterval = 24 * 60 * 60 * 1000; # Once every day.
+            definedAliases = ["@urban"];
+          };
+
           # Disable other search engines.
-          "Bing".metaData.hidden = true;
           "Google".metaData.hidden = true;
+          "Bing".metaData.hidden = true;
+          "Wikipedia (en)".metaData.hidden = true;
         };
       };
 
@@ -120,9 +129,19 @@
           toolbar = true;
           bookmarks = [
             {
-              name = "Mail";
-              keyword = "ma";
-              url = "https://mail.proton.me/u/0";
+              name = "Proton";
+              bookmarks = [
+                {
+                  name = "Mail";
+                  keyword = "ma";
+                  url = "https://mail.proton.me/u/0";
+                }
+                {
+                  name = "Drive";
+                  keyword = "dr";
+                  url = "https://drive.proton.me/u/0";
+                }
+              ];
             }
             {
               name = "GitHub";
