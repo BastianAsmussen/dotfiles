@@ -26,8 +26,8 @@
       btrfs.autoScrub = {
         enable = true;
 
-        interval = config.btrfs.scrub.interval;
-        fileSystems = config.btrfs.scrub.fileSystems;
+        inherit (config.btrfs.scrub) interval;
+        inherit (config.btrfs.scrub) fileSystems;
       };
     };
   };
