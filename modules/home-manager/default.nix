@@ -5,6 +5,7 @@
   ...
 }: {
   imports = [
+    ./goxlr
     ./hyprland
     ./nixvim
     ./oh-my-posh
@@ -24,6 +25,8 @@
   ];
 
   gpg.enable = lib.mkDefault true;
+
+  programs.man.generateCaches = true;
 
   home = {
     username = "${username}";
