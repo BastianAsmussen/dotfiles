@@ -15,7 +15,7 @@
   config = lib.mkIf config.docker.enable {
     virtualisation.docker = {
       enable = true;
-      storageDriver = config.docker.storageDriver;
+      inherit (config.docker) storageDriver;
     };
   };
 }
