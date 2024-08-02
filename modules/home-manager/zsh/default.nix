@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: {
-  imports = [./calculator.nix];
+  imports = [./scripts];
 
   programs.zsh = {
     enable = true;
