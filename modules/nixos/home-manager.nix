@@ -3,7 +3,9 @@
   config,
   lib,
   ...
-}: {
+}: let
+  nixosOptions = config;
+in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
   ];
@@ -19,10 +21,12 @@
 
   config = lib.mkIf config.home-manager.enable {
     home-manager = with config.home-manager; {
-      extraSpecialArgs = {inherit inputs username;};
+      extraSpecialArgs = {inherit inputs username nixosOptions;};
 
       useGlobalPkgs = true;
       useUserPackages = true;
+
+      backupFileExtension = "backup";
 
       users."${username}" = import ../home-manager;
     };
