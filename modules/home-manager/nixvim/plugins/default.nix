@@ -6,6 +6,7 @@
     ./completions.nix
     ./lsp.nix
     ./lualine.nix
+    ./neo-tree.nix
     ./otter.nix
     ./telescope.nix
     ./treesitter.nix
