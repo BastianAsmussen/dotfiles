@@ -8,11 +8,6 @@
       key = "<C-s>";
       action = ":w<CR>";
     }
-    {
-      mode = "n";
-      key = "<leader>e";
-      action = ":Ex<CR>";
-    }
 
     {
       mode = "v";
