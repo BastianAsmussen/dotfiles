@@ -14,13 +14,11 @@
       plugins = {
         alwaysAnimate.enable = true;
         betterGifAltText.enable = true;
-
         betterNotesBox = {
           enable = true;
 
           hide = true;
         };
-
         callTimer.enable = true;
         clearURLs.enable = true;
         copyEmojiMarkdown.enable = true;
@@ -34,17 +32,16 @@
         friendsSince.enable = true;
         iLoveSpam.enable = true;
         memberCount.enable = true;
+        messageLogger.enable = true;
         noOnboardingDelay.enable = true;
         permissionsViewer.enable = true;
         relationshipNotifier.enable = true;
-
         replaceGoogleSearch = {
           enable = true;
 
           customEngineName = "DuckDuckGo";
           customEngineURL = "https://duckduckgo.com/?q=";
         };
-
         reverseImageSearch.enable = true;
         summaries.enable = true;
         serverInfo.enable = true;
@@ -58,6 +55,10 @@
         voiceDownload.enable = true;
         watchTogetherAdblock.enable = true;
       };
+    };
+
+    extraConfig = {
+      IS_MAXIMISED = true;
     };
   };
 }
