@@ -39,7 +39,7 @@
     description = "Bastian Asmussen";
     initialPassword = "Password123!";
 
-    extraGroups = ["wheel" "docker" "libvirtd"];
+    extraGroups = ["wheel" "docker" "libvirtd" "networkmanager"];
     shell = pkgs.zsh;
   };
 }
