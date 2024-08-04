@@ -29,7 +29,6 @@
     bitwarden
     qbittorrent
     spotify
-    mpv
   ];
 
   programs.zsh.enable = true;
