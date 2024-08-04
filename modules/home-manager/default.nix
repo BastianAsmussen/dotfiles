@@ -19,6 +19,7 @@
     ./fzf.nix
     ./git.nix
     ./gpg.nix
+    ./mpv.nix
     ./nixcord.nix
     ./tmux.nix
     ./zoxide.nix
