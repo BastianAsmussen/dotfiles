@@ -12,7 +12,7 @@
     ./zsh
     ./alacritty.nix
     ./btop.nix
-    ./development.nix
+    ./devenv.nix
     ./eza.nix
     ./fastfetch.nix
     ./firefox.nix
