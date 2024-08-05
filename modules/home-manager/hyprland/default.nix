@@ -3,7 +3,12 @@
   lib,
   config,
   ...
-}: {
+}: let
+  cfg = {
+    hyprland = config.hyprland;
+    colors = config.lib.stylix.colors;
+  };
+in {
   options.hyprland.monitors = with lib;
     mkOption {
       default = [
@@ -30,7 +35,7 @@
 
       input.kb_layout = "dk";
 
-      monitor = config.hyprland.monitors;
+      monitor = cfg.hyprland.monitors;
 
       bind =
         [
@@ -67,9 +72,9 @@
         "$mod ALT, mouse:272, resizewindow"
       ];
 
-      general = with config.lib.stylix.colors; {
-        "col.active_border" = lib.mkForce "rgba(${base0E}ff) rgba(${base09}ff) 60deg";
-        "col.inactive_border" = lib.mkForce "rgba(${base00}ff)";
+      general = {
+        "col.active_border" = lib.mkForce "rgba(${cfg.colors.base0E}ff) rgba(${cfg.colors.base09}ff) 60deg";
+        "col.inactive_border" = lib.mkForce "rgba(${cfg.colors.base00}ff)";
 
         gaps_out = 30;
       };

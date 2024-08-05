@@ -3,6 +3,6 @@
     enable = true;
     enableZshIntegration = true;
 
-    settings = builtins.fromTOML (builtins.unsafeDiscardStringContext (builtins.readFile ./theme.toml));
+    settings = builtins.fromTOML (builtins.readFile ./theme.toml);
   };
 }

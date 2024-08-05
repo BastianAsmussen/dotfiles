@@ -5,6 +5,7 @@
   ...
 }: let
   nixosOptions = config;
+  hmOptions = config.home-manager;
 in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
@@ -19,16 +20,16 @@ in {
     };
   };
 
-  config = lib.mkIf config.home-manager.enable {
-    home-manager = with config.home-manager; {
-      extraSpecialArgs = {inherit inputs username nixosOptions;};
+  config = lib.mkIf hmOptions.enable {
+    home-manager = {
+      extraSpecialArgs = {inherit inputs nixosOptions hmOptions;};
 
       useGlobalPkgs = true;
       useUserPackages = true;
 
       backupFileExtension = "backup";
 
-      users."${username}" = import ../home-manager;
+      users."${hmOptions.username}" = import ../home-manager;
     };
   };
 }

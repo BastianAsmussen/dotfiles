@@ -2,26 +2,28 @@
   config,
   lib,
   ...
-}: {
-  options.keyboard = {
-    enable = lib.mkEnableOption "Enables custom keyboard mappings.";
-    keyboards = lib.mkOption {
+}: let
+  cfg = config.keyboard;
+in {
+  options.keyboard = with lib; {
+    enable = mkEnableOption "Enables custom keyboard mappings.";
+    keyboards = mkOption {
       default = [];
       description = ''
         The keyboards to apply the macros to.
 
         An empty list lets Kanata detect which input devices are keyboards and intercept them all.
       '';
-      type = with lib.types; listOf str;
+      type = with types; listOf str;
     };
   };
 
-  config = lib.mkIf config.keyboard.enable {
+  config = lib.mkIf cfg.enable {
     services.kanata = {
       enable = true;
 
       keyboards.internalKeyboard = {
-        devices = config.keyboard.keyboards;
+        devices = cfg.keyboards;
         extraDefCfg = "process-unmapped-keys yes";
         config = ''
           (defsrc caps)
