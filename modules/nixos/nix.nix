@@ -10,7 +10,6 @@
 
       warn-dirty = false;
       auto-optimise-store = true;
-      sandbox = "relaxed";
 
       http-connections = 64;
       log-lines = 64;
