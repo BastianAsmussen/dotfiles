@@ -5,8 +5,8 @@
   ...
 }: let
   cfg = {
-    hyprland = config.hyprland;
-    colors = config.lib.stylix.colors;
+    inherit (config) hyprland;
+    inherit (config.lib.stylix) colors;
   };
 in {
   options.hyprland.monitors = with lib;
