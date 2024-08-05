@@ -10,7 +10,7 @@
       description = ''
         The keyboards to apply the macros to.
 
-        An empty list lets kanata detect which input devices are keyboards and intercept them all.
+        An empty list lets Kanata detect which input devices are keyboards and intercept them all.
       '';
       type = with lib.types; listOf str;
     };
