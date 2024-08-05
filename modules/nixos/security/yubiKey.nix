@@ -11,7 +11,7 @@
     programs.ssh.startAgent = false; # Disallow the SSH agent.
 
     services = {
-      udev.packages = with pkgs; [yubikey-personalization];
+      udev.packages = [pkgs.yubikey-personalization];
       pcscd.enable = true;
     };
 

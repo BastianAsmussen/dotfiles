@@ -3,7 +3,9 @@
   lib,
   config,
   ...
-}: {
+}: let
+  cfg = config.stylix;
+in {
   options.stylix = with lib; {
     colorScheme = mkOption {
       default = "catppuccin-mocha";
@@ -18,10 +20,10 @@
     };
   };
 
-  config = lib.mkIf config.stylix.enable {
+  config = lib.mkIf cfg.enable {
     stylix = {
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.stylix.colorScheme}.yaml";
-      image = config.stylix.wallpaper;
+      base16Scheme = "${pkgs.base16-schemes}/share/themes/${cfg.colorScheme}.yaml";
+      image = cfg.wallpaper;
 
       targets.grub.useImage = true;
 
@@ -32,19 +34,19 @@
         name = "Bibata-Modern-Ice";
       };
 
-      fonts = {
+      fonts = with pkgs; {
         monospace = {
-          package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
+          package = nerdfonts.override {fonts = ["JetBrainsMono"];};
           name = "JetBrainsMono Nerd Font Mono";
         };
 
         sansSerif = {
-          package = pkgs.dejavu_fonts;
+          package = dejavu_fonts;
           name = "DejaVu Sans";
         };
 
         serif = {
-          package = pkgs.dejavu_fonts;
+          package = dejavu_fonts;
           name = "DejaVu Serif";
         };
       };

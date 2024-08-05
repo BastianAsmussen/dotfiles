@@ -2,12 +2,15 @@
   lib,
   config,
   ...
-}: {
-  options.bootloader.isMultiboot = lib.mkOption {
-    default = false;
-    description = "Use OS Prober.";
-    type = lib.types.bool;
-  };
+}: let
+  cfg = config.bootloader;
+in {
+  options.bootloader.isMultiboot = with lib;
+    mkOption {
+      default = false;
+      description = "Use OS Prober.";
+      type = types.bool;
+    };
 
   config = {
     boot.loader = {
@@ -18,7 +21,7 @@
 
       grub = {
         efiSupport = true;
-        useOSProber = config.bootloader.isMultiboot;
+        useOSProber = cfg.isMultiboot;
 
         device = "nodev";
       };

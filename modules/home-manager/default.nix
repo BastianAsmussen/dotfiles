@@ -1,6 +1,6 @@
 {
   lib,
-  username,
+  hmOptions,
   pkgs,
   ...
 }: {
@@ -30,8 +30,8 @@
   programs.man.generateCaches = true;
 
   home = {
-    username = "${username}";
-    homeDirectory = "/home/${username}";
+    username = "${hmOptions.username}";
+    homeDirectory = "/home/${hmOptions.username}";
 
     packages = with pkgs; [
       ripgrep

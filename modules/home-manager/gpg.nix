@@ -3,6 +3,8 @@
   config,
   ...
 }: let
+  cfg = config.gpg;
+
   keyDir = ../../keys;
 
   getAllKeys = keyDir: builtins.attrNames (builtins.readDir keyDir);
@@ -11,7 +13,7 @@
   mapKeyPaths = keys: keyDir: builtins.map (keyName: {source = "${keyDir}/${keyName}";}) keys;
 
   findMissingKeys = keys: builtins.filter (key: !builtins.elem key (getAllKeys keyDir)) keys;
-  missingKeys = findMissingKeys config.gpg.disallowedKeys;
+  missingKeys = findMissingKeys cfg.disallowedKeys;
 in {
   options.gpg = with lib; {
     enable = mkEnableOption "Enables GPG.";
@@ -22,7 +24,7 @@ in {
     };
   };
 
-  config = lib.mkIf config.gpg.enable {
+  config = lib.mkIf cfg.enable {
     warnings =
       if builtins.length missingKeys > 0
       then [
@@ -37,7 +39,7 @@ in {
       enable = true;
 
       # Read public keys from the `keys` directory.
-      publicKeys = mapKeyPaths (filterAllowedKeys (getAllKeys keyDir) config.gpg.disallowedKeys) keyDir;
+      publicKeys = mapKeyPaths (filterAllowedKeys (getAllKeys keyDir) cfg.disallowedKeys) keyDir;
     };
   };
 }
