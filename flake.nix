@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    old-monero.url = "github:nixos/nixpkgs/080a4a27f206d07724b88da096e27ef63401a504";
 
     stylix.url = "github:danth/stylix";
     hyprland.url = "github:hyprwm/Hyprland";
