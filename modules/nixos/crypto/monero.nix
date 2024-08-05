@@ -2,9 +2,10 @@
   lib,
   config,
   pkgs,
-  inputs,
   ...
-}: {
+}: let
+  cfg = config.monero;
+in {
   options.monero = with lib; {
     gui.enable = mkEnableOption "Enables Monero application.";
 
@@ -31,21 +32,21 @@
   };
 
   config = lib.mkMerge [
-    (lib.mkIf config.monero.gui.enable {
-      environment.systemPackages = [
-        inputs.old-monero.legacyPackages.${pkgs.system}.monero-gui
+    (lib.mkIf cfg.gui.enable {
+      environment.systemPackages = with pkgs; [
+        monero-gui
       ];
     })
 
-    (lib.mkIf config.monero.mining.enable {
+    (lib.mkIf cfg.mining.enable {
       assertions = [
         {
-          assertion = config.monero.mining.maxUsagePercentage >= 1 && config.monero.mining.maxUsagePercentage <= 100;
+          assertion = cfg.mining.maxUsagePercentage >= 1 && cfg.mining.maxUsagePercentage <= 100;
           message = "`maxUsagePercentage` must be between 1 and 100!";
         }
       ];
 
-      services.xmrig = with config.monero.mining; {
+      services.xmrig = with cfg.mining; {
         enable = true;
 
         settings = {
