@@ -155,12 +155,13 @@
       extensions = with inputs.firefox-addons.packages.${pkgs.system}; [
         bitwarden
         ublock-origin
+        i-dont-care-about-cookies
         clearurls
         duckduckgo-privacy-essentials
+        darkreader
         sponsorblock
         return-youtube-dislikes
-        darkreader
-        i-dont-care-about-cookies
+        youtube-shorts-block
       ];
     };
   };
