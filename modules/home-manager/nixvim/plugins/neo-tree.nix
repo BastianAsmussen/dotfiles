@@ -6,6 +6,8 @@
       enableGitStatus = true;
       enableModifiedMarkers = true;
       enableRefreshOnWrite = true;
+
+      filesystem.filteredItems.hideDotfiles = false;
     };
 
     keymaps = [
