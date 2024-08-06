@@ -47,7 +47,7 @@ nix flake update
 2. Make sure it can compile.
 
 ```sh
-nh os test ~/dotfiles
+nh os switch ~/dotfiles
 ```
 
 - If it can't build, roll back to a previous version.
