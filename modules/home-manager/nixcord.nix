@@ -13,11 +13,23 @@
 
       plugins = {
         alwaysAnimate.enable = true;
+        anonymiseFileNames = {
+          enable = true;
+
+          anonymiseByDefault = true;
+          randomisedLength = 16;
+        };
         betterGifAltText.enable = true;
+        betterGifPicker.enable = true;
         betterNotesBox = {
           enable = true;
 
           hide = true;
+        };
+        betterRoleContext = {
+          enable = true;
+
+          roleIconFileFormat = "webp";
         };
         callTimer.enable = true;
         clearURLs.enable = true;
@@ -30,11 +42,18 @@
         fixYoutubeEmbeds.enable = true;
         forceOwnerCrown.enable = true;
         friendsSince.enable = true;
+        gifPaste.enable = true;
         iLoveSpam.enable = true;
+        loadingQuotes = {
+          enable = true;
+
+          enableDiscordPresetQuotes = true;
+        };
         memberCount.enable = true;
         messageLogger.enable = true;
         noOnboardingDelay.enable = true;
         permissionsViewer.enable = true;
+        reactErrorDecoder.enable = true;
         relationshipNotifier.enable = true;
         replaceGoogleSearch = {
           enable = true;
@@ -57,8 +76,6 @@
       };
     };
 
-    extraConfig = {
-      IS_MAXIMISED = true;
-    };
+    extraConfig.IS_MAXIMISED = true;
   };
 }
