@@ -155,8 +155,9 @@
       extensions = with inputs.firefox-addons.packages.${pkgs.system}; [
         bitwarden
         ublock-origin
-        i-dont-care-about-cookies
+        istilldontcareaboutcookies
         clearurls
+        privacy-badger
         duckduckgo-privacy-essentials
         darkreader
         sponsorblock
