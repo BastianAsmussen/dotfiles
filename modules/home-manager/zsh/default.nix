@@ -63,6 +63,7 @@
         "kubectl"
         "kubectx"
         "rust"
+        "pass"
       ];
     };
 
