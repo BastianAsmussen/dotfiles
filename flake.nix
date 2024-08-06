@@ -57,6 +57,8 @@
             ./hosts/${hostname}/configuration.nix
             ./modules/nixos
 
+            {networking.hostName = hostname;}
+
             inputs.disko.nixosModules.disko
             inputs.stylix.nixosModules.stylix
           ];

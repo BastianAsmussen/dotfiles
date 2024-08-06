@@ -10,10 +10,7 @@
   pipewire.enable = true;
   hardware.pulseaudio.enable = false;
 
-  networking = {
-    hostName = "judgeman";
-    networkmanager.enable = true;
-  };
+  networking.networkmanager.enable = true;
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
