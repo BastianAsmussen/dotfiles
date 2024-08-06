@@ -15,12 +15,6 @@
       log-lines = 64;
     };
 
-    gc = {
-      automatic = true;
-      options = "--delete-older-than 7d";
-      dates = "weekly";
-    };
-
     optimise.automatic = true;
   };
 
