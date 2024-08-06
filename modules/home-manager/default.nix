@@ -21,6 +21,7 @@
     ./gpg.nix
     ./mpv.nix
     ./nixcord.nix
+    ./password-store.nix
     ./tmux.nix
     ./zoxide.nix
   ];
