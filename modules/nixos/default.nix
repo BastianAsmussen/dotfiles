@@ -14,6 +14,7 @@
     ./home-manager.nix
     ./keyboard.nix
     ./language.nix
+    ./nh.nix
     ./nix.nix
     ./nvidia.nix
     ./stylix.nix
