@@ -27,6 +27,7 @@
   stylix.enable = lib.mkDefault true;
 
   environment.systemPackages = with pkgs; [
+    sops
     bitwarden
     qbittorrent
     spotify

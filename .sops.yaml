@@ -1,0 +1,10 @@
+keys:
+  - &primary 3C792C846E074CB1
+  - &secondary D99EF45898EF5FC9
+
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+    - pgp:
+      - *primary
+      - *secondary
