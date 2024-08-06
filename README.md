@@ -40,16 +40,17 @@ sudo nixos-install --flake ~/dotfiles#limitless
 
 ```sh
 cd ~/dotfiles
+
 nix flake update
 ```
 
 2. Make sure it can compile.
 
 ```sh
-sudo nixos-rebuild switch --flake ~/dotfiles#<CONFIGURATION>
+nh os test ~/dotfiles
 ```
 
-- If it can't compile, roll back to a previous version.
+- If it can't build, roll back to a previous version.
 
 ```sh
 git reset --hard HEAD~1
