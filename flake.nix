@@ -39,6 +39,9 @@
       "aarch64-darwin"
       "x86_64-darwin"
     ];
+
+    hosts = builtins.attrNames (builtins.readDir ./hosts);
+
     forAllSystems = fn:
       nixpkgs.lib.genAttrs systems
       (system: fn {pkgs = import nixpkgs {inherit system;};});
@@ -46,28 +49,19 @@
     packages = forAllSystems ({pkgs}: import ./pkgs nixpkgs.legacyPackages.${pkgs.system});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
-    nixosConfigurations = {
-      limitless = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs;};
-        modules = [
-          ./hosts/limitless/configuration.nix
-          ./modules/nixos
+    nixosConfigurations = builtins.listToAttrs (map (hostname: {
+        name = hostname;
+        value = nixpkgs.lib.nixosSystem {
+          specialArgs = {inherit inputs;};
+          modules = [
+            ./hosts/${hostname}/configuration.nix
+            ./modules/nixos
 
-          inputs.disko.nixosModules.disko
-          inputs.stylix.nixosModules.stylix
-        ];
-      };
-
-      judgeman = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs;};
-        modules = [
-          ./hosts/judgeman/configuration.nix
-          ./modules/nixos
-
-          inputs.disko.nixosModules.disko
-          inputs.stylix.nixosModules.stylix
-        ];
-      };
-    };
+            inputs.disko.nixosModules.disko
+            inputs.stylix.nixosModules.stylix
+          ];
+        };
+      })
+      hosts);
   };
 }
