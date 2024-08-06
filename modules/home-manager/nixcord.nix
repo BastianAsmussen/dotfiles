@@ -50,6 +50,12 @@
           enableDiscordPresetQuotes = true;
         };
         memberCount.enable = true;
+        messageLatency = {
+          enable = true;
+
+          latency = 5;
+          showMillis = true;
+        };
         messageLogger.enable = true;
         noOnboardingDelay.enable = true;
         permissionsViewer.enable = true;
