@@ -39,6 +39,7 @@
       wget
       go
       manix
+      teams-for-linux
     ];
 
     stateVersion = "24.05";
