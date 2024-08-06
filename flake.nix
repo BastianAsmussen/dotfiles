@@ -9,6 +9,7 @@
     ags.url = "github:Aylur/ags";
     matugen.url = "github:InioX/matugen";
     nixcord.url = "github:kaylorben/nixcord";
+    sops-nix.url = "github:Mic92/sops-nix";
 
     disko = {
       url = "github:nix-community/disko";
@@ -59,8 +60,9 @@
 
             {networking.hostName = hostname;}
 
-            inputs.disko.nixosModules.disko
             inputs.stylix.nixosModules.stylix
+            inputs.sops-nix.nixosModules.sops
+            inputs.disko.nixosModules.disko
           ];
         };
       })
