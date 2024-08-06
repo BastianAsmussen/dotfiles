@@ -29,10 +29,7 @@
 
   bootloader.isMultiboot = true;
 
-  networking = {
-    hostName = "limitless";
-    networkmanager.enable = true;
-  };
+  networking.networkmanager.enable = true;
 
   fonts.packages = with pkgs; [
     (nerdfonts.override {fonts = ["JetBrainsMono"];})
