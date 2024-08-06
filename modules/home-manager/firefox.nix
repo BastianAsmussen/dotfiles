@@ -83,7 +83,8 @@
       };
 
       settings = {
-        "signon.rememberSignons" = false; # Disable password saving.
+        # Disable password saving.
+        "signon.rememberSignons" = false;
 
         # Auto-enable extensions.
         "extensions.autoDisableScopes" = 0;
