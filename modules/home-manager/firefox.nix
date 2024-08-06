@@ -85,9 +85,10 @@
       settings = {
         # Disable password saving.
         "signon.rememberSignons" = false;
-
         # Auto-enable extensions.
         "extensions.autoDisableScopes" = 0;
+        # Enable HTTPS-Only mode.
+        "dom.security.https_only_mode" = true;
 
         # Telemetry.
         "browser.newtabpage.activity-stream.feeds.telemetry" = false;
