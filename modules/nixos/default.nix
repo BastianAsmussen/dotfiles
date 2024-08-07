@@ -26,12 +26,6 @@
   keyboard.enable = lib.mkDefault true;
   stylix.enable = lib.mkDefault true;
 
-  environment.systemPackages = with pkgs; [
-    bitwarden
-    qbittorrent
-    spotify
-  ];
-
   programs.zsh.enable = true;
   users.users.bastian = {
     isNormalUser = true;
