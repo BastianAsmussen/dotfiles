@@ -39,15 +39,7 @@ sudo nixos-install --flake ~/dotfiles#limitless
 1. Update the `flake.lock` file about once per week.
 
 ```sh
-cd ~/dotfiles
-
-nix flake update
-```
-
-2. Make sure it can compile.
-
-```sh
-nh os switch ~/dotfiles
+nh os switch --update ~/dotfiles
 ```
 
 - If it can't build, roll back to a previous version.
