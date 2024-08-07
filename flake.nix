@@ -32,7 +32,13 @@
     };
   };
 
-  outputs = {nixpkgs, ...} @ inputs: let
+  outputs = {
+    nixpkgs,
+    stylix,
+    sops-nix,
+    disko,
+    ...
+  } @ inputs: let
     systems = [
       "aarch64-linux"
       "i686-linux"
@@ -60,9 +66,9 @@
 
             {networking.hostName = hostname;}
 
-            inputs.stylix.nixosModules.stylix
-            inputs.sops-nix.nixosModules.sops
-            inputs.disko.nixosModules.disko
+            stylix.nixosModules.stylix
+            sops-nix.nixosModules.sops
+            disko.nixosModules.disko
           ];
         };
       })

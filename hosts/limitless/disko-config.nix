@@ -1,4 +1,4 @@
-{
+{config}: {
   disko.devices = {
     disk = {
       main = {
@@ -25,7 +25,10 @@
               content = {
                 type = "luks";
                 name = "luks_lvm";
-                passwordFile = "/tmp/secret.key";
+                passwordFile = config.sops.secrets.disk-password.path;
+                postCreateHook = ''
+                  PASSWORD=${config.sops.secrets.disk-password} ${config.systemd.package}/bin/systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
+                '';
 
                 settings.allowDiscards = true;
 
