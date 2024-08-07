@@ -22,13 +22,21 @@
     ./mpv.nix
     ./nixcord.nix
     ./password-store.nix
+    ./qbittorrent.nix
     ./tmux.nix
     ./zoxide.nix
   ];
 
-  gpg.enable = lib.mkDefault true;
+  gpg.enable = true;
 
-  programs.man.generateCaches = true;
+  programs = {
+    qbittorrent = {
+      enable = true;
+
+      legalNotice = true;
+    };
+    man.generateCaches = true;
+  };
 
   home = {
     username = "${hmOptions.username}";
@@ -41,6 +49,8 @@
       go
       manix
       teams-for-linux
+      bitwarden
+      spotify
     ];
 
     stateVersion = "24.05";
