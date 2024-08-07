@@ -17,6 +17,7 @@
     ./nh.nix
     ./nix.nix
     ./nvidia.nix
+    ./sops.nix
     ./stylix.nix
   ];
 
@@ -27,14 +28,12 @@
   stylix.enable = lib.mkDefault true;
 
   environment.systemPackages = with pkgs; [
-    sops
     bitwarden
     qbittorrent
     spotify
   ];
 
   programs.zsh.enable = true;
-
   users.users.bastian = {
     isNormalUser = true;
     description = "Bastian Asmussen";

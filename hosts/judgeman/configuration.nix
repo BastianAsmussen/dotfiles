@@ -1,7 +1,11 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   imports = [
     ./hardware-configuration.nix
-    ./disko-config.nix
+    (import ./disko-config.nix {inherit config;})
   ];
 
   gdm.enable = true;
