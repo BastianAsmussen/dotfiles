@@ -1,11 +1,7 @@
-{
-  pkgs,
-  config,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ./hardware-configuration.nix
-    (import ./disko-config.nix {inherit config;})
+    ./disko-config.nix
   ];
 
   ssh.server.enable = true;
