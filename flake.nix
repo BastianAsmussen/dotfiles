@@ -9,7 +9,6 @@
     ags.url = "github:Aylur/ags";
     matugen.url = "github:InioX/matugen";
     nixcord.url = "github:kaylorben/nixcord";
-    sops-nix.url = "github:Mic92/sops-nix";
 
     disko = {
       url = "github:nix-community/disko";
@@ -32,13 +31,7 @@
     };
   };
 
-  outputs = {
-    nixpkgs,
-    stylix,
-    sops-nix,
-    disko,
-    ...
-  } @ inputs: let
+  outputs = {nixpkgs, ...} @ inputs: let
     systems = [
       "aarch64-linux"
       "i686-linux"
@@ -66,9 +59,8 @@
 
             {networking.hostName = hostname;}
 
-            stylix.nixosModules.stylix
-            sops-nix.nixosModules.sops
-            disko.nixosModules.disko
+            inputs.stylix.nixosModules.stylix
+            inputs.disko.nixosModules.disko
           ];
         };
       })

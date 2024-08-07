@@ -25,12 +25,10 @@
               content = {
                 type = "luks";
                 name = "luks_lvm";
-                passwordFile = config.sops.secrets.disk-password.path;
-                postCreateHook = ''
-                  PASSWORD=${config.sops.secrets.disk-password} ${config.systemd.package}/bin/systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
-                '';
-
-                settings.allowDiscards = true;
+                settings = {
+                  allowDiscards = true;
+                  crypttabExtraOpts = ["fido2-device=auto" "token-timeout=10"];
+                };
 
                 content = {
                   type = "lvm_pv";

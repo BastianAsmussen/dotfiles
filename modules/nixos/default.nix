@@ -17,7 +17,6 @@
     ./nh.nix
     ./nix.nix
     ./nvidia.nix
-    ./sops.nix
     ./stylix.nix
   ];
 
