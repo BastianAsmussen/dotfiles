@@ -30,9 +30,6 @@
       # Automatically renumber windows.
       set-option -g renumber-windows on
 
-      # Clear the screen.
-      bind L send-keys '^L'
-
       # Keybindings for yanking.
       bind-key -T copy-mode-vi v send-keys -X begin-selection
       bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
