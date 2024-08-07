@@ -3,7 +3,6 @@
     plugins.neo-tree = {
       enable = true;
 
-      closeIfLastWindow = true;
       window = {
         width = 32;
         autoExpandWidth = true;
