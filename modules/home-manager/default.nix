@@ -1,5 +1,4 @@
 {
-  lib,
   hmOptions,
   pkgs,
   ...
@@ -22,27 +21,20 @@
     ./mpv.nix
     ./nixcord.nix
     ./password-store.nix
-    ./qbittorrent.nix
     ./tmux.nix
     ./zoxide.nix
   ];
 
   gpg.enable = true;
 
-  programs = {
-    qbittorrent = {
-      enable = true;
-
-      legalNotice = true;
-    };
-    man.generateCaches = true;
-  };
+  programs.man.generateCaches = true;
 
   home = {
     username = "${hmOptions.username}";
     homeDirectory = "/home/${hmOptions.username}";
 
     packages = with pkgs; [
+      qbittorrent
       ripgrep
       gitui
       wget
