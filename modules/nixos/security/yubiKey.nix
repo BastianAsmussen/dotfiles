@@ -3,10 +3,12 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  cfg = config.yubiKey;
+in {
   options.yubiKey.enable = lib.mkEnableOption "Enables YubiKey support.";
 
-  config = lib.mkIf config.yubiKey.enable {
+  config = lib.mkIf cfg.enable {
     gpg.enable = true; # Make sure GPG is enabled.
     programs.ssh.startAgent = false; # Disallow the SSH agent.
 
@@ -16,9 +18,7 @@
     };
 
     environment = {
-      systemPackages = with pkgs; [
-        yubikey-personalization
-      ];
+      systemPackages = [pkgs.yubikey-personalization];
 
       shellInit = ''
         gpg-connect-agent /bye
