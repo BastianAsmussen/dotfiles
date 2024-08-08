@@ -4,7 +4,7 @@
   lib,
   ...
 }: let
-  nixosOptions = config;
+  osOptions = config;
   hmOptions = config.home-manager;
 in {
   imports = [
@@ -22,7 +22,7 @@ in {
 
   config = lib.mkIf hmOptions.enable {
     home-manager = {
-      extraSpecialArgs = {inherit inputs nixosOptions hmOptions;};
+      extraSpecialArgs = {inherit inputs osOptions hmOptions;};
 
       useGlobalPkgs = true;
       useUserPackages = true;
