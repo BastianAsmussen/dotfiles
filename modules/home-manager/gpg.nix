@@ -2,7 +2,6 @@
   lib,
   config,
   osOptions,
-  pkgs,
   ...
 }: let
   cfg = config.gpg;
