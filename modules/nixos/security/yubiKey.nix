@@ -25,15 +25,17 @@ in {
       u2f = {
         enable = true;
 
-        interactive = true;
-        cue = true;
+        settings = {
+          interactive = true;
+          cue = true;
 
-        origin = "pam://yubikey";
-        authFile = pkgs.writeText "u2f-mappings" (lib.concatStrings [
-          config.home-manager.username
-          ":<KeyHandle1>,<UserKey1>,<CoseType1>,<Options1>"
-          ":<KeyHandle2>,<UserKey2>,<CoseType2>,<Options2>"
-        ]);
+          origin = "pam://yubikey";
+          authFile = pkgs.writeText "u2f-mappings" (lib.concatStrings [
+            config.home-manager.username
+            ":<KeyHandle1>,<UserKey1>,<CoseType1>,<Options1>"
+            ":<KeyHandle2>,<UserKey2>,<CoseType2>,<Options2>"
+          ]);
+        };
       };
     };
 

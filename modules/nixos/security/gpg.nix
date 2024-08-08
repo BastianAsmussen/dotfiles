@@ -10,11 +10,11 @@
     programs.gnupg.agent = {
       enable = true;
       enableSSHSupport = true;
-
       pinentryPackage = pkgs.pinentry-curses;
+
       settings = {
-        defaultCacheTtl = 60;
-        maxCacheTtl = 120;
+        default-cache-ttl = 60;
+        max-cache-ttl = 120;
         ttyname = "$GPG_TTY";
       };
     };
