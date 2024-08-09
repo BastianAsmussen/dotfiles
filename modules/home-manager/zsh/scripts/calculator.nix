@@ -1,5 +1,5 @@
 {pkgs}:
-pkgs.writers.writePython3Bin "calc" {
+pkgs.writers.writePython3Bin "=" {
   libraries = with pkgs.python312Packages; [
     click
     numexpr
