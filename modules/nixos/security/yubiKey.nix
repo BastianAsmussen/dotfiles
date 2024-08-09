@@ -16,29 +16,6 @@ in {
       pcscd.enable = true;
     };
 
-    security.pam = {
-      services = {
-        login.u2fAuth = true;
-        sudo.u2fAuth = true;
-      };
-
-      u2f = {
-        enable = true;
-
-        settings = {
-          interactive = true;
-          cue = true;
-
-          origin = "pam://yubikey";
-          authFile = pkgs.writeText "u2f-mappings" (lib.concatStrings [
-            config.home-manager.username
-            ":<KeyHandle1>,<UserKey1>,<CoseType1>,<Options1>"
-            ":<KeyHandle2>,<UserKey2>,<CoseType2>,<Options2>"
-          ]);
-        };
-      };
-    };
-
     environment = {
       systemPackages = [pkgs.yubikey-personalization];
 

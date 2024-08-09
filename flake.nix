@@ -6,8 +6,6 @@
 
     stylix.url = "github:danth/stylix";
     hyprland.url = "github:hyprwm/Hyprland";
-    ags.url = "github:Aylur/ags";
-    matugen.url = "github:InioX/matugen";
     nixcord.url = "github:kaylorben/nixcord";
 
     disko = {

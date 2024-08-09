@@ -1,8 +1,4 @@
-{
-  lib,
-  pkgs,
-  ...
-}: {
+{lib, ...}: {
   imports = [
     ./crypto
     ./desktop
@@ -18,6 +14,7 @@
     ./nix.nix
     ./nvidia.nix
     ./stylix.nix
+    ./user.nix
   ];
 
   btrfs.enable = lib.mkDefault true;
@@ -25,14 +22,4 @@
   home-manager.enable = lib.mkDefault true;
   keyboard.enable = lib.mkDefault true;
   stylix.enable = lib.mkDefault true;
-
-  programs.zsh.enable = true;
-  users.users.bastian = {
-    isNormalUser = true;
-    description = "Bastian Asmussen";
-    initialPassword = "Password123!";
-
-    extraGroups = ["wheel" "docker" "libvirtd" "networkmanager"];
-    shell = pkgs.zsh;
-  };
 }
