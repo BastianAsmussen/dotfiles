@@ -25,7 +25,11 @@
     ./zoxide.nix
   ];
 
-  gpg.enable = true;
+  gpg = {
+    enable = true;
+
+    keyTrustMap."0x0FE5A355DBC92568-2024-08-09.asc" = "ultimate";
+  };
 
   programs.man.generateCaches = true;
 
