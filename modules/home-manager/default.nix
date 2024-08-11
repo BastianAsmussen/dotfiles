@@ -47,6 +47,7 @@
       teams-for-linux
       bitwarden
       spotify
+      pika-backup
     ];
 
     stateVersion = "24.05";
