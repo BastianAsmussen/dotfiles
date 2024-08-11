@@ -1,7 +1,7 @@
 {
+  config,
   inputs,
   pkgs,
-  hmOptions,
   ...
 }: {
   programs.firefox = {
@@ -32,7 +32,7 @@
       DisplayBookmarksToolbar = "always";
     };
 
-    profiles.${hmOptions.username} = {
+    profiles.${config.home.username} = {
       search = {
         default = "DuckDuckGo";
         force = true;
