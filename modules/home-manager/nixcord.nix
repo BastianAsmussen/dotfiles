@@ -44,6 +44,10 @@
         friendsSince.enable = true;
         gifPaste.enable = true;
         iLoveSpam.enable = true;
+        implicitRelationships = {
+          enable = true;
+          sortByAffinity = true;
+        };
         loadingQuotes = {
           enable = true;
 
