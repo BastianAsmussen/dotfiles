@@ -8,6 +8,8 @@
         autoExpandWidth = true;
       };
 
+      closeIfLastWindow = true;
+
       enableGitStatus = true;
       enableModifiedMarkers = true;
       enableRefreshOnWrite = true;
@@ -19,7 +21,8 @@
       {
         mode = "n";
         key = "<leader>e";
-        action = ":Neotree<CR>";
+        action = ":Neotree action=focus reveal<CR>";
+        options.silent = true;
       }
     ];
   };
