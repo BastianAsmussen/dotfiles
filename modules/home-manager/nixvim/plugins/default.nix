@@ -1,6 +1,5 @@
 {
   imports = [
-    ./lang
     ./alpha.nix
     ./bufferline.nix
     ./cellular-automaton.nix
