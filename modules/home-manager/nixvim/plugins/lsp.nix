@@ -3,13 +3,6 @@
     enable = true;
 
     servers = {
-      rust-analyzer = {
-        enable = true;
-
-        installCargo = true;
-        installRustc = true;
-      };
-
       nixd.enable = true;
 
       tsserver.enable = true;
