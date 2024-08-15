@@ -1,16 +1,15 @@
-{pkgs, ...}: {
+{
   programs.nixvim.plugins = {
     lsp = {
       enable = true;
 
       servers = {
-        nil-ls = {
+        nixd.enable = true;
+
+        typos-lsp = {
           enable = true;
 
-          settings = {
-            formatting.command = ["${pkgs.alejandra}/bin/alejandra"];
-            nix.binary = "/run/current-system/sw/bin/nix";
-          };
+          extraOptions.init_options.diagnosticSeverity = "Hint";
         };
 
         tsserver.enable = true;
@@ -25,6 +24,23 @@
     };
 
     lsp-format.enable = true;
-    none-ls.enable = true;
+    none-ls = {
+      enable = true;
+
+      sources = {
+        code_actions = {
+          statix.enable = true;
+        };
+
+        diagnostics = {
+          statix.enable = true;
+          deadnix.enable = true;
+        };
+
+        formatting.alejandra.enable = true;
+      };
+    };
+
+    trouble.enable = true;
   };
 }
