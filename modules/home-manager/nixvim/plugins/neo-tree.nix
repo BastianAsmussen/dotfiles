@@ -8,8 +8,6 @@
         autoExpandWidth = true;
       };
 
-      closeIfLastWindow = true;
-
       enableGitStatus = true;
       enableModifiedMarkers = true;
       enableRefreshOnWrite = true;

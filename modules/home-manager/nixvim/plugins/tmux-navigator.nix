@@ -6,23 +6,23 @@
     keymaps = [
       {
         action = "left";
-        key = "<C-w>h";
+        key = "<C-h>";
       }
       {
         action = "down";
-        key = "<C-w>j";
+        key = "<C-j>";
       }
       {
         action = "up";
-        key = "<C-w>k";
+        key = "<C-k>";
       }
       {
         action = "right";
-        key = "<C-w>l";
+        key = "<C-l>";
       }
       {
         action = "previous";
-        key = "<C-w>\\";
+        key = "<C-\\>";
       }
     ];
   };
