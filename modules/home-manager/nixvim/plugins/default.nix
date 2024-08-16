@@ -6,6 +6,7 @@
     ./bufferline.nix
     ./cellular-automaton.nix
     ./completions.nix
+    ./direnv.nix
     ./gitsigns.nix
     ./lualine.nix
     ./luasnip.nix
