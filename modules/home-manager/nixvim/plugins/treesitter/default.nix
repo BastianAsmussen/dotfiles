@@ -1,4 +1,8 @@
 {pkgs, ...}: {
+  imports = [
+    ./context.nix
+  ];
+
   programs.nixvim.plugins = {
     treesitter = {
       enable = true;

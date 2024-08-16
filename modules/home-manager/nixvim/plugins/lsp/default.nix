@@ -1,4 +1,8 @@
 {
+  imports = [
+    ./none-ls.nix
+  ];
+
   programs.nixvim.plugins = {
     lsp = {
       enable = true;
@@ -24,23 +28,6 @@
     };
 
     lsp-format.enable = true;
-    none-ls = {
-      enable = true;
-
-      sources = {
-        code_actions = {
-          statix.enable = true;
-        };
-
-        diagnostics = {
-          statix.enable = true;
-          deadnix.enable = true;
-        };
-
-        formatting.alejandra.enable = true;
-      };
-    };
-
     trouble.enable = true;
   };
 }
