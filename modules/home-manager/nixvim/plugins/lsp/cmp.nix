@@ -7,7 +7,7 @@
         enable = true;
 
         settings = {
-          formatting.fields = ["menu" "abbr" "kind"];
+          formatting.fields = ["kind" "abbr" "menu"];
 
           mapping = {
             "<C-d>" = "cmp.mapping.scroll_docs(-4)";
@@ -19,7 +19,15 @@
             "<CR>" = "cmp.mapping.confirm({ select = true })";
           };
 
-          snippet.expand = "luasnip";
+          snippet.expand =
+            /*
+            lua
+            */
+            ''
+              function(args)
+                  require('luasnip').lsp_expand(args.body)
+              end
+            '';
 
           sources = [
             {name = "path";}
@@ -42,13 +50,14 @@
           ];
 
           window = {
-            completion = {
-              border = "rounded";
-              side_padding = 0;
-            };
-
             documentation = {
               border = "rounded";
+              max_height = "math.floor(40 * (40 / vim.o.lines))";
+            };
+
+            completion = {
+              border = "rounded";
+              col_offset = -3;
               side_padding = 0;
             };
           };
@@ -65,6 +74,7 @@
         enable = true;
 
         cmp.enable = true;
+        mode = "symbol_text";
         extraOptions = {
           maxwidth = 50;
           ellipsis_char = "...";

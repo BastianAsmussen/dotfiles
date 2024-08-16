@@ -1,5 +1,6 @@
 {
   imports = [
+    ./cmp.nix
     ./none-ls.nix
     ./otter.nix
     ./rustaceanvim.nix
