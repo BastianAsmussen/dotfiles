@@ -12,6 +12,8 @@
       check.command = "clippy";
 
       diagnostics.styleLints.enable = true;
+      inlayHints.lifetimeElisionHints.enable = "always";
+
       files.excludeDirs = [".devenv"];
     };
   };

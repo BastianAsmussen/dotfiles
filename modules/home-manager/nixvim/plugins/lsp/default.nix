@@ -30,6 +30,7 @@
         };
       };
 
+      nix.enable = true;
       lsp-format.enable = true;
       trouble.enable = true;
     };
