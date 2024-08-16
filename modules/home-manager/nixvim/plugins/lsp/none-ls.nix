@@ -3,9 +3,7 @@
     enable = true;
 
     sources = {
-      code_actions = {
-        statix.enable = true;
-      };
+      code_actions.statix.enable = true;
 
       diagnostics = {
         statix.enable = true;

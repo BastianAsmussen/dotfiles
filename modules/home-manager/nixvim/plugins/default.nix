@@ -11,8 +11,6 @@
     ./lualine.nix
     ./luasnip.nix
     ./neo-tree.nix
-    ./otter.nix
-    ./rustaceanvim.nix
     ./telescope.nix
     ./tmux-navigator.nix
   ];

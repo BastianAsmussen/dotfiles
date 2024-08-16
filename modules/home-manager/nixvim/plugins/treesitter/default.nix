@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   imports = [
     ./context.nix
+    ./refactor.nix
   ];
 
   programs.nixvim.plugins = {
