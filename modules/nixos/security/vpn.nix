@@ -7,9 +7,7 @@
   options.vpn.enable = lib.mkEnableOption "Enables MullvadVPN.";
 
   config = lib.mkIf config.vpn.enable {
-    environment.systemPackages = with pkgs; [
-      mullvad-vpn
-    ];
+    environment.systemPackages = [pkgs.mullvad-vpn];
 
     services = {
       resolved.enable = true;
