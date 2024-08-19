@@ -1,4 +1,9 @@
 {
+  imports = [
+    ./lspkind.nix
+    ./luasnip.nix
+  ];
+
   programs.nixvim = {
     opts.completeopt = ["menu" "menuone" "noselect"];
 
@@ -67,19 +72,6 @@
       cmp-nvim-lsp.enable = true;
       cmp-path.enable = true;
       cmp-buffer.enable = true;
-
-      luasnip.enable = true;
-
-      lspkind = {
-        enable = true;
-
-        cmp.enable = true;
-        mode = "symbol_text";
-        extraOptions = {
-          maxwidth = 50;
-          ellipsis_char = "...";
-        };
-      };
     };
   };
 }
