@@ -14,7 +14,7 @@
           type = "custom";
         }
         {
-          # Draw borders first to make colors of left and right border consistant.
+          # Draw borders first to make colors of left and right border consistent.
           key = "│ {#31} user    {#keys}│";
           type = "title";
           format = "{1}";
