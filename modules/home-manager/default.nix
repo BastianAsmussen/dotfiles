@@ -7,7 +7,6 @@
     ./goxlr
     ./hyprland
     ./nixvim
-    ./oh-my-posh
     ./zsh
     ./alacritty.nix
     ./btop.nix
@@ -20,6 +19,7 @@
     ./gpg.nix
     ./mpv.nix
     ./nixcord.nix
+    ./oh-my-posh.nix
     ./password-store.nix
     ./tmux.nix
     ./zoxide.nix
