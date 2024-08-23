@@ -17,7 +17,6 @@
     ./fzf.nix
     ./git.nix
     ./gpg.nix
-    ./mpv.nix
     ./nixcord.nix
     ./oh-my-posh.nix
     ./password-store.nix
@@ -48,6 +47,7 @@
       bitwarden
       spotify
       pika-backup
+      mpv
     ];
 
     stateVersion = "24.05";
