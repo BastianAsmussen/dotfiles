@@ -14,7 +14,7 @@ in {
     };
 
     wallpaper = mkOption {
-      default = ./../../wallpapers/tokyo.png;
+      default = ../../wallpapers/tokyo.png;
       description = "The wallpaper image to use.";
       type = types.path;
     };
