@@ -21,6 +21,7 @@
     ./nixcord.nix
     ./oh-my-posh.nix
     ./password-store.nix
+    ./ripgrep.nix
     ./tmux.nix
     ./zoxide.nix
   ];
@@ -39,7 +40,6 @@
 
     packages = with pkgs; [
       qbittorrent
-      ripgrep
       gitui
       wget
       go
