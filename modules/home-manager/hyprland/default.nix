@@ -26,7 +26,7 @@ in {
     xwayland.enable = true;
 
     settings = {
-      exec-once = "ags";
+      exec-once = "${pkgs.ags}/bin/sh";
 
       "$mod" = "SUPER";
 

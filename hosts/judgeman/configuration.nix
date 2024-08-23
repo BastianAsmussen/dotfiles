@@ -4,8 +4,10 @@
     ./disko-config.nix
   ];
 
-  gdm.enable = true;
-  gnome.enable = true;
+  desktop = {
+    greeter.gdm.enable = true;
+    environment.gnome.enable = true;
+  };
 
   pipewire.enable = true;
   hardware.pulseaudio.enable = false;

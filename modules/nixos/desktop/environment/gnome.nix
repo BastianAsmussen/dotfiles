@@ -3,9 +3,9 @@
   config,
   ...
 }: {
-  options.gnome.enable = lib.mkEnableOption "Enables Gnome.";
+  options.desktop.environment.gnome.enable = lib.mkEnableOption "Enables the `Gnome` desktop environment.";
 
-  config = lib.mkIf config.gnome.enable {
+  config = lib.mkIf config.desktop.environment.gnome.enable {
     services.xserver.desktopManager.gnome.enable = true;
 
     # Prevent hibernation.

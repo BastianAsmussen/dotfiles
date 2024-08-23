@@ -2,6 +2,6 @@
   imports = [
     ./audio
     ./environment
-    ./manager
+    ./greeter
   ];
 }
