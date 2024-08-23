@@ -4,25 +4,8 @@
   ...
 }: {
   imports = [
-    ./goxlr
-    ./hyprland
-    ./nixvim
-    ./zsh
-    ./alacritty.nix
-    ./btop.nix
-    ./devenv.nix
-    ./eza.nix
-    ./fastfetch.nix
-    ./firefox.nix
-    ./fzf.nix
-    ./git.nix
-    ./gpg.nix
-    ./nixcord.nix
-    ./oh-my-posh.nix
-    ./password-store.nix
-    ./ripgrep.nix
-    ./tmux.nix
-    ./zoxide.nix
+    ./desktop
+    ./terminal
   ];
 
   gpg = {

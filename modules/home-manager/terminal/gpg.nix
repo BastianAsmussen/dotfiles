@@ -6,7 +6,7 @@
 }: let
   cfg = config.gpg;
 
-  keyDir = ../../keys;
+  keyDir = ../../../keys;
 
   # Function to get all key names in the specified directory.
   getAllKeys = keyDir: builtins.attrNames (builtins.readDir keyDir);
