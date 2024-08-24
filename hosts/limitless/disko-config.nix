@@ -11,6 +11,7 @@
               size = "512M";
               type = "EF02"; # For GRUB MBR.
             };
+
             ESP = {
               size = "4G";
               type = "EF00";
@@ -20,6 +21,7 @@
                 mountpoint = "/boot";
               };
             };
+
             luks = {
               size = "100%";
               content = {
@@ -39,36 +41,52 @@
           };
         };
       };
-    };
-    lvm_vg = {
-      nix = {
-        type = "lvm_vg";
-        lvs = {
-          swap = {
-            size = "66G";
+
+      backup = {
+        device = "/dev/sda";
+        type = "disk";
+        content = {
+          type = "gpt";
+          partitions.root = {
+            size = "100%";
             content = {
-              type = "swap";
-              resumeDevice = true;
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/run/media/bastian/Backup";
             };
           };
-          root = {
-            size = "100%FREE";
-            content = {
-              type = "btrfs";
-              extraArgs = ["-f"];
-              subvolumes = {
-                "/root" = {
-                  mountpoint = "/";
-                  mountOptions = ["compress=zstd" "noatime"];
-                };
-                "/nix" = {
-                  mountpoint = "/nix";
-                  mountOptions = ["compress=zstd" "noatime"];
-                };
-                "/home" = {
-                  mountpoint = "/home";
-                  mountOptions = ["compress=zstd" "noatime"];
-                };
+        };
+      };
+    };
+
+    lvm_vg.nix = {
+      type = "lvm_vg";
+      lvs = {
+        swap = {
+          size = "66G";
+          content = {
+            type = "swap";
+            resumeDevice = true;
+          };
+        };
+
+        root = {
+          size = "100%FREE";
+          content = {
+            type = "btrfs";
+            extraArgs = ["-f"];
+            subvolumes = {
+              "/root" = {
+                mountpoint = "/";
+                mountOptions = ["compress=zstd" "noatime"];
+              };
+              "/nix" = {
+                mountpoint = "/nix";
+                mountOptions = ["compress=zstd" "noatime"];
+              };
+              "/home" = {
+                mountpoint = "/home";
+                mountOptions = ["compress=zstd" "noatime"];
               };
             };
           };
