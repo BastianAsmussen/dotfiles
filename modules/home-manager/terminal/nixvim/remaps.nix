@@ -81,13 +81,6 @@
       action = "<nop>";
     }
 
-    # Quickly switch projects.
-    {
-      mode = "n";
-      key = "<C-f>";
-      action = "<cmd>silent !tmux neww tmux-sessionizer<CR>";
-    }
-
     # Edit the current word.
     {
       mode = "n";
