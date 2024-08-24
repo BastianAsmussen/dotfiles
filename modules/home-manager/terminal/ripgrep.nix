@@ -8,7 +8,7 @@
       "--max-columns-preview"
 
       # Add 'web' type.
-      "--type-add web:*.{html,css,js}*"
+      "--type-add=web:*.{html,css,js}*"
 
       # Search hidden files / directories (e.g. dotfiles) by default.
       "--hidden"
