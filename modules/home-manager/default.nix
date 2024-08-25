@@ -26,6 +26,7 @@
       wget
       go
       manix
+      tlrc
       teams-for-linux
       bitwarden
       spotify
