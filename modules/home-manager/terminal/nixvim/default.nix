@@ -46,6 +46,7 @@
       maplocalleader = " ";
     };
 
+    performance.byteCompileLua.enable = true;
     luaLoader.enable = true;
   };
 }

@@ -2,9 +2,9 @@
   imports = [
     ./lsp
     ./treesitter
-    ./alpha.nix
     ./bufferline.nix
     ./cellular-automaton.nix
+    ./dashboard.nix
     ./direnv.nix
     ./gitsigns.nix
     ./lualine.nix
