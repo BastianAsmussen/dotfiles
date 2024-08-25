@@ -2,6 +2,7 @@
   imports = [
     ./nixvim
     ./zsh
+    ./bat.nix
     ./btop.nix
     ./devenv.nix
     ./eza.nix
