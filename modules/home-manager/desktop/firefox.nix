@@ -17,11 +17,13 @@
         Fingerprinting = true;
         EmailTracking = true;
       };
+
       ExtensionUpdate = false;
       ExtensionSettings."{8446b178-c865-4f5c-8ccc-1d7887811ae3}" = {
         install_url = "https://addons.mozilla.org/firefox/downloads/file/3990315/catppuccin_mocha_lavender_git-2.0.xpi";
         installation_mode = "force_installed";
       };
+
       DisablePocket = true;
       DisableFirefoxAccounts = true;
       DisableAccounts = true;
