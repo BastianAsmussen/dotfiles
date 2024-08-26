@@ -2,6 +2,8 @@
   imports = [
     ./lsp
     ./treesitter
+    ./auto-pairs.nix
+    ./auto-save.nix
     ./bufferline.nix
     ./cellular-automaton.nix
     ./dashboard.nix

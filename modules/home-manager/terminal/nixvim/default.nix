@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   imports = [
     ./plugins
     ./remaps.nix
@@ -33,7 +37,7 @@
       hlsearch = false;
       incsearch = true;
 
-      termguicolors = true;
+      termguicolors = pkgs.stdenv.isLinux;
 
       scrolloff = 8; # Number of lines to show around the cursor.
 

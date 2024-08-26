@@ -19,11 +19,7 @@
         project.enable = false;
         shortcut = [
           {
-            action.__raw =
-              /*
-              lua
-              */
-              "function(path) vim.cmd('Telescope find_files') end";
+            action.__raw = "function(path) vim.cmd('Telescope find_files') end";
             desc = "Files";
             group = "Label";
             icon = " ";
