@@ -25,6 +25,7 @@
       gitui
       wget
       go
+      jq
       manix
       tlrc
       teams-for-linux
