@@ -26,6 +26,9 @@
         enable = true;
         enable32Bit = true;
       };
+
+      # Enable the container toolkit if Docker is enabled.
+      nvidia-container-toolkit.enable = config.docker.enable;
     };
 
     # Load NVIDIA drivers for Xorg and Wayland.
