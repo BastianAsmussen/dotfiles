@@ -3,10 +3,11 @@
   config,
   ...
 }: {
-  options.qemu.enable = lib.mkEnableOption "Enables QEMU virtualization.";
+  options.qemu.enable = lib.mkEnableOption "Enables QEMU virtualisation.";
 
   config = lib.mkIf config.qemu.enable {
     virtualisation.libvirtd.enable = true;
+
     programs.virt-manager.enable = true;
   };
 }

@@ -3,7 +3,7 @@
     ./crypto
     ./desktop
     ./security
-    ./virtualization
+    ./virtualisation
     ./bootloader.nix
     ./btrfs.nix
     ./goxlr.nix

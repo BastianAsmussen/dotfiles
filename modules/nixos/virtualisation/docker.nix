@@ -3,10 +3,10 @@
   config,
   ...
 }: {
-  options.docker = with lib; {
-    enable = mkEnableOption "Enables Docker support.";
+  options.docker = {
+    enable = lib.mkEnableOption "Enables Docker support.";
 
-    storageDriver = mkOption {
+    storageDriver = lib.mkOption {
       default = "btrfs";
       description = "The filesystem that Docker will use.";
     };

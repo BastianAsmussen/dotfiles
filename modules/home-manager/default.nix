@@ -6,6 +6,7 @@
   imports = [
     ./desktop
     ./terminal
+    ./qemu.nix
   ];
 
   gpg = {
