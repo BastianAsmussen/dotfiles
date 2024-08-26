@@ -16,6 +16,13 @@
     virtualisation.docker = {
       enable = true;
       inherit (config.docker) storageDriver;
+
+      rootless = {
+        enable = true;
+        setSocketVariable = true;
+      };
+
+      autoPrune.enable = true;
     };
   };
 }
