@@ -11,12 +11,12 @@ in {
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  options.home-manager = with lib; {
-    enable = mkEnableOption "Enables Home Manager.";
-    username = mkOption {
+  options.home-manager = {
+    enable = lib.mkEnableOption "Enables Home Manager.";
+    username = lib.mkOption {
       default = "bastian";
       description = "The username of the user.";
-      type = types.str;
+      type = lib.types.str;
     };
   };
 
