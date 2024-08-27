@@ -8,10 +8,10 @@ jobs:
       contents: write
 
     steps:
-    - name: Checkout repository
+    - name: Checkout repository.
       uses: actions/checkout@v4
 
-    - name: Install Nix
+    - name: Install Nix.
       uses: cachix/install-nix-action@v27
       with: 
         nix_path: nixpkgs=channel:nixos-unstable
@@ -19,25 +19,28 @@ jobs:
       with:
         name: deadnix
 
-    - name: Dead code analysis
+    - name: Dead code analysis.
       uses: astro/deadnix-action@main
+      with:
+        flags: '-eh'
+        commit_message: 'chore: remove dead code'
 
-    - name: Install Nix Linting and Formatting Tools
+    - name: Install Nix Linting and Formatting Tools.
       run: nix-env -i statix nixpkgs-fmt -f '<nixpkgs>'
 
-    - name: Run Statix Lint
+    - name: Run Statix Lint.
       run: statix fix
 
-    - name: Run Nix Format
+    - name: Run Nix Format.
       run: nix fmt
 
     - name: Nix Flake Check (Manual)
       run: nix flake check --all-systems
 
-    - name: Nix Flake Checker
+    - name: Nix Flake Checker.
       uses: DeterminateSystems/flake-checker-action@v5
     
-    - name: Commit changes
+    - name: Commit changes.
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "chore: run auto formatting and linting tools"
