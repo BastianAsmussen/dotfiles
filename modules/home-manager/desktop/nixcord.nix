@@ -76,7 +76,7 @@
         validReply.enable = true;
         validUser.enable = true;
         voiceDownload.enable = true;
-        watchTogetherAdblock.enable = true;
+        youtubeAdblock.enable = true;
       };
     };
 
