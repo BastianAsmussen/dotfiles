@@ -1,4 +1,4 @@
-{config, ...}: {
+{userInfo, ...}: {
   disko.devices = {
     disk = {
       main = {
@@ -52,7 +52,7 @@
             content = {
               type = "filesystem";
               format = "ext4";
-              mountpoint = "/run/media/${config.home-manager.username}/Backup";
+              mountpoint = "/run/media/${userInfo.username}/Backup";
             };
           };
         };

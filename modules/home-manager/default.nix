@@ -1,5 +1,5 @@
 {
-  hmOptions,
+  userInfo,
   pkgs,
   ...
 }: {
@@ -18,8 +18,8 @@
   programs.man.generateCaches = true;
 
   home = {
-    username = "${hmOptions.username}";
-    homeDirectory = "/home/${hmOptions.username}";
+    inherit (userInfo) username;
+    homeDirectory = "/home/${userInfo.username}";
 
     packages = with pkgs; [
       qbittorrent

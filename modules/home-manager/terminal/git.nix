@@ -1,10 +1,10 @@
-{
+{userInfo, ...}: {
   programs.git = {
     enable = true;
     lfs.enable = true;
 
-    userName = "Bastian Asmussen";
-    userEmail = "bastian@asmussen.tech";
+    userName = userInfo.fullName;
+    userEmail = userInfo.email;
 
     signing = {
       key = null;

@@ -43,6 +43,12 @@
     forAllSystems = fn:
       nixpkgs.lib.genAttrs systems
       (system: fn {pkgs = import nixpkgs {inherit system;};});
+
+    userInfo = {
+      username = "bastian";
+      email = "bastian@asmussen.tech";
+      fullName = "Bastian Asmussen";
+    };
   in {
     packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
@@ -50,7 +56,7 @@
     nixosConfigurations = builtins.listToAttrs (map (hostname: {
         name = hostname;
         value = nixpkgs.lib.nixosSystem {
-          specialArgs = {inherit inputs;};
+          specialArgs = {inherit inputs userInfo;};
           modules = [
             ./hosts/${hostname}/configuration.nix
             ./modules/nixos

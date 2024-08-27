@@ -1,4 +1,5 @@
 {
+  userInfo,
   lib,
   config,
   pkgs,
@@ -6,9 +7,9 @@
 }: {
   programs.zsh.enable = true;
 
-  users.users.bastian = {
+  users.users.${userInfo.username} = {
     isNormalUser = true;
-    description = "Bastian Asmussen";
+    description = userInfo.fullName;
     initialPassword = "Password123!";
 
     extraGroups = lib.mkMerge [

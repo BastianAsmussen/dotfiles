@@ -1,5 +1,5 @@
 {
-  config,
+  userInfo,
   inputs,
   pkgs,
   ...
@@ -34,7 +34,7 @@
       DisplayBookmarksToolbar = "always";
     };
 
-    profiles.${config.home.username} = {
+    profiles.${userInfo.username} = {
       search = {
         default = "DuckDuckGo";
         force = true;

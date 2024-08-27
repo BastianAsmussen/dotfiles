@@ -2,34 +2,27 @@
   inputs,
   config,
   lib,
+  userInfo,
   ...
 }: let
   osOptions = config;
-  hmOptions = config.home-manager;
 in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  options.home-manager = {
-    enable = lib.mkEnableOption "Enables Home Manager.";
-    username = lib.mkOption {
-      default = "bastian";
-      description = "The username of the user.";
-      type = lib.types.str;
-    };
-  };
+  options.home-manager.enable = lib.mkEnableOption "Enables the `Home Manager` module.";
 
-  config = lib.mkIf hmOptions.enable {
+  config = lib.mkIf config.home-manager.enable {
     home-manager = {
-      extraSpecialArgs = {inherit inputs osOptions hmOptions;};
+      extraSpecialArgs = {inherit inputs osOptions userInfo;};
 
       useGlobalPkgs = true;
       useUserPackages = true;
 
       backupFileExtension = "backup";
 
-      users."${hmOptions.username}" = import ../home-manager;
+      users."${userInfo.username}" = import ../home-manager;
     };
   };
 }
