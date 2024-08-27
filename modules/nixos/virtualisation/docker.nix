@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  userInfo,
   ...
 }: {
   options.docker = {
@@ -17,12 +18,9 @@
       enable = true;
       inherit (config.docker) storageDriver;
 
-      rootless = {
-        enable = true;
-        setSocketVariable = true;
-      };
-
       autoPrune.enable = true;
     };
+
+    users.extraGroups.docker.members = [userInfo.username];
   };
 }
