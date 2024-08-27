@@ -2,7 +2,6 @@
   imports = [
     ./cmp
     ./none-ls.nix
-    ./otter.nix
     ./rustaceanvim.nix
   ];
 
@@ -31,9 +30,10 @@
         };
       };
 
-      nix.enable = true;
       lsp-format.enable = true;
       trouble.enable = true;
+      nix.enable = true;
+      otter.enable = true;
     };
   };
 }
