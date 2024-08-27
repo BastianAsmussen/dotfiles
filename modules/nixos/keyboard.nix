@@ -5,16 +5,16 @@
 }: let
   cfg = config.keyboard;
 in {
-  options.keyboard = with lib; {
-    enable = mkEnableOption "Enables custom keyboard mappings.";
-    keyboards = mkOption {
+  options.keyboard = {
+    enable = lib.mkEnableOption "Enables custom keyboard mappings.";
+    keyboards = lib.mkOption {
       default = [];
       description = ''
         The keyboards to apply the macros to.
 
         An empty list lets Kanata detect which input devices are keyboards and intercept them all.
       '';
-      type = with types; listOf str;
+      type = lib.types.listOf lib.types.str;
     };
   };
 
