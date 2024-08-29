@@ -1,9 +1,16 @@
 {
+  lib,
+  osConfig,
   userInfo,
   inputs,
   pkgs,
   ...
 }: {
+  # If we're on Wayland, tell that to Firefox.
+  home.sessionVariables = lib.mkIf osConfig.desktop.greeter.useWayland {
+    MOZ_ENABLE_WAYLAND = "1";
+  };
+
   programs.firefox = {
     enable = true;
 
@@ -36,10 +43,17 @@
 
     profiles.${userInfo.username} = {
       search = {
-        default = "DuckDuckGo";
+        default = "Brave";
         force = true;
 
         engines = {
+          "Brave" = {
+            urls = [{template = "https://search.brave.com/search?q={searchTerms}";}];
+
+            iconUpdateURL = "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon.acxxetWH.ico";
+            updateInterval = 24 * 60 * 60 * 1000; # Once every day.
+          };
+
           "Nix Packages" = {
             urls = [
               {
@@ -64,8 +78,7 @@
           "NixOS Wiki" = {
             urls = [{template = "https://wiki.nixos.org/w/index.php?search={searchTerms}";}];
 
-            iconUpdateURL = "https://wiki.nixos.org/favicon.ico";
-            updateInterval = 24 * 60 * 60 * 1000; # Once every day.
+            icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
             definedAliases = ["@nw"];
           };
 
@@ -78,6 +91,7 @@
           };
 
           # Disable other search engines.
+          "DuckDuckGo".metaData.hidden = true;
           "Google".metaData.hidden = true;
           "Bing".metaData.hidden = true;
           "Wikipedia (en)".metaData.hidden = true;
@@ -85,10 +99,15 @@
       };
 
       settings = {
+        # Auto-focus Firefox when opening link in other applications.
+        "browser.tabs.loadDivertedInBackground" = false;
+
         # Disable password saving.
         "signon.rememberSignons" = false;
+
         # Auto-enable extensions.
         "extensions.autoDisableScopes" = 0;
+
         # Enable HTTPS-Only mode.
         "dom.security.https_only_mode" = true;
 
