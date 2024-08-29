@@ -27,7 +27,7 @@ in {
         extraDefCfg = "process-unmapped-keys yes";
         config = ''
           (defsrc caps)
-          (defalias esc-ctrl (tap-hold 100 150 esc lctl))
+          (defalias esc-ctrl (tap-hold 150 150 esc lctl))
           (deflayer base @esc-ctrl)
         '';
       };
