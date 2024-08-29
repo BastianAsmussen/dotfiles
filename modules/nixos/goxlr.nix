@@ -11,8 +11,9 @@
 
     services.goxlr-utility = {
       enable = true;
-
       autoStart.xdg = true;
     };
+
+    desktop.audio.pipewire.enable = true;
   };
 }

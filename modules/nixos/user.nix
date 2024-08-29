@@ -1,7 +1,5 @@
 {
   userInfo,
-  lib,
-  config,
   pkgs,
   ...
 }: {
@@ -12,10 +10,7 @@
     description = userInfo.fullName;
     initialPassword = "Password123!";
 
-    extraGroups = lib.mkMerge [
-      ["wheel" "networkmanager"]
-      (lib.mkIf config.qemu.enable ["libvirtd"])
-    ];
+    extraGroups = ["wheel" "networkmanager"];
     shell = pkgs.zsh;
   };
 }

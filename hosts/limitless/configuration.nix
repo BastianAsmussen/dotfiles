@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
@@ -10,12 +10,9 @@
   goxlr.enable = true;
 
   desktop = {
-    greeter.gdm.enable = true;
     environment.gnome.enable = true;
+    greeter.gdm.enable = true;
   };
-
-  pipewire.enable = true;
-  hardware.pulseaudio.enable = false;
 
   monero = {
     gui.enable = true;
@@ -30,11 +27,4 @@
   };
 
   bootloader.isMultiboot = true;
-
-  networking.networkmanager.enable = true;
-
-  fonts.packages = with pkgs; [
-    (nerdfonts.override {fonts = ["JetBrainsMono"];})
-    openmoji-color
-  ];
 }

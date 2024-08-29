@@ -1,21 +1,12 @@
-{pkgs, ...}: {
+{
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
   ];
 
   desktop = {
-    greeter.gdm.enable = true;
+    audio.pipewire.enable = true;
     environment.gnome.enable = true;
+    greeter.gdm.enable = true;
   };
-
-  pipewire.enable = true;
-  hardware.pulseaudio.enable = false;
-
-  networking.networkmanager.enable = true;
-
-  fonts.packages = with pkgs; [
-    (nerdfonts.override {fonts = ["JetBrainsMono"];})
-    openmoji-color
-  ];
 }
