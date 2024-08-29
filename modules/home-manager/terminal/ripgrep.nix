@@ -4,7 +4,7 @@
 
     arguments = [
       # Don't let ripgrep vomit really long lines to my terminal, and show a preview.
-      "--max-columns=150"
+      "--max-columns=128"
       "--max-columns-preview"
 
       # Add 'web' type.
@@ -25,4 +25,7 @@
       "--smart-case"
     ];
   };
+
+  # Search by file names.
+  home.shellAliases.rgf = "rg --files | rg";
 }
