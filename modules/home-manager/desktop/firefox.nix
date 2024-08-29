@@ -101,13 +101,12 @@
       settings = {
         # Auto-focus Firefox when opening link in other applications.
         "browser.tabs.loadDivertedInBackground" = false;
-
+        # Enable autoscrolling.
+        "general.autoScroll" = true;
         # Disable password saving.
         "signon.rememberSignons" = false;
-
         # Auto-enable extensions.
         "extensions.autoDisableScopes" = 0;
-
         # Enable HTTPS-Only mode.
         "dom.security.https_only_mode" = true;
 
