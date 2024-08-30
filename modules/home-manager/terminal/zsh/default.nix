@@ -44,13 +44,10 @@
     '';
 
     shellAliases = {
-      ls = "eza";
       c = "clear";
 
       cp = "cp -r";
       rm = "rm -r";
-
-      neofetch = "fastfetch";
     };
 
     oh-my-zsh = {

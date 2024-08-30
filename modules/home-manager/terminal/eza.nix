@@ -1,4 +1,6 @@
 {
+  home.shellAliases.ls = "eza";
+
   programs.eza = {
     enable = true;
 

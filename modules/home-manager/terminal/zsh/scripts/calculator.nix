@@ -12,8 +12,8 @@ pkgs.writers.writePython3Bin "=" {
 
   def show_usage() -> None:
       """Display usage information and exit."""
-      click.echo("Usage: calc <expression>")
-      click.echo("Example: calc '3 + 5 * (2 - 8)'")
+      click.echo("Usage: = '<expression>'")
+      click.echo("Example: = '3 + 5 * (2 - 8)'")
       click.get_current_context().exit(1)
 
 
@@ -45,9 +45,9 @@ pkgs.writers.writePython3Bin "=" {
   def main(expression: tuple[str, ...]) -> None:
       """Simple calculator.
 
-      Usage: calc <expression>
+      Usage: = '<expression>'
 
-      Example: calc '3 + 5 * (2 - 8)'
+      Example: = '3 + 5 * (2 - 8)'
       """
       if not expression:
           show_usage()
