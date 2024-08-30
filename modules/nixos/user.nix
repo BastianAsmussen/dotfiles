@@ -10,7 +10,7 @@
     description = userInfo.fullName;
     initialPassword = "Password123!";
 
-    extraGroups = ["wheel" "networkmanager"];
+    extraGroups = ["wheel"];
     shell = pkgs.zsh;
   };
 }
