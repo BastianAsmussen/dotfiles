@@ -1,13 +1,13 @@
 {
   lib,
-  osConfig,
+  nixosConfig,
   userInfo,
   inputs,
   pkgs,
   ...
 }: {
   # If we're on Wayland, tell that to Firefox.
-  home.sessionVariables = lib.mkIf osConfig.desktop.greeter.useWayland {
+  home.sessionVariables = lib.mkIf nixosConfig.desktop.greeter.useWayland {
     MOZ_ENABLE_WAYLAND = "1";
   };
 

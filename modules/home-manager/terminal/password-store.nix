@@ -1,11 +1,11 @@
 {
-  osConfig,
+  nixosConfig,
   pkgs,
   config,
   ...
 }: let
   clipboardDependency =
-    if osConfig.desktop.greeter.useWayland
+    if nixosConfig.desktop.greeter.useWayland
     then pkgs.wl-clipboard
     else pkgs.xclip;
 in {
