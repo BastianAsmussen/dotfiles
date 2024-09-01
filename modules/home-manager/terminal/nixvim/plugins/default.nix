@@ -3,6 +3,7 @@
     ./lsp
     ./auto-save.nix
     ./cellular-automaton.nix
+    ./dap.nix
     ./dashboard.nix
     ./gitsigns.nix
     ./lualine.nix
@@ -14,6 +15,7 @@
 
   programs.nixvim.plugins = {
     bufferline.enable = true;
+    crates-nvim.enable = true;
     direnv.enable = true;
     nvim-autopairs.enable = true;
   };

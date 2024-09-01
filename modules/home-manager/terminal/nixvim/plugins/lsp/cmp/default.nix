@@ -35,23 +35,15 @@
             '';
 
           sources = [
+            {name = "nvim_lsp";}
+            {name = "luasnip";}
+            {name = "crates";}
             {name = "path";}
             {
-              name = "nvim_lsp";
-              keywordLength = 1;
-            }
-            {
-              name = "luasnip";
-              keywordLength = 2;
-            }
-            {
               name = "buffer";
-              keywordLength = 3;
               # Words from other open buffers can also be suggested.
               option.get_bufnrs.__raw = "vim.api.nvim_list_bufs";
             }
-            {name = "crates";}
-            {name = "calc";} # For math calculations.
           ];
 
           window = {
