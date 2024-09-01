@@ -1,9 +1,15 @@
 {
+  osConfig,
   pkgs,
   config,
   ...
-}: {
-  home.packages = [pkgs.wl-clipboard];
+}: let
+  clipboardDependency =
+    if osConfig.desktop.greeter.useWayland
+    then pkgs.wl-clipboard
+    else pkgs.xclip;
+in {
+  home.packages = [clipboardDependency];
 
   programs.password-store = {
     enable = true;
