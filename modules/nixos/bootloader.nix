@@ -26,5 +26,7 @@ in {
         device = "nodev";
       };
     };
+
+    stylix.targets.grub.useImage = true;
   };
 }

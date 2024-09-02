@@ -23,5 +23,4 @@
   network-manager.enable = lib.mkDefault true;
   home-manager.enable = lib.mkDefault true;
   keyboard.enable = lib.mkDefault true;
-  stylix.enable = lib.mkDefault true;
 }
