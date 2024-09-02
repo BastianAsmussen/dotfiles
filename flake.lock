@@ -665,7 +665,7 @@
         "narHash": "sha256-Z/ELQhrSd7bMzTO8r7NZgi9g5emh+aRKoCdaAv5fiO0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
+        "rev": "f5c96d88c1d87fa801c831abde2113a1217af993",
         "type": "github"
       },
       "original": {
