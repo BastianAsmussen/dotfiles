@@ -4,20 +4,13 @@
   userInfo,
   ...
 }: {
-  options.docker = {
-    enable = lib.mkEnableOption "Enables Docker support.";
-
-    storageDriver = lib.mkOption {
-      default = "btrfs";
-      description = "The filesystem that Docker will use.";
-    };
-  };
+  options.docker.enable = lib.mkEnableOption "Enables Docker support.";
 
   config = lib.mkIf config.docker.enable {
     virtualisation.docker = {
       enable = true;
-      inherit (config.docker) storageDriver;
 
+      storageDriver = "btrfs";
       autoPrune.enable = true;
     };
 
