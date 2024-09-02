@@ -43,6 +43,6 @@ nh os switch --update ~/dotfiles
 - If it can't build, roll back to a previous version.
 
 ```sh
-git reset --hard HEAD~1
+git reset --hard HEAD
 ```
 
