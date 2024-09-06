@@ -30,6 +30,8 @@
   };
 
   outputs = {nixpkgs, ...} @ inputs: let
+    inherit (builtins) attrNames readDir listToAttrs;
+
     systems = [
       "aarch64-linux"
       "i686-linux"
@@ -38,8 +40,7 @@
       "x86_64-darwin"
     ];
 
-    hosts = builtins.attrNames (builtins.readDir ./hosts);
-
+    hosts = attrNames (readDir ./hosts);
     forAllSystems = fn:
       nixpkgs.lib.genAttrs systems
       (system: fn {pkgs = import nixpkgs {inherit system;};});
@@ -53,7 +54,7 @@
     packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
-    nixosConfigurations = builtins.listToAttrs (map (hostname: {
+    nixosConfigurations = listToAttrs (map (hostname: {
         name = hostname;
         value = nixpkgs.lib.nixosSystem {
           specialArgs = {inherit inputs userInfo;};

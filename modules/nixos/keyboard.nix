@@ -3,22 +3,24 @@
   lib,
   ...
 }: let
+  inherit (lib) mkEnableOption mkOption types mkIf;
+
   cfg = config.keyboard;
 in {
   options.keyboard = {
-    enable = lib.mkEnableOption "Enables custom keyboard mappings.";
-    keyboards = lib.mkOption {
+    enable = mkEnableOption "Enables custom keyboard mappings.";
+    keyboards = mkOption {
       default = [];
       description = ''
         The keyboards to apply the macros to.
 
         An empty list lets Kanata detect which input devices are keyboards and intercept them all.
       '';
-      type = lib.types.listOf lib.types.str;
+      type = types.listOf types.str;
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     services.kanata = {
       enable = true;
 

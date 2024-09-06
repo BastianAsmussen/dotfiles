@@ -1,9 +1,9 @@
 {
   lib,
-  osOptions,
+  nixosConfig,
   ...
 }: {
-  config = lib.mkIf osOptions.qemu.enable {
+  config = lib.mkIf nixosConfig.qemu.enable {
     dconf.settings."org/virt-manager/virt-manager/connections" = {
       autoconnect = ["qemu:///system"];
       uris = ["qemu:///system"];

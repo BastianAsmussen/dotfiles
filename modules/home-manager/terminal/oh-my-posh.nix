@@ -1,19 +1,17 @@
 {
   programs.oh-my-posh = {
     enable = true;
-    enableZshIntegration = true;
 
+    enableZshIntegration = true;
     settings = {
       version = 2;
       final_space = true;
       console_title_template = "{{ .Shell }} in {{ .Folder }}";
-
       blocks = [
         {
           type = "prompt";
           alignment = "left";
           newline = true;
-
           segments = [
             {
               type = "path";
@@ -29,7 +27,6 @@
               foreground = "p:grey";
               background = "transparent";
               template = " {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>";
-
               properties = {
                 branch_icon = "";
                 commit_icon = "@";
@@ -48,7 +45,6 @@
               foreground = "yellow";
               background = "transparent";
               template = "{{ .FormattedMs }}";
-
               properties = {
                 threshold = 5000;
                 style = "roundrock";

@@ -16,7 +16,6 @@
 
   monero = {
     gui.enable = true;
-
     mining = {
       enable = false;
 

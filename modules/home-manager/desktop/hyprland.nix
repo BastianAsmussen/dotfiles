@@ -6,40 +6,37 @@
   pkgs,
   ...
 }: let
+  inherit (lib) mkOption types mkIf mkForce;
+  inherit (builtins) concatLists genList toString;
+
   cfg = {
     inherit (config) hyprland;
     inherit (config.lib.stylix) colors;
   };
 in {
-  options.hyprland.monitors = lib.mkOption {
+  options.hyprland.monitors = mkOption {
     default = [
       "DP-1, 1920x1080@240, 0x0, 1"
       "HDMI-A-1, 1920x1080, 1920x0, 1"
       ", preferred, auto, 1" # Recommended rule for quickly plugging in random monitors.
     ];
     description = "The monitors to use for Hyprland.";
-    type = lib.types.listOf lib.types.str;
+    type = types.listOf types.str;
   };
 
-  config = lib.mkIf nixosConfig.desktop.environment.hyprland.enable {
+  config = mkIf nixosConfig.desktop.environment.hyprland.enable {
     wayland.windowManager.hyprland = {
       enable = true;
 
       package = inputs.hyprland.packages."${pkgs.system}".hyprland;
-
       xwayland.enable = true;
       settings = {
         exec-once = "${pkgs.ags}/bin/ags";
-
         "$mod" = "SUPER";
-
         "$terminal" = "alacritty";
         "$browser" = "firefox";
-
         input.kb_layout = "dk";
-
         monitor = cfg.hyprland.monitors;
-
         bind =
           [
             "$mod, RETURN, exec, $terminal"
@@ -55,12 +52,12 @@ in {
             "$mod, J, movefocus, d"
           ]
           ++ (
-            builtins.concatLists (builtins.genList (
+            concatLists (genList (
                 x: let
                   ws = let
                     c = (x + 1) / 10;
                   in
-                    builtins.toString (x + 1 - (c * 10));
+                    toString (x + 1 - (c * 10));
                 in [
                   "$mod, ${ws}, workspace, ${toString (x + 1)}"
                   "$mod SHIFT, ${ws}, movetoworkspace, ${toString (x + 1)}"
@@ -76,8 +73,8 @@ in {
         ];
 
         general = {
-          "col.active_border" = lib.mkForce "rgba(${cfg.colors.base0E}ff) rgba(${cfg.colors.base09}ff) 60deg";
-          "col.inactive_border" = lib.mkForce "rgba(${cfg.colors.base00}ff)";
+          "col.active_border" = mkForce "rgba(${cfg.colors.base0E}ff) rgba(${cfg.colors.base09}ff) 60deg";
+          "col.inactive_border" = mkForce "rgba(${cfg.colors.base00}ff)";
 
           gaps_out = 30;
         };

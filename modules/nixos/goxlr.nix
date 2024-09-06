@@ -3,12 +3,13 @@
   config,
   pkgs,
   ...
-}: {
-  options.goxlr.enable = lib.mkEnableOption "Enables GoXLR drivers.";
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
+  options.goxlr.enable = mkEnableOption "Enables GoXLR drivers.";
 
-  config = lib.mkIf config.goxlr.enable {
+  config = mkIf config.goxlr.enable {
     environment.systemPackages = [pkgs.goxlr-utility];
-
     services.goxlr-utility = {
       enable = true;
       autoStart.xdg = true;

@@ -4,14 +4,39 @@
   pkgs,
   ...
 }: let
-  kubeMasterIP = "127.0.0.1";
-  kubeMasterHostname = "api.kube";
-  kubeMasterAPIServerPort = 6443;
-in {
-  options.kubernetes.enable = lib.mkEnableOption "Enable Kubernetes locally.";
+  inherit (lib) mkEnableOption types mkOption mkIf;
 
-  config = lib.mkIf config.kubernetes.enable {
-    networking.extraHosts = "${kubeMasterIP} ${kubeMasterHostname}";
+  cfg = config.kubernetes;
+in {
+  options.kubernetes = {
+    enable = mkEnableOption "Enable Kubernetes locally.";
+    master = mkOption {
+      type = types.submodule {
+        options = {
+          ip = mkOption {
+            default = "127.0.0.1";
+            description = "The master IP that Kubernetes will use.";
+            type = types.str;
+          };
+
+          hostname = mkOption {
+            default = "api.kube";
+            description = "The master hostname that Kubernetes will use.";
+            type = types.str;
+          };
+
+          apiPort = mkOption {
+            default = 6443;
+            description = "The master API server port that Kubernetes will use.";
+            type = types.int;
+          };
+        };
+      };
+    };
+  };
+
+  config = mkIf cfg.enable {
+    networking.extraHosts = "${cfg.master.ip} ${cfg.master.hostname}";
     environment.systemPackages = with pkgs; [
       kompose
       kubectl
@@ -20,12 +45,12 @@ in {
 
     services.kubernetes = {
       roles = ["master" "node"];
-      masterAddress = kubeMasterHostname;
-      apiserverAddress = "https://${kubeMasterHostname}:${toString kubeMasterAPIServerPort}";
+      masterAddress = cfg.master.hostname;
+      apiserverAddress = "https://${cfg.master.hostname}:${toString cfg.master.apiPort}";
       easyCerts = true;
       apiserver = {
-        securePort = kubeMasterAPIServerPort;
-        advertiseAddress = kubeMasterIP;
+        securePort = cfg.master.apiPort;
+        advertiseAddress = cfg.master.ip;
       };
 
       addons.dns.enable = true;

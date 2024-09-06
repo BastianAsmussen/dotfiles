@@ -9,7 +9,6 @@
     isNormalUser = true;
     description = userInfo.fullName;
     initialPassword = "Password123!";
-
     extraGroups = ["wheel"];
     shell = pkgs.zsh;
   };

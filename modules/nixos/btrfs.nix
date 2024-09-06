@@ -3,9 +3,11 @@
   config,
   ...
 }: let
+  inherit (lib) mkEnableOption mkOption types mkIf;
+
   cfg = config.btrfs;
 in {
-  options.btrfs = with lib; {
+  options.btrfs = {
     enable = mkEnableOption "Enables BTRFS services.";
 
     scrub = {
@@ -18,12 +20,12 @@ in {
       fileSystems = mkOption {
         default = ["/"];
         description = "A list of the filesystems to scrub.";
-        type = with types; listOf str;
+        type = types.listOf types.str;
       };
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     services = {
       fstrim.enable = true;
 

@@ -5,23 +5,22 @@
   userInfo,
   ...
 }: let
-  osOptions = config;
+  inherit (lib) mkEnableOption mkIf;
+
+  nixosConfig = config;
 in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  options.home-manager.enable = lib.mkEnableOption "Enables the `Home Manager` module.";
+  options.home-manager.enable = mkEnableOption "Enables the `Home Manager` module.";
 
-  config = lib.mkIf config.home-manager.enable {
+  config = mkIf config.home-manager.enable {
     home-manager = {
-      extraSpecialArgs = {inherit inputs osOptions userInfo;};
-
+      extraSpecialArgs = {inherit inputs nixosConfig userInfo;};
       useGlobalPkgs = true;
       useUserPackages = true;
-
       backupFileExtension = "backup";
-
       users."${userInfo.username}" = import ../home-manager;
     };
   };

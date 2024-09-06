@@ -10,7 +10,6 @@ in {
 
   config = lib.mkIf (cfg.enable && config.gpg.enable) {
     programs.ssh.startAgent = false; # Disallow the SSH agent.
-
     services = {
       udev.packages = [pkgs.yubikey-personalization];
       pcscd.enable = true;
@@ -18,7 +17,6 @@ in {
 
     environment = {
       systemPackages = [pkgs.yubikey-personalization];
-
       shellInit = ''
         gpg-connect-agent /bye
         export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)

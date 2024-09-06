@@ -2,7 +2,9 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  inherit (lib) mkForce;
+in {
   programs.alacritty = {
     enable = true;
 
@@ -21,9 +23,9 @@
           inherit style;
         };
       in {
-        size = lib.mkForce 14;
+        size = mkForce 14;
 
-        normal = lib.mkForce (jetbrainsMono "Regular");
+        normal = mkForce (jetbrainsMono "Regular");
         bold = jetbrainsMono "Bold";
         italic = jetbrainsMono "Italic";
         bold_italic = jetbrainsMono "Bold Italic";

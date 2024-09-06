@@ -3,14 +3,15 @@
   config,
   ...
 }: let
+  inherit (lib) mkOption types;
+
   cfg = config.bootloader;
 in {
-  options.bootloader.isMultiboot = with lib;
-    mkOption {
-      default = false;
-      description = "Use OS Prober.";
-      type = types.bool;
-    };
+  options.bootloader.isMultiboot = mkOption {
+    default = false;
+    description = "Use OS Prober.";
+    type = types.bool;
+  };
 
   config = {
     boot.loader = {

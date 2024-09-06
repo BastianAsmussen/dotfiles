@@ -9,10 +9,9 @@
   config = lib.mkIf config.gpg.enable {
     programs.gnupg.agent = {
       enable = true;
+
       enableSSHSupport = true;
-
       pinentryPackage = pkgs.pinentry-curses;
-
       settings = {
         default-cache-ttl = 60;
         max-cache-ttl = 120;
