@@ -88,10 +88,11 @@ in {
           "col.active_border" = mkForce "rgba(${cfg.colors.base0E}ff) rgba(${cfg.colors.base09}ff) 60deg";
           "col.inactive_border" = mkForce "rgba(${cfg.colors.base00}ff)";
 
-          gaps_out = 32;
+          border_size = 2;
+          gaps_out = 28;
         };
 
-        decoration.rounding = 8;
+        decoration.rounding = 12;
       };
 
       extraConfig = ''
