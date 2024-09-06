@@ -2,7 +2,6 @@
   imports = [
     ./nixvim
     ./zsh
-    ./bat.nix
     ./btop.nix
     ./devenv.nix
     ./eza.nix
@@ -16,4 +15,6 @@
     ./tmux.nix
     ./zoxide.nix
   ];
+
+  programs.bat.enable = true;
 }
