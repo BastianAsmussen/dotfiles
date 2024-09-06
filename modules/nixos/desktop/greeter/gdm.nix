@@ -14,6 +14,7 @@ in {
       displayManager.gdm = {
         enable = true;
         wayland = cfg.useWayland;
+        autoSuspend = false;
       };
     };
   };

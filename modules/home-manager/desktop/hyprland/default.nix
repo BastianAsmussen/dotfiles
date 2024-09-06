@@ -13,11 +13,17 @@
     inherit (config) hyprland;
     inherit (config.lib.stylix) colors;
   };
+
+  startupScript = pkgs.writers.writeBashBin "start" ''
+    ${pkgs.ags}/bin/ags
+  '';
 in {
+  imports = [./ags];
+
   options.hyprland.monitors = mkOption {
     default = [
       "DP-1, 1920x1080@240, 0x0, 1"
-      "HDMI-A-1, 1920x1080, 1920x0, 1"
+      "HDMI-A-1, 1920x1080, -1920x0, 1"
       ", preferred, auto, 1" # Recommended rule for quickly plugging in random monitors.
     ];
     description = "The monitors to use for Hyprland.";
@@ -29,18 +35,24 @@ in {
       enable = true;
 
       package = inputs.hyprland.packages."${pkgs.system}".hyprland;
+
       xwayland.enable = true;
+      systemd.enableXdgAutostart = true;
+
       settings = {
-        exec-once = "${pkgs.ags}/bin/ags";
+        exec-once = "${startupScript}/bin/start";
+
         "$mod" = "SUPER";
         "$terminal" = "alacritty";
         "$browser" = "firefox";
+
         input.kb_layout = "dk";
         monitor = cfg.hyprland.monitors;
         bind =
           [
             "$mod, RETURN, exec, $terminal"
             "$mod, F, exec, $browser"
+            "$mod, S, exec, ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
 
             "$mod, Q, killactive"
             "$mod, M, exit"
@@ -76,8 +88,10 @@ in {
           "col.active_border" = mkForce "rgba(${cfg.colors.base0E}ff) rgba(${cfg.colors.base09}ff) 60deg";
           "col.inactive_border" = mkForce "rgba(${cfg.colors.base00}ff)";
 
-          gaps_out = 30;
+          gaps_out = 32;
         };
+
+        decoration.rounding = 8;
       };
 
       extraConfig = ''

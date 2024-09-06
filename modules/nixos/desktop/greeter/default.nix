@@ -2,20 +2,24 @@
   lib,
   config,
   ...
-}: {
+}: let
+  inherit (lib) mkOption types mkIf;
+
+  cfg = config.desktop;
+in {
   imports = [
     ./gdm.nix
     ./sddm.nix
   ];
 
-  options.desktop.greeter.useWayland = lib.mkOption {
+  options.desktop.greeter.useWayland = mkOption {
     default = true;
     description = "Whether to use the Wayland compositor or not.";
-    type = lib.types.bool;
+    type = types.bool;
   };
 
   config = {
     # Hint Electron apps to use Wayland.
-    environment.sessionVariables.NIXOS_OZONE_WL = lib.mkIf config.desktop.greeter.useWayland "1";
+    environment.sessionVariables.NIXOS_OZONE_WL = mkIf cfg.greeter.useWayland "1";
   };
 }

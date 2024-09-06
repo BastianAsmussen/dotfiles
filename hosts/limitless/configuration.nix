@@ -10,7 +10,7 @@
   goxlr.enable = true;
 
   desktop = {
-    environment.gnome.enable = true;
+    environment.hyprland.enable = true;
     greeter.gdm.enable = true;
   };
 
