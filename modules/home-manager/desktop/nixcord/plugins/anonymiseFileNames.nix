@@ -3,6 +3,6 @@
     enable = true;
 
     anonymiseByDefault = true;
-    randomisedLength = 16;
+    randomisedLength = 8;
   };
 }
