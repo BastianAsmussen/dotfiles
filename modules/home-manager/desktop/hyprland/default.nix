@@ -18,7 +18,9 @@
     ${pkgs.ags}/bin/ags
   '';
 in {
-  imports = [./ags];
+  imports = [
+    ./ags
+  ];
 
   options.hyprland.monitors = mkOption {
     default = [
@@ -52,11 +54,12 @@ in {
           [
             "$mod, RETURN, exec, $terminal"
             "$mod, F, exec, $browser"
-            "$mod, S, exec, ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
+            "$mod, SPACE, exec, ${pkgs.rofi-wayland}/bin/rofi -show drun -show-icons"
 
             "$mod, Q, killactive"
             "$mod, M, exit"
             "$mod SHIFT, F, fullscreen, 1"
+            "$mod, BACKSPACE, exec, ${pkgs.swaylock}/bin/swaylock"
 
             "$mod, H, movefocus, l"
             "$mod, L, movefocus, r"
