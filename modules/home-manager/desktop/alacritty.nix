@@ -19,8 +19,9 @@ in {
 
       font = let
         jetbrainsMono = style: {
-          family = "JetBrainsMono Nerd Font";
           inherit style;
+
+          family = "JetBrainsMono Nerd Font";
         };
       in {
         size = mkForce 14;
