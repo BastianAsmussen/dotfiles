@@ -6,7 +6,9 @@
     ./dap.nix
     ./dashboard.nix
     ./gitsigns.nix
+    ./hardtime.nix
     ./lualine.nix
+    ./markdown-preview.nix
     ./neo-tree.nix
     ./telescope.nix
     ./tmux-navigator.nix
