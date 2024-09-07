@@ -69,6 +69,9 @@ in {
 
     (mapKey "n" "<leader>dt" "<cmd>lua vim.cmd('RustLsp testables')<CR>")
 
+    # Preview markdown files.
+    (mapKey "n" "<leader>mp" "<cmd>MarkdownPreview<CR>")
+
     # Make it rain!
     (mapKey "n" "<leader>fml" "<cmd>CellularAutomaton make_it_rain<CR>")
   ];
