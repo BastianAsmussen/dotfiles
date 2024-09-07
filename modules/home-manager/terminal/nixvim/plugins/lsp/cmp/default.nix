@@ -5,14 +5,22 @@
   ];
 
   programs.nixvim = {
-    opts.completeopt = ["menu" "menuone" "noselect"];
+    opts.completeopt = [
+      "menu"
+      "menuone"
+      "noselect"
+    ];
 
     plugins = {
       cmp = {
         enable = true;
 
         settings = {
-          formatting.fields = ["kind" "abbr" "menu"];
+          formatting.fields = [
+            "kind"
+            "abbr"
+            "menu"
+          ];
 
           mapping = {
             "<C-d>" = "cmp.mapping.scroll_docs(-4)";

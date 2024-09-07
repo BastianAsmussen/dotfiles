@@ -5,8 +5,13 @@
     enableGitStatus = true;
     enableModifiedMarkers = true;
     enableRefreshOnWrite = true;
+    sources = [
+      "filesystem"
+      "buffers"
+      "git_status"
+      "document_symbols"
+    ];
 
-    sources = ["filesystem" "buffers" "git_status" "document_symbols"];
     addBlankLineAtTop = false;
     hideRootNode = true;
     filesystem = {

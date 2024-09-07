@@ -13,7 +13,10 @@
       right = "";
     };
 
-    disabledFiletypes.statusline = ["dashboard"];
+    disabledFiletypes.statusline = [
+      "dashboard"
+    ];
+
     sections = {
       lualine_a = [
         {
@@ -41,7 +44,10 @@
         {
           name = "diagnostics";
           extraConfig = {
-            sources = ["nvim_lsp"];
+            sources = [
+              "nvim_lsp"
+            ];
+
             symbols = {
               error = " ";
               warn = " ";
@@ -70,8 +76,13 @@
         }
       ];
 
-      lualine_y = ["progress"];
-      lualine_z = ["location"];
+      lualine_y = [
+        "progress"
+      ];
+
+      lualine_z = [
+        "location"
+      ];
     };
   };
 }

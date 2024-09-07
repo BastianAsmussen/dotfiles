@@ -9,12 +9,14 @@
         "-Dclippy::nursery" # Enable all nursery lints.
         "-Dclippy::unwrap_used" # Disallow use of `unwrap`.
       ];
+
       check.command = "clippy";
 
       diagnostics.styleLints.enable = true;
       inlayHints.lifetimeElisionHints.enable = "always";
-
-      files.excludeDirs = [".devenv"];
+      files.excludeDirs = [
+        ".devenv"
+      ];
     };
   };
 }
