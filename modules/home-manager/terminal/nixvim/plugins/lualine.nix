@@ -2,48 +2,50 @@
   programs.nixvim.plugins.lualine = {
     enable = true;
 
-    globalstatus = true;
-    componentSeparators = {
-      left = "|";
-      right = "|";
-    };
+    settings = {
+      options = {
+        globalstatus = true;
+        component_separators = {
+          left = "|";
+          right = "|";
+        };
 
-    sectionSeparators = {
-      left = "";
-      right = "";
-    };
+        section_separators = {
+          left = "";
+          right = "";
+        };
 
-    disabledFiletypes.statusline = [
-      "dashboard"
-    ];
+        disabled_filetypes.statusline = [
+          "dashboard"
+        ];
+      };
 
-    sections = {
-      lualine_a = [
-        {
-          name = "mode";
-          icon = "";
-        }
-      ];
+      sections = {
+        lualine_a = [
+          {
+            __unkeyed-1 = "mode";
+            icon = "";
+          }
+        ];
 
-      lualine_b = [
-        {
-          name = "branch";
-          icon = "";
-        }
-        {
-          name = "diff";
-          extraConfig.symbols = {
-            added = " ";
-            modified = " ";
-            removed = " ";
-          };
-        }
-      ];
+        lualine_b = [
+          {
+            __unkeyed-1 = "branch";
+            icon = "";
+          }
+          {
+            __unkeyed-1 = "diff";
+            symbols = {
+              added = " ";
+              modified = " ";
+              removed = " ";
+            };
+          }
+        ];
 
-      lualine_c = [
-        {
-          name = "diagnostics";
-          extraConfig = {
+        lualine_c = [
+          {
+            __unkeyed-1 = "diagnostics";
             sources = [
               "nvim_lsp"
             ];
@@ -54,35 +56,33 @@
               info = " ";
               hint = "󰝶 ";
             };
-          };
-        }
-      ];
+          }
+        ];
 
-      lualine_x = [
-        {
-          name = "filetype";
-          extraConfig = {
+        lualine_x = [
+          {
+            __unkeyed-1 = "filetype";
             icon_only = true;
             separator = "";
             padding = {
               left = 1;
               right = 0;
             };
-          };
-        }
-        {
-          name = "filename";
-          extraConfig.path = 4;
-        }
-      ];
+          }
+          {
+            __unkeyed-1 = "filename";
+            path = 4;
+          }
+        ];
 
-      lualine_y = [
-        "progress"
-      ];
+        lualine_y = [
+          "progress"
+        ];
 
-      lualine_z = [
-        "location"
-      ];
+        lualine_z = [
+          "location"
+        ];
+      };
     };
   };
 }

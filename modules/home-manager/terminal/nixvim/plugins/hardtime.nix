@@ -2,6 +2,6 @@
   programs.nixvim.plugins.hardtime = {
     enable = true;
 
-    maxCount = 4;
+    settings.max_count = 4;
   };
 }
