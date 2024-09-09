@@ -48,7 +48,13 @@ in {
         "$terminal" = "alacritty";
         "$browser" = "firefox";
 
-        input.kb_layout = "dk";
+        input = {
+          kb_layout = "dk";
+
+          follow_mouse = 1;
+          touchpad.natural_scroll = true;
+        };
+
         monitor = cfg.hyprland.monitors;
         bind =
           [
