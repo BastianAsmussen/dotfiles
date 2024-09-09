@@ -13,8 +13,36 @@ in {
 
   config = mkIf cfg.environment.hyprland.enable {
     # Enable GNOME because Stylix will only style GDM if it's enabled, too.
-    desktop.environment.gnome.enable = mkIf cfg.greeter.gdm.enable true;
-    services.displayManager.defaultSession = "hyprland";
+    services = {
+      xserver = mkIf cfg.greeter.gdm.enable {
+        enable = true;
+
+        desktopManager.gnome.enable = true;
+      };
+
+      displayManager.defaultSession = "hyprland";
+    };
+
+    # Since GNOME only needs to be enabled, we can strip it of all its basic features.
+    environment.gnome.excludePackages =
+      mkIf cfg.greeter.gdm.enable
+      (with pkgs; [
+        gnome-photos
+        gnome-tour
+        gedit # text editor
+        cheese # webcam tool
+        gnome-music
+        gnome-terminal
+        epiphany # web browser
+        geary # email reader
+        evince # document viewer
+        gnome-characters
+        totem # video player
+        tali # poker game
+        iagno # go game
+        hitori # sudoku game
+        atomix # puzzle game
+      ]);
 
     nix.settings = {
       substituters = ["https://hyprland.cachix.org"];

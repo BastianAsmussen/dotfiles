@@ -6,7 +6,7 @@
 
   desktop = {
     audio.pipewire.enable = true;
-    environment.gnome.enable = true;
+    environment.hyprland.enable = true;
     greeter.gdm.enable = true;
   };
 }
