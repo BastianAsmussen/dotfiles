@@ -1,6 +1,7 @@
 {
   imports = [
     ./lsp
+    ./treesitter
     ./auto-save.nix
     ./cellular-automaton.nix
     ./dap.nix
@@ -12,13 +13,13 @@
     ./neo-tree.nix
     ./telescope.nix
     ./tmux-navigator.nix
-    ./treesitter.nix
   ];
 
   programs.nixvim.plugins = {
     bufferline.enable = true;
     crates-nvim.enable = true;
     direnv.enable = true;
+    indent-blankline.enable = true;
     nvim-autopairs.enable = true;
   };
 }
