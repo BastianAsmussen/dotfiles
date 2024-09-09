@@ -15,7 +15,7 @@
   };
 
   startupScript = pkgs.writers.writeBashBin "start" ''
-    ${pkgs.ags}/bin/ags
+    ags &
   '';
 in {
   imports = [
