@@ -1,4 +1,4 @@
-{
+{pkgs, ...}: {
   time.timeZone = "Europe/Copenhagen";
   i18n.defaultLocale = "en_DK.UTF-8";
   i18n.extraLocaleSettings = {
@@ -15,4 +15,8 @@
 
   console.keyMap = "dk";
   services.xserver.xkb.layout = "dk";
+
+  environment.systemPackages = with pkgs; [
+    hunspellDicts.da_DK
+  ];
 }
