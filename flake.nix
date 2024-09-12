@@ -50,6 +50,7 @@
       username = "bastian";
       email = "bastian@asmussen.tech";
       fullName = "Bastian Asmussen";
+      icon = ./assets/icons/bastian.png;
     };
   in {
     packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});

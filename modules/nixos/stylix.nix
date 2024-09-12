@@ -3,7 +3,7 @@
     enable = true;
 
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-    image = ../../wallpapers/tokyo.png;
+    image = ../../assets/wallpapers/tokyo.png;
     polarity = "dark";
     cursor = {
       package = pkgs.bibata-cursors;
@@ -11,6 +11,13 @@
     };
 
     fonts = with pkgs; {
+      sizes = {
+        applications = 12;
+        terminal = 15;
+        desktop = 10;
+        popups = 10;
+      };
+
       monospace = {
         package = nerdfonts.override {fonts = ["JetBrainsMono"];};
         name = "JetBrainsMono Nerd Font Mono";
