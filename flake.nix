@@ -7,6 +7,7 @@
     stylix.url = "github:danth/stylix";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
     ags.url = "github:Aylur/ags";
+    matugen.url = "github:/InioX/Matugen";
     nixcord.url = "github:kaylorben/nixcord";
 
     disko = {
@@ -53,7 +54,7 @@
       icon = ./assets/icons/bastian.png;
     };
   in {
-    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
+    packages = forAllSystems ({pkgs}: pkgs.callPackages ./pkgs {inherit pkgs;});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
     nixosConfigurations = listToAttrs (map (hostname: {
