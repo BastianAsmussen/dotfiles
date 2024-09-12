@@ -1,8 +1,12 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+in {
+  environment.sessionVariables.STYLIX_SCHEME = scheme;
+
   stylix = {
     enable = true;
 
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+    base16Scheme = scheme;
     image = ../../assets/wallpapers/tokyo.png;
     polarity = "dark";
     cursor = {
