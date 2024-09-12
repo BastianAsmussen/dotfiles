@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   nixosConfig,
   inputs,
@@ -116,7 +115,7 @@ in {
 
             "$mod, f, togglefloating"
             "$mod, g, fullscreen"
-            "$mod, o, fullscreen, 0"
+            "$mod, o, fullscreen, 1" # Fake fullscreen.
             "$mod, p, togglesplit"
 
             (mkMoveFocusBind "h" "l")
