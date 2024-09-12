@@ -14,31 +14,31 @@ const options = mkOptions(OPTIONS, {
     theme: {
         dark: {
             primary: {
-                bg: opt("#51a4e7"),
-                fg: opt("#141414"),
+                bg: opt("#89b4fa"),
+                fg: opt("#1e1e2e"),
             },
             error: {
-                bg: opt("#e55f86"),
-                fg: opt("#141414"),
+                bg: opt("#f38ba8"),
+                fg: opt("#1e1e2e"),
             },
-            bg: opt("#171717"),
-            fg: opt("#eeeeee"),
-            widget: opt("#eeeeee"),
-            border: opt("#eeeeee"),
+            bg: opt("#1e1e2e"),
+            fg: opt("#cdd6f4"),
+            widget: opt("#cdd6f4"),
+            border: opt("#585b70"),
         },
         light: {
             primary: {
-                bg: opt("#426ede"),
-                fg: opt("#eeeeee"),
+                bg: opt("#1e66f5"),
+                fg: opt("#4c4f69"),
             },
             error: {
-                bg: opt("#b13558"),
-                fg: opt("#eeeeee"),
+                bg: opt("#d20f39"),
+                fg: opt("#4c4f69"),
             },
-            bg: opt("#fffffa"),
-            fg: opt("#080808"),
-            widget: opt("#080808"),
-            border: opt("#080808"),
+            bg: opt("#eff1f5"),
+            fg: opt("#4c4f69"),
+            widget: opt("#4c4f69"),
+            border: opt("#bcc0cc"),
         },
 
         blur: opt(0),
@@ -106,7 +106,7 @@ const options = mkOptions(OPTIONS, {
         },
         battery: {
             bar: opt<"hidden" | "regular" | "whole">("regular"),
-            charging: opt("#00D787"),
+            charging: opt("#a6e3a1"),
             percentage: opt(true),
             blocks: opt(7),
             width: opt(50),
@@ -234,10 +234,11 @@ const options = mkOptions(OPTIONS, {
 
     hyprland: {
         gaps: opt(2.4),
-        inactiveBorder: opt("#282828"),
+        inactiveBorder: opt("#45475a"),
         gapsWhenOnly: opt(false),
     },
 })
 
 globalThis["options"] = options
 export default options
+
