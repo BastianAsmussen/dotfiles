@@ -4,7 +4,6 @@
     ./none-ls.nix
     ./rustaceanvim.nix
   ];
-
   programs.nixvim = {
     plugins = {
       lsp = {
@@ -27,6 +26,7 @@
           gopls.enable = true;
           pyright.enable = true;
           clangd.enable = true;
+          hls.enable = true;
         };
       };
 

@@ -35,6 +35,8 @@
       spotify
       pika-backup
       mpv
+      ghc
+      cabal-install
     ];
 
     stateVersion = "24.05";
