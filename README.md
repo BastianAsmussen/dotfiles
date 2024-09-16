@@ -37,7 +37,7 @@ sudo nixos-install --flake ~/dotfiles#limitless
 1. Update the `flake.lock` file about once per week.
 
 ```sh
-nh os switch --update ~/dotfiles
+nh os switch --update
 ```
 
 - If it can't build, roll back to a previous version.
