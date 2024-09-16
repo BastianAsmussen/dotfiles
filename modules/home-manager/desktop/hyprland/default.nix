@@ -15,6 +15,7 @@
 in {
   imports = [
     ./ags
+    ./hyprlock.nix
   ];
 
   config = mkIf nixosConfig.desktop.environment.hyprland.enable {
@@ -108,6 +109,7 @@ in {
 
             "$mod, Return, exec, alacritty"
             "$mod, w, exec, firefox"
+            "$mod, Backspace, exec, hyprlock"
 
             "ALT, Tab, focuscurrentorlast"
             "CTRL ALT, Delete, exit"

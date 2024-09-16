@@ -12,6 +12,9 @@ in {
   options.desktop.environment.hyprland.enable = mkEnableOption "Enables the `Hyprland` desktop environment.";
 
   config = mkIf cfg.environment.hyprland.enable {
+    # Enable Hyprlock PAM module.
+    security.pam.services.hyprlock = {};
+
     # Enable GNOME because Stylix will only style GDM if it's enabled, too.
     services = {
       xserver = mkIf cfg.greeter.gdm.enable {
