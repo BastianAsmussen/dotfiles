@@ -1,5 +1,8 @@
 {
-  home.shellAliases.ls = "eza";
+  home.shellAliases = {
+    ls = "eza";
+    tree = "eza --tree";
+  };
 
   programs.eza = {
     enable = true;
