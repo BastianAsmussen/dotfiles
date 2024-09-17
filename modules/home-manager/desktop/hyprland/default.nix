@@ -80,6 +80,8 @@ in {
           (mkFloating "xdg-desktop-portal")
           (mkFloating "xdg-desktop-portal-gnome")
           (mkFloating "de.haeckerfelix.Fragments")
+          (mkFloating "virt-manager")
+          (mkFloating "org.gnome.World.PikaBackup")
           (mkFloating "com.github.Aylur.ags")
         ];
 
