@@ -10,6 +10,7 @@
 
   programs.nixcord.config.plugins = {
     alwaysAnimate.enable = true;
+    crashHandler.attemptToNavigateToHome = true;
     betterGifAltText.enable = true;
     betterGifPicker.enable = true;
     callTimer.enable = true;
