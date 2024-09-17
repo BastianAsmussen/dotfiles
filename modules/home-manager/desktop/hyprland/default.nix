@@ -85,6 +85,16 @@ in {
           (mkFloating "com.github.Aylur.ags")
         ];
 
+        windowrulev2 = let
+          pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
+        in [
+          "float, ${pictureInPicture}"
+          "size 30% 30%, ${pictureInPicture}"
+          "move 100%-w-20, ${pictureInPicture}"
+          "pin, ${pictureInPicture}"
+          "keepaspectratio, ${pictureInPicture}"
+        ];
+
         binds.allow_workspace_cycles = true;
         bind = let
           mkBind = mod: cmd: key: arg: "${mod}, ${key}, ${cmd}, ${arg}";
