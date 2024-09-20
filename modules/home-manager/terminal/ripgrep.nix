@@ -1,4 +1,7 @@
 {
+  # Search by file names.
+  home.shellAliases.rgf = "rg --files | rg";
+
   programs.ripgrep = {
     enable = true;
 
@@ -25,7 +28,4 @@
       "--smart-case"
     ];
   };
-
-  # Search by file names.
-  home.shellAliases.rgf = "rg --files | rg";
 }
