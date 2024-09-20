@@ -26,26 +26,36 @@ in {
       displayManager.defaultSession = "hyprland";
     };
 
-    # Since GNOME only needs to be enabled, we can strip it of all its basic features.
-    environment.gnome.excludePackages =
-      mkIf cfg.greeter.gdm.enable
-      (with pkgs; [
-        gnome-photos
-        gnome-tour
-        gedit # text editor
-        cheese # webcam tool
-        gnome-music
-        gnome-terminal
-        epiphany # web browser
-        geary # email reader
-        evince # document viewer
-        gnome-characters
-        totem # video player
-        tali # poker game
-        iagno # go game
-        hitori # sudoku game
-        atomix # puzzle game
-      ]);
+    environment = {
+      # Since GNOME only needs to be enabled, we can strip it of all its basic features.
+      gnome.excludePackages =
+        mkIf cfg.greeter.gdm.enable
+        (with pkgs; [
+          gnome-photos
+          gnome-tour
+          gedit # text editor
+          cheese # webcam tool
+          gnome-music
+          gnome-terminal
+          epiphany # web browser
+          geary # email reader
+          evince # document viewer
+          gnome-characters
+          totem # video player
+          tali # poker game
+          iagno # go game
+          hitori # sudoku game
+          atomix # puzzle game
+        ]);
+
+      sessionVariables = {
+        # Fix invsible cursors.
+        WLR_NO_HARDWARE_CURSORS = "1";
+
+        HYPRCURSOR_THEME = config.stylix.cursor.name;
+        HYPRCURSOR_SIZE = config.stylix.cursor.size;
+      };
+    };
 
     nix.settings = {
       substituters = ["https://hyprland.cachix.org"];
@@ -57,6 +67,8 @@ in {
 
       package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
       portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+
+      xwayland.enable = true;
     };
   };
 }
