@@ -37,6 +37,7 @@
       mpv
       ghc
       cabal-install
+      rust-analyzer
     ];
 
     stateVersion = "24.05";
