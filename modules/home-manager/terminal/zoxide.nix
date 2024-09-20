@@ -1,4 +1,6 @@
 {
+  home.shellAliases."cd.." = "cd ..";
+
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
