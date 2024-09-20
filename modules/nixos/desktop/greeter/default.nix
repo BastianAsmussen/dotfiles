@@ -19,7 +19,12 @@ in {
   };
 
   config = {
-    # Hint Electron apps to use Wayland.
-    environment.sessionVariables.NIXOS_OZONE_WL = mkIf cfg.greeter.useWayland "1";
+    environment.sessionVariables = mkIf cfg.greeter.useWayland {
+      NIXOS_OZONE_WL = "1"; # Hint Electron apps to use Wayland.
+      SDL_VIDEODRIVER = "wayland";
+      QT_QPA_PLATFORM = "wayland";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      _JAVA_AWT_WM_NONREPARENTING = 1;
+    };
   };
 }
