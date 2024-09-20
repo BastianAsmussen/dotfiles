@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     stylix.url = "github:danth/stylix";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
@@ -67,8 +68,8 @@
 
             {networking.hostName = hostname;}
 
-            inputs.stylix.nixosModules.stylix
             inputs.disko.nixosModules.disko
+            inputs.stylix.nixosModules.stylix
           ];
         };
       })
