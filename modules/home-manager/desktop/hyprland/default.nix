@@ -87,12 +87,14 @@ in {
 
         windowrulev2 = let
           pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
+          qBittorrent = "class:(org.qbittorrent.qBittorrent) title:^(!qBittorrent).*$";
         in [
           "float, ${pictureInPicture}"
           "size 30% 30%, ${pictureInPicture}"
           "move 100%-w-20, ${pictureInPicture}"
           "pin, ${pictureInPicture}"
           "keepaspectratio, ${pictureInPicture}"
+          "float, ${qBittorrent}" # Make all windows belonging, but not being the main qBittorrent window float.
         ];
 
         binds.allow_workspace_cycles = true;
