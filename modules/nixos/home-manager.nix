@@ -21,7 +21,7 @@ in {
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "backup";
-      users."${userInfo.username}" = import ../home-manager;
+      users.${userInfo.username} = import ../home-manager;
     };
   };
 }
