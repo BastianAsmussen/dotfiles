@@ -88,7 +88,7 @@ in {
 
         windowrulev2 = let
           pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
-          qBittorrent = "class:(org.qbittorrent.qBittorrent) title:^(!qBittorrent).*$";
+          qBittorrent = "class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$";
         in [
           "float, ${pictureInPicture}"
           "size 30% 30%, ${pictureInPicture}"
