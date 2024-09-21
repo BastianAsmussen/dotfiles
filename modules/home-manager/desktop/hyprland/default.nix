@@ -82,6 +82,7 @@ in {
           (mkFloating "de.haeckerfelix.Fragments")
           (mkFloating "virt-manager")
           (mkFloating "org.gnome.World.PikaBackup")
+          (mkFloating "Mullvad VPN")
           (mkFloating "com.github.Aylur.ags")
         ];
 
@@ -94,6 +95,7 @@ in {
           "move 100%-w-20, ${pictureInPicture}"
           "pin, ${pictureInPicture}"
           "keepaspectratio, ${pictureInPicture}"
+          "move 100%-w-20 5%, class:Mullvad VPN"
           "float, ${qBittorrent}" # Make all windows belonging, but not being the main qBittorrent window float.
         ];
 
