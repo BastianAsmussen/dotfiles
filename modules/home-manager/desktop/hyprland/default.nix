@@ -78,6 +78,7 @@ in {
           (mkFloating "org.gnome.design.Palette")
           (mkFloating "Color Picker")
           (mkFloating "xdg-desktop-portal")
+          (mkFloating "xdg-desktop-portal-gtk")
           (mkFloating "xdg-desktop-portal-gnome")
           (mkFloating "de.haeckerfelix.Fragments")
           (mkFloating "virt-manager")
