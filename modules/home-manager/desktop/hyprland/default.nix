@@ -72,7 +72,7 @@ in {
         in [
           (mkFloating "org.gnome.Calculator")
           (mkFloating "org.gnome.Nautilus")
-          (mkFloating "pavucontrol")
+          (mkFloating "org.pulseaudio.pavucontrol")
           (mkFloating "nm-connection-editor")
           (mkFloating "org.gnome.Settings")
           (mkFloating "org.gnome.design.Palette")
@@ -89,7 +89,6 @@ in {
 
         windowrulev2 = let
           pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
-          qBittorrent = "class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$";
         in [
           "float, ${pictureInPicture}"
           "size 30% 30%, ${pictureInPicture}"
@@ -97,7 +96,7 @@ in {
           "pin, ${pictureInPicture}"
           "keepaspectratio, ${pictureInPicture}"
           "move 100%-w-20 5%, class:Mullvad VPN"
-          "float, ${qBittorrent}" # Make all windows belonging, but not being the main qBittorrent window float.
+          "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$" 
         ];
 
         binds.allow_workspace_cycles = true;
