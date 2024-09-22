@@ -96,7 +96,7 @@ in {
           "pin, ${pictureInPicture}"
           "keepaspectratio, ${pictureInPicture}"
           "move 100%-w-20 5%, class:Mullvad VPN"
-          "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$" 
+          "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
         ];
 
         binds.allow_workspace_cycles = true;
