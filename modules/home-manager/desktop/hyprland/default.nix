@@ -84,6 +84,7 @@ in {
           (mkFloating "virt-manager")
           (mkFloating "org.gnome.World.PikaBackup")
           (mkFloating "Mullvad VPN")
+          (mkFloating "org.gnome.Weather")
           (mkFloating "com.github.Aylur.ags")
         ];
 
