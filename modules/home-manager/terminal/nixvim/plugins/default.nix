@@ -22,5 +22,6 @@
     indent-blankline.enable = true;
     neocord.enable = true;
     nvim-autopairs.enable = true;
+    web-devicons.enable = true;
   };
 }
