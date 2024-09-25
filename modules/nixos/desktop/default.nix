@@ -1,7 +1,7 @@
 {
   imports = [
-    ./audio
     ./environment
     ./greeter
+    ./audio.nix
   ];
 }
