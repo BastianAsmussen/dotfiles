@@ -12,6 +12,7 @@
     ./language.nix
     ./network-manager.nix
     ./nh.nix
+    ./nix-index.nix
     ./nix.nix
     ./nvidia.nix
     ./stylix.nix
