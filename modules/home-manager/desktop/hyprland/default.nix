@@ -83,20 +83,22 @@ in {
           (mkFloating "de.haeckerfelix.Fragments")
           (mkFloating "virt-manager")
           (mkFloating "org.gnome.World.PikaBackup")
-          (mkFloating "Mullvad VPN")
           (mkFloating "org.gnome.Weather")
           (mkFloating "com.github.Aylur.ags")
         ];
 
         windowrulev2 = let
           pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
+          mullvadVpn = "class:(Mullvad VPN)";
         in [
           "float, ${pictureInPicture}"
           "size 30% 30%, ${pictureInPicture}"
           "move 100%-w-20, ${pictureInPicture}"
           "pin, ${pictureInPicture}"
           "keepaspectratio, ${pictureInPicture}"
-          "move 100%-w-20 5%, class:Mullvad VPN"
+          "float, ${mullvadVpn}"
+          "move 100%-w-20 5%, ${mullvadVpn}"
+          "pin, ${mullvadVpn}"
           "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
         ];
 
