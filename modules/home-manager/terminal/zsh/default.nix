@@ -41,6 +41,9 @@
 
       zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
       zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+
+      # Extra completions.
+      source <(rustup completions zsh)
     '';
 
     shellAliases = {
