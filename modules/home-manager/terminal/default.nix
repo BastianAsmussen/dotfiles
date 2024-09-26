@@ -1,5 +1,6 @@
 {
   imports = [
+    ./lf
     ./nixvim
     ./zsh
     ./btop.nix
