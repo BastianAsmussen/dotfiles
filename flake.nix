@@ -75,6 +75,7 @@
 
             inputs.disko.nixosModules.disko
             inputs.stylix.nixosModules.stylix
+            inputs.nix-index-database.nixosModules.nix-index
           ];
         };
       })
