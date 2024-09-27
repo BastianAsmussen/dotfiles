@@ -35,7 +35,7 @@
           type = "os";
         }
         {
-          key = "│ {#34} pkgs    {#keys}│";
+          key = "│ {#34}󰏓 pkgs    {#keys}│";
           type = "packages";
         }
         {
@@ -51,7 +51,7 @@
           type = "terminal";
         }
         {
-          key = "│ {#32} shell   {#keys}│";
+          key = "│ {#32} shell   {#keys}│";
           type = "shell";
         }
         {
