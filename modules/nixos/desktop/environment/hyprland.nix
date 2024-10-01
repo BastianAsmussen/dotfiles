@@ -49,9 +49,6 @@ in {
         ]);
 
       sessionVariables = {
-        # Fix invsible cursors.
-        WLR_NO_HARDWARE_CURSORS = "1";
-
         HYPRCURSOR_THEME = config.stylix.cursor.name;
         HYPRCURSOR_SIZE = config.stylix.cursor.size;
       };

@@ -2,6 +2,7 @@
   imports = [
     ./crypto
     ./desktop
+    ./nvidia
     ./security
     ./virtualisation
     ./bootloader.nix
@@ -13,7 +14,6 @@
     ./network-manager.nix
     ./nh.nix
     ./nix.nix
-    ./nvidia.nix
     ./stylix.nix
     ./user.nix
   ];
