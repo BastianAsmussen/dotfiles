@@ -9,6 +9,8 @@
   nvidia.enable = true;
   goxlr.enable = true;
 
+  gaming.enable = true;
+
   desktop = {
     environment.hyprland.enable = true;
     greeter.gdm.enable = true;

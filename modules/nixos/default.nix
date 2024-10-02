@@ -7,6 +7,7 @@
     ./virtualisation
     ./bootloader.nix
     ./btrfs.nix
+    ./gaming.nix
     ./goxlr.nix
     ./home-manager.nix
     ./keyboard.nix
