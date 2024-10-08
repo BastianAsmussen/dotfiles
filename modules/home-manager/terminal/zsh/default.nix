@@ -51,6 +51,8 @@
 
       cp = "cp -r";
       rm = "rm -r";
+
+      myip = "${pkgs.curl}/bin/curl ifconfig.me && echo ''";
     };
 
     oh-my-zsh = {
