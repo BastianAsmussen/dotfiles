@@ -1,6 +1,7 @@
 {lib, ...}: {
   imports = [
     ./gpg.nix
+    ./hardening.nix
     ./ssh.nix
     ./vpn.nix
     ./yubiKey.nix
