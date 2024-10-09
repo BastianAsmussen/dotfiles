@@ -1,4 +1,4 @@
-{inputs, ...}: {
+{
   nixpkgs.config.allowUnfree = true;
   nix = {
     settings = {
@@ -13,21 +13,5 @@
     };
 
     optimise.automatic = true;
-  };
-
-  system = {
-    stateVersion = "24.05";
-    autoUpgrade = {
-      enable = true;
-      flake = inputs.self.outPath;
-      flags = [
-        "--update-input"
-        "nixpkgs"
-        "-L" # Print build logs.
-      ];
-
-      dates = "weekly";
-      randomizedDelaySec = "45min";
-    };
   };
 }

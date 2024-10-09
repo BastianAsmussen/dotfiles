@@ -1,4 +1,6 @@
-{lib, ...}: {
+{lib, ...}: let
+  inherit (lib) mkDefault;
+in {
   imports = [
     ./crypto
     ./desktop
@@ -19,8 +21,10 @@
     ./user.nix
   ];
 
-  btrfs.enable = lib.mkDefault true;
-  network-manager.enable = lib.mkDefault true;
-  home-manager.enable = lib.mkDefault true;
-  keyboard.enable = lib.mkDefault true;
+  btrfs.enable = mkDefault true;
+  network-manager.enable = mkDefault true;
+  home-manager.enable = mkDefault true;
+  keyboard.enable = mkDefault true;
+
+  system.stateVersion = mkDefault "24.05";
 }
