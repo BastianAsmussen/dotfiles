@@ -16,8 +16,6 @@
     keyTrustMap."0x0FE5A355DBC92568-2024-08-09.asc" = "ultimate";
   };
 
-  programs.man.generateCaches = true;
-
   home = {
     inherit (userInfo) username;
     homeDirectory = "/home/${userInfo.username}";
@@ -43,7 +41,10 @@
     stateVersion = "24.05";
   };
 
-  programs.home-manager.enable = true;
+  programs = {
+    home-manager.enable = true;
+    man.generateCaches = true;
+  };
 
   # Nicely reload system units when changing configs.
   systemd.user.startServices = "sd-switch";
