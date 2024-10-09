@@ -4,6 +4,7 @@ in {
   imports = [
     ./crypto
     ./desktop
+    ./nix
     ./nvidia
     ./security
     ./virtualisation
@@ -15,11 +16,11 @@ in {
     ./keyboard.nix
     ./language.nix
     ./network-manager.nix
-    ./nh.nix
-    ./nix.nix
     ./stylix.nix
     ./user.nix
   ];
+
+  documentation.dev.enable = true;
 
   btrfs.enable = mkDefault true;
   network-manager.enable = mkDefault true;
