@@ -5,6 +5,7 @@
     ./zsh
     ./btop.nix
     ./devenv.nix
+    ./distrobox.nix
     ./eza.nix
     ./fastfetch.nix
     ./fzf.nix
