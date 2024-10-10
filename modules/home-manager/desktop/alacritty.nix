@@ -1,6 +1,7 @@
 {
-  pkgs,
   lib,
+  config,
+  pkgs,
   ...
 }: let
   inherit (lib) mkForce;
@@ -13,6 +14,7 @@ in {
 
       mouse.hide_when_typing = true;
       cursor.unfocused_hollow = false;
+      scrolling.history = config.programs.zsh.history.size;
 
       colors.draw_bold_text_with_bright_colors = true;
       bell.animation = "EaseOutExpo";
