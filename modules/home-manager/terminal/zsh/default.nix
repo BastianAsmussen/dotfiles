@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }: {
@@ -52,7 +53,7 @@
       cp = "cp -r";
       rm = "rm -r";
 
-      myip = "${pkgs.curl}/bin/curl ifconfig.me && echo ''";
+      myip = "${lib.getExe pkgs.curl} ifconfig.me && echo ''";
     };
 
     oh-my-zsh = {
