@@ -3,6 +3,7 @@
     ./lf
     ./nixvim
     ./zsh
+    ./bat.nix
     ./btop.nix
     ./devenv.nix
     ./distrobox.nix
@@ -17,6 +18,4 @@
     ./tmux.nix
     ./zoxide.nix
   ];
-
-  programs.bat.enable = true;
 }
