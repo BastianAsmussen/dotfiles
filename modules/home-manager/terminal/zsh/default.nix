@@ -52,6 +52,7 @@
 
       cp = "cp -r";
       rm = "rm -r";
+      mkdir = "mkdir -vp";
 
       myip = "${lib.getExe pkgs.curl} ifconfig.me && echo ''";
     };
