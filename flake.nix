@@ -1,5 +1,5 @@
 {
-  description = "Top-level flake.";
+  description = "NixOS configuration flake.";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -55,7 +55,7 @@
       icon = ./assets/icons/bastian.png;
     };
   in {
-    packages = forAllSystems ({pkgs}: pkgs.callPackages ./pkgs {inherit pkgs;});
+    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
     nixosConfigurations = listToAttrs (map (hostname: {

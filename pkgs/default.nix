@@ -1,1 +1,2 @@
-_pkgs: {}
+{pkgs ? import <nixpkgs> {}}: {
+}
