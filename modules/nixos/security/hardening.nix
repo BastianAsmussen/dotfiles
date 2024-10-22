@@ -1,4 +1,4 @@
-{
+{pkgs, ...}: {
   boot = {
     kernel.sysctl = {
       # The Magic SysRq key is a key combo that allows users connected to the
@@ -42,5 +42,19 @@
     };
 
     kernelModules = ["tcp_bbr"];
+  };
+
+  security = {
+    apparmor = {
+      enable = true;
+      killUnconfinedConfinables = true;
+      packages = [pkgs.apparmor-profiles];
+    };
+
+    protectKernelImage = true;
+    lockKernelModules = true;
+    forcePageTableIsolation = true;
+    polkit.enable = true;
+    rtkit.enable = true;
   };
 }
