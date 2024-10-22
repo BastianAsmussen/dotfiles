@@ -8,6 +8,7 @@ in {
     ./nvidia
     ./security
     ./virtualisation
+    ./bluetooth.nix
     ./bootloader.nix
     ./btrfs.nix
     ./gaming.nix

@@ -10,4 +10,6 @@
     environment.hyprland.enable = true;
     greeter.gdm.enable = true;
   };
+
+  bluetooth.enable = true;
 }
