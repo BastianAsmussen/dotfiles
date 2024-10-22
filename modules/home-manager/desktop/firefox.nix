@@ -66,7 +66,9 @@
         default = "DuckDuckGo";
         force = true;
 
-        engines = {
+        engines = let
+          updateDaily = 24 * 60 * 60 * 1000;
+        in {
           "Nix Packages" = {
             urls = [
               {
@@ -95,11 +97,23 @@
             definedAliases = ["@nw"];
           };
 
-          "Urban Dictionary" = {
-            urls = [{template = "https://www.urbandictionary.com/define.php?term={searchTerms}";}];
+          "Rust Packages" = let
+            baseUrl = "https://crates.io";
+          in {
+            urls = [{template = "${baseUrl}/search?q={searchTerms}";}];
 
-            iconUpdateURL = "https://www.urbandictionary.com/favicon-32x32.png";
-            updateInterval = 24 * 60 * 60 * 1000; # Once every day.
+            icon = "${baseUrl}/favicon.ico";
+            updateInterval = updateDaily;
+            definedAliases = ["@crates"];
+          };
+
+          "Urban Dictionary" = let
+            baseUrl = "https://www.urbandictionary.com";
+          in {
+            urls = [{template = "${baseUrl}/define.php?term={searchTerms}";}];
+
+            iconUpdateURL = "${baseUrl}/favicon-32x32.png";
+            updateInterval = updateDaily;
             definedAliases = ["@urban"];
           };
 
@@ -119,7 +133,7 @@
         "toolkit.zoomManager.zoomValues" = ".8,.90,.95,1,1.1,1.2";
         "xpinstall.signatures.required" = false;
         "browser.uidensity" = 1;
-        "extensions.autoDisableScopes" = 5; # Auto-enable extensions.
+        "extensions.autoDisableScopes" = 0; # Auto-enable extensions.
         "general.autoScroll" = true; # Enable autoscrolling.
         "browser.startup.homepage" = "";
 
