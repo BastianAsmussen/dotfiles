@@ -6,8 +6,6 @@
   ...
 }: let
   inherit (lib) mkEnableOption mkIf;
-
-  nixosConfig = config;
 in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
@@ -17,7 +15,7 @@ in {
 
   config = mkIf config.home-manager.enable {
     home-manager = {
-      extraSpecialArgs = {inherit inputs nixosConfig userInfo;};
+      extraSpecialArgs = {inherit inputs userInfo;};
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "backup";

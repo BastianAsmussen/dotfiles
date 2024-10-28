@@ -1,6 +1,6 @@
 {
   lib,
-  nixosConfig,
+  osConfig,
   inputs,
   pkgs,
   ...
@@ -18,7 +18,7 @@ in {
     ./hyprlock.nix
   ];
 
-  config = mkIf nixosConfig.desktop.environment.hyprland.enable {
+  config = mkIf osConfig.desktop.environment.hyprland.enable {
     wayland.windowManager.hyprland = {
       enable = true;
 

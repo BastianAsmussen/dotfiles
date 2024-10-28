@@ -1,4 +1,4 @@
-{nixosConfig, ...}: {
+{osConfig, ...}: {
   programs.hyprlock = {
     enable = true;
 
@@ -11,7 +11,7 @@
 
       background = [
         {
-          path = "${nixosConfig.stylix.image}";
+          path = "${osConfig.stylix.image}";
           color = "rgba(25, 20, 20, 1.0)";
           blur_passes = 3;
           blur_size = 8;

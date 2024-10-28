@@ -1,7 +1,7 @@
 {
   lib,
   config,
-  nixosConfig,
+  osConfig,
   ...
 }: let
   inherit (builtins) attrNames readDir elem filter concatLists length concatStringsSep;
@@ -107,7 +107,7 @@ in {
         cfg.keyTrustMap
         cfg.trustLevel;
 
-      scdaemonSettings.disable-ccid = nixosConfig.yubiKey.enable; # Disable CCID conflicts when using a YubiKey.
+      scdaemonSettings.disable-ccid = osConfig.yubiKey.enable; # Disable CCID conflicts when using a YubiKey.
       settings = {
         personal-cipher-preferences = "AES256 AES192 AES";
         personal-digest-preferences = "SHA512 SHA384 SHA256";

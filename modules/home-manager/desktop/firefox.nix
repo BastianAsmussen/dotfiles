@@ -1,13 +1,13 @@
 {
   lib,
-  nixosConfig,
+  osConfig,
   userInfo,
   inputs,
   pkgs,
   ...
 }: {
   # If we're on Wayland, tell that to Firefox.
-  home.sessionVariables = lib.mkIf nixosConfig.desktop.greeter.useWayland {
+  home.sessionVariables = lib.mkIf osConfig.desktop.greeter.useWayland {
     MOZ_ENABLE_WAYLAND = "1";
   };
 
@@ -136,9 +136,6 @@
         "extensions.autoDisableScopes" = 0; # Auto-enable extensions.
         "general.autoScroll" = true; # Enable autoscrolling.
         "browser.startup.homepage" = "";
-
-        # Spoof the user agent.
-        "general.useragent.override" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:110.0) Gecko/20100101 Firefox/110.0";
 
         # Prevent EULA dialog to popup on first run.
         "browser.EULA.override" = true;
