@@ -10,8 +10,7 @@ in {
     enable = true;
 
     settings = {
-      live_config_reload = true;
-
+      general.live_config_reload = true;
       mouse.hide_when_typing = true;
       cursor.unfocused_hollow = false;
       scrolling.history = config.programs.zsh.history.size;
@@ -36,8 +35,8 @@ in {
 
       env.TERM = "xterm-256color";
 
-      shell = {
-        program = "${pkgs.tmux}/bin/tmux";
+      terminal.shell = {
+        program = "${lib.getExe pkgs.tmux}";
         args = ["attach"];
       };
 
