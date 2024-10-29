@@ -5,11 +5,11 @@
   pkgs,
   ...
 }: let
-  inherit (lib) mkIf mkForce;
+  inherit (lib) getExe mkIf mkForce;
   inherit (builtins) genList toString;
 
-  playerctl = "${pkgs.playerctl}/bin/playerctl";
-  brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
+  playerctl = getExe pkgs.playerctl;
+  brightnessctl = getExe pkgs.brightnessctl;
   pactl = "${pkgs.pulseaudio}/bin/pactl";
   screenshot = import ./scripts/screenshot.nix pkgs;
 in {
@@ -53,8 +53,8 @@ in {
         ];
 
         dwindle = {
-          pseudotile = "yes";
-          preserve_split = "yes";
+          pseudotile = true;
+          preserve_split = true;
         };
 
         gestures = {
@@ -100,6 +100,7 @@ in {
           "move 100%-w-20 5%, ${mullvadVpn}"
           "pin, ${mullvadVpn}"
           "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
+          "float, title:^(.*Bitwarden Password Manager.*)$"
         ];
 
         binds.allow_workspace_cycles = true;
