@@ -4,6 +4,7 @@
     ./treesitter
     ./auto-save.nix
     ./cellular-automaton.nix
+    ./comment.nix
     ./dap.nix
     ./dashboard.nix
     ./gitsigns.nix
