@@ -45,6 +45,7 @@ in {
           };
 
           sensitivity = 0;
+          force_no_accel = true;
           float_switch_override_focus = 2;
         };
 
