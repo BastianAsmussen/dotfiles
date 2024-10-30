@@ -3,9 +3,10 @@
   lib,
   inputs,
   config,
+  outputs,
   ...
 }: let
-  mibToB = mib: mib * 1024 * 1024;
+  mibToBytes = mib: mib * 1024 * 1024;
 in {
   imports = [
     ./nh.nix
@@ -35,15 +36,18 @@ in {
       accept-flake-config = true;
       warn-dirty = false;
       commit-lockfile-summary = "chore: update flake.lock";
-      min-free = mibToB 128;
-      max-free = mibToB 1024;
+      min-free = mibToBytes 128;
+      max-free = mibToBytes 1024;
 
       extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
       extra-substituters = "https://devenv.cachix.org";
     };
   };
 
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs = {
+    overlays = builtins.attrValues outputs.overlays;
+    config.allowUnfree = true;
+  };
 
   # Don't build on tmpfs, it's not a good idea.
   systemd.services.nix-daemon.environment.TMPDIR = "/var/tmp";
