@@ -1,11 +1,16 @@
-pkgs: let
-  notify-send = "${pkgs.libnotify}/bin/notify-send";
-  slurp = "${pkgs.slurp}/bin/slurp";
-  wayshot = "${pkgs.wayshot}/bin/wayshot";
-  swappy = "${pkgs.swappy}/bin/swappy";
+{
+  lib,
+  pkgs,
+}: let
+  inherit (lib) getExe;
+
+  notify-send = getExe pkgs.libnotify;
+  slurp = getExe pkgs.slurp;
+  wayshot = getExe pkgs.wayshot;
+  swappy = getExe pkgs.swappy;
   wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
 in
-  pkgs.writeShellScript "screenshot" ''
+  pkgs.writeShellScriptBin "screenshot" ''
     SCREENSHOTS="$HOME/Pictures/Screenshots"
     NOW=$(date +%Y-%m-%d_%H-%M-%S)
     TARGET="$SCREENSHOTS/$NOW.png"

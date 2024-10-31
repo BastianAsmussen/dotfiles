@@ -11,7 +11,24 @@
   playerctl = getExe pkgs.playerctl;
   brightnessctl = getExe pkgs.brightnessctl;
   pactl = "${pkgs.pulseaudio}/bin/pactl";
-  screenshot = import ./scripts/screenshot.nix pkgs;
+  screenshot = import ./scripts/screenshot.nix {inherit pkgs lib;};
+
+  smartGaps = {
+    windowrulev2 = [
+      "bordersize 0, floating:0, onworkspace:w[t1]"
+      "rounding 0, floating:0, onworkspace:w[t1]"
+      "bordersize 0, floating:0, onworkspace:w[tg1]"
+      "rounding 0, floating:0, onworkspace:w[tg1]"
+      "bordersize 0, floating:0, onworkspace:f[1]"
+      "rounding 0, floating:0, onworkspace:f[1]"
+    ];
+
+    workspace = [
+      "w[t1], gapsout:0, gapsin:0"
+      "w[tg1], gapsout:0, gapsin:0"
+      "f[1], gapsout:0, gapsin:0"
+    ];
+  };
 in {
   imports = [
     ./ags
@@ -30,7 +47,6 @@ in {
       settings = {
         exec-once = [
           "ags -b hypr"
-          "fragments"
         ];
 
         "$mod" = "SUPER";
@@ -45,8 +61,10 @@ in {
           };
 
           sensitivity = 0;
-          force_no_accel = true;
           float_switch_override_focus = 2;
+
+          # Disable mouse acceleration if gaming is enabled.
+          force_no_accel = osConfig.gaming.enable;
         };
 
         monitor = [
@@ -91,18 +109,22 @@ in {
         windowrulev2 = let
           pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
           mullvadVpn = "class:(Mullvad VPN)";
-        in [
-          "float, ${pictureInPicture}"
-          "size 30% 30%, ${pictureInPicture}"
-          "move 100%-w-20, ${pictureInPicture}"
-          "pin, ${pictureInPicture}"
-          "keepaspectratio, ${pictureInPicture}"
-          "float, ${mullvadVpn}"
-          "move 100%-w-20 5%, ${mullvadVpn}"
-          "pin, ${mullvadVpn}"
-          "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
-          "float, title:^(.*Bitwarden Password Manager.*)$"
-        ];
+        in
+          [
+            "float, ${pictureInPicture}"
+            "size 30% 30%, ${pictureInPicture}"
+            "move 100%-w-20, ${pictureInPicture}"
+            "pin, ${pictureInPicture}"
+            "keepaspectratio, ${pictureInPicture}"
+            "float, ${mullvadVpn}"
+            "move 100%-w-20 5%, ${mullvadVpn}"
+            "pin, ${mullvadVpn}"
+            "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
+            "float, title:^(.*Bitwarden Password Manager.*)$"
+          ]
+          ++ smartGaps.windowrulev2;
+
+        inherit (smartGaps) workspace;
 
         binds.allow_workspace_cycles = true;
         bind = let
@@ -125,8 +147,8 @@ in {
 
             ",XF86PowerOff, ${ags} -r 'powermenu.shutdown()'"
 
-            ",Print, exec, ${screenshot}"
-            "SHIFT, Print, exec, ${screenshot} --full"
+            ",Print, exec, ${getExe screenshot}"
+            "SHIFT, Print, exec, ${getExe screenshot} --full"
 
             "$mod, Return, exec, alacritty"
             "$mod, w, exec, firefox"
@@ -164,9 +186,9 @@ in {
 
         bindle = [
           ",XF86MonBrightnessUp, exec, ${brightnessctl} set +5%"
-          ",XF86MonBrightnessDown, exec, ${brightnessctl} set 5%-"
-          ",XF86KbdBrightnessUp, exec, ${brightnessctl} -d asus::kbd_backlight set +1"
-          ",XF86KbdBrightnessDown, exec, ${brightnessctl} -d asus::kbd_backlight set  1-"
+          ",XF86MonBrightnessDown, exec, ${brightnessctl} set -5%"
+          ",XF86KbdBrightnessUp, exec, ${brightnessctl} -d *::kbd_backlight set +33%"
+          ",XF86KbdBrightnessDown, exec, ${brightnessctl} -d *::kbd_backlight set +33%"
           ",XF86AudioRaiseVolume, exec, ${pactl} set-sink-volume @DEFAULT_SINK@ +5%"
           ",XF86AudioLowerVolume, exec, ${pactl} set-sink-volume @DEFAULT_SINK@ -5%"
         ];
@@ -177,6 +199,7 @@ in {
           ",XF86AudioPause, exec, ${playerctl} pause"
           ",XF86AudioPrev, exec, ${playerctl} previous"
           ",XF86AudioNext, exec, ${playerctl} next"
+          ",XF86AudioMute, exec, ${pactl} set-sink-mute @DEFAULT_SINK@ toggle"
           ",XF86AudioMicMute, exec, ${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
         ];
 
