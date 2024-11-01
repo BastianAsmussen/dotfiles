@@ -1,0 +1,25 @@
+! Remove pink fade from YouTube playback progress bar.
+youtube.com##.ytp-cairo-refresh-signature-moments .ytp-play-progress:style(background: #FF0000 !important;)
+youtube.com##ytd-thumbnail-overlay-resume-playback-renderer[enable-refresh-signature-moments-web] #progress.ytd-thumbnail-overlay-resume-playback-renderer:style(background: #FF0000 !important;)
+! Change color of YouTube play-head dot.
+youtube.com##html[refresh], [refresh]:style(--yt-spec-static-brand-red: #FF0000 !important; --yt-spec-static-overlay-background-brand: rgba(255, 0, 0, 0.9) !important;)
+! Change color of YouTube shorts progress bar.
+youtube.com##.YtProgressBarLineProgressBarPlayedRefresh.YtProgressBarLineProgressBarPlayed:style(background: #FF0000 !important;)
+! Change color of YouTube shorts play-head dot.
+youtube.com##.YtProgressBarPlayheadProgressBarPlayheadDot:style(background-color: #FF0000 !important;)
+! Change color of YouTube notification badge and font color.
+www.youtube.com##.yt-spec-icon-badge-shape__badge:style(background: #CC0000 !important; color: #FFF !important;)
+! Remove background transparency from YouTube title bar and change color of player settings icon.
+youtube.com##html, [light]:style(--yt-frosted-glass-desktop: rgba(255, 255, 255, 1.0) !important; --yt-spec-red-indicator: #FF0000 !important;)
+youtube.com##html[dark], [dark]:style(--yt-frosted-glass-desktop: rgba(15, 15, 15, 1.0) !important; --yt-spec-red-indicator: #FF0000 !important;)
+! Change color of YouTube refresh progress bar.
+youtube.com##yt-page-navigation-progress[enable-refresh-signature-moments-web] #progress.yt-page-navigation-progress:style(background: #FF0000 !important;)
+! Change color of YouTube logo.
+youtube.com###logo-icon > .yt-spec-icon-shape.yt-icon.style-scope.yt-icon-shape > div > svg > g:first-of-type > path:first-of-type:style(fill: #FF0000 !important;)
+! Change color of YouTube link preview icon in video description.
+youtube.com##.yt-core-attributed-string--inline-block-mod > img:style(filter: brightness(100%) saturate(100%) hue-rotate(18deg) !important;)
+! Change color of YouTube live-ring.
+youtube.com##.yt-spec-avatar-shape--cairo-refresh.yt-spec-avatar-shape--live-ring::after:style(background: #FF0000 !important;)
+! Change the YouTube favicon.
+www.youtube.com##head > link[rel*="icon"]:remove()
+
