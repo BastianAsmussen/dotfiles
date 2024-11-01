@@ -99,7 +99,6 @@ in {
           (mkFloating "xdg-desktop-portal")
           (mkFloating "xdg-desktop-portal-gtk")
           (mkFloating "xdg-desktop-portal-gnome")
-          (mkFloating "de.haeckerfelix.Fragments")
           (mkFloating "virt-manager")
           (mkFloating "org.gnome.World.PikaBackup")
           (mkFloating "org.gnome.Weather")
@@ -120,7 +119,7 @@ in {
             "move 100%-w-20 5%, ${mullvadVpn}"
             "pin, ${mullvadVpn}"
             "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
-            "float, title:^(.*Bitwarden Password Manager.*)$"
+            "float, class:(electron) title:^(?!electron).*$"
           ]
           ++ smartGaps.windowrulev2;
 
