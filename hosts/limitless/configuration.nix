@@ -1,7 +1,10 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./disko-config.nix
+    (import ../../modules/nixos/disko.nix {
+      device = "/dev/nvme0n1";
+      swapSize = "66G";
+    })
   ];
 
   ssh.server.enable = true;

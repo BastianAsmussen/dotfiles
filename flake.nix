@@ -10,6 +10,7 @@
     ags.url = "github:Aylur/ags";
     matugen.url = "github:/InioX/Matugen";
     nixcord.url = "github:kaylorben/nixcord";
+    impermanence.url = "github:nix-community/impermanence";
 
     disko = {
       url = "github:nix-community/disko";

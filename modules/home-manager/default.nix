@@ -7,6 +7,7 @@
     ./desktop
     ./terminal
     ./dconf.nix
+    ./persistence.nix
     ./qemu.nix
   ];
 

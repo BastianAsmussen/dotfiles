@@ -2,7 +2,7 @@
   imports = [
     inputs.nixos-hardware.nixosModules.hp-notebook-14-df0023
     ./hardware-configuration.nix
-    ./disko-config.nix
+    (import ../../modules/nixos/disko.nix {device = "/dev/nvme0n1";})
   ];
 
   desktop = {
