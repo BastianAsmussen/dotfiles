@@ -23,6 +23,7 @@ in {
       systemPackages = with pkgs; [
         protonup
         prismlauncher
+        lutris
       ];
 
       sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/${userInfo.username}/.steam/root/compatibilitytools.d";
