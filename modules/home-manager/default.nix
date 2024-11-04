@@ -33,7 +33,6 @@
       spotify
       pika-backup
       mpv
-      ghc
       cabal-install
       rustup
     ];

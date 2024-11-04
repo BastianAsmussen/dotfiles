@@ -53,23 +53,11 @@
           ];
 
           window = {
-            documentation = {
-              border = "rounded";
-              max_height = "math.floor(40 * (40 / vim.o.lines))";
-            };
-
-            completion = {
-              border = "rounded";
-              col_offset = -3;
-              side_padding = 0;
-            };
+            completion.border = "rounded";
+            documentation.border = "rounded";
           };
         };
       };
-
-      cmp-nvim-lsp.enable = true;
-      cmp-path.enable = true;
-      cmp-buffer.enable = true;
     };
   };
 }

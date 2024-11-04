@@ -6,6 +6,7 @@
     ./keymaps.nix
     ./opts.nix
     ./performance.nix
+    ./theme.nix
   ];
 
   programs.nixvim = {
