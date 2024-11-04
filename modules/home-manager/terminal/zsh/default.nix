@@ -22,30 +22,32 @@
 
     defaultKeymap = "emacs";
 
-    initExtra = ''
-      # Keybindings.
-      bindkey '^[[1;5C' emacs-forward-word
-      bindkey '^[[1;5D' emacs-backward-word
-      bindkey '^[[3~' delete-char
+    initExtra =
+      # sh
+      ''
+        # Keybindings.
+        bindkey '^[[1;5C' emacs-forward-word
+        bindkey '^[[1;5D' emacs-backward-word
+        bindkey '^[[3~' delete-char
 
-      bindkey '^p' history-search-backward
-      bindkey '^n' history-search-forward
+        bindkey '^p' history-search-backward
+        bindkey '^n' history-search-forward
 
-      # Match any case.
-      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+        # Match any case.
+        zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-      # Previews.
-      zstyle ':completion:*:git-checkout:*' sort false
-      zstyle ':completion:*:descriptions' format '[%d]'
-      zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-      zstyle ':completion:*' menu no
+        # Previews.
+        zstyle ':completion:*:git-checkout:*' sort false
+        zstyle ':completion:*:descriptions' format '[%d]'
+        zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+        zstyle ':completion:*' menu no
 
-      zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+        zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
+        zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 
-      # Extra completions.
-      source <(rustup completions zsh)
-    '';
+        # Extra completions.
+        source <(rustup completions zsh)
+      '';
 
     shellAliases = {
       c = "clear";
@@ -54,7 +56,7 @@
       rm = "rm -r";
       mkdir = "mkdir -vp";
 
-      myip = "${lib.getExe pkgs.curl} ifconfig.me && echo ''";
+      myip = "${lib.getExe pkgs.curl} -s ifconfig.me && echo ''";
     };
 
     oh-my-zsh = {
