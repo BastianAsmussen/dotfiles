@@ -1,5 +1,9 @@
-{pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   home.packages = [
-    (import ./calculator.nix {inherit pkgs;})
+    (import ./calculator.nix {inherit lib pkgs;})
   ];
 }
