@@ -146,8 +146,8 @@ in {
 
             ",XF86PowerOff, ${ags} -r 'powermenu.shutdown()'"
 
-            ",Print, exec, ${getExe screenshot}"
-            "SHIFT, Print, exec, ${getExe screenshot} --full"
+            ",Home , exec, ${getExe screenshot}"
+            "SHIFT, Home, exec, ${getExe screenshot} --full"
 
             "$mod, Return, exec, alacritty"
             "$mod, w, exec, firefox"
