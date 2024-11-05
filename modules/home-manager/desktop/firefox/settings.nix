@@ -1,6 +1,5 @@
 _: {
   # Quality of life stuff.
-  "browser.download.useDownloadDir" = false;
   "browser.aboutConfig.showWarning" = false;
   "browser.tabs.firefox-view" = false;
   "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
@@ -105,7 +104,6 @@ _: {
   "browser.urlbar.trending.featureGate" = false;
   "browser.urlbar.mdn.featureGate" = false;
   "browser.urlbar.weather.featureGate" = false;
-  "browser.download.start_downloads_in_tmp_dir" = true;
   "browser.shopping.experience2023.enabled" = false;
   "security.OCSP.enabled" = 0;
   "security.OCSP.require" = false;
