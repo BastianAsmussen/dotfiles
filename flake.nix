@@ -6,7 +6,7 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     stylix.url = "github:danth/stylix";
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+    hyprland.url = "github:hyprwm/Hyprland";
     ags.url = "github:Aylur/ags";
     matugen.url = "github:/InioX/Matugen";
     nixcord.url = "github:kaylorben/nixcord";

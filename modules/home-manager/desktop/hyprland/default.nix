@@ -1,11 +1,10 @@
 {
   lib,
-  osConfig,
-  inputs,
   pkgs,
+  osConfig,
   ...
 }: let
-  inherit (lib) getExe mkIf mkForce;
+  inherit (lib) getExe mkIf;
   inherit (builtins) genList toString;
 
   playerctl = getExe pkgs.playerctl;
@@ -39,18 +38,12 @@ in {
     wayland.windowManager.hyprland = {
       enable = true;
 
-      package = inputs.hyprland.packages."${pkgs.system}".hyprland;
-
+      inherit (osConfig.programs.hyprland) package;
       xwayland.enable = true;
       systemd.enableXdgAutostart = true;
-
       settings = {
-        exec-once = [
-          "ags -b hypr"
-        ];
-
+        exec-once = ["ags -b hypr"];
         "$mod" = "SUPER";
-
         input = {
           kb_layout = "dk";
           follow_mouse = 1;
@@ -214,14 +207,11 @@ in {
 
         decoration = {
           rounding = 12;
-
+          dim_inactive = false;
           drop_shadow = "yes";
           shadow_range = 8;
           shadow_render_power = 2;
-          "col.shadow" = mkForce "rgba(00000044)";
-
-          dim_inactive = false;
-
+          "col.shadow" = lib.mkForce "rgba(00000044)";
           blur = {
             enabled = true;
             size = 8;
@@ -236,9 +226,9 @@ in {
 
         animations = {
           enabled = "yes";
-          bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
+          bezier = "smoothing, 0.05, 0.9, 0.1, 1.05";
           animation = [
-            "windows, 1, 5, myBezier"
+            "windows, 1, 5, smoothing"
             "windowsOut, 1, 7, default, popin 80%"
             "border, 1, 10, default"
             "fade, 1, 7, default"

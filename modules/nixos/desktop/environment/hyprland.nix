@@ -59,11 +59,13 @@ in {
       trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
     };
 
-    programs.hyprland = {
+    programs.hyprland = let
+      hyprPkgs = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
+    in {
       enable = true;
 
-      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-      portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+      package = hyprPkgs.hyprland;
+      portalPackage = hyprPkgs.xdg-desktop-portal-hyprland;
 
       xwayland.enable = true;
     };
