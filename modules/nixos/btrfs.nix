@@ -32,8 +32,7 @@ in {
       btrfs.autoScrub = {
         enable = true;
 
-        inherit (cfg.scrub) interval;
-        inherit (cfg.scrub) fileSystems;
+        inherit (cfg.scrub) interval fileSystems;
       };
     };
   };
