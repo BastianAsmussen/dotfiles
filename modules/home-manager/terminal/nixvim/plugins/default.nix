@@ -18,6 +18,7 @@
     direnv.enable = true;
     hardtime.enable = true;
     indent-blankline.enable = true;
+    markdown-preview.enable = true;
     neocord.enable = true;
     nvim-autopairs.enable = true;
     web-devicons.enable = true;
