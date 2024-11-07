@@ -16,54 +16,26 @@
         enable = true;
 
         servers = {
-          nixd = {
-            enable = true;
-
-            settings = {
-              nixpkgs.expr =
-                # nix
-                ''
-                  import <nixpkgs> {}
-                '';
-              formatting.command = ["${lib.getExe pkgs.alejandra}"];
-              options = let
-                flakeRoot = "/home/${userInfo.username}/dotfiles";
-              in {
-                nixos.expr =
-                  # nix
-                  ''
-                    (builtins.getFlake ${flakeRoot}).nixosConfigurations.${osConfig.networking.hostName}.options
-                  '';
-              };
-            };
-          };
-
           clangd.enable = true;
+          cssls.enable = true;
+          dockerls = import ./dockerls.nix;
           gopls.enable = true;
-          omnisharp.enable = true;
+          hls = import ./hls.nix;
+          html.enable = true;
           java_language_server.enable = true;
+          nixd = import ./nixd.nix {inherit lib pkgs userInfo osConfig;};
+          omnisharp.enable = true;
           pyright.enable = true;
-          hls = {
-            enable = true;
-            installGhc = true;
-          };
-
           svelte.enable = true;
           ts_ls.enable = true;
-          html.enable = true;
-          cssls.enable = true;
-          typos_lsp = {
-            enable = true;
-
-            extraOptions.init_options.diagnosticSeverity = "Hint";
-          };
+          typos_lsp = import ./typos_lsp.nix;
         };
       };
 
       lsp-format.enable = true;
-      trouble.enable = true;
       nix.enable = true;
       otter.enable = true;
+      trouble.enable = true;
     };
   };
 }
