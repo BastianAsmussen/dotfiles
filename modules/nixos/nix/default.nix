@@ -24,7 +24,6 @@ in {
       experimental-features = ["nix-command" "flakes" "recursive-nix" "ca-derivations"];
       trusted-users = ["root" "@wheel"];
       flake-registry = "/etc/nix/registry.json";
-
       connect-timeout = 5; # Timeout after 5 seconds.
       max-jobs = "auto";
       auto-optimise-store = true;
@@ -38,9 +37,6 @@ in {
       commit-lockfile-summary = "chore: update flake.lock";
       min-free = mibToBytes 128;
       max-free = mibToBytes 1024;
-
-      extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
-      extra-substituters = "https://devenv.cachix.org";
     };
   };
 
