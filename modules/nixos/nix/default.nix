@@ -21,11 +21,18 @@ in {
     nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
 
     settings = {
-      experimental-features = ["nix-command" "flakes" "recursive-nix" "ca-derivations"];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+        "recursive-nix"
+        "ca-derivations"
+      ];
+
       trusted-users = ["root" "@wheel"];
       flake-registry = "/etc/nix/registry.json";
       connect-timeout = 5; # Timeout after 5 seconds.
       max-jobs = "auto";
+      sandbox = true;
       auto-optimise-store = true;
       builders-use-substitutes = true;
       fallback = true; # Fallback to building from source if binary substitute fails.
