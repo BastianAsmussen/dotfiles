@@ -1,4 +1,4 @@
-_: {
+{
   # Quality of life stuff.
   "browser.aboutConfig.showWarning" = false;
   "browser.tabs.firefox-view" = false;

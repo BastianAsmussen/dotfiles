@@ -71,9 +71,9 @@
 
     profiles.${userInfo.username} = {
       extensions = import ./extensions {inherit inputs pkgs;};
-      bookmarks = import ./bookmarks.nix {};
+      bookmarks = import ./bookmarks.nix;
       search = import ./search.nix pkgs;
-      settings = import ./settings.nix {};
+      settings = import ./settings.nix;
     };
   };
 }
