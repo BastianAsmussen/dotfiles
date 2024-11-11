@@ -1,8 +1,12 @@
-{pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   programs.tmux = {
     enable = true;
 
-    shell = "${pkgs.zsh}/bin/zsh";
+    shell = lib.getExe pkgs.zsh;
     terminal = "screen-256color"; # Fix terminal colors.
     keyMode = "vi";
 

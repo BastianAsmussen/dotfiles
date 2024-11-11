@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   home.packages = [pkgs.devenv];
 
   programs.direnv = {
@@ -7,7 +11,7 @@
     nix-direnv.enable = true;
     silent = true;
 
-    enableZshIntegration = true;
+    enableZshIntegration = config.programs.zsh.enable;
   };
 
   nix.settings = {

@@ -1,4 +1,6 @@
-{lib, ...}: {
+{lib, ...}: let
+  inherit (lib) mkDefault;
+in {
   imports = [
     ./gpg.nix
     ./hardening.nix
@@ -7,7 +9,7 @@
     ./yubiKey.nix
   ];
 
-  gpg.enable = lib.mkDefault true;
-  vpn.enable = lib.mkDefault true;
-  yubiKey.enable = lib.mkDefault true;
+  gpg.enable = mkDefault true;
+  vpn.enable = mkDefault true;
+  yubiKey.enable = mkDefault true;
 }
