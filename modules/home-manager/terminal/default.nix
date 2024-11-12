@@ -2,6 +2,7 @@
   imports = [
     ./lf
     ./nixvim
+    ./tmux
     ./zsh
     ./bat.nix
     ./btop.nix
@@ -15,7 +16,6 @@
     ./oh-my-posh.nix
     ./password-store.nix
     ./ripgrep.nix
-    ./tmux.nix
     ./zoxide.nix
   ];
 }

@@ -3,6 +3,10 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ./tmux-sessionizer.nix
+  ];
+
   programs.tmux = {
     enable = true;
 
