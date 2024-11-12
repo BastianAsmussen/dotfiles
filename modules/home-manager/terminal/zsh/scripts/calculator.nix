@@ -1,6 +1,6 @@
 {
-  lib,
   pkgs,
+  lib,
 }:
 pkgs.writeShellScriptBin "=" ''
   cat << EOF | ${lib.getExe pkgs.bc}
