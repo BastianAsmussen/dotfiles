@@ -52,11 +52,11 @@
 
             a (tap-hold-release-keys $pinky-tap-time $hold-time (multi a @tap) lmet $left-hand-keys)
             s (tap-hold-release-keys $ring-tap-time $hold-time (multi s @tap) lalt $left-hand-keys)
-            d (tap-hold-release-keys $normal-tap-time $hold-time (multi d @tap) lctl $left-hand-keys)
-            f (tap-hold-release-keys $normal-tap-time $hold-time (multi f @tap) lsft $left-hand-keys)
+            d (tap-hold-release-keys $normal-tap-time $hold-time (multi d @tap) lsft $left-hand-keys)
+            f (tap-hold-release-keys $normal-tap-time $hold-time (multi f @tap) lctl $left-hand-keys)
 
-            j (tap-hold-release-keys $normal-tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
-            k (tap-hold-release-keys $normal-tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
+            j (tap-hold-release-keys $normal-tap-time $hold-time (multi j @tap) rctl $right-hand-keys)
+            k (tap-hold-release-keys $normal-tap-time $hold-time (multi k @tap) rsft $right-hand-keys)
             l (tap-hold-release-keys $ring-tap-time $hold-time (multi l @tap) ralt $right-hand-keys)
             ; (tap-hold-release-keys $pinky-tap-time $hold-time (multi ; @tap) rmet $right-hand-keys)
           )
