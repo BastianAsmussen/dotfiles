@@ -2,7 +2,9 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  inherit (lib) getExe;
+in {
   imports = [
     ./tmux-sessionizer.nix
   ];
@@ -10,7 +12,7 @@
   programs.tmux = {
     enable = true;
 
-    shell = lib.getExe pkgs.zsh;
+    shell = getExe pkgs.zsh;
     terminal = "screen-256color"; # Fix terminal colors.
     keyMode = "vi";
 
@@ -51,6 +53,9 @@
       # Shift-ALT Vim keys to switch windows.
       bind -n M-H previous-window
       bind -n M-L next-window
+
+      # Better find window.
+      bind -r f run-shell "tmux neww ${getExe pkgs.tmux-sessionizer}"
     '';
   };
 }

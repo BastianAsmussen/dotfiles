@@ -19,4 +19,10 @@ pkgs.stdenv.mkDerivation {
     wrapProgram $out/bin/tmux-sessionizer \
       --prefix PATH : ${lib.makeBinPath (with pkgs; [tmux fzf])}
   '';
+
+  meta = {
+    description = "its a script that does everything awesome at all times";
+    homepage = "https://github.com/BastianAsmussen/tmux-sessionizer";
+    mainProgram = "tmux-sessionizer";
+  };
 }
