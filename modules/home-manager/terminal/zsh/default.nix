@@ -46,7 +46,7 @@
         zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 
         # Extra completions.
-        source <(rustup completions zsh)
+        source <(${pkgs.rustup}/bin/rustup completions zsh)
       '';
 
     shellAliases = {
