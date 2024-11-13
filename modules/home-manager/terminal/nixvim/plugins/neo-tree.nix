@@ -1,5 +1,12 @@
 {
-  programs.nixvim.plugins.neo-tree = {
+  programs.nixvim = {
+    # Disable netrw.
+    globals = {
+      loaded_netrw = 1;
+      loaded_netrwPlugin = 1;
+    };
+
+    plugins.neo-tree = {
     enable = true;
 
     enableGitStatus = true;
@@ -35,4 +42,5 @@
       };
     };
   };
+};
 }
