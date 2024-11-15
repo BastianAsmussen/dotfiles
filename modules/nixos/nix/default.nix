@@ -31,17 +31,14 @@ in {
       trusted-users = ["root" "@wheel"];
       flake-registry = "/etc/nix/registry.json";
       connect-timeout = 5; # Timeout after 5 seconds.
-      max-jobs = "auto";
-      sandbox = true;
+      cores = 0;
       auto-optimise-store = true;
       builders-use-substitutes = true;
       fallback = true; # Fallback to building from source if binary substitute fails.
       keep-going = true;
       keep-outputs = true;
-      keep-derivations = true;
-      accept-flake-config = true;
+      show-trace = true;
       warn-dirty = false;
-      commit-lockfile-summary = "chore: update flake.lock";
       min-free = mibToBytes 128;
       max-free = mibToBytes 1024;
     };
@@ -52,12 +49,7 @@ in {
     config.allowUnfree = true;
   };
 
-  # Don't build on tmpfs, it's not a good idea.
+  # Move build directory from /tmp to /var/tmp.
+  # Source: https://discourse.nixos.org/t/how-do-you-optimize-your-tmp/51956/3
   systemd.services.nix-daemon.environment.TMPDIR = "/var/tmp";
-
-  # Use the Rust rewrite of `switch` instead of the original one.
-  system.switch = {
-    enable = false;
-    enableNg = true;
-  };
 }
