@@ -47,12 +47,12 @@
   security = {
     apparmor = {
       enable = true;
+
       killUnconfinedConfinables = true;
       packages = [pkgs.apparmor-profiles];
     };
 
     protectKernelImage = true;
-    lockKernelModules = true;
     forcePageTableIsolation = true;
     polkit.enable = true;
     rtkit.enable = true;
