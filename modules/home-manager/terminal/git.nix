@@ -1,7 +1,22 @@
-{userInfo, ...}: {
+{
+  config,
+  userInfo,
+  ...
+}: {
   programs.git = {
     enable = true;
+
     lfs.enable = true;
+    maintenance = {
+      enable = true;
+
+      repositories = let
+        makePath = dir: config.home.homeDirectory + dir;
+      in [
+        (makePath "/dotfiles")
+        (makePath "/Projects/*")
+      ];
+    };
 
     userName = userInfo.fullName;
     userEmail = userInfo.email;
