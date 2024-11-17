@@ -25,8 +25,8 @@
       web-devicons.enable = true;
     };
 
-    extraPlugins = [
-      pkgs.vimPlugins.cellular-automaton-nvim
+    extraPlugins = with pkgs.vimPlugins; [
+      cellular-automaton-nvim
     ];
   };
 }
