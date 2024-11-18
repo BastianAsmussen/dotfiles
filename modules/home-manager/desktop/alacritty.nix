@@ -35,10 +35,7 @@ in {
 
       env.TERM = "xterm-256color";
 
-      terminal.shell = {
-        program = "${lib.getExe pkgs.tmux}";
-        args = ["attach"];
-      };
+      terminal.shell.program = "${lib.getExe pkgs.zsh}";
 
       window = {
         startup_mode = "Maximized";

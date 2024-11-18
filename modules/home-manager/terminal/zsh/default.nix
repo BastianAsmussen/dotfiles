@@ -33,6 +33,9 @@
         bindkey '^p' history-search-backward
         bindkey '^n' history-search-forward
 
+        # Switch tmux sessions.
+        bindkey -s '^f' 'tms switch^M'
+
         # Match any case.
         zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 

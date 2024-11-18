@@ -4,11 +4,27 @@
   ...
 }: let
   inherit (lib) getExe;
+
+  bins = {
+    tms = getExe pkgs.tmux-sessionizer;
+    tmux = getExe pkgs.tmux;
+  };
+
+  sessionPopup = pkgs.writeShellScriptBin "sessions" ''
+    raw_width=$(${bins.tmux} display-message -p '#{window_width}')
+    raw_height=$(${bins.tmux} display-message -p '#{window_height}')
+
+    popup_width=$((raw_width > 100 ? 100 : raw_width * 80 / 100))
+    popup_height=$((raw_height > 50 ? 50 : raw_height * 80 / 100))
+
+    ${bins.tmux} display-popup -E -h $popup_height -w $popup_width -T 'tmux Sessionizer' '${bins.tms}'
+  '';
 in {
   imports = [
     ./tmux-sessionizer.nix
   ];
 
+  stylix.targets.tmux.enable = false;
   programs.tmux = {
     enable = true;
 
@@ -28,9 +44,9 @@ in {
     baseIndex = 1;
 
     plugins = with pkgs.tmuxPlugins; [
-      catppuccin
-      yank
       vim-tmux-navigator
+      yank
+      catppuccin
     ];
 
     extraConfig = ''
@@ -41,9 +57,9 @@ in {
       set-option -g renumber-windows on
 
       # Keybindings for yanking.
-      bind-key -T copy-mode-vi v send-keys -X begin-selection
-      bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
-      bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+      bind -T copy-mode-vi v send-keys -X begin-selection
+      bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
+      bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
 
       # Open panes and windows in the current directory.
       bind '"' split-window -v -c "#{pane_current_path}"
@@ -51,11 +67,36 @@ in {
       bind c new-window -c "#{pane_current_path}"
 
       # Shift-ALT Vim keys to switch windows.
-      bind -n M-H previous-window
-      bind -n M-L next-window
+      bind -n M-l next-window
+      bind -n M-h previous-window
 
-      # Better find window.
-      bind -r f run-shell "tmux neww ${getExe pkgs.tmux-sessionizer}"
+      # Swap current and previous pane positions.
+      bind -n C-g swap-pane -dUZ
+
+      # Switch panes.
+      bind -r k select-pane -UZ\; refresh-client -S
+      bind -r j select-pane -DZ\; refresh-client -S
+      bind -r h select-pane -LZ\; refresh-client -S
+      bind -r l select-pane -RZ\; refresh-client -S
+
+      bind -r ')' switch-client -n\; refresh-client -S
+      bind -r '(' switch-client -p\; refresh-client -S
+
+      # Resizing panes.
+      bind -r M-Up resize-pane -U 5
+      bind -r M-Down resize-pane -D 5
+      bind -r M-Left resize-pane -L 5
+      bind -r M-Right resize-pane -R 5
+
+      bind -r C-Up resize-pane -U
+      bind -r C-Down resize-pane -D
+      bind -r C-Left resize-pane -L
+      bind -r C-Right resize-pane -R
+
+      # Sessionizer.
+      bind s display-popup -E -h 60% -w 85% -T 'Active Sessions' "${bins.tms} switch"
+      bind w display-popup -E -h 60% -w 85% -T 'Session Windows' "${bins.tms} windows"
+      bind f run-shell "${sessionPopup}/bin/sessions"
     '';
   };
 }

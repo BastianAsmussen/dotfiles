@@ -1,3 +1,3 @@
 {pkgs ? import <nixpkgs> {}}: {
-  tmux-sessionizer = pkgs.callPackage ./tmux-sessionizer.nix {};
+  custom-tmux-sessionizer = pkgs.callPackage ./tmux-sessionizer.nix {};
 }
