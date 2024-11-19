@@ -2,6 +2,12 @@
 
 This is a repository for my NixOS configuration.
 
+## Table of Contents
+
+- [Installation Guide](#installation-guide)
+- [Maintenance Guide](#maintenance-guide)
+- [To-Do Tracking](#to-do-tracking)
+
 ## Installation Guide
 
 1. Clone the Git repository.
@@ -29,8 +35,9 @@ sudo nixos-install --flake ~/dotfiles#limitless
 4. Remember to change the password of the user!
 
 > [!NOTE]
-> After installation it may be a requirement to update the [channel](https://nixos.wiki/wiki/Nix_channels) to get `command-not-found` working properly.  
-> To do so run `sudo nix-channel --update`.
+> After installation it may be a requirement to update the [channel](https://nixos.wiki/wiki/Nix_channels)
+to get `command-not-found` working properly.  
+> To do so, run `sudo nix-channel --update`.
 
 ## Maintenance Guide
 
@@ -45,4 +52,12 @@ nh os switch --update
 ```sh
 git reset --hard HEAD
 ```
+
+## To-Do Tracking
+
+I track stuff I need to get done and stuff that annoys me about my current
+setup in a file called [TODO.md](./TODO.md).  
+If you have suggestions or notice something that could be improved, feel free
+to open a pull request. I'll review and consider integrating your
+contributions.
 
