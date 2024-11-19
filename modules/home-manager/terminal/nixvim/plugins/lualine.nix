@@ -53,8 +53,8 @@
             symbols = {
               error = " ";
               warn = " ";
-              info = " ";
               hint = "󰝶 ";
+              info = " ";
             };
           }
         ];
