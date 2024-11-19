@@ -1,4 +1,10 @@
-{osConfig, ...}: {
+{
+  lib,
+  osConfig,
+  ...
+}: let
+  inherit (lib) mkForce;
+in {
   programs.hyprlock = {
     enable = true;
 
@@ -9,7 +15,7 @@
         no_fade_in = false;
       };
 
-      background = [
+      background = mkForce [
         {
           path = "${osConfig.stylix.image}";
           color = "rgba(25, 20, 20, 1.0)";
@@ -18,7 +24,7 @@
         }
       ];
 
-      input-field = [
+      input-field = mkForce [
         {
           monitor = "";
           size = "200, 50";

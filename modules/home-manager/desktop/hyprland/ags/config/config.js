@@ -9,6 +9,14 @@ const v = {
     expect: [1, 8, 1],
 }
 
+const isVersionLess = (v1, v2) => {
+    for (let i = 0; i < v2.length; i++) {
+        if ((v1[i] || 0) < v2[i]) return true;
+        if ((v1[i] || 0) > v2[i]) return false;
+    }
+    return false;
+}
+
 try {
     switch (bundler) {
         case "bun": await Utils.execAsync([
@@ -32,7 +40,7 @@ try {
             throw `"${bundler}" is not a valid bundler!`
     }
 
-    if (v.ags[1] < v.expect[1] || v.ags[2] < v.expect[2]) {
+    if (isVersionLess(v.ags, v.expect)) {
         print(`My config needs at least v${v.expect.join(".")}, yours is v${v.ags.join(".")}!`)
         App.quit()
     }

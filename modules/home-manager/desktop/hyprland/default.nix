@@ -208,10 +208,13 @@ in {
         decoration = {
           rounding = 12;
           dim_inactive = false;
-          drop_shadow = "yes";
-          shadow_range = 8;
-          shadow_render_power = 2;
-          "col.shadow" = lib.mkForce "rgba(00000044)";
+          shadow = {
+            enabled = true;
+            range = 8;
+            render_power = 2;
+            color = lib.mkForce "rgba(00000044)";
+          };
+
           blur = {
             enabled = true;
             size = 8;
