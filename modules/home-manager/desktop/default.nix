@@ -5,5 +5,6 @@
     ./hyprland
     ./nixcord
     ./alacritty.nix
+    ./spicetify.nix
   ];
 }

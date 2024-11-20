@@ -30,7 +30,6 @@
       tlrc
       teams-for-linux
       bitwarden
-      spotify
       pika-backup
       mpv
       cabal-install
