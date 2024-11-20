@@ -6,12 +6,25 @@ around problems.
 
 ## Table of Contents
 
+- [Developer Environments](#developer-environments)
 - [Disko Command](#disko-command)
 - [Impermanence Setup](#impermanence-setup)
 - [AGS Migration](#ags-migration)
 - [Linux Hardening](#linux-hardening)
 - [File Structure](#file-structure)
 - [Secrets Management](#secrets-management)
+
+## Developer Environments
+
+I want a proper way to handle ephemeral developer environments. Right now I'm
+using [devenv](./modules/home-manager/terminal/devenv.nix), but it feels a bit
+like cheating; what I'd really like is to add templates to my flake.
+
+### Inspiration
+
+I've seen a repository called
+[nix-templates](https://github.com/MordragT/nix-templates) which might be
+pretty useful. Perhaps it could be a flake input?
 
 ## Disko Command
 
