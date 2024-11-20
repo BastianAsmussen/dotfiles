@@ -160,6 +160,22 @@
         "type": "github"
       }
     },
+    "docker-overlay": {
+      "locked": {
+        "lastModified": 1731924966,
+        "narHash": "sha256-oeFGsHOYMPT3lexczBuIoDX2SBjqNyEUjREDvcTT7og=",
+        "owner": "BastianAsmussen",
+        "repo": "nixpkgs",
+        "rev": "7187203fc4b5f9d089b5b2868eb8b243440b6e2b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BastianAsmussen",
+        "ref": "docker-init",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "firefox-addons": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -959,6 +975,7 @@
       "inputs": {
         "ags": "ags",
         "disko": "disko",
+        "docker-overlay": "docker-overlay",
         "firefox-addons": "firefox-addons",
         "home-manager": "home-manager",
         "hyprland": "hyprland",

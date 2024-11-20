@@ -10,6 +10,7 @@
     ags.url = "github:Aylur/ags/v1";
     matugen.url = "github:/InioX/Matugen";
     nixcord.url = "github:kaylorben/nixcord";
+    docker-overlay.url = "github:BastianAsmussen/nixpkgs/docker-init";
 
     disko = {
       url = "github:nix-community/disko";
@@ -64,7 +65,7 @@
     };
   in {
     packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
-    overlays = import ./overlays {};
+    overlays = import ./overlays {inherit inputs;};
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
     nixosConfigurations = listToAttrs (map (hostname: {
