@@ -5,31 +5,26 @@ let
     options.silent = true;
   };
 
-  mapKeyWithOpts = mode: key: action: opts: (mapKey mode key action) // {options = opts;};
+  mapKeyWithOpts = mode: key: action: options:
+    (mapKey mode key action) // {inherit options;};
 in {
   programs.nixvim.keymaps = [
     # Typos.
     (mapKeyWithOpts "n" "æ" ":" {nowait = true;})
 
-    # Fix bad habits.
-    (mapKey "" "<Up>" "<Nop>")
-    (mapKey "" "<Down>" "<Nop>")
-    (mapKey "" "<Left>" "<Nop>")
-    (mapKey "" "<Right>" "<Nop>")
-
-    # Save current buffer.
-    (mapKey "" "<C-s>" ":w<CR>")
+    # Save the current buffer.
+    (mapKey "" "<C-s>" "<cmd>w<CR>")
 
     # Move single lines.
-    (mapKey "v" "J" ":m '>+1<CR>gv=gv")
     (mapKey "v" "K" ":m '<-2<CR>gv=gv")
+    (mapKey "v" "J" ":m '>+1<CR>gv=gv")
 
-    # Append line below to current line.
+    # Append line below to the current line.
     (mapKey "n" "J" "mzJ`z")
 
     # Stay in the middle during half-page jumps.
-    (mapKey "n" "<C-d>" "<C-d>zz")
     (mapKey "n" "<C-u>" "<C-u>zz")
+    (mapKey "n" "<C-d>" "<C-d>zz")
 
     # Make search terms stay in the middle.
     (mapKey "n" "n" "nzzzv")
@@ -54,8 +49,26 @@ in {
     (mapKey "n" "<S-Tab>" "<cmd>BufferLineCyclePrev<CR>")
     (mapKey "n" "<leader>x" "<cmd>bdelete!<CR>")
 
+    # Toggle comments.
+    (mapKeyWithOpts "n" "<leader>/" "gcc" {remap = true;})
+    (mapKeyWithOpts "v" "<leader>/" "gc" {remap = true;})
+
     # Focus the file explorer.
-    (mapKey "n" "<leader>e" "<cmd>Neotree action=focus reveal<CR>")
+    (mapKey "n" "<leader>e" "<cmd>NvimTreeFocus<CR>")
+
+    # LSP.
+    (mapKey "n" "<leader>lc" "<cmd>Lspsaga code_action<CR>")
+    (mapKey "n" "<leader>lff" "<cmd>Lspsaga finder<CR>")
+    (mapKey "n" "<leader>lfi" "<cmd>Lspsaga finder imp<CR>")
+    (mapKey "n" "<leader>lfI" "<cmd>Lspsaga incoming_calls<CR>")
+    (mapKey "n" "<leader>lfo" "<cmd>Lspsaga outgoing_calls<CR>")
+    (mapKey "n" "<leader>lr" "<cmd>Lspsaga rename<CR>")
+    (mapKey "n" "<leader>lpd" "<cmd>Lspsaga peek_definition<CR>")
+    (mapKey "n" "<leader>lpt" "<cmd>Lspsaga peek_type_definition<CR>")
+    (mapKey "n" "<leader>lbl" "<cmd>BaconList<CR>")
+    (mapKey "n" "<leader>lbs" "<cmd>BaconShow<CR>")
+    (mapKey "n" "<leader>lo" "<cmd>Outline<CR>")
+    (mapKey "n" "<leader>lO" "<cmd>Outline!<CR>")
 
     # Debugging.
     (mapKey "n" "<leader>dl" "<cmd>lua require 'dap'.step_into()<CR>")

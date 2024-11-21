@@ -1,9 +1,4 @@
-{
-  imports = [
-    ./lspkind.nix
-    ./luasnip.nix
-  ];
-
+{pkgs, ...}: {
   programs.nixvim = {
     opts.completeopt = [
       "menu"
@@ -12,6 +7,8 @@
     ];
 
     plugins = {
+      lspkind = import ./lspkind.nix;
+      luasnip = import ./luasnip.nix {inherit pkgs;};
       cmp = {
         enable = true;
 
@@ -58,6 +55,11 @@
           };
         };
       };
+
+      cmp-nvim-lsp.enable = true;
+      cmp-buffer.enable = true;
+      cmp-path.enable = true;
+      cmp_luasnip.enable = true;
     };
   };
 }

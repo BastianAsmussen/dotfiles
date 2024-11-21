@@ -1,5 +1,5 @@
 let
-  mkKeymap = action: key: {
+  mapAction = action: key: {
     inherit action key;
   };
 in {
@@ -8,11 +8,11 @@ in {
 
     settings.no_mappings = 1;
     keymaps = [
-      (mkKeymap "up" "<C-k>")
-      (mkKeymap "down" "<C-j>")
-      (mkKeymap "left" "<C-h>")
-      (mkKeymap "right" "<C-l>")
-      (mkKeymap "previous" "<C-\\>")
+      (mapAction "up" "<C-k>")
+      (mapAction "down" "<C-j>")
+      (mapAction "left" "<C-h>")
+      (mapAction "right" "<C-l>")
+      (mapAction "previous" "<C-\\>")
     ];
   };
 }

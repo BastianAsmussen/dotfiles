@@ -36,9 +36,9 @@
           {
             __unkeyed-1 = "diff";
             symbols = {
-              added = " ";
-              modified = " ";
-              removed = " ";
+              added = " ";
+              modified = " ";
+              removed = " ";
             };
           }
         ];
