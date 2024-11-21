@@ -8,7 +8,7 @@
 
   config = lib.mkIf config.qemu.enable {
     virtualisation.libvirtd.enable = true;
-    users.extraGroups.libvirtd.members = [userInfo.username];
+    users.extraGroups.libvirt.members = [userInfo.username];
 
     programs.virt-manager.enable = true;
   };
