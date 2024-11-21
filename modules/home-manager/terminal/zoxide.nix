@@ -1,5 +1,8 @@
 {
-  home.shellAliases."cd.." = "cd ..";
+  home.shellAliases = {
+    "cd.." = "cd ..";
+    "cd-" = "cd -";
+  };
 
   programs.zoxide = {
     enable = true;
