@@ -2,7 +2,6 @@
   pkgs,
   lib,
   inputs,
-  config,
   outputs,
   ...
 }: let
@@ -12,13 +11,14 @@ in {
     ./nh.nix
   ];
 
-  nix = {
+  nix = let
+    flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+  in {
     package = pkgs.lix;
 
-    # Add each flake input as a registry.
-    registry = lib.mapAttrs (_: value: {flake = value;}) inputs;
-    # Add inputs to the system's legacy channels.
-    nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
+    # Map flake registry and Nix path to the flake inputs.
+    registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
+    nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
 
     settings = {
       experimental-features = [
@@ -29,7 +29,6 @@ in {
       ];
 
       trusted-users = ["root" "@wheel"];
-      flake-registry = "/etc/nix/registry.json";
       connect-timeout = 5; # Timeout after 5 seconds.
       cores = 0;
       auto-optimise-store = true;
