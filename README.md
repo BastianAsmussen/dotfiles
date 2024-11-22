@@ -36,7 +36,7 @@ sudo nixos-install --flake ~/dotfiles#limitless
 
 > [!NOTE]
 > After installation it may be a requirement to update the [channel](https://nixos.wiki/wiki/Nix_channels)
-to get `command-not-found` working properly.  
+> to get `command-not-found` working properly.  
 > To do so, run `sudo nix-channel --update`.
 
 ## Maintenance Guide
@@ -60,4 +60,3 @@ setup in a file called [TODO.md](./TODO.md).
 If you have suggestions or notice something that could be improved, feel free
 to open a pull request. I'll review and consider integrating your
 contributions.
-
