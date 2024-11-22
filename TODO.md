@@ -7,6 +7,8 @@ around problems.
 ## Table of Contents
 
 - [Developer Environments](#developer-environments)
+- [Neovim](#neovim)
+- [Firefox](#firefox)
 - [Disko Command](#disko-command)
 - [Impermanence Setup](#impermanence-setup)
 - [AGS Migration](#ags-migration)
@@ -26,6 +28,26 @@ I've seen a repository called
 [nix-templates](https://github.com/MordragT/nix-templates) which might be
 pretty useful. Perhaps it could be a flake input?
 
+## Neovim
+
+### Plugins
+
+Here's a list of Neovim plugins I'd like to take a look at integrating in the
+future:
+
+- [undotree](https://github.com/mbbill/undotree)
+
+### Issues
+
+- [otter.nvim](https://github.com/jmbuhr/otter.nvim) seems to fail to start
+  when I enter a Nix file.
+
+## Firefox
+
+### Extensions
+
+- uBlock Origin: I'd like to be able to customize the extension through Nix.
+
 ## Disko Command
 
 The command I use for setting up my disk layout seems to be deprecated. I need
@@ -36,7 +58,7 @@ to figure out a new way to handle it soon.
 ### Current Issues
 
 - **Desyncs**:
-  Fresh installs don’t always match long-running ones.  
+  Fresh installs don’t always match long-running ones.
   - **Example**: If I change something in my
     [Firefox setup](./modules/home-manager/desktop/firefox), like tweaking
     uBlock Origin settings, those changes don’t carry over to new installs
@@ -47,19 +69,19 @@ to figure out a new way to handle it soon.
 ### Goal
 
 - Get rid of desyncs so fresh installs work the same as a system I’ve been
-using for a long time.
+  using for a long time.
 
 ## AGS Migration
 
 I'm considering [migrating AGS](https://aylur.github.io/ags/guide/migrate.html)
-to [Astal](https://aylur.github.io/astal).  
+to [Astal](https://aylur.github.io/astal).
 
 ### Status
 
 - Currently, I'm pinning the flake input to
-[v1](https://github.com/Aylur/ags/tree/v1).  
+  [v1](https://github.com/Aylur/ags/tree/v1).
 - Astal introduced quite a bit of breaking changes, so it'll probably take me a
-while to migrate.
+  while to migrate.
 
 ## Linux Hardening
 
@@ -110,4 +132,3 @@ I don’t have to import an entire file just to access a single function I defin
 I want to use [sops.nix](https://github.com/Mic92/sops-nix) to manage
 repository secrets but my current setup with my GPG keys on my YubiKey doesn't
 seem to really work all too well for that.
-
