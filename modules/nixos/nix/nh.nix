@@ -5,7 +5,7 @@
     clean = {
       enable = true;
 
-      extraArgs = "--delete-older-than 7d --keep 3";
+      extraArgs = "--keep-since 7d --keep 3";
     };
 
     flake = "/home/${userInfo.username}/dotfiles";
