@@ -16,7 +16,6 @@
     backup = false;
     undofile = true;
 
-    hlsearch = false;
     incsearch = true;
 
     termguicolors = pkgs.stdenv.isLinux;
