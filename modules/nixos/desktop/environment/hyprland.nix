@@ -5,11 +5,19 @@
   pkgs,
   ...
 }: let
-  inherit (lib) mkEnableOption mkIf;
+  inherit (lib) mkIf types;
 
   cfg = config.desktop;
 in {
-  options.desktop.environment.hyprland.enable = mkEnableOption "Enables the `Hyprland` desktop environment.";
+  options.desktop.environment.hyprland = {
+    enable = lib.mkEnableOption "Enables the `Hyprland` desktop environment.";
+
+    monitors = lib.mkOption {
+      default = [", preferred, auto, 1"];
+      description = "A list of the monitors to define.";
+      type = types.listOf types.str;
+    };
+  };
 
   config = mkIf cfg.environment.hyprland.enable {
     # Enable Hyprlock PAM module.

@@ -60,10 +60,7 @@ in {
           force_no_accel = osConfig.gaming.enable;
         };
 
-        monitor = [
-          ",preferred,auto,1"
-        ];
-
+        monitor = osConfig.desktop.environment.hyprland.monitors;
         dwindle = {
           pseudotile = true;
           preserve_split = true;
