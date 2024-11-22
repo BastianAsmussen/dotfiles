@@ -2,8 +2,8 @@
   enable = true;
 
   settings = {
-    enableEditorConfigSupport = true;
     enableImportCompletion = true;
+    enableRoslynAnalyzers = true;
     organizeImportsOnFormat = true;
   };
 }
