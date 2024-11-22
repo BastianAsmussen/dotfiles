@@ -65,10 +65,6 @@ in {
     (mapKey "n" "<leader>lr" "<cmd>Lspsaga rename<CR>")
     (mapKey "n" "<leader>lpd" "<cmd>Lspsaga peek_definition<CR>")
     (mapKey "n" "<leader>lpt" "<cmd>Lspsaga peek_type_definition<CR>")
-    (mapKey "n" "<leader>lbl" "<cmd>BaconList<CR>")
-    (mapKey "n" "<leader>lbs" "<cmd>BaconShow<CR>")
-    (mapKey "n" "<leader>lo" "<cmd>Outline<CR>")
-    (mapKey "n" "<leader>lO" "<cmd>Outline!<CR>")
 
     # Debugging.
     (mapKey "n" "<leader>dl" "<cmd>lua require 'dap'.step_into()<CR>")
