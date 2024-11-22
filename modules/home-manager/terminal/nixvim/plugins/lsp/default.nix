@@ -1,8 +1,9 @@
 {
-  lib,
-  pkgs,
   config,
   osConfig,
+  lib,
+  pkgs,
+  userInfo,
   ...
 }: {
   imports = [
@@ -27,7 +28,7 @@
           lua_ls = import ./lua_ls.nix;
           nixd = import ./nixd.nix {
             # Nix
-            inherit lib pkgs config osConfig;
+            inherit osConfig config lib pkgs userInfo;
           };
 
           omnisharp = import ./omnisharp.nix; # C#
@@ -42,7 +43,9 @@
       lsp-format.enable = true;
       lspsaga = import ./lspsaga.nix;
       nix.enable = true;
+      none-ls = import ./none-ls.nix;
       otter.enable = true;
+      ts-autotag.enable = true;
       trouble.enable = true;
     };
   };
