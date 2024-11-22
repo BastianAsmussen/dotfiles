@@ -5,7 +5,6 @@
     ./plugins
     ./keymaps.nix
     ./opts.nix
-    ./performance.nix
     ./theme.nix
   ];
 
@@ -21,6 +20,8 @@
       mapleader = " ";
       maplocalleader = " ";
     };
+
+    performance = import ./performance.nix;
 
     extraConfigLuaPre =
       # lua

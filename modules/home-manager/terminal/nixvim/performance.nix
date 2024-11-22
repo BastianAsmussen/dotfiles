@@ -1,19 +1,14 @@
 {
-  programs.nixvim = {
-    luaLoader.enable = true;
-    performance = {
-      byteCompileLua = {
-        enable = true;
+  byteCompileLua = {
+    enable = true;
 
-        nvimRuntime = true;
-        plugins = true;
-      };
+    nvimRuntime = true;
+    plugins = true;
+  };
 
-      combinePlugins = {
-        enable = true;
+  combinePlugins = {
+    enable = true;
 
-        standalonePlugins = ["nvim-treesitter"];
-      };
-    };
+    standalonePlugins = ["nvim-treesitter"];
   };
 }
