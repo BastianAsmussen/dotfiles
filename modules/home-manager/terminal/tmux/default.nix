@@ -54,7 +54,7 @@ in {
       set -as terminal-features ",xterm-256color:RGB"
 
       # Automatically renumber windows.
-      set-option -g renumber-windows on
+      set -g renumber-windows on
 
       # Keybindings for yanking.
       bind -T copy-mode-vi v send-keys -X begin-selection
@@ -97,6 +97,9 @@ in {
       bind s display-popup -E -h 60% -w 85% -T 'Active Sessions' "${bins.tms} switch"
       bind w display-popup -E -h 60% -w 85% -T 'Session Windows' "${bins.tms} windows"
       bind f run-shell "${sessionPopup}/bin/sessions"
+
+      # Detach from current session.
+      bind C-d detach-client
     '';
   };
 }
