@@ -2,7 +2,6 @@
   enable = true;
 
   sources = {
-    completion.luasnip.enable = true;
     code_actions = {
       gitsigns.enable = true;
       statix.enable = true;
