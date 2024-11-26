@@ -2,8 +2,12 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  calculator = import ./calculator.nix {inherit pkgs lib;};
+  myip = import ./myip.nix {inherit pkgs lib;};
+in {
   home.packages = [
-    (import ./calculator.nix {inherit pkgs lib;})
+    calculator
+    myip
   ];
 }
