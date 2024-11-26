@@ -44,6 +44,11 @@ future:
 
 ## Firefox
 
+### Broken Features
+
+- DRM: Currently, DRM simply refuses to install.
+- Image Rendering: Some images appear to render totally glitched.
+
 ### Extensions
 
 - uBlock Origin: I'd like to be able to customize the extension through Nix.
