@@ -3,7 +3,9 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  inherit (lib) getExe;
+in {
   imports = [./scripts];
 
   programs.zsh = {
@@ -50,6 +52,7 @@
 
         # Extra completions.
         source <(${pkgs.rustup}/bin/rustup completions zsh)
+        source <(${getExe pkgs.todo} completion zsh)
       '';
 
     shellAliases = {
@@ -59,7 +62,7 @@
       rm = "rm -r";
       mkdir = "mkdir -vp";
 
-      myip = "${lib.getExe pkgs.curl} -s ifconfig.me && echo ''";
+      myip = "${getExe pkgs.curl} -s ifconfig.me && echo ''";
     };
 
     oh-my-zsh = {

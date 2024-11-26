@@ -34,6 +34,7 @@
       mpv
       cabal-install
       rustup
+      todo
     ];
 
     stateVersion = "24.05";
