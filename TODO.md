@@ -15,6 +15,7 @@ around problems.
 - [Linux Hardening](#linux-hardening)
 - [File Structure](#file-structure)
 - [Secrets Management](#secrets-management)
+- [Continuous Integration](#continuous-integration)
 
 ## Developer Environments
 
@@ -137,3 +138,9 @@ I don’t have to import an entire file just to access a single function I defin
 I want to use [sops.nix](https://github.com/Mic92/sops-nix) to manage
 repository secrets but my current setup with my GPG keys on my YubiKey doesn't
 seem to really work all too well for that.
+
+## Continuous Integration
+
+I'm considering looking into having the [flake.lock](./flake.lock) file
+automatically update weekly using a [GitHub Workflow](https://docs.github.com/en/actions/writing-workflows/about-workflows)
+or something.
