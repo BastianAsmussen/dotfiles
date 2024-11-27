@@ -10,48 +10,56 @@ This is a repository for my NixOS configuration.
 
 ## Installation Guide
 
-1. Clone the Git repository.
+1. Get the source code.
 
-```sh
-nix-shell -p git
+   1. Enter a Nix shell with Git.
 
-git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-```
+      ```sh
+      nix-shell -p git
+      ```
+
+   2. Clone the Git repository.
+
+      ```sh
+      git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
+      cd ~/dotfiles
+      ```
 
 2. Set up the disk configuration, e.g. for `limitless`.
 
-```sh
-sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
-  --mode disko ~/dotfiles/hosts/limitless/disko-config.nix
-```
+   ```sh
+   sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
+       --mode disko ~/dotfiles/hosts/limitless/disko-config.nix
+   ```
 
 3. Install NixOS with the given configuration, e.g. `limitless`.
 
-```sh
-sudo nixos-install --flake ~/dotfiles#limitless
-```
+   ```sh
+   sudo nixos-install --flake ~/dotfiles#limitless
+   ```
 
-4. Remember to change the password of the user!
+> [!IMPORTANT]
+> Remember to change the password of the user!
 
-> [!NOTE]
+---
+
+> [!TIP]
 > After installation it may be a requirement to update the [channel](https://nixos.wiki/wiki/Nix_channels)
 > to get `command-not-found` working properly.  
 > To do so, run `sudo nix-channel --update`.
 
 ## Maintenance Guide
 
-1. Update the `flake.lock` file about once per week.
+1. I recommend updating the [flake.lock](./flake.lock) file about once per week.
 
-```sh
-nh os switch --update
-```
+   ```sh
+   nh os switch --update
+   ```
 
-- If it can't build, roll back to a previous version.
-
-```sh
-git reset --hard HEAD
-```
+> [!NOTE]
+> If it can't build, roll back the [flake.lock](./flake.lock) file to a
+> previous version.  
+> Running `git restore flake.lock` should be sufficient.
 
 ## To-Do Tracking
 
