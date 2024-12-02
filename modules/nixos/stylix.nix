@@ -6,7 +6,7 @@
     image = ../../assets/wallpapers/tokyo.png;
     polarity = "dark";
     cursor = {
-      package = pkgs.bibata-cursors;
+      package = pkgs.stable.bibata-cursors;
       name = "Bibata-Modern-Ice";
     };
 
