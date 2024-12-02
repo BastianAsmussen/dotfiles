@@ -1,8 +1,8 @@
-{
+{config, ...}: {
   programs.oh-my-posh = {
     enable = true;
 
-    enableZshIntegration = true;
+    enableZshIntegration = config.programs.zsh.enable;
     settings = {
       version = 2;
       final_space = true;
