@@ -5,6 +5,7 @@
   docker-overlay = final: _prev: {
     docker-overlay = import inputs.docker-overlay {
       inherit (final) system;
+
       config.allowUnfree = true;
     };
   };
