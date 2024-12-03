@@ -1,13 +1,8 @@
-{
-  home.shellAliases = {
-    "cd.." = "cd ..";
-    "cd-" = "cd -";
-  };
-
+{config, ...}: {
   programs.zoxide = {
     enable = true;
-    enableZshIntegration = true;
 
+    enableZshIntegration = config.programs.zsh.enable;
     options = ["--cmd cd"];
   };
 }

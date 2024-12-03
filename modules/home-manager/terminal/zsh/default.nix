@@ -9,19 +9,20 @@
   programs.zsh = {
     enable = true;
 
-    enableCompletion = true;
-    autosuggestion.enable = true;
     autocd = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
 
     history = {
-      size = 16 * 1024;
-      path = "${config.xdg.dataHome}/zsh/history";
-
+      append = true;
       ignoreAllDups = true;
+      path = "${config.xdg.dataHome}/zsh/history";
+      size = 16 * 1024;
     };
 
-    defaultKeymap = "emacs";
+    historySubstringSearch.enable = true;
 
+    defaultKeymap = "emacs";
     initExtra =
       # sh
       ''
@@ -49,7 +50,6 @@
         zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 
         # Extra completions.
-        source <(${pkgs.rustup}/bin/rustup completions zsh)
         source <(${lib.getExe pkgs.todo} completion zsh)
       '';
 
@@ -64,36 +64,35 @@
     oh-my-zsh = {
       enable = true;
 
+      extraConfig =
+        # sh
+        ''
+          zstyle ':completion:*:*:docker:*' option-stacking yes
+          zstyle ':completion:*:*:docker-*:*' option-stacking yes
+        '';
+
       plugins = [
-        "git"
-        "sudo"
+        "archlinux"
         "command-not-found"
+        "docker"
+        "docker-compose"
+        "dotnet"
+        "eza"
+        "git"
+        "golang"
         "kubectl"
         "kubectx"
-        "rust"
         "pass"
+        "rust"
+        "sudo"
+        "systemd"
       ];
     };
 
-    plugins = with pkgs; [
-      {
-        name = "zsh-syntax-highlighting";
-        src = zsh-syntax-highlighting;
-        file = "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh";
-      }
-      {
-        name = "zsh-completions";
-        src = zsh-completions;
-        file = "share/zsh-completions/zsh-completions.zsh";
-      }
-      {
-        name = "zsh-autosuggestions";
-        src = zsh-autosuggestions;
-        file = "share/zsh-autosuggestions/zsh-autosuggestions.zsh";
-      }
+    plugins = [
       {
         name = "fzf-tab";
-        src = zsh-fzf-tab;
+        src = pkgs.zsh-fzf-tab;
         file = "share/fzf-tab/fzf-tab.plugin.zsh";
       }
     ];
