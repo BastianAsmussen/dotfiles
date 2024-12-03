@@ -1,5 +1,6 @@
 {
   inputs,
+  userInfo,
   lib,
   osConfig,
   ...
@@ -8,7 +9,7 @@
     inputs.impermanence.nixosModules.home-manager.impermanence
   ];
 
-  home.persistence."/persist/home" = {
+  home.persistence."/persist/home/${userInfo.username}" = {
     directories = [
       "Downloads"
       "Music"
