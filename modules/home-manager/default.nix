@@ -8,6 +8,7 @@
     ./terminal
     ./dconf.nix
     ./qemu.nix
+    ./rust.nix
   ];
 
   gpg = {
@@ -33,7 +34,6 @@
       pika-backup
       mpv
       cabal-install
-      rustup
       todo
     ];
 
