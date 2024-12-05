@@ -5,7 +5,6 @@ in {
     ./crypto
     ./desktop
     ./nix
-    ./nvidia
     ./security
     ./virtualisation
     ./bluetooth.nix
@@ -17,6 +16,7 @@ in {
     ./keyboard.nix
     ./language.nix
     ./network-manager.nix
+    ./nvidia.nix
     ./stylix.nix
     ./user.nix
   ];

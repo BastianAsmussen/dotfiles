@@ -6,10 +6,6 @@
 }: let
   inherit (lib) mkEnableOption mkIf;
 in {
-  imports = [
-    ./vaapi.nix
-  ];
-
   options.nvidia.enable = mkEnableOption "Enables NVIDIA drivers.";
   config = mkIf config.nvidia.enable {
     hardware = {
@@ -24,12 +20,6 @@ in {
 
         open = false;
         nvidiaSettings = true;
-
-        vaapi = {
-          enable = true;
-
-          firefox.enable = true;
-        };
       };
 
       # Enable graphics driver.
@@ -37,20 +27,12 @@ in {
         enable = true;
         enable32Bit = true;
 
-        extraPackages = with pkgs; [vulkan-validation-layers];
+        extraPackages = [pkgs.vulkan-validation-layers];
       };
 
       # Enable the container toolkit if Docker is enabled.
       nvidia-container-toolkit.enable = config.docker.enable;
     };
-
-    nixpkgs.overlays = [
-      (_: final: {
-        wlroots_0_16 = final.wlroots_0_16.overrideAttrs (_: {
-          patches = [./wlroots-nvidia.patch];
-        });
-      })
-    ];
 
     # Load NVIDIA drivers for Xorg and Wayland.
     services.xserver.videoDrivers = ["nvidia"];
