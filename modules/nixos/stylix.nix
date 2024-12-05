@@ -19,7 +19,7 @@
       };
 
       monospace = {
-        package = nerdfonts.override {fonts = ["JetBrainsMono"];};
+        package = nerd-fonts.jetbrains-mono;
         name = "JetBrainsMono Nerd Font Mono";
       };
 
