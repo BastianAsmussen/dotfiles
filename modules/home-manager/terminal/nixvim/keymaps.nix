@@ -30,6 +30,9 @@ in {
     (mapKey "n" "n" "nzzzv")
     (mapKey "n" "N" "Nzzzv")
 
+    # Clear highlights on search.
+    (mapKey "n" "<Esc>" "<cmd>nohlsearch<CR>")
+
     # Preserve paste buffer.
     (mapKey "x" "<leader>p" "\"_dP")
 
@@ -50,38 +53,104 @@ in {
     (mapKey "n" "<leader>x" "<cmd>bdelete!<CR>")
 
     # Toggle comments.
-    (mapKeyWithOpts "n" "<leader>/" "gcc" {remap = true;})
-    (mapKeyWithOpts "v" "<leader>/" "gc" {remap = true;})
+    (mapKeyWithOpts "n" "<leader>t/" "gcc" {
+      remap = true;
+      desc = "Comment: Toggle Comment";
+    })
+    (mapKeyWithOpts "v" "<leader>t/" "gc" {
+      remap = true;
+      desc = "Comment: Toggle Comment";
+    })
 
     # Focus the file explorer.
-    (mapKey "n" "<leader>e" "<cmd>NvimTreeFocus<CR>")
-
-    # LSP.
-    (mapKey "n" "<leader>lc" "<cmd>Lspsaga code_action<CR>")
-    (mapKey "n" "<leader>lff" "<cmd>Lspsaga finder<CR>")
-    (mapKey "n" "<leader>lfi" "<cmd>Lspsaga finder imp<CR>")
-    (mapKey "n" "<leader>lfI" "<cmd>Lspsaga incoming_calls<CR>")
-    (mapKey "n" "<leader>lfo" "<cmd>Lspsaga outgoing_calls<CR>")
-    (mapKey "n" "<leader>lr" "<cmd>Lspsaga rename<CR>")
-    (mapKey "n" "<leader>lpd" "<cmd>Lspsaga peek_definition<CR>")
-    (mapKey "n" "<leader>lpt" "<cmd>Lspsaga peek_type_definition<CR>")
+    (mapKeyWithOpts "n" "<leader>e" "<cmd>NvimTreeFocus<CR>" {
+      desc = "NvimTree: Toggle Tree";
+    })
 
     # Debugging.
-    (mapKey "n" "<leader>dl" "<cmd>lua require 'dap'.step_into()<CR>")
-    (mapKey "n" "<leader>dj" "<cmd>lua require 'dap'.step_over()<CR>")
-    (mapKey "n" "<leader>dk" "<cmd>lua require 'dap'.step_out()<CR>")
-    (mapKey "n" "<leader>dc>" "<cmd>lua require 'dap'.continue()<CR>")
-    (mapKey "n" "<leader>db" "<cmd>lua require 'dap'.toggle_breakpoint()<CR>")
-    (mapKey "n" "<leader>dd" "<cmd>lua require 'dap'.set_breakpoint(vim.fn.input('Breakpoint Condition: '))<CR>")
-    (mapKey "n" "<leader>de" "<cmd>lua require 'dap'.terminate()<CR>")
-    (mapKey "n" "<leader>dr" "<cmd>lua require 'dap'.run_last()<CR>")
+    (mapKeyWithOpts "n" "<F1>" {
+      __raw = ''
+        function()
+          require('dap').step_into()
+        end
+      '';
+    } {desc = "Debug: Step Into";})
+    (mapKeyWithOpts "n" "<F2>" {
+      __raw = ''
+        function()
+          require('dap').step_over()
+        end
+      '';
+    } {desc = "Debug: Step Over";})
+    (mapKeyWithOpts "n" "<F3>" {
+      __raw = ''
+        function()
+          require('dap').step_out()
+        end
+      '';
+    } {desc = "Debug: Step Out";})
+    (mapKeyWithOpts "n" "<F5>" {
+      __raw = ''
+        function()
+          require('dap').continue()
+        end
+      '';
+    } {desc = "Debug: Start/Continue";})
+    (mapKeyWithOpts "n" "<leader>b" {
+      __raw = ''
+        function()
+          require('dap').toggle_breakpoint()
+        end
+      '';
+    } {desc = "Debug: Toggle Breakpoint";})
+    (mapKeyWithOpts "n" "<leader>B" {
+      __raw = ''
+        function()
+          require('dap').set_breakpoint(vim.fn.input 'Breakpoint Condition: ')
+        end
+      '';
+    } {desc = "Debug: Set Breakpoint";})
+    (mapKeyWithOpts "n" "<F7>" {
+      __raw = ''
+        function()
+          require('dapui').toggle()
+        end
+      '';
+    } {desc = "Debug: See last session result.";})
 
-    (mapKey "n" "<leader>dt" "<cmd>lua vim.cmd('RustLsp testables')<CR>")
+    # Telescope keybinds.
+    # Slightly advanced example of overriding default behavior and theme.
+    (mapKeyWithOpts "n" "<leader>/" {
+      __raw = ''
+        function()
+          require('telescope.builtin').current_buffer_fuzzy_find(
+            require('telescope.themes').get_dropdown {
+              winblend = 10,
+              previewer = false
+            }
+          )
+        end
+      '';
+    } {desc = "[/] Fuzzily search in current buffer";})
+    (mapKeyWithOpts "n" "<leader>s/" {
+      __raw = ''
+        function()
+          require('telescope.builtin').live_grep {
+            grep_open_files = true,
+            prompt_title = 'Live Grep in Open Files'
+          }
+        end
+      '';
+    } {desc = "[S]earch [/] in Open Files";})
 
     # Preview markdown files.
-    (mapKey "n" "<leader>mp" "<cmd>MarkdownPreviewToggle<CR>")
+    (mapKeyWithOpts "n" "<leader>mp" "<cmd>MarkdownPreviewToggle<CR>" {
+      desc = "[M]arkdown [P]review";
+    })
 
     # Make it rain!
-    (mapKey "n" "<leader>fml" "<cmd>CellularAutomaton make_it_rain<CR>")
+    (mapKeyWithOpts "n" "<leader>fml" "<cmd>CellularAutomaton make_it_rain<CR>" {
+      desc = "[F]uck [M]y [L]ife";
+    })
   ];
 }

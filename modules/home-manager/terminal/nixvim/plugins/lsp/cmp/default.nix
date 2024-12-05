@@ -13,22 +13,41 @@
         enable = true;
 
         settings = {
+          mapping = {
+            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+            "<C-e>" = "cmp.mapping.close()";
+            "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+            "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
+            "<CR>" = "cmp.mapping.confirm({ select = true })";
+            "<C-n>" = "cmp.mapping.select_next_item()";
+            "<C-p>" = "cmp.mapping.select_prev_item()";
+            "<C-b>" = "cmp.mapping.scroll_docs(-4)";
+            "<C-f>" = "cmp.mapping.scroll_docs(4)";
+            "<C-y>" = "cmp.mapping.confirm { select = true }";
+            "<C-Space>" = "cmp.mapping.complete {}";
+            "<C-l>" = ''
+              cmp.mapping(function()
+                if luasnip.expand_or_locally_jumpable() then
+                  luasnip.expand_or_jump()
+                end
+              end, { 'i', 's' })
+            '';
+            "<C-h>" = ''
+              cmp.mapping(function()
+                if luasnip.locally_jumpable(-1) then
+                  luasnip.jump(-1)
+                end
+              end, { 'i', 's' })
+            '';
+          };
+
           formatting.fields = [
             "kind"
             "abbr"
             "menu"
           ];
 
-          mapping = {
-            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-            "<C-f>" = "cmp.mapping.scroll_docs(4)";
-            "<C-Space>" = "cmp.mapping.complete()";
-            "<C-e>" = "cmp.mapping.close()";
-            "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
-            "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
-            "<CR>" = "cmp.mapping.confirm({ select = true })";
-          };
-
+          completion.completeopt = "menu,menuone,noinsert";
           snippet.expand =
             # lua
             ''
@@ -38,8 +57,8 @@
             '';
 
           sources = [
-            {name = "nvim_lsp";}
             {name = "luasnip";}
+            {name = "nvim_lsp";}
             {name = "crates";}
             {name = "path";}
             {

@@ -1,7 +1,6 @@
 {inputs, ...}: {
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
-
     ./plugins
     ./keymaps.nix
     ./opts.nix
@@ -22,7 +21,6 @@
     };
 
     performance = import ./performance.nix;
-
     extraConfigLuaPre =
       # lua
       ''
