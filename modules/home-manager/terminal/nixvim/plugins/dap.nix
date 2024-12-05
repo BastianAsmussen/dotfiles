@@ -1,4 +1,4 @@
-{
+{pkgs, ...}: {
   programs.nixvim = {
     plugins = {
       cmp-dap.enable = true;
@@ -50,6 +50,8 @@
             texthl = "DapLogPoint";
           };
         };
+
+        adapters.executables.lldb.command = "${pkgs.lldb}/bin/lldb-dap";
       };
     };
 

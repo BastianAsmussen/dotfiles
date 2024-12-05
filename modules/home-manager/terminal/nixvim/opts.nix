@@ -8,6 +8,7 @@
     backup = false;
     swapfile = false;
 
+    hlsearch = true;
     ignorecase = true;
     smartcase = true;
     inccommand = "split";
@@ -18,7 +19,10 @@
     expandtab = true;
     smartindent = true;
     wrap = false;
+    breakindent = true;
     scrolloff = 8; # Number of lines to show around the cursor.
+
+    cursorline = true;
 
     signcolumn = "yes";
     list = true;
@@ -31,6 +35,8 @@
     termguicolors = pkgs.stdenv.isLinux;
 
     updatetime = 50; # Faster completion.
+    timeoutlen = 300;
+
     colorcolumn = "80";
   };
 }

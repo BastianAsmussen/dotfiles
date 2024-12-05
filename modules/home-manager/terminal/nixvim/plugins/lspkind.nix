@@ -1,7 +1,6 @@
 {
   enable = true;
 
-  cmp.enable = true;
   mode = "symbol_text";
   extraOptions = {
     maxwidth = 50;

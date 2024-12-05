@@ -48,9 +48,9 @@ in {
     (mapKey "n" "<leader>s" ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>")
 
     # Manage open buffers.
-    (mapKey "n" "<Tab>" "<cmd>BufferLineCycleNext<CR>")
-    (mapKey "n" "<S-Tab>" "<cmd>BufferLineCyclePrev<CR>")
-    (mapKey "n" "<leader>x" "<cmd>bdelete!<CR>")
+    (mapKeyWithOpts "n" "<leader>db" "<cmd>bdelete!<CR>" {
+      desc = "Buffer: [D]elete [B]uffer";
+    })
 
     # Toggle comments.
     (mapKeyWithOpts "n" "<leader>t/" "gcc" {
