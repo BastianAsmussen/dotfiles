@@ -41,6 +41,8 @@ future:
 
 - [otter.nvim](https://github.com/jmbuhr/otter.nvim) seems to fail to start
   when I enter a Nix file.
+- [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
+  multiple different runners when I press <F5>.
 
 ## Firefox
 
