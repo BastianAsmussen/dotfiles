@@ -22,8 +22,9 @@ in {
     environment = {
       systemPackages = with pkgs; [
         protonup
-        prismlauncher
         lutris
+        bottles
+        prismlauncher
       ];
 
       sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/${userInfo.username}/.steam/root/compatibilitytools.d";
