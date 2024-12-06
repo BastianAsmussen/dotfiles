@@ -97,27 +97,38 @@ in {
 
         windowrulev2 = let
           pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
-          mullvadVpn = "class:(Mullvad VPN)";
+          mullvadVPN = "class:(Mullvad VPN)";
+          steam = "class:(steam)";
         in
-          [
-            "float, ${pictureInPicture}"
-            "size 30% 30%, ${pictureInPicture}"
-            "move 100%-w-20, ${pictureInPicture}"
-            "pin, ${pictureInPicture}"
-            "keepaspectratio, ${pictureInPicture}"
-            "float, ${mullvadVpn}"
-            "move 100%-w-20 5%, ${mullvadVpn}"
-            "pin, ${mullvadVpn}"
-            "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
-            "float, class:(electron) title:^(?!electron).*$"
-          ]
-          ++ smartGaps.windowrulev2;
+          lib.mkMerge [
+            smartGaps.windowrulev2
+            [
+              "float, ${pictureInPicture}"
+              "size 30% 30%, ${pictureInPicture}"
+              "move 100%-w-20, ${pictureInPicture}"
+              "pin, ${pictureInPicture}"
+              "keepaspectratio, ${pictureInPicture}"
+              "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
+              "float, class:(electron) title:^(?!electron).*$"
+            ]
+            (mkIf osConfig.vpn.enable [
+              "float, ${mullvadVPN}"
+              "move 100%-w-20 5%, ${mullvadVPN}"
+              "pin, ${mullvadVPN}"
+            ])
+            (mkIf osConfig.gaming.enable [
+              "float, ${steam} title:^(?!Steam).*$"
+              "size 15% 60%, ${steam} title:Friends List"
+              "center, ${steam} title:Friends List"
+            ])
+          ];
 
         inherit (smartGaps) workspace;
 
         binds.allow_workspace_cycles = true;
         bind = let
           mkBind = mod: cmd: key: arg: "${mod}, ${key}, ${cmd}, ${arg}";
+          
           mkWorkspaceBind = mkBind "$mod" "workspace";
           mkMoveFocusBind = mkBind "$mod" "movefocus";
           mkResizeActiveBind = mkBind "$mod CTRL" "resizeactive";
