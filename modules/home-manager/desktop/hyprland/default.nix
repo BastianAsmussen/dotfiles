@@ -128,7 +128,7 @@ in {
         binds.allow_workspace_cycles = true;
         bind = let
           mkBind = mod: cmd: key: arg: "${mod}, ${key}, ${cmd}, ${arg}";
-          
+
           mkWorkspaceBind = mkBind "$mod" "workspace";
           mkMoveFocusBind = mkBind "$mod" "movefocus";
           mkResizeActiveBind = mkBind "$mod CTRL" "resizeactive";
