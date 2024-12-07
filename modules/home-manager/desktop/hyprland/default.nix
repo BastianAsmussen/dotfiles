@@ -117,7 +117,7 @@ in {
               "pin, ${mullvadVPN}"
             ])
             (mkIf osConfig.gaming.enable [
-              "float, ${steam} title:^(?!Steam).*$"
+              "float, ${steam} title:^(?!Steam$).*$"
               "size 15% 60%, ${steam} title:Friends List"
               "center, ${steam} title:Friends List"
             ])
