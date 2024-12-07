@@ -28,7 +28,12 @@ in {
         "ca-derivations"
       ];
 
-      trusted-users = ["root" "@wheel"];
+      extra-experimental-features = ["pipe-operator"];
+      trusted-users = [
+        "root"
+        "@wheel"
+      ];
+
       connect-timeout = 5; # Timeout after 5 seconds.
       cores = 0;
       auto-optimise-store = true;

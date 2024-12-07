@@ -8,37 +8,43 @@
   inherit (lib) hasAttr mkEnableOption mkOption types mkIf;
 
   cfg = config.gpg;
-
   keyDir = ../../../keys;
+
   # Function to get all key names in the specified directory.
   getAllKeys = keyDir: attrNames (readDir keyDir);
+
   # Function to check if a key is in the disallowed list.
   isKeyAllowed = keyName: disallowedKeys: !elem keyName disallowedKeys;
+
   # Function to filter out disallowed keys from the list of all keys.
   filterAllowedKeys = allKeys: disallowedKeys:
-    filter (key: isKeyAllowed key disallowedKeys) allKeys;
+    allKeys
+      |> filter (key: isKeyAllowed key disallowedKeys);
+
   # Function to map keys to their paths and trust levels.
   mapKeyPaths = keys: keyDir: trustMap: defaultTrust:
-    map (keyName: {
-      source = "${keyDir}/${keyName}";
-      trust =
-        if hasAttr keyName trustMap
-        then trustMap.${keyName}
-        else defaultTrust;
-    })
-    keys;
+    keys
+      |> map (keyName: {
+        source = "${keyDir}/${keyName}";
+        trust =
+          if hasAttr keyName trustMap
+          then trustMap.${keyName}
+          else defaultTrust;
+      });
 
   # Function to find keys listed in a list or map that are not present in the `keys` directory.
-  findMissingKeys = keyList: filter (key: !elem key (getAllKeys keyDir)) keyList;
+  findMissingKeys = keyList:
+    keyList
+      |> filter (key: !elem key (getAllKeys keyDir));
+
   # Create a set with missing keys for `disallowedKeys` and `keyTrustMap`.
   missingKeys = {
-    disallowList = findMissingKeys cfg.disallowedKeys;
-    trustMap = findMissingKeys (attrNames cfg.keyTrustMap);
+    disallowList = cfg.disallowedKeys |> findMissingKeys;
+    trustMap = cfg.keyTrustMap |> attrNames |> findMissingKeys;
   };
 in {
   options.gpg = {
     enable = mkEnableOption "Enables GPG.";
-
     trustLevel = mkOption {
       default = "marginal";
       description = "Default trust level for unspecified keys.";
@@ -77,17 +83,22 @@ in {
         then [
           ''
             The following keys specified in `disallowedKeys` are not present in "${keyDir}":
-            ${concatStringsSep "\n" (map (key: " - ${key}") missingKeys.disallowList)}
+            ${missingKeys.disallowList
+              |> map (key: " - ${key}")
+              |> concatStringsSep "\n"}
           ''
         ]
         else []
       )
+
       (
         if length missingKeys.trustMap > 0
         then [
           ''
             The following keys specified in `keyTrustMap` are not present in "${keyDir}":
-            ${concatStringsSep "\n" (map (key: " - ${key}") missingKeys.trustMap)}
+            ${missingKeys.trustMap
+              |> map (key: " - ${key}")
+              |> concatStringsSep "\n"}
           ''
         ]
         else []
@@ -101,11 +112,10 @@ in {
       mutableTrust = false;
       # Read public keys from the `keys` directory, applying trust levels from the map or default.
       publicKeys =
-        mapKeyPaths
-        (filterAllowedKeys (getAllKeys keyDir) cfg.disallowedKeys)
         keyDir
-        cfg.keyTrustMap
-        cfg.trustLevel;
+          |> getAllKeys
+          |> (allKeys: filterAllowedKeys allKeys cfg.disallowedKeys)
+          |> (allowedKeys: mapKeyPaths allowedKeys keyDir cfg.keyTrustMap cfg.trustLevel);
 
       scdaemonSettings.disable-ccid = osConfig.yubiKey.enable; # Disable CCID conflicts when using a YubiKey.
       settings = {
