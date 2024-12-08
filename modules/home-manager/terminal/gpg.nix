@@ -29,7 +29,7 @@
     keys;
 
   # Function to find keys listed in a list or map that are not present in the `keys` directory.
-  findMissingKeys = keyList: filter (key: !elem key (getAllKeys keyDir)) keyList;
+  findMissingKeys = filter (key: !elem key (getAllKeys keyDir));
   # Create a set with missing keys for `disallowedKeys` and `keyTrustMap`.
   missingKeys = {
     disallowList = findMissingKeys cfg.disallowedKeys;
