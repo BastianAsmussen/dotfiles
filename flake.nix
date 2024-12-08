@@ -63,6 +63,10 @@
           pkgs = import nixpkgs {inherit system;};
         });
 
+    lib = nixpkgs.lib.extend (final: _prev: {
+      custom = import ./lib final;
+    });
+
     userInfo = {
       username = "bastian";
       email = "bastian@asmussen.tech";
@@ -77,7 +81,7 @@
     nixosConfigurations = listToAttrs (map (hostname: {
         name = hostname;
         value = nixpkgs.lib.nixosSystem {
-          specialArgs = {inherit inputs outputs userInfo;};
+          specialArgs = {inherit inputs outputs userInfo lib;};
           modules = [
             ./hosts/${hostname}/configuration.nix
             ./modules/nixos
