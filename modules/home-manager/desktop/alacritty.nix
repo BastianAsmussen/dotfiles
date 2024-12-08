@@ -3,9 +3,7 @@
   config,
   pkgs,
   ...
-}: let
-  inherit (lib) mkForce;
-in {
+}: {
   programs.alacritty = {
     enable = true;
 
@@ -17,21 +15,6 @@ in {
 
       colors.draw_bold_text_with_bright_colors = true;
       bell.animation = "EaseOutExpo";
-
-      font = let
-        jetbrainsMono = style: {
-          inherit style;
-
-          family = "JetBrainsMono Nerd Font";
-        };
-      in {
-        size = mkForce 14;
-
-        normal = mkForce (jetbrainsMono "Regular");
-        bold = jetbrainsMono "Bold";
-        italic = jetbrainsMono "Italic";
-        bold_italic = jetbrainsMono "Bold Italic";
-      };
 
       env.TERM = "xterm-256color";
 

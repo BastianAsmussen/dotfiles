@@ -13,14 +13,14 @@
     fonts = with pkgs; {
       sizes = {
         applications = 12;
-        terminal = 15;
+        terminal = 14;
         desktop = 10;
         popups = 10;
       };
 
       monospace = {
-        package = nerdfonts.override {fonts = ["JetBrainsMono"];};
-        name = "JetBrainsMono Nerd Font Mono";
+        package = nerd-fonts.jetbrains-mono;
+        name = "JetBrainsMono Nerd Font";
       };
 
       sansSerif = {
