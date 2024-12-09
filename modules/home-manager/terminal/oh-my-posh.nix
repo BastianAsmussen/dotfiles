@@ -26,12 +26,19 @@
               style = "plain";
               foreground = "p:grey";
               background = "transparent";
-              template = " {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>";
+              template = "{{ if .HEAD }} {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>{{ end }}";
               properties = {
                 branch_icon = "";
                 commit_icon = "@";
                 fetch_status = true;
               };
+            }
+            {
+              type = "distrobox";
+              style = "plain";
+              foreground = "p:grey";
+              background = "transparent";
+              template = "{{ if not .Segments.Git.HEAD }} {{ end }}in {{ .ContainerId }}";
             }
           ];
         }

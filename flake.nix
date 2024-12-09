@@ -75,7 +75,7 @@
     };
   in {
     packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
-    overlays = import ./overlays {inherit inputs;};
+    overlays = import ./overlays {inherit inputs lib;};
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
 
     nixosConfigurations = listToAttrs (map (hostname: {

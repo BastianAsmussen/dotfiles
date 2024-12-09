@@ -3,12 +3,14 @@
   additions = final: _prev: import ../pkgs {pkgs = final;};
 
   # User-defined overlays.
-  modifications = final: _prev: {
+  modifications = final: prev: {
     docker-overlay = import inputs.docker-overlay {
       inherit (final) system;
 
       config.allowUnfree = true;
     };
+
+    oh-my-posh = import ./oh-my-posh.nix prev;
   };
 
   # Convenient access to the nixpkgs stable branch.
