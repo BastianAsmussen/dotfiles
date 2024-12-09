@@ -8,7 +8,6 @@
     ./dap.nix
     ./gitsigns.nix
     ./nvim-autopairs.nix
-    ./nvim-colorizer.nix
     ./telescope.nix
     ./tmux-navigator.nix
   ];
@@ -17,6 +16,7 @@
     plugins = {
       bufferline.enable = true;
       crates-nvim.enable = true;
+      colorizer = import ./colorizer.nix;
       direnv.enable = true;
       fidget.enable = true;
       hardtime.enable = true;
