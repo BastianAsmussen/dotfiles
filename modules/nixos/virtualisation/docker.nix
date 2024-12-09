@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  pkgs,
   userInfo,
   ...
 }: {
@@ -10,9 +9,6 @@
   config = lib.mkIf config.docker.enable {
     virtualisation.docker = {
       enable = true;
-      package = pkgs.docker-overlay.docker.override {
-        initSupport = true;
-      };
 
       storageDriver = "btrfs";
       autoPrune.enable = true;
