@@ -16,6 +16,5 @@
     ./oh-my-posh.nix
     ./password-store.nix
     ./ripgrep.nix
-    ./zoxide.nix
   ];
 }

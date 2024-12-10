@@ -4,13 +4,21 @@
   pkgs,
   ...
 }: {
-  imports = [./scripts];
+  imports = [
+    ./scripts
+    ./zoxide.nix
+  ];
 
   programs.zsh = {
     enable = true;
 
     autocd = true;
-    autosuggestion.enable = true;
+    autosuggestion = {
+      enable = true;
+
+      strategy = ["history" "completion"];
+    };
+
     syntaxHighlighting.enable = true;
 
     history = {
@@ -27,15 +35,14 @@
       # sh
       ''
         # Keybindings.
+        bindkey '^f' autosuggest-accept
+
         bindkey '^[[1;5C' emacs-forward-word
         bindkey '^[[1;5D' emacs-backward-word
         bindkey '^[[3~' delete-char
 
         bindkey '^p' history-search-backward
         bindkey '^n' history-search-forward
-
-        # Switch tmux sessions.
-        bindkey -s '^f' 'tms switch^M'
 
         # Match any case.
         zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
@@ -58,7 +65,7 @@
 
       cp = "cp -r";
       rm = "rm -r";
-      mkdir = "mkdir -vp";
+      mkdir = "mkdir -p";
     };
 
     oh-my-zsh = {

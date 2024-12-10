@@ -1,4 +1,6 @@
 {config, ...}: {
+  home.shellAliases."cd.." = "cd ..";
+
   programs.zoxide = {
     enable = true;
 
