@@ -3,8 +3,8 @@ prev.oh-my-posh.overrideAttrs (old: {
   src = prev.fetchFromGitHub {
     owner = "BastianAsmussen";
     repo = "oh-my-posh";
-    rev = "c8f484e9f25e14020505f561853410a292ce8462";
-    hash = "sha256-f5v4OtRjisWeggF06+Rkb13sRDw3Cvv/foUzzZpG7HY=";
+    rev = "6633293910518b2924917b1abd7fbfc7c566534d";
+    hash = "sha256-ZRMoFUTms+dR9LXIXxUmueXNqREYFBHT9MmJvyZrdQQ=";
   };
 
   vendorHash = "sha256-YaMW2BUFone3/19/FvT4f8GpfVJxtVBMIOziBhEQPmE=";

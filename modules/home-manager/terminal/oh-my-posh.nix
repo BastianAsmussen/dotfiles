@@ -38,7 +38,7 @@
               style = "plain";
               foreground = "p:grey";
               background = "transparent";
-              template = "{{ if not .Segments.Git.HEAD }} {{ end }}in {{ .ContainerId }}";
+              template = "{{ if not .Segments.Git.HEAD }} {{ end }}in {{ .ContainerID }}";
             }
           ];
         }
