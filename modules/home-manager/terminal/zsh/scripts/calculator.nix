@@ -4,7 +4,7 @@
 }:
 pkgs.writeShellScriptBin "=" ''
   cat << EOF | ${lib.getExe pkgs.bc}
-  scale=64
+  scale=2
   $@
   EOF
 
