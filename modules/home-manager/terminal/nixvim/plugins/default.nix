@@ -2,7 +2,6 @@
   imports = [
     ./lsp
     ./snacks
-    ./treesitter
     ./cmp.nix
     ./comment.nix
     ./dap.nix
@@ -31,6 +30,7 @@
       otter.enable = true;
       rustaceanvim = import ./rustaceanvim.nix pkgs;
       sleuth.enable = true;
+      treesitter = import ./treesitter.nix pkgs;
       trouble.enable = true;
       web-devicons.enable = true;
       which-key = import ./which-key.nix;
