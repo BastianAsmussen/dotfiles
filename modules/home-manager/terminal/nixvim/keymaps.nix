@@ -55,11 +55,11 @@ in {
     # Toggle comments.
     (mapKeyWithOpts "n" "<leader>tc" "gcc" {
       remap = true;
-      desc = "Comment: [T]oggle [C]omment";
+      desc = "[T]oggle [C]omment";
     })
     (mapKeyWithOpts "v" "<leader>tc" "gc" {
       remap = true;
-      desc = "Comment: [T]oggle [C]omment";
+      desc = "[T]oggle [C]omment";
     })
 
     # Focus the file explorer.
