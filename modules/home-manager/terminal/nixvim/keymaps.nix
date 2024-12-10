@@ -53,13 +53,13 @@ in {
     })
 
     # Toggle comments.
-    (mapKeyWithOpts "n" "<leader>t/" "gcc" {
+    (mapKeyWithOpts "n" "<leader>tc" "gcc" {
       remap = true;
-      desc = "Comment: Toggle Comment";
+      desc = "Comment: [T]oggle [C]omment";
     })
-    (mapKeyWithOpts "v" "<leader>t/" "gc" {
+    (mapKeyWithOpts "v" "<leader>tc" "gc" {
       remap = true;
-      desc = "Comment: Toggle Comment";
+      desc = "Comment: [T]oggle [C]omment";
     })
 
     # Focus the file explorer.
