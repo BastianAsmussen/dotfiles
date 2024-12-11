@@ -1,6 +1,10 @@
-rec {
+{lib}: rec {
+  inherit (builtins) div;
+  
+  PI = 3.14159265358979323846;
+
   mod = a: n: let
-    quotient = builtins.div a n;
+    quotient = div a n;
   in
     a - (n * quotient);
 
@@ -17,6 +21,8 @@ rec {
     if x < 0
     then (-x)
     else x;
+
+  pow = n: exp: builtins.foldl' (acc: x: acc * x) 1 (builtins.genList (_: n) exp);
 
   newtonSqrt = n: x: precision: iteration: maxIterations: let
     next = (x + (n / x)) / 2.0;
@@ -36,4 +42,9 @@ rec {
     else if n == 0
     then 0
     else newtonSqrt n (max 1.0 (n / 2.0)) precision 0 maxIterations;
+
+  fact = n:
+    if n <= 1
+    then 1
+    else n * fact (n - 1);
 }
