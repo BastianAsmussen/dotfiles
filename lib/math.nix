@@ -1,6 +1,6 @@
 {lib}: rec {
   inherit (builtins) div;
-  
+
   PI = 3.14159265358979323846;
 
   mod = a: n: let
