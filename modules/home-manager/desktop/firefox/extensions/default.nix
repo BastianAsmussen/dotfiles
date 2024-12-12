@@ -10,7 +10,6 @@ with inputs.firefox-addons.packages.${pkgs.system}; [
   clearurls
   privacy-badger
   skip-redirect
-  don-t-fuck-with-paste
   istilldontcareaboutcookies
   duckduckgo-privacy-essentials
   return-youtube-dislikes
