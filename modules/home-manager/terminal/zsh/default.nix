@@ -87,7 +87,6 @@
         "pass"
         "rust"
         "sudo"
-        "systemd"
       ];
     };
 
