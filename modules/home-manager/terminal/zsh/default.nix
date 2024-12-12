@@ -13,12 +13,7 @@
     enable = true;
 
     autocd = true;
-    autosuggestion = {
-      enable = true;
-
-      strategy = ["history" "completion"];
-    };
-
+    autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
     history = {
