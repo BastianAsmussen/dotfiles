@@ -9,7 +9,7 @@
   in
     # toml
     ''
-      session-sort-order = "LastAttached"
+      session_sort_order = "LastAttached"
 
       [[search_dirs]]
       path = "${homeDirectory}/Projects"
