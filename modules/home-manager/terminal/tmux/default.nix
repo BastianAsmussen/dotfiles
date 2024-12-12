@@ -5,19 +5,17 @@
 }: let
   inherit (lib) getExe;
 
-  bins = {
-    tms = getExe pkgs.tmux-sessionizer;
-    tmux = getExe pkgs.tmux;
-  };
+  tms = getExe pkgs.tmux-sessionizer;
+  tmux = getExe pkgs.tmux;
 
   sessionPopup = pkgs.writeShellScriptBin "sessions" ''
-    raw_width=$(${bins.tmux} display-message -p '#{window_width}')
-    raw_height=$(${bins.tmux} display-message -p '#{window_height}')
+    raw_width=$(${tmux} display-message -p '#{window_width}')
+    raw_height=$(${tmux} display-message -p '#{window_height}')
 
     popup_width=$((raw_width > 100 ? 100 : raw_width * 80 / 100))
     popup_height=$((raw_height > 50 ? 50 : raw_height * 80 / 100))
 
-    ${bins.tmux} display-popup -E -h $popup_height -w $popup_width -T 'tmux Sessionizer' '${bins.tms}'
+    ${tmux} display-popup -E -h $popup_height -w $popup_width -T 'tmux Sessionizer' '${tms}'
   '';
 in {
   imports = [
@@ -94,8 +92,8 @@ in {
       bind -r C-Right resize-pane -R
 
       # Sessionizer.
-      bind s display-popup -E -h 60% -w 85% -T 'Active Sessions' "${bins.tms} switch"
-      bind w display-popup -E -h 60% -w 85% -T 'Session Windows' "${bins.tms} windows"
+      bind s display-popup -E -h 60% -w 85% -T 'Active Sessions' "${tms} switch"
+      bind w display-popup -E -h 60% -w 85% -T 'Session Windows' "${tms} windows"
       bind f run-shell "${sessionPopup}/bin/sessions"
 
       # Detach from current session.
