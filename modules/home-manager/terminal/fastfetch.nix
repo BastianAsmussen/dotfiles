@@ -5,18 +5,13 @@
     enable = true;
 
     settings = {
-      display = {
-        separator = "";
-        key.width = 15;
-      };
-
+      display.separator = " ";
       modules = [
         {
           key = "╭───────────╮";
           type = "custom";
         }
         {
-          # Draw borders first to make colors of left and right border consistent.
           key = "│ {#31} user    {#keys}│";
           type = "title";
           format = "{1}";
