@@ -8,7 +8,6 @@ around problems.
 
 - [Developer Environments](#developer-environments)
 - [Neovim](#neovim)
-- [Firefox](#firefox)
 - [Disko Command](#disko-command)
 - [Impermanence Setup](#impermanence-setup)
 - [AGS Migration](#ags-migration)
@@ -43,18 +42,6 @@ future:
   when I enter a file.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
   multiple different runners when I press <F5>.
-
-## Firefox
-
-### Broken Features
-
-- DRM: Currently, DRM simply refuses to install.
-- Image Rendering: Some images appear to render totally glitched.
-- Bookmarks: Refuses to initialize anymore.
-
-### Extensions
-
-- uBlock Origin: I'd like to be able to customize the extension through Nix.
 
 ## Disko Command
 
