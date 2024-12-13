@@ -11,6 +11,7 @@
     ags.url = "github:Aylur/ags/v1";
     matugen.url = "github:/InioX/Matugen";
     nixcord.url = "github:kaylorben/nixcord";
+    schizofox.url = "github:schizofox/schizofox";
 
     disko = {
       url = "github:nix-community/disko";
@@ -24,11 +25,6 @@
 
     nixvim = {
       url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    firefox-addons = {
-      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
