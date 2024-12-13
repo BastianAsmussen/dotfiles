@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   imports = [
     ./lsp
     ./snacks
@@ -24,7 +28,7 @@
       lualine = import ./lualine.nix;
       luasnip = import ./luasnip.nix pkgs;
       markdown-preview = import ./markdown-preview.nix;
-      neocord.enable = true;
+      neocord = import ./neocord.nix config;
       noice.enable = true;
       nvim-tree = import ./nvim-tree.nix;
       otter.enable = true;
