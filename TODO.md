@@ -39,8 +39,8 @@ future:
 
 ### Issues
 
-- [otter.nvim](https://github.com/jmbuhr/otter.nvim) seems to fail to start
-  when I enter a Nix file.
+- [otter.nvim](https://github.com/jmbuhr/otter.nvim) sometimes fails to start
+  when I enter a file.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
   multiple different runners when I press <F5>.
 
@@ -50,6 +50,7 @@ future:
 
 - DRM: Currently, DRM simply refuses to install.
 - Image Rendering: Some images appear to render totally glitched.
+- Bookmarks: Refuses to initialize anymore.
 
 ### Extensions
 
