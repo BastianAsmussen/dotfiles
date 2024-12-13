@@ -9,7 +9,6 @@
     ./cmp.nix
     ./comment.nix
     ./dap.nix
-    ./gitsigns.nix
     ./nvim-autopairs.nix
     ./telescope.nix
     ./tmux-navigator.nix
@@ -22,6 +21,7 @@
       colorizer = import ./colorizer.nix;
       direnv.enable = true;
       fidget.enable = true;
+      gitsigns = import ./gitsigns.nix config;
       hardtime.enable = true;
       indent-blankline.enable = true;
       lspkind = import ./lspkind.nix;
