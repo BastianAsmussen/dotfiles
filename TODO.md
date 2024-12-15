@@ -27,6 +27,12 @@ I've seen a repository called
 [nix-templates](https://github.com/MordragT/nix-templates) which might be
 pretty useful. Perhaps it could be a flake input?
 
+### Distrobox
+
+I'm also using [Distrobox](https://distrobox.it) for generic Linux environments.
+Package installs sometimes don't work as expected due to FHS issues. I'll need
+to find a fix for this.
+
 ## Neovim
 
 ### Plugins
