@@ -34,11 +34,11 @@
               };
             }
             {
-              type = "distrobox";
+              type = "text";
               style = "plain";
               foreground = "p:grey";
               background = "transparent";
-              template = "{{ if not .Segments.Git.HEAD }} {{ end }}in {{ .ContainerID }}";
+              template = "{{ if not .Segments.Git.HEAD }} {{ end }}{{ if .Env.CONTAINER_ID }}in {{ .Env.CONTAINER_ID }}{{ end }}";
             }
           ];
         }

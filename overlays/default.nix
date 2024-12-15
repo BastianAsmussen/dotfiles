@@ -4,7 +4,6 @@
 
   # User-defined overlays.
   modifications = _final: prev: {
-    oh-my-posh = import ./oh-my-posh.nix prev;
     docker = prev.docker.override {
       initSupport = true;
     };
