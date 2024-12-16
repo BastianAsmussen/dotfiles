@@ -9,7 +9,6 @@
     stylix.url = "github:danth/stylix";
     hyprland.url = "github:hyprwm/Hyprland";
     ags.url = "github:Aylur/ags/v1";
-    matugen.url = "github:/InioX/Matugen";
     nixcord.url = "github:kaylorben/nixcord";
     schizofox.url = "github:schizofox/schizofox";
 
