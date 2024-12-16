@@ -10,7 +10,11 @@
     updateRoot = true;
   };
 
-  view.preserveWindowProportions = true;
+  view = {
+    preserveWindowProportions = true;
+    side = "right";
+  };
+
   renderer = {
     rootFolderLabel = false;
     highlightGit = true;
