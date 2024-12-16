@@ -23,9 +23,8 @@
         java_language_server.enable = true; # Java
         lua_ls = import ./lua_ls.nix;
         nixd = import ./nixd.nix {
-          # Nix
           inherit osConfig config lib pkgs userInfo;
-        };
+        }; # Nix
 
         omnisharp = import ./omnisharp.nix; # C#
         pylsp.enable = true; # Python
