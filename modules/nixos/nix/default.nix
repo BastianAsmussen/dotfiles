@@ -48,7 +48,36 @@ in {
     config.allowUnfree = true;
   };
 
-  # Move build directory from /tmp to /var/tmp.
-  # Source: https://discourse.nixos.org/t/how-do-you-optimize-your-tmp/51956/3
-  systemd.services.nix-daemon.environment.TMPDIR = "/var/tmp";
+  systemd = {
+    # systemd OOMd.
+    # Fedora enables these options by default. See the 10-oomd-* files here:
+    # https://src.fedoraproject.org/rpms/systemd/tree/3211e4adfcca38dfe24188e28a65b1cf385ecfd6
+    # by default it only kills cgroups. So either systemd services marked for
+    # killing under OOM or (disabled by default, enabled by us) the entire user
+    # slice. Fedora used to kill root and system slices, but their OOMd
+    # configuration has since changed.
+    oomd = {
+      enable = true;
+
+      enableRootSlice = true;
+      enableSystemSlice = true;
+      enableUserSlices = true;
+
+      extraConfig."DefaultMemoryPressureDurationSec" = "20s";
+    };
+
+    services.nix-daemon = {
+      # Make it that Nix builds are more likely killed than important services.
+      # 100 is the default for user slices and 500 is systemd-coredumpd@.
+      # This is important because as the system gets bigger and bigger,
+      # `nix flake check` can start causing OOMs and killing e.g. the desktop
+      # environment - which isn't desirable. Kill nix-daemon if it gets too
+      # memory hungry.
+      serviceConfig.OOMScoreAdjust = lib.mkDefault 350;
+
+      # Move build directory from /tmp to /var/tmp.
+      # Source: https://discourse.nixos.org/t/how-do-you-optimize-your-tmp/51956/3
+      environment.TMPDIR = "/var/tmp";
+    };
+  };
 }
