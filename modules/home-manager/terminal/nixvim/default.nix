@@ -7,6 +7,7 @@
     ./theme.nix
   ];
 
+  home.sessionVariables.MANPAGER = "nvim -c 'set ft=man bt=nowrite noswapfile nobk shada=\\\"NONE\\\" ro noma' +Man! -o -";
   programs.nixvim = {
     enable = true;
 
