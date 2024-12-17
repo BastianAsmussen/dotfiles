@@ -19,7 +19,7 @@ around problems.
 ## Developer Environments
 
 I want a proper way to handle ephemeral developer environments. Right now I'm
-using [devenv](./modules/home-manager/terminal/devenv.nix), but it feels a bit
+using [devenv](./modules/home-manager/terminal/direnv.nix), but it feels a bit
 like cheating; what I'd really like is to add templates to my flake.
 
 ### Inspiration
