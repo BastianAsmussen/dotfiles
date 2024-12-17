@@ -81,7 +81,7 @@
       script = ''
         set -eu
 
-        if [[ $(stat -c "%s" /var/log/audit/audit.log) -gt ${builtins.toString (mbToBytes 512)} ]]; then
+        if [[ $(stat -c "%s" /var/log/audit/audit.log) -gt ${toString (mbToBytes 512)} ]]; then
           echo "Clearing Audit Log...";
           rm -rfv /var/log/audit/audit.log;
 
