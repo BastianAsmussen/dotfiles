@@ -75,7 +75,7 @@
     nixosConfigurations = listToAttrs (map (hostname: {
         name = hostname;
         value = nixpkgs.lib.nixosSystem {
-          specialArgs = {inherit inputs outputs userInfo lib;};
+          specialArgs = {inherit inputs outputs userInfo lib self;};
           modules = [
             ./hosts/${hostname}/configuration.nix
             ./modules/nixos

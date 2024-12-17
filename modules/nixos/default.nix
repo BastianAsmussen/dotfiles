@@ -1,4 +1,8 @@
-{lib, ...}: let
+{
+  lib,
+  self,
+  ...
+}: let
   inherit (lib) mkDefault;
 in {
   imports = [
@@ -29,5 +33,8 @@ in {
   home-manager.enable = mkDefault true;
   keyboard.enable = mkDefault true;
 
-  system.stateVersion = mkDefault "24.05";
+  system = {
+    configurationRevision = self.shortRev or self.dirtyShortRev;
+    stateVersion = mkDefault "24.05";
+  };
 }
