@@ -1,6 +1,5 @@
-{pkgs, ...}: {
+{
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
     kernel.sysctl = {
       # The Magic SysRq key is a key combo that allows users connected to the
       # system console of a Linux kernel to perform some low-level commands.
@@ -43,19 +42,5 @@
     };
 
     kernelModules = ["tcp_bbr"];
-  };
-
-  security = {
-    apparmor = {
-      enable = true;
-
-      killUnconfinedConfinables = true;
-      packages = [pkgs.apparmor-profiles];
-    };
-
-    protectKernelImage = true;
-    forcePageTableIsolation = true;
-    polkit.enable = true;
-    rtkit.enable = true;
   };
 }

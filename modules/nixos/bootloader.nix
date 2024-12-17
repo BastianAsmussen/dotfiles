@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }: let
   inherit (lib) mkOption types;
@@ -14,17 +15,20 @@ in {
   };
 
   config = {
-    boot.loader = {
-      efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
-      };
+    boot = {
+      kernelPackages = pkgs.linuxPackages_latest;
+      loader = {
+        efi = {
+          canTouchEfiVariables = true;
+          efiSysMountPoint = "/boot";
+        };
 
-      grub = {
-        efiSupport = true;
-        useOSProber = cfg.isMultiboot;
+        grub = {
+          efiSupport = true;
+          useOSProber = cfg.isMultiboot;
 
-        device = "nodev";
+          device = "nodev";
+        };
       };
     };
 

@@ -2,8 +2,8 @@
   inherit (lib) mkDefault;
 in {
   imports = [
+    ./hardening
     ./gpg.nix
-    ./hardening.nix
     ./ssh.nix
     ./vpn.nix
     ./yubiKey.nix
