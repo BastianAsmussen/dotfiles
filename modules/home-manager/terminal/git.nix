@@ -26,7 +26,17 @@
       signByDefault = true;
     };
 
-    aliases.staash = "stash --all";
+    aliases = {
+      graph = "log --all --decorate --graph";
+      staash = "stash --all";
+      hist = ''
+        log --pretty=format:"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)" --graph --date=relative --decorate --all
+      '';
+      fuck = "commit --amend -m";
+      br = "branch";
+      st = "status";
+      d = "diff";
+    };
 
     extraConfig = {
       push = {
@@ -58,7 +68,6 @@
         autoupdate = true;
       };
 
-      column.ui = "auto"; # Make `git branch` prettier.
       branch = {
         sort = "-committerdate"; # Sort by most recent commit.
         autosetupmerge = true;
