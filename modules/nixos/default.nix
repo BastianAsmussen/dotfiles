@@ -15,6 +15,7 @@ in {
     ./home-manager.nix
     ./keyboard.nix
     ./language.nix
+    ./misc.nix
     ./network-manager.nix
     ./nvidia.nix
     ./stylix.nix
