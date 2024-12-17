@@ -22,24 +22,37 @@ in {
 
     settings = {
       experimental-features = [
-        "nix-command"
         "flakes"
+        "nix-command"
         "recursive-nix"
-        "ca-derivations"
+        "ca-derivations" # Enable possible early cutoffs during rebuilds.
+        "cgroups" # Allow Nix to execute builds inside cgroups.
+        "auto-allocate-uids" # Allow Nix to automatically pick UIDs, rather than creating nixbld* user accounts.
+        "dynamic-derivations" # Allow building of .drv files.
+        "no-url-literals" # Disallow deprecated url-literals, i.e., URLs without quotation.
       ];
 
       trusted-users = ["root" "@wheel"];
+      http-connections = 32;
       connect-timeout = 5; # Timeout after 5 seconds.
+      stalled-download-timeout = 20; # Retry downloads if no data is recieived for 20 seconds.
       cores = 0;
       auto-optimise-store = true;
       builders-use-substitutes = true;
       fallback = true; # Fallback to building from source if binary substitute fails.
       keep-going = true;
+      keep-derivations = true;
       keep-outputs = true;
       show-trace = true;
       warn-dirty = false;
+      accept-flake-config = false;
+      use-cgroups = pkgs.stdenv.isLinux;
       min-free = mibToBytes 128;
       max-free = mibToBytes 1024;
+
+      # Always build in a sandbox.
+      sandbox = true;
+      sandbox-fallback = false;
     };
   };
 
