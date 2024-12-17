@@ -56,8 +56,10 @@
       '';
 
     shellAliases = {
-      c = "clear";
+      # Make sudo use aliases.
+      sudo = "sudo ";
 
+      c = "clear";
       cp = "cp -r";
       rm = "rm -r";
       mkdir = "mkdir -p";
