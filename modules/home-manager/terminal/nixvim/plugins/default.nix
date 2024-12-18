@@ -36,6 +36,7 @@
       sleuth.enable = true;
       treesitter = import ./treesitter.nix pkgs;
       trouble.enable = true;
+      typescript-tools.enable = true;
       web-devicons.enable = true;
       which-key = import ./which-key.nix;
     };
