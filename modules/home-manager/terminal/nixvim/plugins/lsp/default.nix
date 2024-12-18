@@ -14,23 +14,23 @@
 
       inlayHints = true;
       servers = {
-        clangd.enable = true; # C/C++
-        csharp_ls.enable = true; # C#
-        cssls.enable = true; # CSS
-        dockerls = import ./dockerls.nix; # Docker
-        gopls.enable = true; # Golang
+        clangd.enable = true;
+        csharp_ls.enable = true;
+        cssls.enable = true;
+        dockerls = import ./dockerls.nix;
+        eslint.enable = true;
+        gopls.enable = true;
         hls = import ./hls.nix; # Haskell
-        html.enable = true; # HTML
-        java_language_server.enable = true; # Java
+        html.enable = true;
+        java_language_server.enable = true;
         lua_ls = import ./lua_ls.nix;
-        nixd = import ./nixd.nix {
-          inherit osConfig config lib pkgs userInfo;
-        }; # Nix
-
-        pylsp.enable = true; # Python
-        sqls.enable = true; # SQL
-        svelte.enable = true; # Svelte
-        ts_ls.enable = true; # TS/JS
+        nixd = import ./nixd.nix {inherit osConfig config lib pkgs userInfo;};
+        pylsp.enable = true;
+        sqls.enable = true;
+        svelte.enable = true;
+        tailwindcss.enable = true;
+        taplo.enable = true; # TOML
+        ts_ls.enable = true;
         typos_lsp = import ./typos_lsp.nix;
       };
 
