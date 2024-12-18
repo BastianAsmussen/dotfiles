@@ -15,6 +15,7 @@
       inlayHints = true;
       servers = {
         clangd.enable = true; # C/C++
+        csharp_ls.enable = true; # C#
         cssls.enable = true; # CSS
         dockerls = import ./dockerls.nix; # Docker
         gopls.enable = true; # Golang
@@ -26,7 +27,6 @@
           inherit osConfig config lib pkgs userInfo;
         }; # Nix
 
-        omnisharp = import ./omnisharp.nix; # C#
         pylsp.enable = true; # Python
         sqls.enable = true; # SQL
         svelte.enable = true; # Svelte
