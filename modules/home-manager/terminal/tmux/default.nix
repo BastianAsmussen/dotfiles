@@ -5,8 +5,8 @@
 }: let
   inherit (lib) getExe;
 
-  tms = getExe pkgs.tmux-sessionizer;
   tmux = getExe pkgs.tmux;
+  tms = getExe pkgs.tmux-sessionizer;
 
   sessionPopup = pkgs.writeShellScriptBin "sessions" ''
     raw_width=$(${tmux} display-message -p '#{window_width}')
@@ -94,7 +94,7 @@ in {
       # Sessionizer.
       bind s display-popup -E -h 60% -w 85% -T 'Active Sessions' "${tms} switch"
       bind w display-popup -E -h 60% -w 85% -T 'Session Windows' "${tms} windows"
-      bind f run-shell "${sessionPopup}/bin/sessions"
+      bind f run-shell "${getExe sessionPopup}"
 
       # Detach from current session.
       bind C-d detach-client

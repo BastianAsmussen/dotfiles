@@ -6,7 +6,7 @@
 }: let
   cfg = config.programs;
 
-  fd = lib.getBin pkgs.fd;
+  fd = lib.getExe pkgs.fd;
 in {
   programs.fzf = {
     enable = true;
