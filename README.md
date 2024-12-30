@@ -25,17 +25,44 @@ This is a repository for my NixOS configuration.
       cd ~/dotfiles
       ```
 
-2. Set up the disk configuration, e.g. for `limitless`.
+   3. Enter the provided Nix development shell.
+      
+      ```sh
+      nix-shell
+      ```
+
+   4. Or, as a one-liner.
+      
+      ```sh
+      nix-shell -p git --run "git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && cd ~/dotfiles && nix-shell"
+      ```
+
+2. Choose a host:
+
+   1. View available host options.
+
+      ```sh
+      HOSTNAME=$(ls ~/dotfiles/hosts | fzf)
+      ```
+
+   2. Set manually, e.g. `limitless`.
+
+      ```sh
+      HOSTNAME=limitless
+      ```
+
+3. Set up the disk configuration.
 
    ```sh
-   sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
-       --mode disko ~/dotfiles/hosts/limitless/disko-config.nix
+   sudo nix run 'github:nix-community/disko/latest#disko-install' -- \
+       --write-efi-boot-entries \
+       --mode disko ~/dotfiles/hosts/$HOSTNAME/disko-config.nix
    ```
 
-3. Install NixOS with the given configuration, e.g. `limitless`.
+4. Install NixOS with the given configuration.
 
    ```sh
-   sudo nixos-install --flake ~/dotfiles#limitless
+   sudo nixos-install --flake ~/dotfiles#$HOSTNAME
    ```
 
 > [!IMPORTANT]

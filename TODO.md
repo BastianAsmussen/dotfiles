@@ -8,7 +8,6 @@ around problems.
 
 - [Developer Environments](#developer-environments)
 - [Neovim](#neovim)
-- [Disko Command](#disko-command)
 - [Impermanence Setup](#impermanence-setup)
 - [AGS Migration](#ags-migration)
 - [Linux Hardening](#linux-hardening)
@@ -49,11 +48,6 @@ future:
   when I enter a file.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
   multiple different runners when I press <F5>.
-
-## Disko Command
-
-The command I use for setting up my disk layout seems to be deprecated. I need
-to figure out a new way to handle it soon.
 
 ## Impermanence Setup
 
