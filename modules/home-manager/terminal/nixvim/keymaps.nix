@@ -41,6 +41,11 @@ in {
     (mapKey "v" "<leader>y" "\"+y")
     (mapKey "n" "<leader>Y" "\"+Y")
 
+    # Toggle the undo tree.
+    (mapKeyWithOpts "n" "<leader>u" "<cmd>UndotreeToggle<CR>" {
+      desc = "Undotree: Toggle the undo tree.";
+    })
+
     # "Don't press Q, it's the worst place in the universe." - ThePrimeagen.
     (mapKey "n" "Q" "<Nop>")
 
@@ -52,6 +57,11 @@ in {
       desc = "Buffer: [D]elete [B]uffer";
     })
 
+    # Open parent directory in current window.
+    (mapKeyWithOpts "n" "<leader>-" "<cmd>Oil<CR>" {
+      desc = "Oil: Open the parent directory.";
+    })
+
     # Toggle comments.
     (mapKeyWithOpts "n" "<leader>tc" "gcc" {
       remap = true;
@@ -60,11 +70,6 @@ in {
     (mapKeyWithOpts "v" "<leader>tc" "gc" {
       remap = true;
       desc = "[T]oggle [C]omment";
-    })
-
-    # Focus the file explorer.
-    (mapKeyWithOpts "n" "<leader>e" "<cmd>NvimTreeFocus<CR>" {
-      desc = "NvimTree: Toggle Tree";
     })
 
     # Debugging.
@@ -119,7 +124,6 @@ in {
     } {desc = "Debug: See last session result.";})
 
     # Telescope keybinds.
-    # Slightly advanced example of overriding default behavior and theme.
     (mapKeyWithOpts "n" "<leader>/" {
       __raw = ''
         function()

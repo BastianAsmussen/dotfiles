@@ -16,7 +16,6 @@
 
   programs.nixvim = {
     plugins = {
-      bufferline.enable = true;
       crates.enable = true;
       colorizer = import ./colorizer.nix;
       direnv.enable = true;
@@ -30,13 +29,14 @@
       markdown-preview = import ./markdown-preview.nix;
       neocord = import ./neocord.nix config;
       noice.enable = true;
-      nvim-tree = import ./nvim-tree.nix;
+      oil = import ./oil.nix;
       otter.enable = true;
       rustaceanvim = import ./rustaceanvim.nix pkgs;
       sleuth.enable = true;
       treesitter = import ./treesitter.nix pkgs;
       trouble.enable = true;
       typescript-tools.enable = true;
+      undotree.enable = true;
       web-devicons.enable = true;
       which-key = import ./which-key.nix;
     };
