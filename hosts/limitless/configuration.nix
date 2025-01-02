@@ -1,7 +1,11 @@
-{
+{inputs, ...}: let
+  hardware = inputs.nixos-hardware.nixosModules;
+in {
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
+
+    hardware.common-cpu-amd
   ];
 
   ssh.server.enable = true;
