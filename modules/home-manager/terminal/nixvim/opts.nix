@@ -21,6 +21,7 @@
     wrap = false;
     breakindent = true;
     scrolloff = 8; # Number of lines to show around the cursor.
+    clipboard = "unnamedplus";
 
     cursorline = true;
 

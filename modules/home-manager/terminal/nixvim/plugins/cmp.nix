@@ -16,20 +16,24 @@
           "<C-f>" = "cmp.mapping.scroll_docs(4)";
           "<C-y>" = "cmp.mapping.confirm { select = true }";
           "<C-Space>" = "cmp.mapping.complete {}";
-          "<C-l>" = ''
-            cmp.mapping(function()
-              if luasnip.expand_or_locally_jumpable() then
-                luasnip.expand_or_jump()
-              end
-            end, { 'i', 's' })
-          '';
-          "<C-h>" = ''
-            cmp.mapping(function()
-              if luasnip.locally_jumpable(-1) then
-                luasnip.jump(-1)
-              end
-            end, { 'i', 's' })
-          '';
+          "<C-l>" =
+            # lua
+            ''
+              cmp.mapping(function()
+                if luasnip.expand_or_locally_jumpable() then
+                  luasnip.expand_or_jump()
+                end
+              end, { 'i', 's' })
+            '';
+          "<C-h>" =
+            # lua
+            ''
+              cmp.mapping(function()
+                if luasnip.locally_jumpable(-1) then
+                  luasnip.jump(-1)
+                end
+              end, { 'i', 's' })
+            '';
         };
 
         formatting.fields = [
@@ -49,12 +53,9 @@
 
         sources = [
           {name = "nvim_lsp";}
-          {name = "luasnip";}
-          {name = "crates";}
           {name = "path";}
           {
             name = "buffer";
-            keyword_length = 5;
             # Words from other open buffers can also be suggested.
             option.get_bufnrs.__raw = "vim.api.nvim_list_bufs";
           }
@@ -66,10 +67,5 @@
         };
       };
     };
-
-    cmp-nvim-lsp.enable = true;
-    cmp-buffer.enable = true;
-    cmp-path.enable = true;
-    cmp_luasnip.enable = true;
   };
 }
