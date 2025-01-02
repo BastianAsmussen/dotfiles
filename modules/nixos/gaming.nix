@@ -23,7 +23,6 @@ in {
       systemPackages = with pkgs; [
         protonup
         lutris
-        bottles
         prismlauncher
       ];
 

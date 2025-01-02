@@ -17,7 +17,7 @@
   programs.nixvim = {
     plugins = {
       bufferline.enable = true;
-      crates-nvim.enable = true;
+      crates.enable = true;
       colorizer = import ./colorizer.nix;
       direnv.enable = true;
       fidget.enable = true;
