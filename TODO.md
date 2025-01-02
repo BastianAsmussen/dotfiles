@@ -35,19 +35,19 @@ to find a fix for this.
 
 ## Neovim
 
+### SSH
+
+I want to be able to use the paste buffer of the client when using Neovim on a 
+server.
+
 ### Plugins
-
-Here's a list of Neovim plugins I'd like to take a look at integrating in the
-future:
-
-- [undotree](https://github.com/mbbill/undotree)
 
 ### Issues
 
 - [otter.nvim](https://github.com/jmbuhr/otter.nvim) sometimes fails to start
   when I enter a file.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
-  multiple different runners when I press <F5>.
+  multiple different runners when I press `<F5>`.
 
 ## Impermanence Setup
 
