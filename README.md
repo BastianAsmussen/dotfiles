@@ -37,7 +37,7 @@ This is a repository for my NixOS configuration.
       nix-shell -p git --run "git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && cd ~/dotfiles && nix-shell"
       ```
 
-2. Choose a host:
+2. Choose a host.
 
    1. View available host options.
 
