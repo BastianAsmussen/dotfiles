@@ -40,9 +40,7 @@ to find a fix for this.
 I want to be able to use the paste buffer of the client when using Neovim on a 
 server.
 
-### Plugins
-
-### Issues
+### Plugin Issues
 
 - [otter.nvim](https://github.com/jmbuhr/otter.nvim) sometimes fails to start
   when I enter a file.
