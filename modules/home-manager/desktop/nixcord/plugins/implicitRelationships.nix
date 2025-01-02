@@ -1,7 +1,5 @@
 {
-  programs.nixcord.config.plugins.implicitRelationships = {
-    enable = true;
+  enable = true;
 
-    sortByAffinity = true;
-  };
+  sortByAffinity = true;
 }

@@ -1,7 +1,5 @@
 {
-  programs.nixcord.config.plugins.betterNotesBox = {
-    enable = true;
+  enable = true;
 
-    hide = true;
-  };
+  hide = true;
 }

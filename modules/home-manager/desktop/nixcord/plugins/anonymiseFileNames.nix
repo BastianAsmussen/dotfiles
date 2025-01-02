@@ -1,8 +1,6 @@
 {
-  programs.nixcord.config.plugins.anonymiseFileNames = {
-    enable = true;
+  enable = true;
 
-    anonymiseByDefault = false;
-    randomisedLength = 8;
-  };
+  anonymiseByDefault = false;
+  randomisedLength = 8;
 }

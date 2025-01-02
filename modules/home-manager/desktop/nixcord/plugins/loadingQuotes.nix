@@ -1,7 +1,5 @@
 {
-  programs.nixcord.config.plugins.loadingQuotes = {
-    enable = true;
+  enable = true;
 
-    enableDiscordPresetQuotes = true;
-  };
+  enableDiscordPresetQuotes = true;
 }

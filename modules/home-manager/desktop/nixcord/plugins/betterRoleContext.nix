@@ -1,7 +1,5 @@
 {
-  programs.nixcord.config.plugins.betterRoleContext = {
-    enable = true;
+  enable = true;
 
-    roleIconFileFormat = "webp";
-  };
+  roleIconFileFormat = "webp";
 }

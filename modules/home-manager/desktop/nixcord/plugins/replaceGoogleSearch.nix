@@ -1,8 +1,6 @@
 {
-  programs.nixcord.config.plugins.replaceGoogleSearch = {
-    enable = true;
+  enable = true;
 
-    customEngineName = "DuckDuckGo";
-    customEngineURL = "https://duckduckgo.com/?q=";
-  };
+  customEngineName = "DuckDuckGo";
+  customEngineURL = "https://duckduckgo.com/?q=";
 }

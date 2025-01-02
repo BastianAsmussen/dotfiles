@@ -1,22 +1,16 @@
 {
-  imports = [
-    ./anonymiseFileNames.nix
-    ./betterNotesBox.nix
-    ./betterRoleContext.nix
-    ./implicitRelationships.nix
-    ./loadingQuotes.nix
-    ./replaceGoogleSearch.nix
-  ];
-
   programs.nixcord.config.plugins = {
     alwaysAnimate.enable = true;
-    crashHandler.attemptToNavigateToHome = true;
+    anonymiseFileNames = import ./anonymiseFileNames.nix;
     betterGifAltText.enable = true;
     betterGifPicker.enable = true;
+    betterNotesBox = import ./betterNotesBox.nix;
+    betterRoleContext = import ./betterRoleContext.nix;
     callTimer.enable = true;
     clearURLs.enable = true;
     copyEmojiMarkdown.enable = true;
     copyUserURLs.enable = true;
+    crashHandler.attemptToNavigateToHome = true;
     dontRoundMyTimestamps.enable = true;
     fakeNitro.enable = true;
     fixCodeblockGap.enable = true;
@@ -26,12 +20,15 @@
     friendsSince.enable = true;
     gifPaste.enable = true;
     iLoveSpam.enable = true;
+    implicitRelationships = import ./implicitRelationships.nix;
+    loadingQuotes = import ./loadingQuotes.nix;
     memberCount.enable = true;
     messageLogger.enable = true;
     noOnboardingDelay.enable = true;
     permissionsViewer.enable = true;
     reactErrorDecoder.enable = true;
     relationshipNotifier.enable = true;
+    replaceGoogleSearch = import ./replaceGoogleSearch.nix;
     reverseImageSearch.enable = true;
     summaries.enable = true;
     serverInfo.enable = true;
