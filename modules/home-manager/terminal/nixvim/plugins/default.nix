@@ -23,6 +23,7 @@
       gitsigns = import ./gitsigns.nix config;
       hardtime.enable = true;
       indent-blankline.enable = true;
+      lsp-format.enable = true;
       lspkind = import ./lspkind.nix;
       lualine = import ./lualine.nix;
       luasnip = import ./luasnip.nix pkgs;
