@@ -7,6 +7,7 @@
     keymaps = {
       "<C-r>" = "actions.refresh";
       "<leader>qq" = "actions.close";
+      "<C-s>" = false; # Used for writing a buffer.
     };
   };
 }
