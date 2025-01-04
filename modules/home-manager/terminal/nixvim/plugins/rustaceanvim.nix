@@ -34,8 +34,7 @@
         };
 
         inlayHints = {
-          bindingModeHints.enable = true;
-          closureReturnTypeHints.enable = "always";
+          closureReturnTypeHints.enable = "with_block";
           closureStyle = "rust_analyzer";
         };
 
