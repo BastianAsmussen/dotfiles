@@ -26,13 +26,13 @@ This is a repository for my NixOS configuration.
       ```
 
    3. Enter the provided Nix development shell.
-      
+
       ```sh
       nix-shell
       ```
 
    4. Or, as a one-liner.
-      
+
       ```sh
       nix-shell -p git --run "git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && cd ~/dotfiles && nix-shell"
       ```
@@ -67,13 +67,6 @@ This is a repository for my NixOS configuration.
 
 > [!IMPORTANT]
 > Remember to change the password of the user!
-
----
-
-> [!TIP]
-> After installation it may be a requirement to update the [channel](https://nixos.wiki/wiki/Nix_channels)
-> to get `command-not-found` working properly.  
-> To do so, run `sudo nix-channel --update`.
 
 ## Maintenance Guide
 
