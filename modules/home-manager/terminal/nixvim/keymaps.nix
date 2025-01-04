@@ -58,7 +58,7 @@ in {
     })
 
     # Open parent directory in current window.
-    (mapKeyWithOpts "n" "<leader>-" "<cmd>Oil<CR>" {
+    (mapKeyWithOpts "n" "<leader>e" "<cmd>Oil<CR>" {
       desc = "Oil: Open the parent directory.";
     })
 
