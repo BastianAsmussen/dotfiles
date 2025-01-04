@@ -1,4 +1,4 @@
-{
+{lib, ...}: {
   security = {
     auditd.enable = true;
     audit = {
@@ -75,13 +75,11 @@
 
     # Clean audit log if it's more than 512 MiB. It can grow very large in size
     # if left unchecked.
-    services."clean-audit-log" = let
-      mbToBytes = mb: mb * 1024 * 1024;
-    in {
+    services."clean-audit-log" = {
       script = ''
         set -eu
 
-        if [[ $(stat -c "%s" /var/log/audit/audit.log) -gt ${toString (mbToBytes 512)} ]]; then
+        if [[ $(stat -c "%s" /var/log/audit/audit.log) -gt ${toString (lib.custom.units.mibToBytes 512)} ]]; then
           echo "Clearing Audit Log...";
           rm -rfv /var/log/audit/audit.log;
 

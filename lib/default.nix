@@ -3,6 +3,7 @@ lib: let
     callLibs = file: import file {inherit lib;};
   in {
     math = callLibs ./math.nix;
+    units = callLibs ./units.nix;
   });
 in
   custom

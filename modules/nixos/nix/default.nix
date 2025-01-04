@@ -4,14 +4,14 @@
   inputs,
   outputs,
   ...
-}: let
-  mibToBytes = mib: mib * 1024 * 1024;
-in {
+}: {
   imports = [
     ./nh.nix
   ];
 
   nix = let
+    inherit (lib.custom.units) mibToBytes;
+
     flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
   in {
     package = pkgs.lix;
@@ -20,11 +20,14 @@ in {
     registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
     nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
 
+    # Disable channels.
+    channel.enable = false;
+
     settings = {
       experimental-features = [
         "flakes"
         "nix-command"
-        "recursive-nix"
+        "recursive-nix" # Allow derivation builders to call Nix.
         "ca-derivations" # Enable possible early cutoffs during rebuilds.
         "cgroups" # Allow Nix to execute builds inside cgroups.
         "auto-allocate-uids" # Allow Nix to automatically pick UIDs, rather than creating nixbld* user accounts.
@@ -35,7 +38,7 @@ in {
       trusted-users = ["root" "@wheel"];
       http-connections = 32;
       connect-timeout = 5; # Timeout after 5 seconds.
-      stalled-download-timeout = 20; # Retry downloads if no data is recieived for 20 seconds.
+      stalled-download-timeout = 30; # Retry downloads if no data is recieived for 20 seconds.
       cores = 0;
       auto-optimise-store = true;
       builders-use-substitutes = true;
