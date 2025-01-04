@@ -37,7 +37,7 @@ to find a fix for this.
 
 ### SSH
 
-I want to be able to use the paste buffer of the client when using Neovim on a 
+I want to be able to use the paste buffer of the client when using Neovim on a
 server.
 
 ### Plugin Issues
@@ -86,47 +86,17 @@ other people do to harden their systems.
 ## File Structure
 
 I'm not exactly super thrilled about how my dotfiles structure is at the moment,
-so I'd like to look into possibly restructuring it in the future. Some things
-I'd really like to change would be how I separate modules.
+so I'd like to look into possibly restructuring it in the future.
 
-For something like my [NixVim](https://github.com/nix-community/nixvim) module:
-
-```
-modules/home-manager/terminal/nixvim/
-├── plugins/
-│   ├── lualine.nix
-│   └── default.nix
-└── default.nix
-```
-
-In `plugins/`, I enable all one-liners in `default.nix` and put the rest of the
-plugins in separate files, like this:
-
-```nix
-{
-  imports = [
-    ./lualine.nix
-    # ...
-  ];
-
-  programs.nixvim.plugins = {
-    bufferline.enable = true;
-    # ...
-  };
-}
-```
-
-I'm gradually moving away from this setup, but it's still not enough. I'm
-considering a full re-ordering of my structure since I haven't really found a
-good strategy for it yet. Another thing I want to explore is "custom libs," so
-I don't have to import an entire file just to access a single function I defined.
+Some things I'd really like to change would be how I separate modules. The
+setup used in [EmergentMind's dotfiles](https://github.com/EmergentMind/nix-config)
+looks very promising, and appears to cover all my pain points.
 
 ## Secrets Management
 
 I want to use [sops.nix](https://github.com/Mic92/sops-nix) to manage
 repository secrets but my current setup with my GPG keys on my YubiKey doesn't
 seem to really work all too well for that.
-
 
 ## SSH
 
@@ -135,4 +105,3 @@ requiring GPG signing, authentication or encryption. Because my GPG keys are
 stored on my YubiKey I'll need to find a way to forward that key somehow.
 [RemoteForward](https://wiki.gnupg.org/AgentForwarding) looks rather promising
 in that regard.
-
