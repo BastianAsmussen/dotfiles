@@ -1,8 +1,8 @@
 {
   config,
   osConfig,
+  self,
   lib,
-  userInfo,
   pkgs,
   ...
 }: {
@@ -22,7 +22,7 @@
       gitsigns = import ./gitsigns.nix config;
       hardtime.enable = true;
       indent-blankline.enable = true;
-      lsp = import ./lsp {inherit config osConfig lib pkgs userInfo;};
+      lsp = import ./lsp {inherit osConfig self lib pkgs;};
       lsp-format.enable = true;
       lspkind = import ./lspkind.nix;
       lualine = import ./lualine.nix;

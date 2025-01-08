@@ -1,9 +1,8 @@
 {
-  config,
   osConfig,
+  self,
   lib,
   pkgs,
-  userInfo,
 }: {
   enable = true;
 
@@ -19,7 +18,7 @@
     html.enable = true;
     java_language_server.enable = true;
     lua_ls = import ./lua_ls.nix;
-    nixd = import ./nixd.nix {inherit osConfig config lib pkgs userInfo;};
+    nixd = import ./nixd.nix {inherit osConfig self lib pkgs;};
     pylsp.enable = true;
     sqls.enable = true;
     svelte.enable = true;

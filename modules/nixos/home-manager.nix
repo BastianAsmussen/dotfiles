@@ -3,6 +3,7 @@
   config,
   lib,
   userInfo,
+  self,
   ...
 }: let
   inherit (lib) mkEnableOption mkIf;
@@ -15,7 +16,7 @@ in {
 
   config = mkIf config.home-manager.enable {
     home-manager = {
-      extraSpecialArgs = {inherit inputs userInfo;};
+      extraSpecialArgs = {inherit inputs userInfo self;};
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "backup";

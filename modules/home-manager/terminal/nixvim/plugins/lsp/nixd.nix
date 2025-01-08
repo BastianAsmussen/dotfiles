@@ -1,38 +1,22 @@
 {
   osConfig,
-  config,
+  self,
   lib,
   pkgs,
-  userInfo,
 }: {
   enable = true;
 
   settings = let
     inherit (osConfig.networking) hostName;
 
-    flakeExpr =
-      # nix
-      ''
-        (builtins.getFlake "${config.home.homeDirectory}/dotfiles")
-      '';
+    flake = ''(builtins.getFlake "${self}")'';
+    nixosOpts = ''${flake}.nixosConfigurations.${hostName}.options'';
   in {
-    nixpkgs.expr =
-      # nix
-      ''
-        import ${flakeExpr}.inputs.nixpkgs {}
-      '';
+    nixpkgs.expr = ''import ${flake}.inputs.nixpkgs {}'';
     formatting.command = ["${lib.getExe pkgs.alejandra}"];
     options = {
-      nixos.expr =
-        # nix
-        ''
-          ${flakeExpr}.nixosConfigurations.${hostName}.options
-        '';
-      home-manager.expr =
-        # nix
-        ''
-          ${flakeExpr}.homeConfigurations."${userInfo.username}@${hostName}".options
-        '';
+      nixos.expr = nixosOpts;
+      home-manager.expr = ''${nixosOpts}.home-manager.users.type.getSubOptions []'';
     };
   };
 }
