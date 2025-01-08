@@ -34,6 +34,10 @@
       pika-backup
       mpv
       cabal-install
+      mit
+      calculator
+      myip
+      system-size
       todo
     ];
 

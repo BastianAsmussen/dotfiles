@@ -5,7 +5,6 @@
   ...
 }: {
   imports = [
-    ./scripts
     ./nix-index.nix
     ./zoxide.nix
   ];
