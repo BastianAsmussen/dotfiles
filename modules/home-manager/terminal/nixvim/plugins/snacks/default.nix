@@ -1,7 +1,5 @@
 {
-  programs.nixvim.plugins.snacks = {
-    enable = true;
+  enable = true;
 
-    settings.notifier = import ./notifier.nix;
-  };
+  settings.notifier = import ./notifier.nix;
 }

@@ -7,19 +7,16 @@
   ...
 }: {
   imports = [
-    ./snacks
-    ./cmp.nix
-    ./comment.nix
     ./dap.nix
     ./nvim-autopairs.nix
-    ./telescope.nix
-    ./tmux-navigator.nix
   ];
 
   programs.nixvim = {
     plugins = {
+      cmp = import ./cmp.nix;
       crates.enable = true;
       colorizer = import ./colorizer.nix;
+      comment = import ./comment.nix;
       direnv.enable = true;
       fidget.enable = true;
       gitsigns = import ./gitsigns.nix config;
@@ -32,14 +29,19 @@
       luasnip = import ./luasnip.nix pkgs;
       markdown-preview = import ./markdown-preview.nix;
       neocord = import ./neocord.nix config;
+      nix.enable = true;
       noice.enable = true;
       none-ls = import ./none-ls.nix;
       oil = import ./oil.nix;
       otter.enable = true;
       rustaceanvim = import ./rustaceanvim.nix {inherit lib config pkgs;};
       sleuth.enable = true;
+      snacks = import ./snacks;
+      telescope = import ./telescope.nix;
+      tmux-navigator = import ./tmux-navigator.nix;
       treesitter = import ./treesitter.nix pkgs;
       trouble.enable = true;
+      ts-context-commentstring.enable = true;
       typescript-tools.enable = true;
       undotree.enable = true;
       web-devicons.enable = true;
