@@ -76,6 +76,10 @@
     packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
     overlays = import ./overlays {inherit inputs lib;};
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
+    checks = forAllSystems ({pkgs}: {
+      default = pkgs.callPackage ./tests {inherit pkgs lib;};
+    });
+
     devShells = forAllSystems ({pkgs}: {
       default = import ./shell.nix {inherit pkgs;};
     });
