@@ -1,7 +1,5 @@
 {
-  pkgs ?
-  # If 'pkgs' isn't defined, instantiate 'nixpkgs' from locked commit.
-  let
+  pkgs ? let
     lock = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked;
     nixpkgs = fetchTarball {
       url = "https://github.com/NixOS/nixpkgs/archive/${lock.rev}.tar.gz";
