@@ -5,10 +5,23 @@
   inherit (pkgs) runCommandLocal;
   inherit (lib.generators) toPretty;
 
-  fileList = builtins.attrNames (lib.filterAttrs (name: type: name != "default.nix" && type == "regular") (builtins.readDir ./.));
-  testSuites = map (file: pkgs.callPackage ./${file} {inherit lib;}) fileList;
-  mergedTests = lib.foldl (acc: suite: acc // suite) {} testSuites;
+  # Get all entries in the test directory.
+  contents = builtins.readDir ./.;
 
+  # Process each entry - either a single file or a directory.
+  testSuites =
+    lib.mapAttrsToList (
+      name: type:
+        if type == "regular" && name != "default.nix"
+        then pkgs.callPackage ./${name} {inherit lib;}
+        else if type == "directory"
+        then pkgs.callPackage ./${name} {inherit lib;}
+        else {}
+    )
+    contents;
+
+  # Merge all test suites.
+  mergedTests = lib.foldl (acc: suite: acc // suite) {} testSuites;
   results = lib.runTests mergedTests;
 in
   if results == []
