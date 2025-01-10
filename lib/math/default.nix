@@ -57,5 +57,7 @@ _: let
       then 1.0
       else n * fact (n - 1.0);
   };
+
+  trigenometry = import ./trigenometry.nix {inherit base;};
 in
-  base // import ./trigenometry.nix {inherit base;}
+  base // trigenometry
