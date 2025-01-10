@@ -1,11 +1,9 @@
-{lib}: let
-  inherit (lib.custom.math) abs max mod pow sin cos TAU PI HALF_PI sqrt;
-
-  # Helper for comparing floating point numbers with small margin of error.
-  isClose = a: b: let
-    tol = 1.0e-4;
-  in
-    abs (a - b) < tol || abs (a - b) / max (abs a) (abs b) < tol;
+{
+  lib,
+  helpers,
+}: let
+  inherit (lib.custom.math) sqrt pow sin cos TAU PI HALF_PI;
+  inherit (helpers) isClose;
 
   # Common angles for more readable tests.
   angle30 = PI / 6;
@@ -18,60 +16,6 @@
   sqrt2 = sqrt 2 {};
   sqrt3 = sqrt 3 {};
 in {
-  # Modulo Tests.
-  testMod = {
-    expr = mod 10 2;
-    expected = 0;
-  };
-
-  testModWithNegative = {
-    expr = mod (-10) 3;
-    expected = -1;
-  };
-
-  testModWithLargeNumbers = {
-    expr = mod 1000000 7;
-    expected = 1;
-  };
-
-  ### POWER TESTS ###
-  testPowWithExp0 = {
-    expr = pow 2 0;
-    expected = 1;
-  };
-
-  testPowWithExp1 = {
-    expr = pow 5 1;
-    expected = 5;
-  };
-
-  testPowWithExp2 = {
-    expr = pow 3 2;
-    expected = 9;
-  };
-
-  testPowWithNegativeBase = {
-    expr = pow (-2) 3;
-    expected = -8;
-  };
-
-  testPowWithLargeExp = {
-    expr = pow 2 10;
-    expected = 1024;
-  };
-
-  testPowWith1AsBase = {
-    expr = pow 1 1000;
-    expected = 1;
-  };
-
-  testPowWith0AsBase = {
-    expr = pow 0 5;
-    expected = 0;
-  };
-
-  # Sine Tests.
-
   # Critical angles.
   testSinZero = {
     expr = isClose (sin 0) 0.0;
