@@ -1,6 +1,6 @@
-_: let
+{lib}: let
   base = rec {
-    inherit (builtins) floor;
+    inherit (builtins) floor ciel;
 
     HALF_PI = 1.5707963267948965579989817342720925807952880859375;
     PI = 3.141592653589793115997963468544185161590576171875;
@@ -58,6 +58,7 @@ _: let
       else n * fact (n - 1.0);
   };
 
+  random = import ./random.nix {inherit base lib;};
   trigenometry = import ./trigenometry.nix {inherit base;};
 in
-  base // trigenometry
+  base // random // trigenometry
