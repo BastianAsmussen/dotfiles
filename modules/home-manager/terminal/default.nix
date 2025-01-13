@@ -1,6 +1,5 @@
 {
   imports = [
-    ./lf
     ./nixvim
     ./tmux
     ./zsh
