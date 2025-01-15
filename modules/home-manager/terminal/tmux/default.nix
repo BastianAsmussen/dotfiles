@@ -15,7 +15,7 @@
     popup_width=$((raw_width > 100 ? 100 : raw_width * 80 / 100))
     popup_height=$((raw_height > 50 ? 50 : raw_height * 80 / 100))
 
-    ${tmux} display-popup -E -h $popup_height -w $popup_width -T 'tmux Sessionizer' '${tms}'
+    ${tmux} display-popup -E -h $popup_height -w $popup_width -T 'Choose Project' '${tms}'
   '';
 in {
   imports = [
