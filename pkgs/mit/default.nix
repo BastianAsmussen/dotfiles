@@ -35,14 +35,18 @@ in
 
         if [ $exit_code -gt 0 ]; then
             # Restore the original file.
-            mv $backup_file $argc_file
+            if [ -f "$backup_file" ]; then
+              mv $backup_file $argc_file
+            fi
 
             echo "Failed to write to $argc_file!"
             exit $exit_code
         fi
 
         # Remove backup file.
-        rm $backup_file
+        if [ -f "$backup_file" ]; then
+          rm $backup_file
+        fi
 
         echo "Wrote MIT license to $argc_file."
     }
