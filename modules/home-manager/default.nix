@@ -22,6 +22,8 @@
     homeDirectory = "/home/${userInfo.username}";
 
     packages = with pkgs; [
+      man-pages
+      man-pages-posix
       qbittorrent
       gitui
       wget
