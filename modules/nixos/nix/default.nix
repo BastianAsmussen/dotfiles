@@ -56,6 +56,9 @@
       # Always build in a sandbox.
       sandbox = true;
       sandbox-fallback = false;
+
+      # Disable the global registry.
+      flake-registry = "";
     };
   };
 
