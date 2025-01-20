@@ -10,4 +10,9 @@ in {
     expr = mibToBytes 0;
     expected = 0;
   };
+
+  testNegativeMib = {
+    expr = mibToBytes (-1024);
+    expected = -1073741824;
+  };
 }
