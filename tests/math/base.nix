@@ -1,5 +1,5 @@
 {lib}: let
-  inherit (lib.custom.math) mod pow;
+  inherit (lib.custom.math) mod isEven isOdd pow;
 in {
   # Modulo Tests.
   testMod = {
@@ -15,6 +15,26 @@ in {
   testModWithLargeNumbers = {
     expr = mod 1000000 7;
     expected = 1;
+  };
+
+  testIsEvenEight = {
+    expr = isEven 8;
+    expected = true;
+  };
+
+  testIsEvenFive = {
+    expr = isEven 5;
+    expected = false;
+  };
+
+  testIsOddThree = {
+    expr = isOdd 3;
+    expected = true;
+  };
+
+  testIsOddTen = {
+    expr = isOdd 10;
+    expected = false;
   };
 
   # Exponentiation Tests.

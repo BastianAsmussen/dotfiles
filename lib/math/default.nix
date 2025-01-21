@@ -14,6 +14,9 @@
     in
       a - (n * quotient);
 
+    isEven = n: mod n 2 == 0;
+    isOdd = n: !isEven n;
+
     max = a: b:
       if a > b
       then a
@@ -58,7 +61,7 @@
       else n * fact (n - 1.0);
   };
 
-  crypto = import ./crypto.nix {inherit base;};
+  crypto = import ./crypto.nix {inherit base lib;};
   random = import ./random.nix {inherit base lib;};
   trigenometry = import ./trigenometry.nix {inherit base;};
 in
