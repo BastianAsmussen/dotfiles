@@ -43,7 +43,6 @@
     self,
     ...
   } @ inputs: let
-    inherit (builtins) attrNames readDir listToAttrs;
     inherit (self) outputs;
 
     systems = [
@@ -54,7 +53,7 @@
       "x86_64-darwin"
     ];
 
-    hosts = attrNames (readDir ./hosts);
+    hosts = builtins.attrNames (builtins.readDir ./hosts);
     forAllSystems = fn:
       nixpkgs.lib.genAttrs systems
       (system:
@@ -84,7 +83,7 @@
       default = import ./shell.nix {inherit pkgs;};
     });
 
-    nixosConfigurations = listToAttrs (map (hostname: {
+    nixosConfigurations = builtins.listToAttrs (map (hostname: {
         name = hostname;
         value = nixpkgs.lib.nixosSystem {
           specialArgs = {inherit inputs outputs userInfo lib self;};

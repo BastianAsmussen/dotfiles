@@ -6,11 +6,11 @@
     image = ../../assets/wallpapers/tokyo.png;
     polarity = "dark";
     cursor = {
-      package = pkgs.stable.bibata-cursors;
+      package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";
     };
 
-    fonts = with pkgs; {
+    fonts = {
       sizes = {
         applications = 12;
         terminal = 14;
@@ -19,17 +19,17 @@
       };
 
       monospace = {
-        package = nerd-fonts.jetbrains-mono;
+        package = pkgs.nerd-fonts.jetbrains-mono;
         name = "JetBrainsMono Nerd Font";
       };
 
       sansSerif = {
-        package = dejavu_fonts;
+        package = pkgs.dejavu_fonts;
         name = "DejaVu Sans";
       };
 
       serif = {
-        package = dejavu_fonts;
+        package = pkgs.dejavu_fonts;
         name = "DejaVu Serif";
       };
     };
