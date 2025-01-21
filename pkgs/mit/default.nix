@@ -11,8 +11,8 @@ in
     # return the exit code of the failed command.
     # @meta version 0.1.0
     # @meta author Bastian Asmussen <bastian@asmussen.tech>
-    # @flag -F --force Overwrite an existing LICENSE file.
-    # @option -f --file=LICENSE <FILE> The file to write to.
+    # @flag -F --force Overwrite an existing LICENSE file
+    # @option -f --file=LICENSE <FILE> The file to write to
 
     main() {
         backup_file="LICENSE.bak"
