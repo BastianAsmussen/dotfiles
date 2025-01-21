@@ -1,8 +1,5 @@
-{
-  pkgs,
-  lib,
-}:
+{pkgs}:
 pkgs.writeShellScriptBin "myip" ''
-  ${lib.getExe pkgs.curl} -s ifconfig.me \
+  curl -s ifconfig.me \
     && echo ""
 ''
