@@ -58,7 +58,8 @@
       else n * fact (n - 1.0);
   };
 
+  crypto = import ./crypto.nix {inherit base;};
   random = import ./random.nix {inherit base lib;};
   trigenometry = import ./trigenometry.nix {inherit base;};
 in
-  base // random // trigenometry
+  base // crypto // random // trigenometry

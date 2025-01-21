@@ -15,7 +15,8 @@
   };
 
   base = import ./base.nix {inherit lib;};
+  crypto = import ./crypto.nix {inherit lib;};
   random = import ./random.nix {inherit lib helpers;};
   trigenometry = import ./trigenometry.nix {inherit lib helpers;};
 in
-  base // random // trigenometry
+  base // crypto // random // trigenometry
