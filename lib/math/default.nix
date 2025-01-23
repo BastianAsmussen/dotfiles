@@ -36,7 +36,7 @@
       then 1.0
       else base * pow base (exp - 1.0);
 
-    newtonSqrt = n: x: precision: iteration: maxIterations: let
+    sqrt' = n: x: precision: iteration: maxIterations: let
       next = (x + (n / x)) / 2.0;
       diff = abs (next - x);
     in
@@ -44,16 +44,16 @@
       then next
       else if diff < precision
       then next
-      else newtonSqrt n next precision (iteration + 1.0) maxIterations;
-    sqrt = n: {
-      precision ? 0.000001,
-      maxIterations ? 100.0,
-    }:
+      else sqrt' n next precision (iteration + 1) maxIterations;
+    sqrt = n: let
+      precision = 0.000001;
+      maxIterations = 100;
+    in
       if n < 0.0
       then throw "Cannot calculate square root of negative number!"
       else if n == 0.0
       then 0.0
-      else newtonSqrt n (max 1.0 (n / 2.0)) precision 0.0 maxIterations;
+      else sqrt' n (max 1.0 (n / 2.0)) precision 0 maxIterations;
 
     fact = n:
       if n <= 1.0

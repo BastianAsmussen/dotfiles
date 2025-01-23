@@ -13,8 +13,8 @@
   angle180 = PI;
   angle360 = TAU;
 
-  sqrt2 = sqrt 2 {};
-  sqrt3 = sqrt 3 {};
+  sqrt2 = sqrt 2;
+  sqrt3 = sqrt 3;
 in {
   # Critical angles.
   testSinZero = {
