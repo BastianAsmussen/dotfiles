@@ -6,10 +6,14 @@
 in
   pkgs.writeShellScriptBin "mit" ''
     # @describe Generate an MIT license file.
+    # The script will populate the license with the current user's name and the
+    # current year. The user's name is retrieved from the system and used in the
+    # license file, while the year is set to the current year.
     #
     # If any part of the script fails, the script will immediately terminate and
     # return the exit code of the failed command.
-    # @meta version 0.1.0
+    #
+    # @meta version 0.1.1
     # @meta author Bastian Asmussen <bastian@asmussen.tech>
     # @flag -F --force Overwrite an existing LICENSE file
     # @option -f --file=LICENSE <FILE> The file to write to
