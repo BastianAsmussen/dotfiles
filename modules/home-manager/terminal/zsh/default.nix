@@ -63,6 +63,9 @@
       cp = "cp -r";
       rm = "rm -r";
       mkdir = "mkdir -p";
+
+      myip = "curl -s ifconfig.me -w '\n'";
+      system-size = "nix path-info -Sh /run/current-system | tail -1 | awk '{ print $2, $3 }'";
     };
 
     oh-my-zsh = {

@@ -38,8 +38,7 @@
       cabal-install
       mit
       calculator
-      myip
-      system-size
+      copy-file
       todo
     ];
 

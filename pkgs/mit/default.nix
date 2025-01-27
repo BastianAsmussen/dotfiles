@@ -18,7 +18,7 @@ in
     # @flag -F --force Overwrite an existing LICENSE file
     # @option -f --file=LICENSE <FILE> The file to write to
 
-    main() {
+    function main {
         backup_file="LICENSE.bak"
         if [ -f "$argc_file" ]; then
             if [ ! $argc_force ]; then
@@ -40,9 +40,9 @@ in
           -e "s/\[year\]/$current_year/g" \
           -e "s/\[fullname\]/$full_name/g" \
           $argc_file
-        exit_code=$?
 
-        if [ $exit_code -gt 0 ]; then
+        local exit_code=$?
+        if [ "$exit_code" -gt 0 ]; then
             # Restore the original file.
             if [ -f "$backup_file" ]; then
               mv $backup_file $argc_file

@@ -10,7 +10,6 @@
 }: {
   mit = pkgs.callPackage ./mit {};
   calculator = pkgs.callPackage ./calculator.nix {};
-  myip = pkgs.callPackage ./myip.nix {};
-  system-size = pkgs.callPackage ./system-size.nix {};
+  copy-file = pkgs.callPackage ./copy-file.nix {};
   todo = pkgs.callPackage ./todo.nix {};
 }
