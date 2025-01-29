@@ -72,13 +72,14 @@
       icon = ./assets/icons/bastian.png;
     };
   in {
-    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
     overlays = import ./overlays {inherit inputs lib;};
+    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
     checks = forAllSystems ({pkgs}: {
       default = pkgs.callPackage ./tests {inherit pkgs lib;};
     });
 
+    templates = import ./templates;
     devShells = forAllSystems ({pkgs}: {
       default = import ./shell.nix {inherit pkgs;};
     });

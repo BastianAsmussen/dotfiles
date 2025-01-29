@@ -7,6 +7,7 @@ This is a repository for my NixOS configuration.
 - [Installation Guide](#installation-guide)
 - [Maintenance Guide](#maintenance-guide)
 - [To-Do Tracking](#to-do-tracking)
+- [Development Templates](#development-templates)
 
 ## Installation Guide
 
@@ -88,3 +89,29 @@ setup in a file called [TODO.md](./TODO.md).
 If you have suggestions or notice something that could be improved, feel free
 to open a pull request. I'll review and consider integrating your
 contributions.
+
+## Development Templates
+
+You can use this flake for development environment templates.
+
+### List Templates
+
+```sh
+nix shell nixpkgs#jq --command sh "nix flake show self --all-systems --json | jq .templates"
+```
+
+### Use Template
+
+> [!NOTE]
+> Because we override the [Nix registry](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-registry#description)
+> [here](./modules/nixos/nix/default.nix), we can simply use the `self` registry
+> entry which references this flake.
+
+### Rust Example
+
+```sh
+mkdir ~/Projects/example
+cd ~/Projects/example
+
+nix flake init -t self#rust
+```

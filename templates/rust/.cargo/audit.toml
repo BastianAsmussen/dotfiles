@@ -1,0 +1,4 @@
+# Doesn't work in the sandbox.
+[yanked]
+enabled = false      # Don't warn for yanked crates in Cargo.lock.
+update_index = false # Don't auto-update the crates.io index.

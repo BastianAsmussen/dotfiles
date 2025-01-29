@@ -6,7 +6,7 @@ around problems.
 
 ## Table of Contents
 
-- [Developer Environments](#developer-environments)
+- [Development Environments](#development-environments)
 - [Neovim](#neovim)
 - [Impermanence Setup](#impermanence-setup)
 - [AGS Migration](#ags-migration)
@@ -15,23 +15,18 @@ around problems.
 - [Secrets Management](#secrets-management)
 - [SSH](#ssh)
 
-## Developer Environments
+## Development Environments
 
-I want a proper way to handle ephemeral developer environments. Right now I'm
-using [devenv](./modules/home-manager/terminal/direnv.nix), but it feels a bit
-like cheating; what I'd really like is to add templates to my flake.
+I've started using [Nix Flake Templates](https://nix.dev/manual/nix/2.24/command-ref/new-cli/nix3-flake-init.html#description)
+to handle development environments and it seems pretty good! Now I'll just have
+to implement a template for each language I use, which, as of now consists of:
 
-### Inspiration
-
-I've seen a repository called
-[nix-templates](https://github.com/MordragT/nix-templates) which might be
-pretty useful. Perhaps it could be a flake input?
-
-### Distrobox
-
-I'm also using [Distrobox](https://distrobox.it) for generic Linux environments.
-Package installs sometimes don't work as expected due to FHS issues. I'll need
-to find a fix for this.
+- [x] Rust
+- [ ] Go
+- [ ] C#
+- [ ] Haskell
+- [ ] C
+- [ ] Python
 
 ## Neovim
 
