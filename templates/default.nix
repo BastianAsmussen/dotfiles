@@ -1,5 +1,19 @@
 rec {
   default = rust;
+  python = {
+    path = ./python;
+    description = "Basic Python development environment.";
+    welcomeText = ''
+      # Python Project Template
+
+      ## Notes
+
+      This isn't a final version, I'd like to integrate stuff like `flake-utils`
+      and other utilities. Not to mention testing through `nix flake check` and
+      running through `nix run`.
+    '';
+  };
+
   rust = {
     path = ./rust;
     description = "Standard Rust development environment.";
