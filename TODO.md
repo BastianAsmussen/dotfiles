@@ -14,6 +14,7 @@ around problems.
 - [File Structure](#file-structure)
 - [Secrets Management](#secrets-management)
 - [SSH](#ssh)
+- [CI](#ci)
 
 ## Development Environments
 
@@ -100,3 +101,7 @@ requiring GPG signing, authentication or encryption. Because my GPG keys are
 stored on my YubiKey I'll need to find a way to forward that key somehow.
 [RemoteForward](https://wiki.gnupg.org/AgentForwarding) looks rather promising
 in that regard.
+
+## CI
+
+Look into making `nix flake check` run the entire lint suite, too.
