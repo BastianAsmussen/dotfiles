@@ -97,7 +97,7 @@ You can use this flake for development environment templates.
 ### List Templates
 
 ```sh
-nix shell nixpkgs#jq --command sh "nix flake show self --all-systems --json | jq .templates"
+nix-shell -p jq --run "nix flake show self --all-systems --json | jq .templates"
 ```
 
 ### Use Template
