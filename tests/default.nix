@@ -12,9 +12,7 @@
   testSuites =
     lib.mapAttrsToList (
       name: type:
-        if type == "regular" && name != "default.nix"
-        then pkgs.callPackage ./${name} {inherit lib;}
-        else if type == "directory"
+        if type == "directory" || (type == "regular" && name != "default.nix")
         then pkgs.callPackage ./${name} {inherit lib;}
         else {}
     )
