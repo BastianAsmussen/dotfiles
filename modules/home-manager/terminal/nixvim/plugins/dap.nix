@@ -1,38 +1,8 @@
 {pkgs, ...}: {
   programs.nixvim = {
     plugins = {
-      cmp-dap.enable = true;
       dap = {
         enable = true;
-
-        extensions = {
-          dap-ui = {
-            enable = true;
-
-            floating.mappings.close = ["<ESC>" "q"];
-            icons = {
-              expanded = "▾";
-              collapsed = "▸";
-              current_frame = "*";
-            };
-
-            controls = {
-              icons = {
-                pause = "⏸";
-                play = "▶";
-                step_into = "⏎";
-                step_over = "⏭";
-                step_out = "⏮";
-                step_back = "b";
-                run_last = "▶▶";
-                terminate = "⏹";
-                disconnect = "⏏";
-              };
-            };
-          };
-
-          dap-virtual-text.enable = true;
-        };
 
         signs = {
           dapBreakpoint = {
@@ -53,6 +23,36 @@
 
         adapters.executables.lldb.command = "${pkgs.lldb}/bin/lldb-dap";
       };
+
+      dap-ui = {
+        enable = true;
+
+        settings = {
+          floating.mappings.close = ["<ESC>" "q"];
+          icons = {
+            expanded = "▾";
+            collapsed = "▸";
+            current_frame = "*";
+          };
+
+          controls = {
+            icons = {
+              pause = "⏸";
+              play = "▶";
+              step_into = "⏎";
+              step_over = "⏭";
+              step_out = "⏮";
+              step_back = "b";
+              run_last = "▶▶";
+              terminate = "⏹";
+              disconnect = "⏏";
+            };
+          };
+        };
+      };
+
+      dap-virtual-text.enable = true;
+      cmp-dap.enable = true;
     };
 
     extraConfigLua =
