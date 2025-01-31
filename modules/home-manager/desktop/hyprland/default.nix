@@ -39,6 +39,7 @@ in {
       enable = true;
 
       inherit (osConfig.programs.hyprland) package;
+
       xwayland.enable = true;
       systemd.enableXdgAutostart = true;
       settings = {
@@ -273,11 +274,10 @@ in {
             };
           };
         };
-      };
 
-      extraConfig = ''
-        xwayland:force_zero_scaling = true
-      '';
+        ecosystem.no_donation_nag = true;
+        xwayland.force_zero_scaling = true;
+      };
     };
   };
 }
