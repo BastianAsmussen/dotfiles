@@ -40,6 +40,7 @@
       calculator
       copy-file
       todo
+      libreoffice-fresh
     ];
 
     stateVersion = "24.05";
