@@ -11,7 +11,7 @@
 
   keyDir = ../../../keys;
   # Function to get all key names in the specified directory.
-  getAllKeys = keyDir: attrNames (readDir keyDir);
+  getAllKeys = keyDir: builtins.filter (x: lib.strings.hasSuffix ".asc" x) (attrNames (readDir keyDir));
   # Function to check if a key is in the disallowed list.
   isKeyAllowed = keyName: disallowedKeys: !elem keyName disallowedKeys;
   # Function to filter out disallowed keys from the list of all keys.

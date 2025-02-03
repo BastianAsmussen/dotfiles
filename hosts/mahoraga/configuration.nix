@@ -4,6 +4,7 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
+    ./distributed-builds.nix
 
     hardware.common-cpu-intel
     hardware.common-gpu-intel
