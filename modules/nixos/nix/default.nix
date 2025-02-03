@@ -52,6 +52,7 @@
         http-connections = 32;
         connect-timeout = 5; # Timeout after 5 seconds.
         stalled-download-timeout = 30; # Retry downloads if no data is recieived for 20 seconds.
+        max-jobs = "auto";
         cores = 0;
         auto-optimise-store = true;
         builders-use-substitutes = true;
@@ -119,6 +120,7 @@
         isNormalUser = true;
         createHome = false;
         group = "builder";
+        hashedPassword = "*";
 
         openssh.authorizedKeys.keyFiles = [../../../keys/builder.pub];
       };
