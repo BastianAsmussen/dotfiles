@@ -7,6 +7,7 @@
   inherit (lib) mkEnableOption mkIf;
 in {
   options.nvidia.enable = mkEnableOption "Enables NVIDIA drivers.";
+
   config = mkIf config.nvidia.enable {
     hardware = {
       nvidia = {
