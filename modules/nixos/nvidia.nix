@@ -11,7 +11,7 @@ in {
   config = mkIf config.nvidia.enable {
     hardware = {
       nvidia = {
-        package = config.boot.kernelPackages.nvidiaPackages.production;
+        package = config.boot.kernelPackages.nvidiaPackages.beta;
 
         modesetting.enable = true;
         powerManagement = {

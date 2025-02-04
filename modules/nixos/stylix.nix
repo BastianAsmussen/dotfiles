@@ -33,5 +33,7 @@
         name = "DejaVu Serif";
       };
     };
+
+    targets.qt.platform = "qtct";
   };
 }
