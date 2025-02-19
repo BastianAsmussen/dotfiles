@@ -19,6 +19,7 @@ in {
       gamemode.enable = true;
     };
 
+    users.extraGroups.gamemode.members = [userInfo.username];
     environment = {
       systemPackages = with pkgs; [
         protonup
