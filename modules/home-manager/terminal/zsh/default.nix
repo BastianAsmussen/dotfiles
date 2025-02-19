@@ -53,6 +53,11 @@
 
         # Extra completions.
         source <(${lib.getExe pkgs.todo} completion zsh)
+
+        # Automatic tmux session through SSH.
+        if [[ $- =~ i ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then
+          ${lib.getExe pkgs.tmux} new -As ssh
+        fi
       '';
 
     shellAliases = {
