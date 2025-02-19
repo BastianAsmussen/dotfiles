@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   stylix = {
     enable = true;
 
@@ -34,6 +38,6 @@
       };
     };
 
-    targets.qt.platform = "qtct";
+    targets.qt.platform = lib.mkForce "qtct";
   };
 }

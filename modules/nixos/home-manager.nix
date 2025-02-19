@@ -2,6 +2,7 @@
   inputs,
   config,
   lib,
+  pkgs,
   userInfo,
   self,
   ...
@@ -16,8 +17,7 @@ in {
 
   config = mkIf config.home-manager.enable {
     home-manager = {
-      extraSpecialArgs = {inherit inputs userInfo self;};
-      useGlobalPkgs = true;
+      extraSpecialArgs = {inherit inputs pkgs userInfo self;};
       useUserPackages = true;
       backupFileExtension = "backup";
       users.${userInfo.username} = import ../home-manager;
