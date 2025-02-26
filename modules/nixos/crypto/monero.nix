@@ -60,13 +60,13 @@ in {
           cuda = false;
           cpu = {
             enabled = true;
-            max-threads-hint = cfg.maxUsagePercentage;
+            max-threads-hint = cfg.mining.maxUsagePercentage;
           };
 
           pools = [
             {
-              url = cfg.pool;
-              user = cfg.wallet;
+              url = cfg.mining.pool;
+              user = cfg.mining.wallet;
               keepalive = true;
               tls = true;
             }
