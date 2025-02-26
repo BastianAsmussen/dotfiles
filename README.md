@@ -82,6 +82,24 @@ This is a repository for my NixOS configuration.
 > previous version.  
 > Running `git restore flake.lock` should be sufficient.
 
+### Rename Host
+
+1. Move the host directory, e.g. `lambda` -> `epsilon`.
+
+   ```sh
+   mv hosts/lambda hosts/epsilon
+   ```
+
+2. Switch to new configuration.
+
+   ```sh
+   nh os switch -H epsilon
+   ```
+
+> [!WARNING]
+> The hostname won't update automatically!  
+> To update the hostname, either reboot the computer, or restart the current session.
+
 ## To-Do Tracking
 
 I track stuff I need to get done and stuff that annoys me about my current
