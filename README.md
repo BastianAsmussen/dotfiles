@@ -46,10 +46,10 @@ This is a repository for my NixOS configuration.
       HOSTNAME=$(ls ~/dotfiles/hosts | fzf)
       ```
 
-   2. Set manually, e.g. `limitless`.
+   2. Set manually, e.g. `lambda`.
 
       ```sh
-      HOSTNAME=limitless
+      HOSTNAME=lambda
       ```
 
 3. Set up the disk configuration.
@@ -103,8 +103,7 @@ nix-shell -p jq --run "nix flake show self --all-systems --json | jq .templates"
 ### Use Template
 
 > [!NOTE]
-> Because we override the [Nix registry](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-registry#description)
-> [here](./modules/nixos/nix/default.nix), we can simply use the `self` registry
+> Because we override the [Nix registry](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-registry#description) > [here](./modules/nixos/nix/default.nix), we can simply use the `self` registry
 > entry which references this flake.
 
 ### Rust Example
