@@ -7,11 +7,6 @@
     docker = prev.docker.override {
       initSupport = true;
     };
-
-    # Temporary solution to nixpkgs issue #380196.
-    lldb = prev.lldb.overrideAttrs {
-      dontCheckForBrokenSymlinks = true;
-    };
   };
 
   # Custom nixpkgs fork.
