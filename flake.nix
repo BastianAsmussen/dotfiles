@@ -11,6 +11,7 @@
     ags.url = "github:Aylur/ags/v1";
     nixcord.url = "github:kaylorben/nixcord";
     schizofox.url = "github:schizofox/schizofox";
+    airtame.url = "github:BastianAsmussen/nixpkgs/create-airtame";
 
     disko = {
       url = "github:nix-community/disko";

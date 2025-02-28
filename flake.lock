@@ -20,6 +20,22 @@
         "type": "github"
       }
     },
+    "airtame": {
+      "locked": {
+        "lastModified": 1740728289,
+        "narHash": "sha256-NInNp5iVh95nPwGxAqNQdNo3nXsHE4B3aQrlhshLi38=",
+        "owner": "BastianAsmussen",
+        "repo": "nixpkgs",
+        "rev": "e0eaefa7f609906e250f5786b589aba375c88fd6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BastianAsmussen",
+        "ref": "create-airtame",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "aquamarine": {
       "inputs": {
         "hyprutils": [
@@ -1149,6 +1165,7 @@
     "root": {
       "inputs": {
         "ags": "ags",
+        "airtame": "airtame",
         "disko": "disko",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
