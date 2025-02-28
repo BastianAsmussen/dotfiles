@@ -20,22 +20,6 @@
         "type": "github"
       }
     },
-    "airtame": {
-      "locked": {
-        "lastModified": 1740728289,
-        "narHash": "sha256-NInNp5iVh95nPwGxAqNQdNo3nXsHE4B3aQrlhshLi38=",
-        "owner": "BastianAsmussen",
-        "repo": "nixpkgs",
-        "rev": "e0eaefa7f609906e250f5786b589aba375c88fd6",
-        "type": "github"
-      },
-      "original": {
-        "owner": "BastianAsmussen",
-        "ref": "create-airtame",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "aquamarine": {
       "inputs": {
         "hyprutils": [
@@ -947,6 +931,21 @@
         "type": "github"
       }
     },
+    "nixpkgs-custom": {
+      "locked": {
+        "lastModified": 1740729284,
+        "narHash": "sha256-c9m8O+TxnM7HoNE1k1fY4g/civC2Ll4NsnERLc6t7OE=",
+        "owner": "BastianAsmussen",
+        "repo": "nixpkgs",
+        "rev": "eec494f255ed76e75751272842df9ea57ae006dd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BastianAsmussen",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1735774519,
@@ -1165,7 +1164,6 @@
     "root": {
       "inputs": {
         "ags": "ags",
-        "airtame": "airtame",
         "disko": "disko",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
@@ -1173,6 +1171,7 @@
         "nixcord": "nixcord",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_5",
+        "nixpkgs-custom": "nixpkgs-custom",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
         "schizofox": "schizofox",

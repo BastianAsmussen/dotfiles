@@ -14,6 +14,15 @@
     };
   };
 
+  # Custom nixpkgs fork.
+  custom = final: _: {
+    custom = import inputs.nixpkgs-custom {
+      inherit (final) system;
+
+      config.allowUnfree = true;
+    };
+  };
+
   # Convenient access to the nixpkgs stable branch.
   stable-packages = final: _: {
     stable = import inputs.nixpkgs-stable {

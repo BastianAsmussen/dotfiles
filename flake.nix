@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs-custom.url = "github:BastianAsmussen/nixpkgs";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     stylix.url = "github:danth/stylix";
@@ -11,7 +12,6 @@
     ags.url = "github:Aylur/ags/v1";
     nixcord.url = "github:kaylorben/nixcord";
     schizofox.url = "github:schizofox/schizofox";
-    airtame.url = "github:BastianAsmussen/nixpkgs/create-airtame";
 
     disko = {
       url = "github:nix-community/disko";

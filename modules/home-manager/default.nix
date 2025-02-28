@@ -1,7 +1,6 @@
 {
   userInfo,
   pkgs,
-  inputs,
   ...
 }: {
   imports = [
@@ -22,13 +21,7 @@
     inherit (userInfo) username;
     homeDirectory = "/home/${userInfo.username}";
 
-    packages = with pkgs; let
-      airtamePkgs = import inputs.airtame {
-        inherit (pkgs) system;
-
-        config.allowUnfree = true;
-      };
-    in [
+    packages = with pkgs; [
       man-pages
       man-pages-posix
       qbittorrent
@@ -48,7 +41,7 @@
       copy-file
       todo
       libreoffice-fresh
-      airtamePkgs.airtame
+      custom.airtame
     ];
 
     stateVersion = "24.05";
