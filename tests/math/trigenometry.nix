@@ -2,7 +2,7 @@
   lib,
   helpers,
 }: let
-  inherit (lib.custom.math) sqrt pow sin cos TAU PI HALF_PI;
+  inherit (lib.custom.math) sqrt pow sin cos tan TAU PI HALF_PI;
   inherit (helpers) isClose;
 
   # Common angles for more readable tests.
@@ -11,6 +11,7 @@
   angle60 = PI / 3;
   angle90 = HALF_PI;
   angle180 = PI;
+  angle270 = 3 * HALF_PI;
   angle360 = TAU;
 
   sqrt2 = sqrt 2;
@@ -33,7 +34,7 @@ in {
   };
 
   testSin3HalfPi = {
-    expr = isClose (sin (3 * angle90)) (-1.0);
+    expr = isClose (sin angle270) (-1.0);
     expected = true;
   };
 
@@ -77,7 +78,7 @@ in {
   };
 
   testCos3HalfPi = {
-    expr = isClose (cos (3 * angle90)) 0.0;
+    expr = isClose (cos angle270) 0.0;
     expected = true;
   };
 
@@ -99,6 +100,50 @@ in {
 
   testCos60Deg = {
     expr = isClose (cos angle60) 0.5;
+    expected = true;
+  };
+
+  # Tangent Tests.
+
+  # Critical angles.
+  testTanZero = {
+    expr = isClose (tan 0) 0.0;
+    expected = true;
+  };
+
+  testTanHalfPi = {
+    expr = (builtins.tryEval (tan angle90)).success;
+    expected = false;
+  };
+
+  testTanPi = {
+    expr = isClose (tan angle180) 0.0;
+    expected = true;
+  };
+
+  testTan3HalfPi = {
+    expr = (builtins.tryEval (tan angle270)).success;
+    expected = false;
+  };
+
+  testTanTau = {
+    expr = isClose (tan angle360) 0.0;
+    expected = true;
+  };
+
+  # Common angles with exact values.
+  testTan30Deg = {
+    expr = isClose (tan angle30) 0.5773;
+    expected = true;
+  };
+
+  testTan45Deg = {
+    expr = isClose (tan angle45) 1.0;
+    expected = true;
+  };
+
+  testTan60Deg = {
+    expr = isClose (tan angle60) 1.7321;
     expected = true;
   };
 

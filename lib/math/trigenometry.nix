@@ -50,4 +50,10 @@ in rec {
     else -computeCos norm.offset;
 
   cos = x: sin (x + HALF_PI);
+  tan = x: let
+    cosX = cos x;
+  in
+    if cosX == 0.0
+    then (throw "`cos x` cannot equal 0!")
+    else (sin x) / cosX;
 }
