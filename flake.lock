@@ -931,7 +931,7 @@
         "type": "github"
       }
     },
-    "nixpkgs-custom": {
+    "nixpkgs-fork": {
       "locked": {
         "lastModified": 1740729284,
         "narHash": "sha256-c9m8O+TxnM7HoNE1k1fY4g/civC2Ll4NsnERLc6t7OE=",
@@ -1171,7 +1171,7 @@
         "nixcord": "nixcord",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_5",
-        "nixpkgs-custom": "nixpkgs-custom",
+        "nixpkgs-fork": "nixpkgs-fork",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
         "schizofox": "schizofox",

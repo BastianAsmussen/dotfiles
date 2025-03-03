@@ -10,8 +10,8 @@
   };
 
   # Custom nixpkgs fork.
-  custom = final: _: {
-    custom = import inputs.nixpkgs-custom {
+  fork = final: _: {
+    fork = import inputs.nixpkgs-fork {
       inherit (final) system;
 
       config.allowUnfree = true;
