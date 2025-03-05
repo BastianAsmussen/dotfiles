@@ -41,7 +41,7 @@
       copy-file
       todo
       libreoffice-fresh
-      fork.airtame
+      airtame
     ];
 
     stateVersion = "24.05";
