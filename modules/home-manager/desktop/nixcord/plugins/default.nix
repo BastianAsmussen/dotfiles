@@ -28,8 +28,6 @@
     permissionsViewer.enable = true;
     reactErrorDecoder.enable = true;
     relationshipNotifier.enable = true;
-    replaceGoogleSearch = import ./replaceGoogleSearch.nix;
-    reverseImageSearch.enable = true;
     summaries.enable = true;
     serverInfo.enable = true;
     showConnections.enable = true;
