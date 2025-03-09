@@ -20,6 +20,7 @@
       direnv.enable = true;
       fidget.enable = true;
       gitsigns = import ./gitsigns.nix config;
+      harpoon = import ./harpoon.nix;
       indent-blankline.enable = true;
       lsp = import ./lsp {inherit osConfig self lib pkgs;};
       lsp-format.enable = true;
@@ -39,6 +40,7 @@
       telescope = import ./telescope.nix;
       tmux-navigator = import ./tmux-navigator.nix;
       treesitter = import ./treesitter.nix pkgs;
+      treesitter-context = import ./treesitter-context.nix;
       trouble.enable = true;
       ts-context-commentstring.enable = true;
       typescript-tools.enable = true;
