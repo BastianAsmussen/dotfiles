@@ -20,7 +20,6 @@
       direnv.enable = true;
       fidget.enable = true;
       gitsigns = import ./gitsigns.nix config;
-      hardtime.enable = true;
       indent-blankline.enable = true;
       lsp = import ./lsp {inherit osConfig self lib pkgs;};
       lsp-format.enable = true;
