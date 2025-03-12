@@ -60,6 +60,7 @@
         keep-going = true;
         keep-derivations = true;
         keep-outputs = true;
+        keep-failed = true;
         warn-dirty = false;
         accept-flake-config = false;
         use-cgroups = pkgs.stdenv.isLinux;
