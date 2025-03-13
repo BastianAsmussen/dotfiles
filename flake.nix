@@ -45,6 +45,7 @@
     ...
   } @ inputs: let
     inherit (self) outputs;
+    inherit (builtins) attrNames readDir listToAttrs;
 
     systems = [
       "aarch64-linux"
@@ -54,7 +55,7 @@
       "x86_64-darwin"
     ];
 
-    hosts = builtins.attrNames (builtins.readDir ./hosts);
+    hosts = attrNames (readDir ./hosts);
     forAllSystems = fn:
       nixpkgs.lib.genAttrs systems
       (system:
@@ -74,18 +75,18 @@
     };
   in {
     overlays = import ./overlays {inherit inputs lib;};
-    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
     formatter = forAllSystems ({pkgs}: pkgs.alejandra);
+    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
+    templates = import ./templates;
     checks = forAllSystems ({pkgs}: {
-      default = pkgs.callPackage ./tests {inherit pkgs lib;};
+      library = pkgs.callPackage ./tests {inherit pkgs lib;};
     });
 
-    templates = import ./templates;
     devShells = forAllSystems ({pkgs}: {
       default = import ./shell.nix {inherit pkgs;};
     });
 
-    nixosConfigurations = builtins.listToAttrs (map (hostname: {
+    nixosConfigurations = listToAttrs (map (hostname: {
         name = hostname;
         value = nixpkgs.lib.nixosSystem {
           specialArgs = {inherit inputs outputs userInfo lib self;};
