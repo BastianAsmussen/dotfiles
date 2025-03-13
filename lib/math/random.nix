@@ -40,7 +40,7 @@
 
       toNum = str:
         foldl
-        (acc: c: (acc * 16) + (lib.lists.elemIndex c (stringToCharacters "0123456789abcdef")))
+        (acc: c: (acc * 16) + (lib.lists.findFirstIndex (x: x == c) 0 (stringToCharacters "0123456789abcdef")))
         0
         (stringToCharacters (substring 0 8 str));
     in
