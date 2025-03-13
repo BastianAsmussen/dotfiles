@@ -1,5 +1,25 @@
 rec {
   default = rust;
+  go = {
+    path = ./go;
+    description = "Go development environment.";
+    welcomeText = ''
+      # Go Project Template
+
+      ## Indented Usage
+
+      Development of Go programs and libraries.
+
+      ## Notes
+
+      Remember to change project name!
+
+      I highly recommend giving Adam Hoese's
+      [gomod2nix blog post](https://www.tweag.io/blog/2021-03-04-gomod2nix) a
+      read before continuing.
+    '';
+  };
+
   python = {
     path = ./python;
     description = "Basic Python development environment.";
