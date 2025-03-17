@@ -30,7 +30,6 @@
       markdown-preview = import ./markdown-preview.nix;
       neocord = import ./neocord.nix config;
       nix.enable = true;
-      noice.enable = true;
       none-ls = import ./none-ls.nix;
       oil = import ./oil.nix;
       otter.enable = true;
