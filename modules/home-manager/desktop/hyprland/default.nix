@@ -45,8 +45,14 @@ in {
       settings = {
         exec-once = ["ags -b hypr"];
         "$mod" = "SUPER";
-        input = {
-          kb_layout = "dk";
+
+        input = let
+          xkbCfg = osConfig.services.xserver.xkb;
+        in {
+          kb_layout = xkbCfg.layout;
+          kb_variant = xkbCfg.variant;
+          kb_options = xkbCfg.options;
+
           follow_mouse = 1;
           touchpad = {
             natural_scroll = "yes";

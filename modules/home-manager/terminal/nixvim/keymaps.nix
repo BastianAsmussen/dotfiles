@@ -9,9 +9,6 @@ let
     (mapKey mode key action) // {inherit options;};
 in {
   programs.nixvim.keymaps = [
-    # Typos.
-    (mapKeyWithOpts "n" "æ" ":" {nowait = true;})
-
     # Save the current buffer.
     (mapKey "" "<C-s>" "<cmd>w<CR>")
 

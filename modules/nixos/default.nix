@@ -17,7 +17,6 @@ in {
     ./gaming.nix
     ./goxlr.nix
     ./home-manager.nix
-    ./keyboard.nix
     ./language.nix
     ./misc.nix
     ./network-manager.nix
@@ -31,7 +30,6 @@ in {
   btrfs.enable = mkDefault true;
   network-manager.enable = mkDefault true;
   home-manager.enable = mkDefault true;
-  keyboard.enable = mkDefault true;
 
   system = {
     configurationRevision = self.shortRev or self.dirtyShortRev;

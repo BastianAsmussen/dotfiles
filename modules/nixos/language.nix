@@ -21,8 +21,12 @@
     };
   };
 
-  console.keyMap = "dk";
-  services.xserver.xkb.layout = "dk";
+  console.useXkbConfig = true;
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "colemak_dh_iso";
+    options = "caps:escape";
+  };
 
   environment.systemPackages = with pkgs; [
     hunspellDicts.da_DK
