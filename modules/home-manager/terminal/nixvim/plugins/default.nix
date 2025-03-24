@@ -25,6 +25,7 @@
       lsp = import ./lsp {inherit osConfig self lib pkgs;};
       lsp-format.enable = true;
       lspkind = import ./lspkind.nix;
+      lsp-lines.enable = true;
       lualine = import ./lualine.nix;
       luasnip = import ./luasnip.nix pkgs;
       markdown-preview = import ./markdown-preview.nix;

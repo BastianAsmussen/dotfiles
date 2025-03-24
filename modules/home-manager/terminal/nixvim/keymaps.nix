@@ -144,6 +144,15 @@ in {
       '';
     } {desc = "[S]earch [/] in Open Files";})
 
+    # Toggle LSP lines.
+    (mapKeyWithOpts "n" "<leader>tl" {
+      __raw = ''
+        function()
+          require('lsp_lines').toggle {}
+        end
+      '';
+    } {desc = "LSP: [T]oggle [L]ines";})
+
     # Preview markdown files.
     (mapKeyWithOpts "n" "<leader>mp" "<cmd>MarkdownPreviewToggle<CR>" {
       desc = "[M]arkdown [P]review";
