@@ -16,7 +16,7 @@
       # Search hidden files / directories (e.g. dotfiles) by default.
       "--hidden"
 
-      # Using glob patterns to include/exclude files or folders.
+      # Using glob patterns to include/exclude files or directories.
       "--glob=!.git/*"
       "--glob=!vendor/*"
 
