@@ -42,6 +42,7 @@
       todo
       libreoffice-fresh
       airtame
+      freecad-wayland
     ];
 
     stateVersion = "24.05";
