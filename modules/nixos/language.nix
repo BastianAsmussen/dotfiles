@@ -23,9 +23,9 @@
 
   console.useXkbConfig = true;
   services.xserver.xkb = {
-    layout = "us";
-    variant = "colemak_dh_iso";
-    options = "caps:escape";
+    layout = "us,dk";
+    variant = "colemak_dh_iso,";
+    options = "caps:escape,grp:win_space_toggle";
   };
 
   environment.systemPackages = with pkgs; [
