@@ -13,7 +13,7 @@
   screenshot = import ./scripts/screenshot.nix {inherit pkgs lib;};
 
   smartGaps = {
-    windowrulev2 = [
+    windowrule = [
       "bordersize 0, floating:0, onworkspace:w[t1]"
       "rounding 0, floating:0, onworkspace:w[t1]"
       "bordersize 0, floating:0, onworkspace:w[tg1]"
@@ -84,31 +84,14 @@ in {
         };
 
         windowrule = let
-          mkFloating = regex: "float, ^(${regex})$";
-        in [
-          (mkFloating "org.gnome.Calculator")
-          (mkFloating "org.gnome.Nautilus")
-          (mkFloating "org.pulseaudio.pavucontrol")
-          (mkFloating "nm-connection-editor")
-          (mkFloating "org.gnome.Settings")
-          (mkFloating "org.gnome.design.Palette")
-          (mkFloating "Color Picker")
-          (mkFloating "xdg-desktop-portal")
-          (mkFloating "xdg-desktop-portal-gtk")
-          (mkFloating "xdg-desktop-portal-gnome")
-          (mkFloating "virt-manager")
-          (mkFloating "org.gnome.World.PikaBackup")
-          (mkFloating "org.gnome.Weather")
-          (mkFloating "com.github.Aylur.ags")
-        ];
-
-        windowrulev2 = let
           pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
           mullvadVPN = "class:(Mullvad VPN)";
           steam = "class:(steam)";
+
+          mkFloating = pattern: "float, title:^(${pattern})$";
         in
           lib.mkMerge [
-            smartGaps.windowrulev2
+            smartGaps.windowrule
             [
               "float, ${pictureInPicture}"
               "size 30% 30%, ${pictureInPicture}"
@@ -117,6 +100,21 @@ in {
               "keepaspectratio, ${pictureInPicture}"
               "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
               "float, class:(electron) title:^(?!electron).*$"
+
+              (mkFloating "org.gnome.Calculator")
+              (mkFloating "org.gnome.Nautilus")
+              (mkFloating "org.pulseaudio.pavucontrol")
+              (mkFloating "nm-connection-editor")
+              (mkFloating "org.gnome.Settings")
+              (mkFloating "org.gnome.design.Palette")
+              (mkFloating "Color Picker")
+              (mkFloating "xdg-desktop-portal")
+              (mkFloating "xdg-desktop-portal-gtk")
+              (mkFloating "xdg-desktop-portal-gnome")
+              (mkFloating "virt-manager")
+              (mkFloating "org.gnome.World.PikaBackup")
+              (mkFloating "org.gnome.Weather")
+              (mkFloating "com.github.Aylur.ags")
             ]
             (mkIf osConfig.vpn.enable [
               "float, ${mullvadVPN}"
