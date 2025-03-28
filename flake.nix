@@ -7,6 +7,7 @@
     nixpkgs-fork.url = "github:BastianAsmussen/nixpkgs";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
     stylix.url = "github:danth/stylix";
     hyprland.url = "github:hyprwm/Hyprland";
     ags.url = "github:Aylur/ags/v1";
@@ -20,6 +21,11 @@
 
     home-manager = {
       url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

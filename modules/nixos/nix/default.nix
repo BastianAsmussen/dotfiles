@@ -90,7 +90,7 @@
       # slice. Fedora used to kill root and system slices, but their OOMd
       # configuration has since changed.
       oomd = {
-        enable = true;
+        enable = lib.mkDefault true;
 
         enableRootSlice = true;
         enableSystemSlice = true;
