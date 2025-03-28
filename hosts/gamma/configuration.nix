@@ -34,5 +34,13 @@
   # Used for resolving hostnames.
   services.resolved.enable = true;
 
+  virtualisation.docker = {
+    # Enable Docker on boot.
+    enableOnBoot = true;
+
+    # Disable btrfs storage driver.
+    storageDriver = lib.mkForce null;
+  };
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }
