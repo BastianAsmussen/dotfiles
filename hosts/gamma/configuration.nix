@@ -1,6 +1,7 @@
 {
   inputs,
   userInfo,
+  pkgs,
   lib,
   ...
 }: {
@@ -23,6 +24,13 @@
 
     startMenuLaunchers = true;
     docker-desktop.enable = false;
+  };
+
+  # Running VSCode Remote.
+  programs.nix-ld = {
+    enable = true;
+
+    package = pkgs.nix-ld-rs;
   };
 
   # Disable default options as they're rendered redundant in a WSL environment.
