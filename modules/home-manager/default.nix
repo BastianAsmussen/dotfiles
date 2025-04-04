@@ -1,4 +1,6 @@
 {
+  lib,
+  osConfig,
   userInfo,
   pkgs,
   ...
@@ -9,6 +11,11 @@
     ./dconf.nix
     ./qemu.nix
     ./rust.nix
+  ];
+
+  disabledModules = lib.optionals (osConfig ? wsl.enable) [
+    ./desktop
+    ./dconf.nix
   ];
 
   gpg = {
