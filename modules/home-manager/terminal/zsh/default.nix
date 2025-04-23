@@ -26,7 +26,7 @@
     historySubstringSearch.enable = true;
 
     defaultKeymap = "emacs";
-    initExtra =
+    initContent =
       # sh
       ''
         # Keybindings.

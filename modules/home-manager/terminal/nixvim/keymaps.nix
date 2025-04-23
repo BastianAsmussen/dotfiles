@@ -144,6 +144,54 @@ in {
       '';
     } {desc = "[S]earch [/] in Open Files";})
 
+    # Harpoon binds.
+    (mapKey "n" "<leader>a" {
+      __raw = ''
+        function()
+          require('harpoon'):list():add()
+        end
+      '';
+    })
+    (mapKey "n" "<C-e>" {
+      __raw = ''
+        function()
+          local harpoon = require('harpoon')
+
+          harpoon.ui:toggle_quick_menu(harpoon:list())
+        end
+      '';
+    })
+
+    (mapKey "n" "<C-j>" {
+      __raw = ''
+        function()
+          require('harpoon'):list():select(1)
+        end
+      '';
+    })
+    (mapKey "n" "<C-k>" {
+      __raw = ''
+        function()
+          require('harpoon'):list():select(2)
+        end
+      '';
+    })
+    (mapKey "n" "<C-l>" {
+      __raw = ''
+        function()
+          require('harpoon'):list():select(3)
+        end
+      '';
+    })
+
+    (mapKey "n" "<C-m>" {
+      __raw = ''
+        function()
+          require('harpoon'):list():select(4)
+        end
+      '';
+    })
+
     # Toggle LSP lines.
     (mapKeyWithOpts "n" "<leader>tl" {
       __raw = ''
