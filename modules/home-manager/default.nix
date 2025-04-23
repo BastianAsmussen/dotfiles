@@ -28,28 +28,32 @@
     inherit (userInfo) username;
     homeDirectory = "/home/${userInfo.username}";
 
-    packages = with pkgs; [
-      man-pages
-      man-pages-posix
-      qbittorrent
-      gitui
-      wget
-      go
-      jq
-      manix
-      tlrc
-      teams-for-linux
-      bitwarden
-      pika-backup
-      mpv
-      cabal-install
-      mit
-      calculator
-      copy-file
-      todo
-      libreoffice-fresh
-      airtame
-      freecad-wayland
+    packages = lib.mkMerge [
+      (with pkgs; [
+        man-pages
+        man-pages-posix
+        gitui
+        wget
+        go
+        jq
+        manix
+        tlrc
+        cabal-install
+        mit
+        calculator
+        copy-file
+        todo
+      ])
+      (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
+        bitwarden
+        teams-for-linux
+        qbittorrent
+        pika-backup
+        libreoffice-fresh
+        airtame
+        freecad-wayland
+        mpv
+      ]))
     ];
 
     stateVersion = "24.05";
