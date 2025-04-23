@@ -9,7 +9,6 @@
   inlayHints = true;
   servers = {
     clangd.enable = true;
-    csharp_ls.enable = true;
     cssls.enable = true;
     dockerls = import ./dockerls.nix;
     eslint.enable = true;
@@ -19,6 +18,7 @@
     java_language_server.enable = true;
     lua_ls = import ./lua_ls.nix;
     nixd = import ./nixd.nix {inherit osConfig self lib pkgs;};
+    omnisharp.enable = true;
     pylsp.enable = true;
     sqls.enable = true;
     svelte.enable = true;
