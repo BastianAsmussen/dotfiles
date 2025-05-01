@@ -42,6 +42,6 @@
     };
 
     # Rendered redundant due to `lsp_lines.nvim`.
-    diagnostics.virtual_text = false;
+    diagnostic.settings.virtual_text = false;
   };
 }
