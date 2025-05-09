@@ -42,6 +42,7 @@
         mit
         calculator
         copy-file
+        nixpoch
         todo
       ])
       (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
