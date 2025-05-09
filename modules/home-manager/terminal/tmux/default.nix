@@ -36,6 +36,7 @@ in {
     escapeTime = 0; # Make pressing escape instant.
     prefix = "C-Space";
     mouse = true;
+    clock24 = true;
 
     aggressiveResize = true;
     disableConfirmationPrompt = true;
