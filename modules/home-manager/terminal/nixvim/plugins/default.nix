@@ -33,7 +33,6 @@
       nix.enable = true;
       none-ls = import ./none-ls.nix;
       oil = import ./oil.nix;
-      otter.enable = true;
       rustaceanvim = import ./rustaceanvim.nix {inherit lib config pkgs;};
       sleuth.enable = true;
       snacks = import ./snacks;

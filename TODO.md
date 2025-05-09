@@ -15,6 +15,7 @@ around problems.
 - [Secrets Management](#secrets-management)
 - [SSH](#ssh)
 - [CI](#ci)
+- [Glove80](#glove80)
 
 ## Development Environments
 
@@ -38,8 +39,6 @@ server.
 
 ### Plugin Issues
 
-- [otter.nvim](https://github.com/jmbuhr/otter.nvim) sometimes fails to start
-  when I enter a file.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
   multiple different runners when I press `<F5>`.
 
@@ -105,3 +104,10 @@ in that regard.
 ## CI
 
 Look into making `nix flake check` run the entire lint suite, too.
+
+## Glove80
+
+I've added a script to the flake that can flash my [Glove80](https://www.moergo.com/collections/glove80-keyboards/products/glove80-split-ergonomic-keyboard-revision-2)
+firmware to the keyboard (`nix run .#glove80`), the end goal is having a
+reproducible keyboard layout. I'm thinking this can be achieved using something
+like a systemd service.
