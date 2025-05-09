@@ -39,6 +39,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    glove80-zmk = {
+      url = "github:moergo-sc/zmk";
+      flake = false;
+    };
+
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -80,10 +85,7 @@
       icon = ./assets/icons/bastian.png;
     };
   in {
-    overlays = import ./overlays {inherit inputs lib;};
-    formatter = forAllSystems ({pkgs}: pkgs.alejandra);
-    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
-    templates = import ./templates;
+    apps = forAllSystems ({pkgs}: import ./apps {inherit inputs pkgs lib;});
     checks = forAllSystems ({pkgs}: {
       library = pkgs.callPackage ./tests {inherit pkgs lib;};
     });
@@ -91,6 +93,11 @@
     devShells = forAllSystems ({pkgs}: {
       default = import ./shell.nix {inherit pkgs;};
     });
+
+    formatter = forAllSystems ({pkgs}: pkgs.alejandra);
+    overlays = import ./overlays {inherit inputs lib;};
+    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
+    templates = import ./templates;
 
     nixosConfigurations = listToAttrs (map (hostname: {
         name = hostname;
