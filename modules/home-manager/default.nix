@@ -44,6 +44,8 @@
         copy-file
         nixpoch
         todo
+        rusty-man
+        cargo-info
       ])
       (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
         bitwarden
