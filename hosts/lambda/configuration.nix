@@ -11,6 +11,8 @@ in {
   ssh.server.enable = true;
   nix.isRemoteBuilder = true;
 
+  web.enable = true;
+
   nvidia.enable = true;
   goxlr.enable = true;
 
