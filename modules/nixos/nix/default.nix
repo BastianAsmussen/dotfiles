@@ -7,10 +7,11 @@
   ...
 }: {
   imports = [
+    ./binary-cache.nix
     ./nh.nix
   ];
 
-  options.nix.isRemoteBuilder = lib.mkEnableOption "Marks this machine as a remote builder.";
+  options.nix.remoteBuilder.enable = lib.mkEnableOption "Marks this machine as a remote builder.";
 
   config = {
     nix = let
@@ -30,7 +31,7 @@
       # Enable build distribution.
       distributedBuilds = true;
 
-      nrBuildUsers = lib.mkIf config.nix.isRemoteBuilder 64;
+      nrBuildUsers = lib.mkIf config.nix.remoteBuilder.enable 64;
       settings = {
         experimental-features = [
           "flakes"
@@ -45,7 +46,7 @@
 
         trusted-users =
           ["root" "@wheel"]
-          ++ (lib.optionals config.nix.isRemoteBuilder [
+          ++ (lib.optionals config.nix.remoteBuilder.enable [
             "builder"
           ]);
 
@@ -104,7 +105,7 @@
           {
             OOMScoreAdjust = 500;
           }
-          // (lib.optionalAttrs config.nix.isRemoteBuilder {
+          // (lib.optionalAttrs config.nix.remoteBuilder.enable {
             MemoryAccounting = true;
             MemoryMax = "90%";
           });
@@ -115,14 +116,14 @@
       };
     };
 
-    users = lib.mkIf config.nix.isRemoteBuilder {
+    users = lib.mkIf config.nix.remoteBuilder.enable {
       users.builder = {
         isNormalUser = true;
         createHome = false;
         group = "builder";
         hashedPassword = "*";
 
-        openssh.authorizedKeys.keyFiles = [../../../keys/builder.pub];
+        openssh.authorizedKeys.keyFiles = lib.custom.keys.default.builderPaths;
       };
 
       groups.builder = {};

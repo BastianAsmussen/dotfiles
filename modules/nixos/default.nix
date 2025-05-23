@@ -11,7 +11,6 @@ in {
     ./nix
     ./security
     ./virtualisation
-    ./web
     ./bluetooth.nix
     ./bootloader.nix
     ./btrfs.nix

@@ -9,9 +9,10 @@ in {
   ];
 
   ssh.server.enable = true;
-  nix.isRemoteBuilder = true;
-
-  web.enable = true;
+  nix = {
+    binaryCache.enable = true;
+    remoteBuilder.enable = true;
+  };
 
   nvidia.enable = true;
   goxlr.enable = true;
