@@ -13,7 +13,10 @@
     lib.mapAttrsToList (
       name: type:
         if type == "directory" || (type == "regular" && name != "default.nix")
-        then pkgs.callPackage ./${name} {inherit lib;}
+        then
+          pkgs.callPackage ./${name} {
+            lib = lib.recursiveUpdate lib {custom.keys.keyDir = lib.mkForce ./keys/mock;};
+          }
         else {}
     )
     contents;
