@@ -35,4 +35,12 @@ in {
       "ssh-theta.pub"
     ];
   };
+
+  testBuilderKeys = {
+    expr = keys.builderPaths;
+    expected = mapKeys [
+      "builder-kappa.pub"
+      "builder-sigma.pub"
+    ];
+  };
 }
