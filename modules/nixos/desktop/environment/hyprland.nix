@@ -25,12 +25,7 @@ in {
 
     # Enable GNOME because Stylix will only style GDM if it's enabled, too.
     services = {
-      xserver = mkIf cfg.greeter.gdm.enable {
-        enable = true;
-
-        desktopManager.gnome.enable = true;
-      };
-
+      desktopManager.gnome.enable = cfg.greeter.gdm.enable;
       displayManager.defaultSession = "hyprland";
     };
 

@@ -34,8 +34,9 @@
       nrBuildUsers = lib.mkIf config.nix.remoteBuilder.enable 64;
       settings = {
         experimental-features = [
-          "flakes"
-          "nix-command"
+          "flakes" # Enable flake support.
+          "repl-flake"
+          "nix-command" # Enable new Nix commands.
           "recursive-nix" # Allow derivation builders to call Nix.
           "ca-derivations" # Enable possible early cutoffs during rebuilds.
           "cgroups" # Allow Nix to execute builds inside cgroups.

@@ -8,14 +8,11 @@ in {
   options.desktop.greeter.gdm.enable = lib.mkEnableOption "Enables the `GDM` greeter.";
 
   config = lib.mkIf cfg.gdm.enable {
-    services.xserver = {
+    services.displayManager.gdm = {
       enable = true;
 
-      displayManager.gdm = {
-        enable = true;
-        wayland = cfg.useWayland;
-        autoSuspend = false;
-      };
+      wayland = cfg.useWayland;
+      autoSuspend = false;
     };
   };
 }
