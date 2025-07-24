@@ -17,6 +17,7 @@ in {
     ./gaming.nix
     ./goxlr.nix
     ./home-manager.nix
+    ./ipfs.nix
     ./language.nix
     ./misc.nix
     ./network-manager.nix
