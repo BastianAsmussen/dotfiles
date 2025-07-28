@@ -35,7 +35,6 @@
       settings = {
         experimental-features = [
           "flakes" # Enable flake support.
-          "repl-flake"
           "nix-command" # Enable new Nix commands.
           "recursive-nix" # Allow derivation builders to call Nix.
           "ca-derivations" # Enable possible early cutoffs during rebuilds.
