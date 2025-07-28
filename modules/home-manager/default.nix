@@ -46,6 +46,7 @@
         todo
         rusty-man
         cargo-info
+        yt-dlp
       ])
       (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
         bitwarden
