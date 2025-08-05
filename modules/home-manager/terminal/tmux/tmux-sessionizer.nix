@@ -13,7 +13,7 @@
 
       [[search_dirs]]
       path = "${homeDirectory}/Projects"
-      depth = 1
+      depth = 2
 
       [[search_dirs]]
       path = "${homeDirectory}/dotfiles"
