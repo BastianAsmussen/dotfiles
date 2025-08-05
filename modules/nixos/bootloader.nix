@@ -32,6 +32,6 @@ in {
       };
     };
 
-    stylix.targets.grub.useImage = true;
+    stylix.targets.grub.useWallpaper = true;
   };
 }
