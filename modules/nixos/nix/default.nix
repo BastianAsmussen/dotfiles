@@ -36,11 +36,8 @@
         experimental-features = [
           "flakes" # Enable flake support.
           "nix-command" # Enable new Nix commands.
-          "recursive-nix" # Allow derivation builders to call Nix.
-          "ca-derivations" # Enable possible early cutoffs during rebuilds.
           "cgroups" # Allow Nix to execute builds inside cgroups.
           "auto-allocate-uids" # Allow Nix to automatically pick UIDs, rather than creating nixbld* user accounts.
-          "dynamic-derivations" # Allow building of .drv files.
           "no-url-literals" # Disallow deprecated url-literals, i.e., URLs without quotation.
         ];
 
