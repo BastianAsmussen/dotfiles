@@ -36,6 +36,7 @@
         wget
         go
         jq
+        fd
         manix
         tlrc
         cabal-install
