@@ -58,6 +58,7 @@
         airtame
         freecad-wayland
         mpv
+        telegram-desktop
       ]))
     ];
 
