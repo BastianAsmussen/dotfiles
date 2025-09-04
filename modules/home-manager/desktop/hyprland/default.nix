@@ -73,11 +73,7 @@ in {
           preserve_split = true;
         };
 
-        gestures = {
-          workspace_swipe = true;
-          workspace_swipe_use_r = true;
-        };
-
+        gestures.workspace_swipe_use_r = true;
         misc = {
           disable_splash_rendering = true;
           force_default_wallpaper = 1;
