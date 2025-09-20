@@ -275,8 +275,11 @@ in {
           };
         };
 
-        ecosystem.no_donation_nag = true;
         xwayland.force_zero_scaling = true;
+        ecosystem = {
+          no_donation_nag = true;
+          no_update_news = true;
+        };
       };
     };
   };
