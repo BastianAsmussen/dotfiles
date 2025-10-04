@@ -1200,10 +1200,10 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1759536300,
-        "narHash": "sha256-QaZOtmQ1HCveiBmUbspCOdR0YjHR58lKfRHBwu7OC58=",
+        "lastModified": 1759537387,
+        "narHash": "sha256-BZasFUfGfZyaTx1K9pLTEWFCYTo0NH/qpKBGiVe+ZWQ=",
         "ref": "refs/heads/master",
-        "rev": "bcab2ccdaf1dd755c14abf4f97da9a2b9008840b",
+        "rev": "e4c3614b5758c23ebb5bfad5bdd605fce48bf38a",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/BastianAsmussen/nix-secrets.git"
