@@ -12,7 +12,6 @@ around problems.
 - [AGS Migration](#ags-migration)
 - [Linux Hardening](#linux-hardening)
 - [File Structure](#file-structure)
-- [Secrets Management](#secrets-management)
 - [SSH](#ssh)
 - [CI](#ci)
 - [Glove80](#glove80)
@@ -86,12 +85,6 @@ so I'd like to look into possibly restructuring it in the future.
 Some things I'd really like to change would be how I separate modules. The
 setup used in [EmergentMind's dotfiles](https://github.com/EmergentMind/nix-config)
 looks very promising, and appears to cover all my pain points.
-
-## Secrets Management
-
-I want to use [sops.nix](https://github.com/Mic92/sops-nix) to manage
-repository secrets but my current setup with my GPG keys on my YubiKey doesn't
-seem to really work all too well for that.
 
 ## SSH
 
