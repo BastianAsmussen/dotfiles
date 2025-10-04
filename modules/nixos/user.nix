@@ -1,5 +1,6 @@
 {
   userInfo,
+  config,
   pkgs,
   lib,
   ...
@@ -8,14 +9,20 @@
 in {
   programs.zsh.enable = true;
 
-  users.users.${username} = {
-    isNormalUser = true;
-    description = fullName;
-    initialPassword = "Password123!";
-    extraGroups = ["wheel"];
-    shell = pkgs.zsh;
+  sops.secrets."passwords/${username}".neededForUsers = true;
 
-    openssh.authorizedKeys.keyFiles = lib.custom.keys.default.sshPaths;
+  users = {
+    mutableUsers = false;
+
+    users.${username} = {
+      isNormalUser = true;
+      description = fullName;
+      hashedPasswordFile = config.sops.secrets."passwords/${username}".path;
+      extraGroups = ["wheel"];
+      shell = pkgs.zsh;
+
+      openssh.authorizedKeys.keyFiles = lib.custom.keys.default.sshPaths;
+    };
   };
 
   # Set the user's icon.

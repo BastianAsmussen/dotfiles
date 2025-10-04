@@ -1,3 +1,2 @@
 # Ignore results from `nix build`.
-result/
-result
+result*

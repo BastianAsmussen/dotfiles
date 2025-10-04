@@ -22,6 +22,7 @@ in {
     ./misc.nix
     ./network-manager.nix
     ./nvidia.nix
+    ./sops.nix
     ./stylix.nix
     ./user.nix
   ];
