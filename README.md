@@ -12,7 +12,6 @@ This is a repository for my NixOS configuration.
 ## Installation Guide
 
 1. Get the source code.
-
    1. Enter a Nix shell with Git.
 
       ```sh
@@ -39,7 +38,6 @@ This is a repository for my NixOS configuration.
       ```
 
 2. Choose a host.
-
    1. View available host options.
 
       ```sh
@@ -65,9 +63,6 @@ This is a repository for my NixOS configuration.
    ```sh
    sudo nixos-install --flake ~/dotfiles#$HOSTNAME
    ```
-
-> [!IMPORTANT]
-> Remember to change the password of the user!
 
 ## Maintenance Guide
 
