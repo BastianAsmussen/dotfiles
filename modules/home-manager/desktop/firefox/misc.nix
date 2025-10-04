@@ -17,6 +17,12 @@
       Folder = "Proton";
     }
     {
+      Title = "Calendar";
+      URL = "https://calendar.proton.me/u/0";
+      Placement = "toolbar";
+      Folder = "Proton";
+    }
+    {
       Title = "GitHub";
       URL = "https://github.com";
       Placement = "toolbar";

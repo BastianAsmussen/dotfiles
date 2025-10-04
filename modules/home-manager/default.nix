@@ -36,6 +36,7 @@
         wget
         go
         jq
+        fd
         manix
         tlrc
         cabal-install
@@ -46,6 +47,7 @@
         todo
         rusty-man
         cargo-info
+        yt-dlp
       ])
       (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
         bitwarden
@@ -56,6 +58,7 @@
         airtame
         freecad-wayland
         mpv
+        telegram-desktop
       ]))
     ];
 
