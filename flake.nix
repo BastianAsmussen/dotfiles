@@ -14,6 +14,16 @@
     nixcord.url = "github:kaylorben/nixcord";
     schizofox.url = "github:schizofox/schizofox";
 
+    secrets = {
+      url = "git+ssh://git@github.com/BastianAsmussen/nix-secrets.git?shallow=1";
+      flake = false;
+    };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
