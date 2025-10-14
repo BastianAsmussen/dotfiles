@@ -3,7 +3,6 @@
   config,
   pkgs,
   userInfo,
-  inputs,
   ...
 }: {
   options.nix.binaryCache = {
