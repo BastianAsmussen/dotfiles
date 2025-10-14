@@ -32,7 +32,7 @@ jobs:
         run: statix fix
 
       - name: Run Nix Format
-        run: nix fmt
+        run: nix fmt .
 
       - name: Nix Flake Checker
         uses: DeterminateSystems/flake-checker-action@v5
