@@ -31,7 +31,7 @@
     };
 
     sops.secrets.vaultwarden = let
-      secretsPath = "${builtins.toString inputs.secrets}/secrets";
+      secretsPath = "${toString inputs.secrets}/secrets";
     in {
       sopsFile = "${secretsPath}/vaultwarden.env";
       format = "dotenv";
