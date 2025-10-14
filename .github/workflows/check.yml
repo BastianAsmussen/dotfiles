@@ -34,9 +34,6 @@ jobs:
       - name: Run Nix Format
         run: nix fmt
 
-      - name: Nix Flake Check (Manual)
-        run: nix flake check --all-systems
-
       - name: Nix Flake Checker
         uses: DeterminateSystems/flake-checker-action@v5
         with:
