@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: let
-  secretsPath = builtins.toString inputs.secrets;
+  secretsPath = "${builtins.toString inputs.secrets}/secrets";
 in {
   imports = [inputs.sops-nix.nixosModules.sops];
 

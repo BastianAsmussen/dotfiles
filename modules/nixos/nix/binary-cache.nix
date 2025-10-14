@@ -3,6 +3,7 @@
   config,
   pkgs,
   userInfo,
+  inputs,
   ...
 }: {
   options.nix.binaryCache = {
@@ -19,7 +20,7 @@
   in
     lib.mkIf config.nix.binaryCache.enable {
       nix.settings = {
-        substituters = ["https://${cfg.domain}"];
+        substituters = ["https://${cfg.domain}/cache"];
         trusted-public-keys = [
           "${cfg.domain}:H0C/Z4Hls1uoZb0jj3MsMahWkxZA4Sxn/kw6hyAnnO0="
         ];
@@ -30,7 +31,7 @@
           enable = true;
 
           package = pkgs.nix-serve-ng;
-          secretKeyFile = "/var/secrets/cache-private-key.pem";
+          secretKeyFile = config.sops.secrets."keys/cache/private".path;
         };
 
         nginx = {
@@ -50,7 +51,7 @@
             enableACME = true;
             forceSSL = true;
 
-            locations."/".proxyPass = "http://${cfg'.bindAddress}:${toString cfg'.port}";
+            locations."/cache".proxyPass = "http://${cfg'.bindAddress}:${toString cfg'.port}";
           };
         };
       };
@@ -66,5 +67,10 @@
         defaultHTTPListenPort
         defaultSSLListenPort
       ];
+
+      sops.secrets = {
+        "keys/cache/private" = {};
+        "keys/cache/public" = {};
+      };
     };
 }
