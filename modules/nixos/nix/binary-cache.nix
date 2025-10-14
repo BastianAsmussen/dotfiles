@@ -19,9 +19,13 @@
   in
     lib.mkIf config.nix.binaryCache.enable {
       nix.settings = {
-        substituters = ["https://${cfg.domain}/cache"];
+        substituters = [
+          "https://${cfg.domain}/"
+          "https://cache.nixos.org/"
+        ];
+
         trusted-public-keys = [
-          "${cfg.domain}:H0C/Z4Hls1uoZb0jj3MsMahWkxZA4Sxn/kw6hyAnnO0="
+          "internal.asmussen.tech:FfvMc1N66wWVZQHaRUZl1GJOdpqAUIZcmJ2/g079NJI="
         ];
       };
 
@@ -50,7 +54,7 @@
             enableACME = true;
             forceSSL = true;
 
-            locations."/cache".proxyPass = "http://${cfg'.bindAddress}:${toString cfg'.port}";
+            locations."/".proxyPass = "http://${cfg'.bindAddress}:${toString cfg'.port}";
           };
         };
       };
