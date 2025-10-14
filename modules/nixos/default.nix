@@ -25,6 +25,7 @@ in {
     ./sops.nix
     ./stylix.nix
     ./user.nix
+    ./vaultwarden.nix
   ];
 
   documentation.dev.enable = true;

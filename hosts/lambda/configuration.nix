@@ -14,6 +14,8 @@ in {
     remoteBuilder.enable = true;
   };
 
+  vaultwarden.enable = true;
+
   ipfs.enable = true;
 
   nvidia.enable = true;
