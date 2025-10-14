@@ -22,11 +22,13 @@
         };
       };
 
-      nginx.virtualHosts."internal.asmussen.tech" = {
+      nginx.virtualHosts."internal.asmussen.tech" = let
+        cfg = config.services.vaultwarden.config;
+      in {
         enableACME = true;
         forceSSL = true;
 
-        locations."/vault".proxyPass = "http://127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT}";
+        locations."/vault".proxyPass = "http://${toString cfg.ROCKET_ADDRESS}:${toString cfg.ROCKET_PORT}";
       };
     };
 
