@@ -1148,7 +1148,8 @@
         "secrets": "secrets",
         "sops-nix": "sops-nix",
         "spicetify-nix": "spicetify-nix",
-        "stylix": "stylix"
+        "stylix": "stylix",
+        "winboat": "winboat"
       }
     },
     "schizofox": {
@@ -1471,6 +1472,26 @@
       "original": {
         "owner": "tinted-theming",
         "repo": "base16-zed",
+        "type": "github"
+      }
+    },
+    "winboat": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1760827883,
+        "narHash": "sha256-6Cvg9YE8wqpkdjnw0HwJH+HOWY9inO/slXf48w+84RM=",
+        "owner": "TibixDev",
+        "repo": "winboat",
+        "rev": "a1b1105a30b1f5210ce29077e19f21b53083469a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "TibixDev",
+        "repo": "winboat",
         "type": "github"
       }
     },

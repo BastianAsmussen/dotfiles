@@ -26,6 +26,7 @@ in {
     ./stylix.nix
     ./user.nix
     ./vaultwarden.nix
+    ./winboat.nix
   ];
 
   documentation.dev.enable = true;
