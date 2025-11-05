@@ -50,7 +50,7 @@
         yt-dlp
       ])
       (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
-        bitwarden
+        bitwarden-desktop
         teams-for-linux
         qbittorrent
         pika-backup

@@ -30,7 +30,7 @@
   programs.nix-ld = {
     enable = true;
 
-    package = pkgs.nix-ld-rs;
+    package = pkgs.nix-ld;
   };
 
   # Disable default options as they're rendered redundant in a WSL environment.

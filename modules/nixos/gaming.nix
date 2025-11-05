@@ -51,7 +51,7 @@ in {
     users.extraGroups.gamemode.members = [userInfo.username];
     environment = {
       systemPackages = with pkgs; [
-        protonup
+        protonup-ng
         lutris
         bottles
       ];
