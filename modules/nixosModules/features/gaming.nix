@@ -1,0 +1,62 @@
+{
+  flake.nixosModules.gaming = {
+    pkgs,
+    lib,
+    ...
+  }: {
+    hardware.graphics.enable = lib.mkDefault true;
+
+    programs = {
+      gamemode.enable = true;
+      gamescope.enable = true;
+
+      steam = {
+        enable = true;
+        extraCompatPackages = with pkgs; [
+          proton-ge-bin
+        ];
+
+        extraPackages = with pkgs; [
+          SDL2
+          gamescope
+          er-patcher
+        ];
+
+        protontricks.enable = true;
+      };
+    };
+
+    environment.systemPackages = with pkgs; [
+      lutris
+      steam-run
+      dxvk
+
+      gamescope
+      mangohud
+
+      r2modman
+
+      heroic
+
+      er-patcher
+      bottles
+
+      steamtinkerlaunch
+
+      prismlauncher
+    ];
+
+    persistence.cache.directories = [
+      ".local/share/Steam"
+      ".local/share/bottles"
+      ".local/share/PrismLauncher"
+      ".config/r2modmanPlus-local"
+
+      ".local/share/Terraria"
+
+      "Games"
+
+      ".config/heroic"
+    ];
+  };
+}
