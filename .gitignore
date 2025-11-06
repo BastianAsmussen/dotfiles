@@ -1,0 +1,2 @@
+# Ignore results from `nix build`.
+result*
