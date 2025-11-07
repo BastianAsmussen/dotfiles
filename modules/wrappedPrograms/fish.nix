@@ -1,18 +1,7 @@
-{
-  inputs,
-  lib,
-  ...
-}: let
-  inherit (lib) mkMerge;
-in {
-  perSystem = {
-    pkgs,
-    self',
-    ...
-  }: let
-    inherit (self'.packages) lf;
-
-    fishConf = pkgs.writeText "config.fish"
+{inputs, ...}: {
+  perSystem = {pkgs, ...}: let
+    fishConf =
+      pkgs.writeText "config.fish"
       # fish
       ''
         function fish_prompt
@@ -71,7 +60,7 @@ in {
         function rgf "Search by file names"
             rg --files | rg
         end
-        
+
         function cp
             cp -r $argv
         end

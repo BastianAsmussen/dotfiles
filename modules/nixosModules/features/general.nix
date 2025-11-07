@@ -19,7 +19,7 @@
       description = "${description}";
       extraGroups = ["wheel" "networkmanager"];
       shell = self.packages.${pkgs.system}.environment;
-      
+
       initialPassword = "Password123!";
       hashedPasswordFile = "/persist/passwd";
     };

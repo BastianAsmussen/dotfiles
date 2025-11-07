@@ -6,7 +6,8 @@
   inherit (lib) getExe;
 in {
   perSystem = {pkgs, ...}: let
-    conf = pkgs.writeText "config"
+    conf =
+      pkgs.writeText "config"
       # bash
       ''
         set reverse true

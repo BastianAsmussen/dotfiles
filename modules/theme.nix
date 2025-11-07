@@ -16,7 +16,7 @@ let
     base0D = "#89b4fa"; # blue
     base0E = "#cba6f7"; # mauve
     base0F = "#f2cdcd"; # flamingo
-    
+
     red = base08;
     orange = base09;
     yellow = base0A;

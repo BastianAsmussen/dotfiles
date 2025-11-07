@@ -1,5 +1,9 @@
 {
-  flake.nixosModules.base = {lib, config, ...}: let
+  flake.nixosModules.base = {
+    lib,
+    config,
+    ...
+  }: let
     inherit (lib) mkEnableOption mkOption;
   in {
     options.persistence = {

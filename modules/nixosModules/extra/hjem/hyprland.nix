@@ -46,12 +46,6 @@ in {
               name = "script";
             });
 
-          settings.exec-once = builtins.map (entry:
-            if (builtins.typeOf entry) == "string"
-            then getExe (pkgs.writeShellScriptBin "autostart" entry)
-            else getExe entry)
-          config.preferences.autostart;
-
           # Turns sane looking keymaps into ugly Hyprland syntax ones.
           # "A" into ",A"
           # "super + d" into "super, d"
