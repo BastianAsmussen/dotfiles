@@ -12,6 +12,7 @@
 
     hjem.url = "github:feel-co/hjem";
     nix-index-database.url = "github:Mic92/nix-index-database";
+    nvf.url = "github:NotAShelf/nvf";
   };
 
   outputs = inputs: inputs.flake-parts.lib.mkFlake {inherit inputs;} (inputs.import-tree ./modules);

@@ -17,6 +17,7 @@
 
       self.nixosModules.impermanence
 
+      self.nixosModules.neovim
       self.nixosModules.gaming
       self.nixosModules.discord
       self.nixosModules.gimp
