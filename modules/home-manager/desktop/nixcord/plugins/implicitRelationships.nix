@@ -1,5 +1,0 @@
-{
-  enable = true;
-
-  sortByAffinity = true;
-}
