@@ -1,9 +1,13 @@
-{inputs, self, ...}: {
+{
+  inputs,
+  self,
+  ...
+}: {
   flake = {
     flakeModules.nvfConfig = {
       vim = {
         enableLuaLoader = true;
-        
+
         viAlias = true;
         vimAlias = true;
         globals.maplocalleader = " ";
@@ -61,7 +65,7 @@
       };
     };
 
-    nixosModules.neovim = {pkgs, ...}: {
+    nixosModules.neovim = {...}: {
       imports = [
         inputs.nvf.nixosModules.default
       ];

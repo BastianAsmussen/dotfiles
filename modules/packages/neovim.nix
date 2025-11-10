@@ -1,9 +1,14 @@
-{inputs, self, ...}: {
-  perSystem = {pkgs, config, ...}: {
-    packages.neovim = (inputs.nvf.lib.neovimConfiguration {
-      inherit pkgs;
+{
+  inputs,
+  self,
+  ...
+}: {
+  perSystem = {pkgs, ...}: {
+    packages.neovim =
+      (inputs.nvf.lib.neovimConfiguration {
+        inherit pkgs;
 
-      modules = [self.flakeModules.nvfConfig];
-    }).neovim;
+        modules = [self.flakeModules.nvfConfig];
+      }).neovim;
   };
 }
