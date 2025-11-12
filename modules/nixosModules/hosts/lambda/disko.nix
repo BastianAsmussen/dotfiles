@@ -24,14 +24,6 @@
               };
             };
 
-            swap = {
-              size = "64G";
-              content = {
-                type = "swap";
-                resumeDevice = true;
-              };
-            };
-
             root = {
               name = "root";
               size = "100%";
@@ -54,21 +46,31 @@
 
       lvm_vg.btrfs_vg = {
         type = "lvm_vg";
-        lvs.root = {
-          size = "100%FREE";
-          content = {
-            type = "btrfs";
-            extraArgs = ["-f"];
-            subvolumes = {
-              "/root" = {};
-              "/persist" = {
-                mountOptions = ["subvol=persist" "noatime"];
-                mountpoint = "/persist";
-              };
+        lvs = {
+          swap = {
+            size = "64G";
+            content = {
+              type = "swap";
+              resumeDevice = true;
+            };
+          };
 
-              "/nix" = {
-                mountOptions = ["subvol=nix" "noatime"];
-                mountpoint = "/nix";
+          root = {
+            size = "100%FREE";
+            content = {
+              type = "btrfs";
+              extraArgs = ["-f"];
+              subvolumes = {
+                "/root" = {};
+                "/persist" = {
+                  mountOptions = ["subvol=persist" "noatime"];
+                  mountpoint = "/persist";
+                };
+
+                "/nix" = {
+                  mountOptions = ["subvol=nix" "noatime"];
+                  mountpoint = "/nix";
+                };
               };
             };
           };
