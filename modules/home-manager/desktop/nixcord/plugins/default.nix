@@ -7,9 +7,7 @@
     betterNotesBox = import ./betterNotesBox.nix;
     betterRoleContext = import ./betterRoleContext.nix;
     callTimer.enable = true;
-    clearURLs.enable = true;
     copyEmojiMarkdown.enable = true;
-    copyUserURLs.enable = true;
     crashHandler.attemptToNavigateToHome = true;
     dontRoundMyTimestamps.enable = true;
     fakeNitro.enable = true;

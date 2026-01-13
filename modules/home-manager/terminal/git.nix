@@ -16,31 +16,34 @@
         makePath = dir: config.home.homeDirectory + dir;
       in [
         (makePath "/dotfiles")
-        (makePath "/Projects/*")
+        (makePath "/Projects/*/*")
       ];
     };
-
-    userName = userInfo.fullName;
-    userEmail = userInfo.email;
 
     signing = {
       key = null;
       signByDefault = true;
     };
 
-    aliases = {
-      graph = "log --all --decorate --graph";
-      staash = "stash --all";
-      hist = "log --pretty=format:\"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)\" --graph --date=relative --decorate --all";
-      fuck = "commit --amend -m";
-      br = "branch";
-      st = "status";
-      d = "diff";
-    };
-
-    extraConfig = let
+    settings = let
       deltaBin = lib.getExe pkgs.delta;
     in {
+      user = {
+        inherit (userInfo) email;
+
+        name = userInfo.fullName;
+      };
+
+      alias = {
+        graph = "log --all --decorate --graph";
+        staash = "stash --all";
+        hist = "log --pretty=format:\"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)\" --graph --date=relative --decorate --all";
+        fuck = "commit --amend -m";
+        br = "branch";
+        st = "status";
+        d = "diff";
+      };
+
       push = {
         autoSetupRemote = true;
         default = "current";

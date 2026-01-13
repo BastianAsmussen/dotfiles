@@ -24,11 +24,11 @@ to handle development environments and it seems pretty good! Now I'll just have
 to implement a template for each language I use, which, as of now consists of:
 
 - [x] Rust
-- [ ] Go
+- [x] Go
 - [ ] C#
 - [ ] Haskell
 - [ ] C
-- [ ] Python
+- [x] Python
 
 ## Neovim
 
