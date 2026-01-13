@@ -17,7 +17,6 @@
       crates.enable = true;
       colorizer = import ./colorizer.nix;
       comment = import ./comment.nix;
-      direnv.enable = true;
       fidget.enable = true;
       gitsigns = import ./gitsigns.nix config;
       harpoon = import ./harpoon.nix;
@@ -35,7 +34,6 @@
       oil = import ./oil.nix;
       rustaceanvim = import ./rustaceanvim.nix {inherit lib config pkgs;};
       sleuth.enable = true;
-      snacks = import ./snacks;
       telescope = import ./telescope.nix;
       tmux-navigator = import ./tmux-navigator.nix;
       treesitter = import ./treesitter.nix pkgs;

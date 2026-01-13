@@ -33,6 +33,6 @@ in {
 
   system = {
     configurationRevision = self.shortRev or self.dirtyShortRev;
-    stateVersion = mkDefault "24.05";
+    stateVersion = mkDefault "25.11";
   };
 }

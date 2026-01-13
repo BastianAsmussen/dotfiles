@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-fork.url = "github:BastianAsmussen/nixpkgs";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
@@ -62,8 +62,6 @@
       "aarch64-linux"
       "i686-linux"
       "x86_64-linux"
-      "aarch64-darwin"
-      "x86_64-darwin"
     ];
 
     hosts = attrNames (readDir ./hosts);

@@ -12,7 +12,7 @@
   # Custom nixpkgs fork.
   fork = final: _: {
     fork = import inputs.nixpkgs-fork {
-      inherit (final) system;
+      inherit (final.stdenv.hostPlatform) system;
 
       config.allowUnfree = true;
     };
@@ -21,7 +21,7 @@
   # Convenient access to the nixpkgs stable branch.
   stable-packages = final: _: {
     stable = import inputs.nixpkgs-stable {
-      inherit (final) system;
+      inherit (final.stdenv.hostPlatform) system;
 
       config.allowUnfree = true;
     };

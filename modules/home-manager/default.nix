@@ -26,8 +26,8 @@
 
   home = {
     inherit (userInfo) username;
-    homeDirectory = "/home/${userInfo.username}";
 
+    homeDirectory = "/home/${userInfo.username}";
     packages = lib.mkMerge [
       (with pkgs; [
         man-pages
@@ -42,13 +42,11 @@
         mit
         calculator
         copy-file
-        nixpoch
         todo
-        rusty-man
         cargo-info
       ])
       (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
-        bitwarden
+        bitwarden-desktop
         teams-for-linux
         qbittorrent
         pika-backup
@@ -59,7 +57,7 @@
       ]))
     ];
 
-    stateVersion = "24.05";
+    stateVersion = "25.11";
   };
 
   programs = {

@@ -1,10 +1,11 @@
 {
   inputs,
   userInfo,
-  pkgs,
   lib,
   ...
-}: {
+}: let
+  inherit (lib) mkForce;
+in {
   imports = [
     inputs.nixos-wsl.nixosModules.default
   ];
@@ -27,17 +28,15 @@
   };
 
   # Running VSCode Remote.
-  programs.nix-ld = {
-    enable = true;
-
-    package = pkgs.nix-ld-rs;
-  };
+  programs.nix-ld.enable = true;
 
   # Disable default options as they're rendered redundant in a WSL environment.
   btrfs.enable = false;
   network-manager.enable = false;
   qemu.enable = false;
   vpn.enable = false;
+
+  security.auditd.enable = mkForce false;
 
   # Used for resolving hostnames.
   services.resolved.enable = true;
@@ -47,7 +46,7 @@
     enableOnBoot = true;
 
     # Disable btrfs storage driver.
-    storageDriver = lib.mkForce null;
+    storageDriver = mkForce null;
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

@@ -41,8 +41,7 @@ in {
     environment.variables = {
       # Required to run the correct GBM backend for NVIDIA GPUs on Wayland.
       GBM_BACKEND = mkIf config.desktop.greeter.useWayland "nvidia-drm";
-      # Apparently, without this nouveau may attempt to be used instead.
-      # (despite it being blacklisted)
+      # Select NVIDIA's GLX and VA-API drivers instead of nouveau.
       __GLX_VENDOR_LIBRARY_NAME = "nvidia";
 
       LIBVA_DRIVER_NAME = "nvidia";
