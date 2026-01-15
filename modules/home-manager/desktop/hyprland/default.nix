@@ -14,12 +14,12 @@
 
   smartGaps = {
     windowrule = [
-      "bordersize 0, floating:0, onworkspace:w[t1]"
-      "rounding 0, floating:0, onworkspace:w[t1]"
-      "bordersize 0, floating:0, onworkspace:w[tg1]"
-      "rounding 0, floating:0, onworkspace:w[tg1]"
-      "bordersize 0, floating:0, onworkspace:f[1]"
-      "rounding 0, floating:0, onworkspace:f[1]"
+      "border_size 0, match:float 0, match:workspace w[t1]"
+      "rounding 0, match:float 0, match:workspace w[t1]"
+      "border_size 0, match:float 0, match:workspace w[tg1]"
+      "rounding 0, match:float 0, match:workspace w[tg1]"
+      "border_size 0, match:float 0, match:workspace f[1]"
+      "rounding 0, match:float 0, match:workspace f[1]"
     ];
 
     workspace = [
@@ -73,10 +73,10 @@ in {
           preserve_split = true;
         };
 
-        gestures = {
-          workspace_swipe = true;
-          workspace_swipe_use_r = true;
-        };
+        gesture = [
+          "3, left, workspace, r+1"
+          "3, right, workspace, r-1"
+        ];
 
         misc = {
           disable_splash_rendering = true;
@@ -84,22 +84,22 @@ in {
         };
 
         windowrule = let
-          pictureInPicture = "class:(firefox) title:^(Picture-in-Picture)$";
-          mullvadVPN = "class:(Mullvad VPN)";
-          steam = "class:(steam)";
+          pictureInPicture = "match:class (firefox) match:title ^(Picture-in-Picture)$";
+          mullvadVPN = "match:class (Mullvad VPN)";
+          steam = "match:class (steam)";
 
-          mkFloating = pattern: "float, title:^(${pattern})$";
+          mkFloating = pattern: "match:title ^(${pattern})$, float on";
         in
           lib.mkMerge [
             smartGaps.windowrule
             [
-              "float, ${pictureInPicture}"
-              "size 30% 30%, ${pictureInPicture}"
-              "move 100%-w-20, ${pictureInPicture}"
-              "pin, ${pictureInPicture}"
-              "keepaspectratio, ${pictureInPicture}"
-              "float, class:(org.qbittorrent.qBittorrent) title:^(?!qBittorrent).*$"
-              "float, class:(electron) title:^(?!electron).*$"
+              "${pictureInPicture}, float on"
+              "${pictureInPicture}, size 30% 30%"
+              "${pictureInPicture}, move 100%-w-20"
+              "${pictureInPicture}, pin on"
+              "${pictureInPicture}, keep_aspect_ratio on"
+              "match:class (org.qbittorrent.qBittorrent) match:title ^(?!qBittorrent).*$, float on"
+              "match:class (electron) match:title ^(?!electron).*$, float on"
 
               (mkFloating "org.gnome.Calculator")
               (mkFloating "org.gnome.Nautilus")
@@ -117,14 +117,14 @@ in {
               (mkFloating "com.github.Aylur.ags")
             ]
             (mkIf osConfig.vpn.enable [
-              "float, ${mullvadVPN}"
-              "move 100%-w-20 5%, ${mullvadVPN}"
-              "pin, ${mullvadVPN}"
+              "${mullvadVPN}, float on"
+              "${mullvadVPN}, move 100%-w-20 5%"
+              "${mullvadVPN}, pin on"
             ])
             (mkIf osConfig.gaming.enable [
-              "float, ${steam} title:^(?!Steam$).*$"
-              "size 15% 60%, ${steam} title:Friends List"
-              "center, ${steam} title:Friends List"
+              "${steam} match:title ^(?!Steam$).*$, float on"
+              "${steam} match:title Friends List, size 15% 60%"
+              "${steam} match:title Friends List, center"
             ])
           ];
 
