@@ -4,7 +4,7 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
-    ./distributed-builds.nix
+    # ./distributed-builds.nix
 
     hardware.common-cpu-intel
     hardware.common-gpu-intel
@@ -13,7 +13,12 @@ in {
 
   desktop = {
     audio.pipewire.enable = true;
-    environment.hyprland.enable = true;
+    environment.hyprland = {
+      enable = true;
+
+      monitors = ["eDP-1, 1920x1080@60, 0x0, 1"];
+    };
+
     greeter.gdm.enable = true;
   };
 
