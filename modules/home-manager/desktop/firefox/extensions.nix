@@ -3,10 +3,6 @@
   enableExtraExtensions = true;
 
   darkreader.enable = true;
-  simplefox = {
-    enable = true;
-    showUrlBar = true;
-  };
 
   extraExtensions = let
     mkFirefoxURL = name: "https://addons.mozilla.org/firefox/downloads/latest/${name}/latest.xpi";
