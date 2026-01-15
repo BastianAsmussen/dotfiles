@@ -73,11 +73,7 @@ in {
           preserve_split = true;
         };
 
-        gesture = [
-          "3, left, workspace, r+1"
-          "3, right, workspace, r-1"
-        ];
-
+        gesture = ["3, horizontal, workspace,"];
         misc = {
           disable_splash_rendering = true;
           force_default_wallpaper = 1;
