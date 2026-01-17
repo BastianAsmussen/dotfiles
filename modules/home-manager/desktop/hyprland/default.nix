@@ -120,7 +120,7 @@ in {
             (mkIf osConfig.gaming.enable [
               "${steam} match:title ^(?!Steam$).*$, float on"
               "${steam} match:title Friends List, size 15% 60%"
-              "${steam} match:title Friends List, center"
+              "${steam} match:title Friends List, center on"
             ])
           ];
 
