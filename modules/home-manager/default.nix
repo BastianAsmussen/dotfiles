@@ -13,11 +13,6 @@
     ./rust.nix
   ];
 
-  disabledModules = lib.optionals (osConfig ? wsl.enable) [
-    ./desktop
-    ./dconf.nix
-  ];
-
   gpg = {
     enable = true;
 
@@ -28,33 +23,31 @@
     inherit (userInfo) username;
 
     homeDirectory = "/home/${userInfo.username}";
-    packages = lib.mkMerge [
-      (with pkgs; [
-        man-pages
-        man-pages-posix
-        gitui
-        wget
-        go
-        jq
-        manix
-        tlrc
-        cabal-install
-        mit
-        calculator
-        copy-file
-        todo
-        cargo-info
-      ])
-      (lib.mkIf (!osConfig ? wsl.enable) (with pkgs; [
-        bitwarden-desktop
-        teams-for-linux
-        qbittorrent
-        pika-backup
-        libreoffice-fresh
-        airtame
-        freecad-wayland
-        mpv
-      ]))
+    packages = with pkgs; [
+      man-pages
+      man-pages-posix
+      gitui
+      wget
+      go
+      jq
+      manix
+      tlrc
+      cabal-install
+      mit
+      calculator
+      copy-file
+      todo
+      cargo-info
+      bitwarden-desktop
+      teams-for-linux
+      qbittorrent
+      pika-backup
+      libreoffice-fresh
+      airtame
+      freecad-wayland
+      mpv
+      winboat
+      freerdp
     ];
 
     stateVersion = "25.11";
