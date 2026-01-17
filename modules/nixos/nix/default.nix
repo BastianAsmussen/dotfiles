@@ -7,7 +7,6 @@
   ...
 }: {
   imports = [
-    ./binary-cache.nix
     ./nh.nix
   ];
 
