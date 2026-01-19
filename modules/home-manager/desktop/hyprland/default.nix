@@ -279,5 +279,7 @@ in {
         xwayland.force_zero_scaling = true;
       };
     };
+
+    services.hyprpaper.settings.splash = false;
   };
 }
