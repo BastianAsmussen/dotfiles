@@ -26,6 +26,7 @@
       "w[t1], gapsout:0, gapsin:0"
       "w[tg1], gapsout:0, gapsin:0"
       "f[1], gapsout:0, gapsin:0"
+      "10, border:false, rounding:false"
     ];
   };
 in {
@@ -121,6 +122,10 @@ in {
               "${steam} match:title ^(?!Steam$).*$, float on"
               "${steam} match:title Friends List, size 15% 60%"
               "${steam} match:title Friends List, center on"
+
+              "match:class ^steam_app\d+$, fullscreen on"
+              "match:class ^steam_app\d+$, monitor 1"
+              "match:class ^steam_app\d+$, workspace 10"
             ])
           ];
 
