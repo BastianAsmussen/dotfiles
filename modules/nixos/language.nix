@@ -22,11 +22,7 @@
   };
 
   console.useXkbConfig = true;
-  services.xserver.xkb = {
-    layout = "us,dk";
-    variant = "colemak_dh_iso,";
-    options = "caps:escape,grp:win_space_toggle";
-  };
+  services.xserver.xkb.layout = "dk";
 
   environment.systemPackages = with pkgs; [
     hunspellDicts.da_DK
