@@ -26,7 +26,6 @@
       "w[t1], gapsout:0, gapsin:0"
       "w[tg1], gapsout:0, gapsin:0"
       "f[1], gapsout:0, gapsin:0"
-      "10, border:false, rounding:false"
     ];
   };
 in {
@@ -65,7 +64,8 @@ in {
           float_switch_override_focus = 2;
 
           # Disable mouse acceleration if gaming is enabled.
-          force_no_accel = osConfig.gaming.enable;
+          accel_profile = "flat";
+          force_no_accel = !osConfig.gaming.enable;
         };
 
         monitor = osConfig.desktop.environment.hyprland.monitors;
@@ -123,9 +123,12 @@ in {
               "${steam} match:title Friends List, size 15% 60%"
               "${steam} match:title Friends List, center on"
 
-              "match:class ^steam_app\d+$, fullscreen on"
-              "match:class ^steam_app\d+$, monitor 1"
-              "match:class ^steam_app\d+$, workspace 10"
+              "match:class (steam_app_default), match:title (Overwatch), content game"
+
+              "match:tag game, fullscreen on"
+              "match:tag game, immediate on"
+              "match:tag game, no_vrr off"
+              "match:tag game, content game"
             ])
           ];
 
@@ -166,6 +169,7 @@ in {
 
             "$mod, f, togglefloating"
             "$mod, g, fullscreen"
+            "$mod, SHIFT g, tagwindow, game" # Mark as a game.
             "$mod, o, fullscreen, 1" # Fake fullscreen.
             "$mod, p, togglesplit"
 
