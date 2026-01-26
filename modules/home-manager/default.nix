@@ -39,7 +39,6 @@
       bitwarden-desktop
       teams-for-linux
       qbittorrent
-      pika-backup
       libreoffice-fresh
       airtame
       freecad-wayland
