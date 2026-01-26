@@ -64,7 +64,7 @@ in {
           float_switch_override_focus = 2;
 
           # Disable mouse acceleration if gaming is enabled.
-          accel_profile = "flat";
+          accel_profile = lib.mkIf osConfig.gaming.enable "flat";
           force_no_accel = !osConfig.gaming.enable;
         };
 
