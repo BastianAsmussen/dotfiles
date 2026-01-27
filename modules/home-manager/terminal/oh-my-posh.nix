@@ -22,6 +22,13 @@
               properties.style = "full";
             }
             {
+              type = "session";
+              style = "plain";
+              foreground = "red";
+              background = "transparent";
+              template = "{{ if .SSHSession }} {{ end }}";
+            }
+            {
               type = "git";
               style = "plain";
               foreground = "p:grey";
