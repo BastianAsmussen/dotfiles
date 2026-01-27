@@ -82,7 +82,6 @@ in {
         windowrule = let
           pictureInPicture = "match:class (firefox) match:title ^(Picture-in-Picture)$";
           mullvadVPN = "match:class (Mullvad VPN)";
-          steam = "match:class (steam)";
 
           mkFloating = pattern: "match:title ^(${pattern})$, float on";
         in
@@ -118,16 +117,16 @@ in {
               "${mullvadVPN}, pin on"
             ])
             (mkIf osConfig.gaming.enable [
-              "${steam} match:title ^(?!Steam$).*$, float on"
-              "${steam} match:title Friends List, size 15% 60%"
-              "${steam} match:title Friends List, center on"
+              "match:class ^([Ss]team)$ match:title negative:^([Ss]team)$, float on"
 
-              "match:class (steam_app_default), match:title (Overwatch), content game"
+              "match:class ^([Ss]team|heroic)$, tag +gamestore"
+              "match:title ^([Ll]utris)$, tag +gamestore"
+              "match:class ^(steam_app_(\\d|\\w)+|gamescope)$, tag +games"
 
-              "match:tag game, fullscreen on"
-              "match:tag game, immediate on"
-              "match:tag game, no_vrr off"
-              "match:tag game, content game"
+              "match:tag games, no_blur on, fullscreen 0"
+              "match:tag games, fullscreen 0"
+              "match:tag games, immediate on"
+              "match:tag games, no_vrr off"
             ])
           ];
 
