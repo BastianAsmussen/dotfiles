@@ -65,7 +65,6 @@ in {
 
           # Disable mouse acceleration if gaming is enabled.
           accel_profile = lib.mkIf osConfig.gaming.enable "flat";
-          force_no_accel = !osConfig.gaming.enable;
         };
 
         monitor = osConfig.desktop.environment.hyprland.monitors;
