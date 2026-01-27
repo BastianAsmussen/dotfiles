@@ -28,7 +28,15 @@ in {
         enable = true;
         enable32Bit = true;
 
-        extraPackages = [pkgs.vulkan-validation-layers];
+        extraPackages = with pkgs; [
+          libva-vdpau-driver
+          libvdpau
+          libvdpau-va-gl
+          nvidia-vaapi-driver
+          vdpauinfo
+          libva
+          libva-utils
+        ];
       };
 
       # Enable the container toolkit if Docker is enabled.
