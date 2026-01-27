@@ -3,8 +3,8 @@
     ./firefox
     ./goxlr
     ./hyprland
-    ./nixcord
     ./alacritty.nix
+    ./nixcord.nix
     ./spicetify.nix
   ];
 }
