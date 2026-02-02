@@ -3,7 +3,7 @@
   config,
   pkgs,
 }: {
-  enable = false;
+  enable = true;
 
   settings = {
     server = {
