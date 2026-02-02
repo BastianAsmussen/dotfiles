@@ -26,7 +26,7 @@
               style = "plain";
               foreground = "red";
               background = "transparent";
-              template = "{{ if .SSHSession }} {{ end }}";
+              template = "{{ if .SSHSession }}  {{ end }}";
             }
             {
               type = "git";
