@@ -37,7 +37,6 @@
           "nix-command" # Enable new Nix commands.
           "cgroups" # Allow Nix to execute builds inside cgroups.
           "auto-allocate-uids" # Allow Nix to automatically pick UIDs, rather than creating nixbld* user accounts.
-          "no-url-literals" # Disallow deprecated url-literals, i.e., URLs without quotation.
         ];
 
         trusted-users =
