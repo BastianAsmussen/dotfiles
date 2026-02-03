@@ -14,11 +14,7 @@
 
     disko.url = "github:nix-community/disko";
     home-manager.url = "github:nix-community/home-manager";
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
+    nixvim.url = "github:nix-community/nixvim";
     hyprland.url = "github:hyprwm/Hyprland";
     ags.url = "github:Aylur/ags/v1";
     stylix.url = "github:danth/stylix";
