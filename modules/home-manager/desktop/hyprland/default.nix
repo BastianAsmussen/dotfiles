@@ -132,7 +132,7 @@ in {
 
         inherit (smartGaps) workspace;
 
-        binds.allow_workspace_cycles = true;
+        binds.movefocus_cycles_fullscreen = true;
         bind = let
           mkBind = mod: cmd: key: arg: "${mod}, ${key}, ${cmd}, ${arg}";
 
