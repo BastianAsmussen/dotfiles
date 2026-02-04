@@ -21,6 +21,7 @@
     misc = import ./misc.nix;
     search.defaultSearchEngine = "DuckDuckGo";
     settings = import ./settings.nix;
+    security.sandbox.enable = true;
     theme = import ./theme.nix osConfig;
   };
 }
