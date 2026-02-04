@@ -1,7 +1,7 @@
 {
   drm.enable = true;
+  disableWebgl = false;
   contextMenu.enable = true;
-
   displayBookmarksInToolbar = "always";
   bookmarks = [
     {
