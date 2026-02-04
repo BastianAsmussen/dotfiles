@@ -19,6 +19,7 @@ in {
     home-manager = {
       extraSpecialArgs = {inherit inputs pkgs userInfo self;};
       useUserPackages = true;
+      useGlobalPkgs = true;
       backupFileExtension = "backup";
       users.${userInfo.username} = import ../home-manager;
     };
