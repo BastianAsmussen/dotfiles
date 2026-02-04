@@ -27,7 +27,7 @@ in {
     enable = true;
 
     shell = getExe pkgs.zsh;
-    terminal = "screen-256color"; # Fix terminal colors.
+    terminal = "tmux-256color"; # Fix terminal colors.
     keyMode = "vi";
 
     newSession = true;
@@ -45,13 +45,18 @@ in {
     plugins = with pkgs.tmuxPlugins; [
       vim-tmux-navigator
       yank
-      pkgs.stable.tmuxPlugins.catppuccin
+      {
+        plugin = catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_flavor 'mocha'
+          set -g @catppuccin_window_status_style 'basic'
+          set -g @catppuccin_window_tabs_enabled on
+          set -g @catppuccin_date_time "%H:%M"
+        '';
+      }
     ];
 
     extraConfig = ''
-      # Fix terminal colors.
-      set -as terminal-features ",xterm-256color:RGB"
-
       # Automatically renumber windows.
       set -g renumber-windows on
 
