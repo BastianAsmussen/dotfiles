@@ -337,22 +337,6 @@
         "type": "github"
       }
     },
-    "glove80-zmk": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1764160494,
-        "narHash": "sha256-drM6YecXmSTNCePxXyD6Tfl9UKwDpjYjq+/h/Bq4oLA=",
-        "owner": "moergo-sc",
-        "repo": "zmk",
-        "rev": "11454d23596afbdb06380a1125371b19ab65675c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "moergo-sc",
-        "repo": "zmk",
-        "type": "github"
-      }
-    },
     "gnome-shell": {
       "flake": false,
       "locked": {
@@ -1057,7 +1041,6 @@
       "inputs": {
         "ags": "ags",
         "disko": "disko",
-        "glove80-zmk": "glove80-zmk",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "nix-index-database": "nix-index-database",
