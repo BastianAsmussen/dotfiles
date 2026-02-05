@@ -45,6 +45,7 @@
       mpv
       winboat
       freerdp
+      anki
     ];
 
     stateVersion = "25.11";
