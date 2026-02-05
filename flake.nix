@@ -37,10 +37,6 @@
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     schizofox.url = "github:schizofox/schizofox";
     nixcord.url = "github:FlameFlag/nixcord";
-    glove80-zmk = {
-      url = "github:moergo-sc/zmk";
-      flake = false;
-    };
   };
 
   outputs = {
@@ -76,7 +72,6 @@
       icon = ./assets/icons/bastian.png;
     };
   in {
-    apps = forAllSystems ({pkgs}: import ./apps {inherit inputs pkgs lib;});
     checks = forAllSystems ({pkgs}: {
       library = pkgs.callPackage ./tests {inherit pkgs lib;};
     });
