@@ -27,4 +27,8 @@
   environment.systemPackages = with pkgs; [
     hunspellDicts.da_DK
   ];
+
+  fonts.packages = with pkgs; [
+    kochi-substitute
+  ];
 }
