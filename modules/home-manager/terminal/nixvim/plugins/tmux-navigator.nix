@@ -5,7 +5,6 @@ let
 in {
   enable = true;
 
-  settings.no_mappings = 1;
   keymaps = [
     (mapAction "up" "<C-k>")
     (mapAction "down" "<C-j>")
