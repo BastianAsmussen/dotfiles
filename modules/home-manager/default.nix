@@ -34,6 +34,7 @@
       mit
       calculator
       copy-file
+      repo-cloner
       todo
       cargo-info
       bitwarden-desktop
