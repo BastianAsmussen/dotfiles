@@ -4,6 +4,7 @@
   ...
 }: {
   home.packages = [pkgs.tmux-sessionizer];
+
   xdg.configFile."tms/config.toml".text = let
     inherit (config.home) homeDirectory;
   in
