@@ -11,5 +11,6 @@
   mit = pkgs.callPackage ./mit {};
   calculator = pkgs.callPackage ./calculator.nix {};
   copy-file = pkgs.callPackage ./copy-file.nix {};
+  repo-cloner = pkgs.callPackage ./repo-cloner.nix {};
   todo = pkgs.callPackage ./todo.nix {};
 }
