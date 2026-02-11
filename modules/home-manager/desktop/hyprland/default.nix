@@ -38,7 +38,9 @@ in {
     wayland.windowManager.hyprland = {
       enable = true;
 
-      inherit (osConfig.programs.hyprland) package;
+      # Use XDPH packages from the NixOS module.
+      package = null;
+      portalPackage = null;
 
       xwayland.enable = true;
       systemd.enableXdgAutostart = true;
