@@ -47,6 +47,7 @@
       winboat
       freerdp
       anki
+      diesel-cli
     ];
 
     stateVersion = "25.11";
