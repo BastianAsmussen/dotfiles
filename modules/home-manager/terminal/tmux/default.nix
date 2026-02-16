@@ -1,12 +1,18 @@
 {
   lib,
   pkgs,
+  config,
   ...
 }: let
   inherit (lib) getExe;
 
   tmux = getExe pkgs.tmux;
   tms = getExe pkgs.tmux-sessionizer;
+  fzf = getExe pkgs.fzf;
+  git = getExe pkgs.git;
+
+  homeDir = config.home.homeDirectory;
+  logFile = "/tmp/clone-project.log";
 
   sessionPopup = pkgs.writeShellScriptBin "sessions" ''
     raw_width=$(${tmux} display-message -p '#{window_width}')
@@ -16,6 +22,66 @@
     popup_height=$((raw_height > 50 ? 50 : raw_height * 80 / 100))
 
     ${tmux} display-popup -E -h $popup_height -w $popup_width -T 'Choose Project' '${tms}'
+  '';
+
+  cloneProject = pkgs.writeShellScriptBin "clone-project" ''
+    set -euo pipefail
+
+    # ── Helpers ──────────────────────────────────────────────
+    die()  { printf '\033[1;31m✗\033[0m %b\n' "$1"; sleep 2; exit 1; }
+    info() { printf '\033[1;34m›\033[0m %b\n' "$1"; }
+    ok()   { printf '\033[1;32m✓\033[0m %b\n' "$1"; }
+
+    # ── 1. Category ──────────────────────────────────────────
+    category=$(printf 'Personal\nSchool' \
+      | ${fzf} --prompt=' Category › ' \
+              --height=~50% \
+              --reverse \
+              --no-info \
+              --border=rounded \
+              --border-label=' Clone Project ' \
+              --color='pointer:blue,prompt:blue,border:dim')
+    [ -z "''${category:-}" ] && exit 0
+
+    # ── 2. Repository URL ────────────────────────────────────
+    printf '\033[1;34m›\033[0m Repo \033[2m(owner/repo or full URL)\033[0m: '
+    read -r repo_input
+    [ -z "''${repo_input:-}" ] && exit 0
+
+    # Expand owner/repo shorthand → SSH URL.
+    if echo "$repo_input" | grep -qE '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$'; then
+      repo_url="git@github.com:''${repo_input}.git"
+    else
+      repo_url="$repo_input"
+    fi
+
+    project_name=$(basename "$repo_url" .git)
+    target_dir="${homeDir}/Projects/''${category}/''${project_name}"
+
+    # ── 3. Clone / reuse ─────────────────────────────────────
+    if [ -d "$target_dir" ]; then
+      info "Already exists – opening \033[1m$project_name\033[0m"
+    else
+      info "Cloning into \033[2m$target_dir\033[0m …"
+      printf '\n'
+
+      if ! ${git} clone --progress "$repo_url" "$target_dir" 2>&1; then
+        # Re-run to capture the error into the log.
+        ${git} clone "$repo_url" "$target_dir" > "${logFile}" 2>&1 || true
+        printf '\n'
+        die "Clone failed – see \033[4m${logFile}\033[0m"
+      fi
+
+      printf '\n'
+      ok "Cloned \033[1m$project_name\033[0m"
+    fi
+
+    # ── 4. Sessionize ────────────────────────────────────────
+    session_name=$(echo "$project_name" | tr '.' '-')
+    if ! ${tmux} has-session -t "=$session_name" 2>/dev/null; then
+      ${tmux} new-session -d -s "$session_name" -c "$target_dir"
+    fi
+    ${tmux} switch-client -t "$session_name"
   '';
 in {
   imports = [
@@ -104,6 +170,9 @@ in {
       bind s display-popup -E -h 60% -w 85% -T 'Active Sessions' "${tms} switch"
       bind w display-popup -E -h 60% -w 85% -T 'Session Windows' "${tms} windows"
       bind f run-shell "${getExe sessionPopup}"
+
+      # Clone a new project and sessionize it.
+      bind g display-popup -E -h 14 -w 64 -T ' Clone Project ' "${getExe cloneProject}"
 
       # Detach from current session.
       bind C-d detach-client
