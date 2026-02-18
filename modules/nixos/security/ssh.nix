@@ -11,7 +11,7 @@
       openssh = {
         enable = true;
 
-        allowSFTP = false;
+        allowSFTP = true;
         settings = {
           PermitRootLogin = "no";
           MaxAuthTries = 3;
