@@ -112,6 +112,7 @@
         # Bookmarked directories.
         hash -d personal=~/Projects/Personal
         hash -d work=~/Projects/Work
+        hash -d school=~/Projects/School
         hash -d cfg=~/dotfiles
         hash -d dl=~/Downloads
 
@@ -159,16 +160,16 @@
       sudo = "sudo ";
 
       c = "clear";
-      cp = "cp -r";
-      rm = "rm -r";
-      mkdir = "mkdir -p";
+      cp = "cp --recursive";
+      rm = "rm --recursive";
+      mkdir = "mkdir --parents";
 
       # Copy and link with patterns.
       zcp = "zmv -C";
       zln = "zmv -L";
 
-      myip = "curl -s ifconfig.me -w '\n'";
-      system-size = "nix path-info -Sh /run/current-system | tail -1 | awk '{ print $2, $3 }'";
+      myip = "curl --silent --write-out '\n' https://ifconfig.me/";
+      system-size = "nix path-info -Sh /run/current-system | awk '{ print $2, $3 }'";
     };
 
     shellGlobalAliases = {

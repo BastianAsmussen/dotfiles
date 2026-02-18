@@ -1,6 +1,4 @@
 {
-  home.shellAliases.neofetch = "fastfetch";
-
   programs.fastfetch = {
     enable = true;
 

@@ -38,7 +38,7 @@
         graph = "log --all --decorate --graph";
         staash = "stash --all";
         hist = "log --pretty=format:\"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)\" --graph --date=relative --decorate --all";
-        fuck = "commit --amend -m";
+        fuck = "commit --amend --message";
         br = "branch";
         st = "status";
         d = "diff";
