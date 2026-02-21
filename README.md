@@ -115,7 +115,7 @@ You can use this flake for development environment templates.
 ### List Templates
 
 ```sh
-nix-shell -p jq --run "nix flake show self --all-systems --json | jq .templates"
+nix-shell -p jq --run "nix flake show self --json 2>/dev/null | jq '.templates | map_values(.description) | del(.default)'"
 ```
 
 ### Use Template
