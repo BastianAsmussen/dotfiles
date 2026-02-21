@@ -6,6 +6,8 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-fork.url = "github:BastianAsmussen/nixpkgs";
 
+    flake-parts.url = "github:hercules-ci/flake-parts";
+
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
@@ -37,70 +39,140 @@
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     schizofox.url = "github:schizofox/schizofox";
     nixcord.url = "github:FlameFlag/nixcord";
+
+    pre-commit-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = {
-    nixpkgs,
+  outputs = inputs @ {
     self,
+    nixpkgs,
+    flake-parts,
     ...
-  } @ inputs: let
-    inherit (self) outputs;
-    inherit (builtins) attrNames readDir listToAttrs;
+  }:
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      imports = [
+        inputs.pre-commit-hooks.flakeModule
+      ];
 
-    systems = [
-      "aarch64-linux"
-      "i686-linux"
-      "x86_64-linux"
-    ];
+      systems = [
+        "aarch64-linux"
+        "i686-linux"
+        "x86_64-linux"
+      ];
 
-    hosts = attrNames (readDir ./hosts);
-    forAllSystems = fn:
-      nixpkgs.lib.genAttrs systems
-      (system:
-        fn {
-          pkgs = import nixpkgs {inherit system;};
+      flake = {
+        lib = nixpkgs.lib.extend (final: _prev: {
+          custom = import ./lib final;
         });
 
-    lib = nixpkgs.lib.extend (final: _prev: {
-      custom = import ./lib final;
-    });
-
-    userInfo = {
-      username = "bastian";
-      email = "bastian@asmussen.tech";
-      fullName = "Bastian Asmussen";
-      icon = ./assets/icons/bastian.png;
-    };
-  in {
-    checks = forAllSystems ({pkgs}: {
-      library = pkgs.callPackage ./tests {inherit pkgs lib;};
-    });
-
-    devShells = forAllSystems ({pkgs}: {
-      default = import ./shell.nix {inherit pkgs;};
-    });
-
-    formatter = forAllSystems ({pkgs}: pkgs.alejandra);
-    overlays = import ./overlays {inherit inputs lib;};
-    packages = forAllSystems ({pkgs}: import ./pkgs {inherit pkgs;});
-    templates = import ./templates;
-
-    nixosConfigurations = listToAttrs (map (hostname: {
-        name = hostname;
-        value = nixpkgs.lib.nixosSystem {
-          specialArgs = {inherit inputs outputs userInfo lib self;};
-          modules = [
-            ./hosts/${hostname}/configuration.nix
-            ./modules/nixos
-
-            {networking.hostName = hostname;}
-
-            inputs.disko.nixosModules.disko
-            inputs.stylix.nixosModules.stylix
-            inputs.nix-index-database.nixosModules.nix-index
-          ];
+        overlays = import ./overlays {
+          inherit inputs;
+          inherit (self) lib;
         };
-      })
-      hosts);
-  };
+
+        templates = import ./templates;
+        nixosConfigurations = let
+          inherit (builtins) attrNames readDir listToAttrs;
+
+          hosts = attrNames (readDir ./hosts);
+          userInfo = {
+            username = "bastian";
+            email = "bastian@asmussen.tech";
+            fullName = "Bastian Asmussen";
+            icon = ./assets/icons/bastian.png;
+          };
+        in
+          listToAttrs (map (hostname: {
+              name = hostname;
+              value = nixpkgs.lib.nixosSystem {
+                specialArgs = {
+                  inherit inputs userInfo self;
+                  inherit (self) lib;
+
+                  outputs = self;
+                };
+
+                modules = [
+                  ./hosts/${hostname}/configuration.nix
+                  ./modules/nixos
+
+                  {networking.hostName = hostname;}
+
+                  inputs.disko.nixosModules.disko
+                  inputs.stylix.nixosModules.stylix
+                  inputs.nix-index-database.nixosModules.nix-index
+                ];
+              };
+            })
+            hosts);
+      };
+
+      perSystem = {
+        pkgs,
+        config,
+        ...
+      }: {
+        formatter = pkgs.alejandra;
+        packages = import ./pkgs {inherit pkgs;};
+        pre-commit.settings.hooks = {
+          deadnix = {
+            enable = true;
+            settings.edit = true;
+          };
+
+          statix.enable = true;
+          alejandra.enable = true;
+          flake-checker = {
+            enable = true;
+            args = ["--no-telemetry"];
+          };
+        };
+
+        checks = {
+          library = pkgs.callPackage ./tests {
+            inherit pkgs;
+            inherit (self) lib;
+          };
+
+          # Check for dead Nix code.
+          deadnix =
+            pkgs.runCommandLocal "deadnix" {
+              buildInputs = [pkgs.deadnix];
+              src = ./.;
+            } ''
+              deadnix --fail "$src"
+              touch $out
+            '';
+
+          # Lint Nix files.
+          statix =
+            pkgs.runCommandLocal "statix" {
+              buildInputs = [pkgs.statix];
+              src = ./.;
+            } ''
+              statix check "$src"
+              touch $out
+            '';
+
+          # Check flake inputs.
+          flake-checker =
+            pkgs.runCommandLocal "flake-checker" {
+              buildInputs = [pkgs.flake-checker];
+              src = ./.;
+            } ''
+              flake-checker --fail-mode --no-telemetry "$src/flake.lock"
+              touch $out
+            '';
+        };
+
+        devShells.default = pkgs.mkShell {
+          inherit (config.pre-commit) shellHook;
+
+          inputsFrom = [(import ./shell.nix {inherit pkgs;})];
+        };
+      };
+    };
 }
