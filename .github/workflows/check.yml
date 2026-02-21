@@ -4,8 +4,6 @@ on: [push]
 jobs:
   flake-check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout Repository
@@ -13,34 +11,6 @@ jobs:
 
       - name: Install Nix
         uses: cachix/install-nix-action@v27
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v15
-        with:
-          name: deadnix
 
-      - name: Dead Code Analysis
-        uses: astro/deadnix-action@main
-        with:
-          flags: "-eh"
-          commit_message: "chore: remove dead code"
-
-      - name: Install Nix Linting and Formatting Tools
-        run: nix-env -i statix alejandra -f '<nixpkgs>'
-
-      - name: Run Statix Lint
-        run: statix fix
-
-      - name: Run Nix Format
-        run: nix fmt
-
-      - name: Nix Flake Check (Manual)
+      - name: Nix Flake Check
         run: nix flake check --all-systems
-
-      - name: Nix Flake Checker
-        uses: DeterminateSystems/flake-checker-action@v5
-
-      - name: Commit Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: run auto formatting and linting tools"
