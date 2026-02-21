@@ -32,7 +32,7 @@ in {
   home-manager.enable = mkDefault true;
 
   system = {
-    configurationRevision = self.shortRev or self.dirtyShortRev;
+    configurationRevision = toString (self.shortRev or self.dirtyShortRev or self.lastModified or "unknown");
     stateVersion = mkDefault "25.11";
   };
 }
