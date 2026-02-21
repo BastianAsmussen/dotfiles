@@ -12,7 +12,6 @@ This is a repository for my NixOS configuration.
 ## Installation Guide
 
 1. Get the source code.
-
    1. Enter a Nix shell with Git.
 
       ```sh
@@ -39,7 +38,6 @@ This is a repository for my NixOS configuration.
       ```
 
 2. Choose a host.
-
    1. View available host options.
 
       ```sh
@@ -55,9 +53,11 @@ This is a repository for my NixOS configuration.
 3. Set up the disk configuration.
 
    ```sh
-   sudo nix run 'github:nix-community/disko/latest#disko-install' -- \
+   sudo nix run 'github:nix-community/disko/latest#disko-install' \
+       --extra-experimental-features 'nix-command flakes' -- \
        --write-efi-boot-entries \
-       --mode disko ~/dotfiles/hosts/$HOSTNAME/disko-config.nix
+       --flake ~/dotfiles#$HOSTNAME \
+       --disk main <disk-device>
    ```
 
 4. Install NixOS with the given configuration.

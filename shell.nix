@@ -12,7 +12,6 @@ pkgs.mkShell {
   NIX_CONFIG = "extra-experimental-features = nix-command flakes";
 
   packages = with pkgs; [
-    lix
     git
     neovim
     fzf
