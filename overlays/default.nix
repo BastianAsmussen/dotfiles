@@ -7,6 +7,10 @@
     docker = prev.docker.override {
       initSupport = true;
     };
+
+    bottles = prev.bottles.override {
+      removeWarningPopup = true;
+    };
   };
 
   # Custom nixpkgs fork.
