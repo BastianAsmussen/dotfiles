@@ -8,6 +8,7 @@
   inherit (lib) mkEnableOption mkIf;
 in {
   options.gaming.enable = mkEnableOption "Enables gaming related settings.";
+
   config = mkIf config.gaming.enable {
     programs = {
       steam = {
