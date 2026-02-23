@@ -41,7 +41,7 @@ This is a repository for my NixOS configuration.
    1. View available host options.
 
       ```sh
-      HOSTNAME=$(ls ~/dotfiles/hosts | fzf)
+      HOSTNAME=$(ls hosts | fzf)
       ```
 
    2. Set manually, e.g. `lambda`.
@@ -53,18 +53,33 @@ This is a repository for my NixOS configuration.
 3. Set up the disk configuration.
 
    ```sh
-   sudo nix run 'github:nix-community/disko/latest#disko-install' \
-       --extra-experimental-features 'nix-command flakes' -- \
-       --write-efi-boot-entries \
-       --flake ~/dotfiles#$HOSTNAME \
-       --disk main <disk-device>
+   sudo nix run github:nix-community/disko/latest \
+       --experimental-features 'nix-command flakes' -- \
+       --mode destroy,format,mount hosts/$HOSTNAME/disko-config.nix
    ```
 
-4. Install NixOS with the given configuration.
+4. Finally, install NixOS with the given configuration.
 
    ```sh
-   sudo nixos-install --flake ~/dotfiles#$HOSTNAME
+   sudo nixos-install --flake .#$HOSTNAME
    ```
+
+### Possible Errors and Workarounds
+
+- `error: creating pipe: Too many open files`
+
+  Simply increase the open file limit, i.e. setting it to `2048`.
+
+  ```sh
+  ulimit -n 2048
+  ```
+
+- `warning: download buffer is full; consider increasing the 'download-buffer-size' setting`
+
+  It's worth to consider increasing the download buffer during installation.
+  Like the warning suggests, this can be accomplished by increasing the
+  `download-buffer-size` setting; pass `--option download-buffer-size n` where
+  `n` is the buffer size to the `nixos-install` command from step 4.
 
 > [!IMPORTANT]
 > Remember to change the password of the user!
