@@ -65,6 +65,10 @@ server.
 I'm considering [migrating AGS](https://aylur.github.io/ags/guide/migrate.html)
 to [Astal](https://aylur.github.io/astal).
 
+Another possibility is moving to a more traditional setup like Waybar. The
+[Hyprland Wiki](https://wiki.hypr.land/Useful-Utilities/Status-Bars/) has a
+good section on this.
+
 ### Status
 
 - Currently, I'm pinning the flake input to
