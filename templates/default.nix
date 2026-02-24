@@ -6,7 +6,7 @@ rec {
     welcomeText = ''
       # Go Project Template
 
-      ## Indented Usage
+      ## Intended Usage
 
       Development of Go programs and libraries.
 
@@ -22,21 +22,23 @@ rec {
 
   python = {
     path = ./python;
-    description = "Basic Python development environment.";
+    description = "Python development environment.";
     welcomeText = ''
       # Python Project Template
 
+      ## Intended Usage
+
+      Development and packaging of Python scripts and libraries.
+
       ## Notes
 
-      This isn't a final version, I'd like to integrate stuff like `flake-utils`
-      and other utilities. Not to mention testing through `nix flake check` and
-      running through `nix run`.
+      Do not forget to change the `pyproject.toml`'s `tool.poetry.name` field!
     '';
   };
 
   rust = {
     path = ./rust;
-    description = "Standard Rust development environment.";
+    description = "Rust development environment.";
     welcomeText = ''
       # Rust Project Template
 
