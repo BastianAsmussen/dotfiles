@@ -28,7 +28,6 @@
       lualine = import ./lualine.nix;
       luasnip = import ./luasnip.nix pkgs;
       markdown-preview = import ./markdown-preview.nix;
-      neocord = import ./neocord.nix config;
       nix.enable = true;
       none-ls = import ./none-ls.nix;
       oil = import ./oil.nix;
