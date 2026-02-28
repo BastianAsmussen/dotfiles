@@ -1,10 +1,10 @@
 [package]
 name = "sample-project"
+description = "A short description of my package"
 version = "0.1.0"
-edition = "2021"
-description = ""
+edition = "2024"
 authors = ["Bastian Asmussen <bastian@asmussen.tech>"]
 readme = "README.md"
-license-file = "LICNESE"
+license-file = "LICENSE"
 
 [dependencies]

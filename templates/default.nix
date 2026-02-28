@@ -42,13 +42,10 @@ rec {
     welcomeText = ''
       # Rust Project Template
 
-      ## Intended Usage
+      ## Getting Started
 
-      Development and packaging of Rust programs and libraries.
-
-      ## Notes
-
-      Do not forget to change the `Cargo.toml`'s `package.name` field!
+      - Enter the development shell with `nix develop`.
+      - Run the `init.sh` script to rename the project files automatically.
     '';
   };
 }
