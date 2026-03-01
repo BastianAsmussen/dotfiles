@@ -3,12 +3,16 @@
 
   helpers = {
     # Helper for comparing floating point numbers with small margin of error.
-    isClose = a: b: let
-      tol = 1.0e-4;
+    isClose = {
+      margins ? {
+        abs = 1.0e-6;
+        rel = 1.0e-6;
+      },
+    }: a: b: let
+      absDiff = abs (a - b);
+      scale = max 1.0 (max (abs a) (abs b));
     in
-      abs (a - b)
-      < tol
-      || abs (a - b) / max (abs a) (abs b) < tol;
+      absDiff <= margins.abs || (absDiff / scale) <= margins.rel;
 
     # Helper to assert a generated float is between 0 and 1.
     inRange = value: value >= 0.0 && value <= 1.0;

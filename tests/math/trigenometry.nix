@@ -3,7 +3,23 @@
   helpers,
 }: let
   inherit (lib.custom.math) sqrt pow sin cos tan TAU PI HALF_PI;
-  inherit (helpers) isClose;
+
+  isClose = a: b:
+    helpers.isClose {
+      margins = {
+        abs = 1.0e-6;
+        rel = 1.0e-6;
+      };
+    }
+    a
+    b;
+
+  tanIsClose = helpers.isClose {
+    margins = {
+      abs = 1.0e-5;
+      rel = 1.0e-5;
+    };
+  };
 
   # Common angles for more readable tests.
   angle30 = PI / 6;
@@ -133,7 +149,7 @@ in {
 
   # Common angles with exact values.
   testTan30Deg = {
-    expr = isClose (tan angle30) 0.5773;
+    expr = tanIsClose (tan angle30) (1 / sqrt3);
     expected = true;
   };
 
@@ -143,7 +159,7 @@ in {
   };
 
   testTan60Deg = {
-    expr = isClose (tan angle60) 1.7321;
+    expr = tanIsClose (tan angle60) sqrt3;
     expected = true;
   };
 
