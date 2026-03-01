@@ -1,139 +1,50 @@
 {lib}: let
-  inherit (lib.custom.math) isPrime rsaKeypair rsaEncrypt rsaDecrypt;
-in {
-  # Edge Cases.
-  testIsPrimeZero = {
-    expr = isPrime 0;
-    expected = false;
-  };
+  inherit (lib.custom.math) isPrime rsaKeypair rsaEncrypt rsaDecrypt mod;
 
-  testIsPrimeOne = {
-    expr = isPrime 1;
-    expected = false;
-  };
+  LIMIT = 100;
 
-  testIsPrimeNegative = {
-    expr = isPrime (-5);
-    expected = false;
-  };
+  primesUpTo = limit: let
+    nums = lib.range 2 limit;
+    sieve = list:
+      if list == []
+      then []
+      else let
+        p = builtins.head list;
+        rest = builtins.tail list;
+        filtered = builtins.filter (x: mod x p != 0) rest;
+      in
+        [p] ++ (sieve filtered);
+  in
+    sieve nums;
 
-  testIsPrimeFloat = {
-    expr = isPrime 3.14;
-    expected = false;
-  };
+  # Use the sieve to produce the known-primes truth table for the test range.
+  knownPrimes = primesUpTo LIMIT;
 
-  # Small Numbers (1-10).
-  testIsPrimeTwo = {
-    expr = isPrime 2;
-    expected = true;
-  };
+  mkPrimeTests = builtins.listToAttrs (map (n: {
+    name = "testIsPrime${toString n}";
+    value = {
+      expr = isPrime n;
+      expected = builtins.elem n knownPrimes;
+    };
+  }) (lib.range 0 LIMIT ++ [(-5) 3.14]));
 
-  testIsPrimeThree = {
-    expr = isPrime 3;
-    expected = true;
-  };
-
-  testIsPrimeFour = {
-    expr = isPrime 4;
-    expected = false;
-  };
-
-  testIsPrimeFive = {
-    expr = isPrime 5;
-    expected = true;
-  };
-
-  testIsPrimeSix = {
-    expr = isPrime 6;
-    expected = false;
-  };
-
-  testIsPrimeSeven = {
-    expr = isPrime 7;
-    expected = true;
-  };
-
-  testIsPrimeEight = {
-    expr = isPrime 8;
-    expected = false;
-  };
-
-  testIsPrimeNine = {
-    expr = isPrime 9;
-    expected = false;
-  };
-
-  testIsPrimeTen = {
-    expr = isPrime 10;
-    expected = false;
-  };
-
-  # Larger Numbers.
-  testIsPrime97 = {
-    expr = isPrime 97;
-    expected = true;
-  };
-
-  testIsPrime99 = {
-    expr = isPrime 99;
-    expected = false;
-  };
-
-  # Perfect Squares.
-  testIsPrime25 = {
-    expr = isPrime 25;
-    expected = false;
-  };
-
-  # Basic RSA encryption/decryption test with small primes.
-  testRSABasic = let
-    keys = rsaKeypair 61 53;
-    msg = 42;
+  mkRSATest = p: q: msg: let
+    keys = rsaKeypair p q;
     cipher = rsaEncrypt msg keys.public;
-    decrypted = rsaDecrypt cipher keys.private;
   in {
-    expr = decrypted;
+    expr = rsaDecrypt cipher keys.private;
     expected = msg;
   };
+in
+  mkPrimeTests
+  // {
+    testRSABasic = mkRSATest 61 53 42;
+    testRSAZero = mkRSATest 61 53 0;
+    testRSAMax = mkRSATest 61 53 (61 * 53 - 1);
+    testRSADifferentPrimes = mkRSATest 47 43 42;
 
-  # Test with message of 0.
-  testRSAZero = let
-    keys = rsaKeypair 61 53;
-    msg = 0;
-    cipher = rsaEncrypt msg keys.public;
-    decrypted = rsaDecrypt cipher keys.private;
-  in {
-    expr = decrypted;
-    expected = msg;
-  };
-
-  # Test with message equal to modulus - 1 (max value).
-  testRSAMax = let
-    keys = rsaKeypair 61 53;
-    msg = 61 * 53 - 1;
-    cipher = rsaEncrypt msg keys.public;
-    decrypted = rsaDecrypt cipher keys.private;
-  in {
-    expr = decrypted;
-    expected = msg;
-  };
-
-  # Test with different prime pair.
-  testRSADifferentPrimes = let
-    keys = rsaKeypair 47 43;
-    msg = 42;
-    cipher = rsaEncrypt msg keys.public;
-    decrypted = rsaDecrypt cipher keys.private;
-  in {
-    expr = decrypted;
-    expected = msg;
-  };
-
-  # Test error on non-prime input.
-  testRSANonPrime = let
-    nonPrimeKeypair = rsaKeypair 4 53;
-  in {
-    expr = (builtins.tryEval (builtins.deepSeq nonPrimeKeypair nonPrimeKeypair)).success;
-    expected = false;
-  };
-}
+    testRSANonPrime = {
+      expr = (builtins.tryEval (builtins.deepSeq (rsaKeypair 4 53) null)).success;
+      expected = false;
+    };
+  }

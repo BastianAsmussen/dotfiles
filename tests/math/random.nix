@@ -59,7 +59,7 @@ in {
       r1 = rngPosSeed.random rngPosSeed.initialSeed;
       r2 = (mkRandom {seed = 12345;}).random 12345;
     in
-      isClose r1.value r2.value;
+      isClose {} r1.value r2.value;
     expected = true;
   };
 
@@ -68,7 +68,7 @@ in {
       r1 = rngNegSeed.random rngNegSeed.initialSeed;
       r2 = (mkRandom {seed = -12345;}).random (-12345);
     in
-      isClose r1.value r2.value;
+      isClose {} r1.value r2.value;
     expected = true;
   };
 
@@ -77,7 +77,7 @@ in {
       r1 = rngMaxSeed.random rngMaxSeed.initialSeed;
       r2 = (mkRandom {seed = MAX_WORD;}).random MAX_WORD;
     in
-      isClose r1.value r2.value;
+      isClose {} r1.value r2.value;
     expected = true;
   };
 
