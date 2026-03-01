@@ -147,4 +147,5 @@ mkdir ~/Projects/example
 cd ~/Projects/example
 
 nix flake init -t self#rust
+./init.sh
 ```
