@@ -1,74 +1,92 @@
 {lib}: let
   inherit (lib.custom.units) mibToBytes toBinary;
-in {
-  testMibToBytesConversion = {
-    expr = mibToBytes 256;
-    expected = 268435456;
-  };
 
-  testZeroMib = {
-    expr = mibToBytes 0;
-    expected = 0;
-  };
+  mkCases = cases:
+    builtins.listToAttrs (map (
+        c: {
+          inherit (c) name;
 
-  testNegativeMib = {
-    expr = mibToBytes (-1024);
-    expected = -1073741824;
-  };
+          value = {
+            inherit (c) expr expected;
+          };
+        }
+      )
+      cases);
 
-  testToBinaryZero = {
-    expr = toBinary 0;
-    expected = [0];
-  };
+  mibCases = [
+    {
+      name = "testMibToBytesConversion";
+      expr = mibToBytes 256;
+      expected = 268435456;
+    }
+    {
+      name = "testZeroMib";
+      expr = mibToBytes 0;
+      expected = 0;
+    }
+    {
+      name = "testNegativeMib";
+      expr = mibToBytes (-1024);
+      expected = -1073741824;
+    }
+  ];
 
-  testToBinaryOne = {
-    expr = toBinary 1;
-    expected = [1];
-  };
+  toBinaryCases = [
+    {
+      name = "testToBinaryZero";
+      expr = toBinary 0;
+      expected = [0];
+    }
+    {
+      name = "testToBinaryOne";
+      expr = toBinary 1;
+      expected = [1];
+    }
+    {
+      name = "testToBinaryTwo";
+      expr = toBinary 2;
+      expected = [1 0];
+    }
+    {
+      name = "testToBinaryThree";
+      expr = toBinary 3;
+      expected = [1 1];
+    }
+    {
+      name = "testToBinaryEight";
+      expr = toBinary 8;
+      expected = [1 0 0 0];
+    }
+    {
+      name = "testToBinaryFifteen";
+      expr = toBinary 15;
+      expected = [1 1 1 1];
+    }
+    {
+      name = "testToBinary42";
+      expr = toBinary 42;
+      expected = [1 0 1 0 1 0];
+    }
+  ];
 
-  testToBinaryTwo = {
-    expr = toBinary 2;
-    expected = [1 0];
-  };
+  pow2Inputs = [1 2 4 8 16 32 64];
+  pow2Cases =
+    map (
+      i: let
+        idx = lib.lists.findFirstIndex (x: x == i) null pow2Inputs; # 0-based exponent.
+        zerosCount =
+          if idx == null
+          then 0
+          else idx;
+        zeros = builtins.genList (_: 0) zerosCount;
+        expected = [1] ++ zeros;
+      in {
+        inherit expected;
 
-  testToBinaryThree = {
-    expr = toBinary 3;
-    expected = [1 1];
-  };
-
-  testToBinaryEight = {
-    expr = toBinary 8;
-    expected = [1 0 0 0];
-  };
-
-  testToBinaryFifteen = {
-    expr = toBinary 15;
-    expected = [1 1 1 1];
-  };
-
-  testToBinary42 = {
-    expr = toBinary 42;
-    expected = [1 0 1 0 1 0];
-  };
-
-  testToBinaryPowersOf2 = {
-    expr = [
-      (toBinary 1) # 2^0
-      (toBinary 2) # 2^1
-      (toBinary 4) # 2^2
-      (toBinary 8) # 2^3
-      (toBinary 16) # 2^4
-      (toBinary 32) # 2^5
-      (toBinary 64) # 2^6
-    ];
-    expected = [
-      [1]
-      [1 0]
-      [1 0 0]
-      [1 0 0 0]
-      [1 0 0 0 0]
-      [1 0 0 0 0 0]
-      [1 0 0 0 0 0 0]
-    ];
-  };
-}
+        name = "testToBinaryPowersOf2${toString i}";
+        expr = toBinary i;
+      }
+    )
+    pow2Inputs;
+in
+  mkCases (mibCases ++ toBinaryCases ++ pow2Cases)
