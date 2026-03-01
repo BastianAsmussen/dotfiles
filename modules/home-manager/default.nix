@@ -42,11 +42,11 @@
       qbittorrent
       libreoffice-fresh
       airtame
-      # freecad-wayland
+      freecad-wayland
       mpv
       winboat
       freerdp
-      # anki
+      anki
       diesel-cli
     ];
 
