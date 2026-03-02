@@ -5,7 +5,6 @@
   ...
 }: let
   inherit (lib) getExe mkIf;
-  inherit (builtins) genList toString;
 
   playerctl = getExe pkgs.playerctl;
   brightnessctl = getExe pkgs.brightnessctl;
@@ -84,6 +83,7 @@ in {
         windowrule = let
           pictureInPicture = "match:class (firefox) match:title ^(Picture-in-Picture)$";
           mullvadVPN = "match:class (Mullvad VPN)";
+          games = "match:class ^(steam_app_(\\d|\\w)+|steam_proton|gamescope)$";
 
           mkFloating = pattern: "match:title ^(${pattern})$, float on";
         in
@@ -121,14 +121,12 @@ in {
             (mkIf osConfig.gaming.enable [
               "match:class ^([Ss]team)$ match:title negative:^([Ss]team)$, float on"
 
-              "match:class ^([Ss]team|heroic)$, tag +gamestore"
-              "match:title ^([Ll]utris)$, tag +gamestore"
-              "match:class ^(steam_app_(\\d|\\w)+|gamescope)$, tag +games"
-
-              "match:tag games, no_blur on, fullscreen 0"
-              "match:tag games, fullscreen 0"
-              "match:tag games, immediate on"
-              "match:tag games, no_vrr off"
+              "${games}, monitor DP-1"
+              "${games}, workspace 3"
+              "${games}, fullscreen 1"
+              "${games}, no_blur on"
+              "${games}, immediate on"
+              "${games}, no_vrr off"
             ])
           ];
 
@@ -144,7 +142,7 @@ in {
           mkMoveActiveBind = mkBind "$mod ALT" "moveactive";
           mkMoveToWorkspaceBind = mkBind "$mod SHIFT" "movetoworkspace";
 
-          workspaceList = genList (x: x + 1) 9;
+          workspaceList = builtins.genList (x: x + 1) 9;
 
           ags = "exec, ags -b hypr";
         in
