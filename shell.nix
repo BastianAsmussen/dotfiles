@@ -13,13 +13,6 @@ pkgs.mkShell {
 
   packages = with pkgs; [
     git
-    neovim
     fzf
-
-    # Code Linting.
-    statix
-    deadnix
-    alejandra
-    flake-checker
   ];
 }
