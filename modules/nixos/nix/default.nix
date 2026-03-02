@@ -75,7 +75,10 @@
 
     nixpkgs = {
       overlays = builtins.attrValues outputs.overlays;
-      config.allowUnfree = true;
+      config = {
+        allowUnfree = true;
+        android_sdk.accept_license = config.android.enable;
+      };
     };
 
     systemd = {
@@ -111,6 +114,8 @@
         environment.TMPDIR = "/var/tmp";
       };
     };
+
+    programs.nix-ld.enable = true;
 
     users = lib.mkIf config.nix.remoteBuilder.enable {
       users.builder = {
