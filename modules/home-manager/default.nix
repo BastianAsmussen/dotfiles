@@ -7,6 +7,7 @@
     ./desktop
     ./terminal
     ./dconf.nix
+    ./dotnet.nix
     ./qemu.nix
     ./rust.nix
   ];
