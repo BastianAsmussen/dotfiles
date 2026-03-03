@@ -49,6 +49,7 @@
       freerdp
       anki
       diesel-cli
+      postman
     ];
 
     stateVersion = "25.11";
