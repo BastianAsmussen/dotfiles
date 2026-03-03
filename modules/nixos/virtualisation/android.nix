@@ -9,7 +9,7 @@
 
   config = lib.mkIf config.qemu.enable {
     environment.systemPackages = [
-      pkgs.android-studio-full
+      pkgs.android-studio
     ];
 
     users.users.${userInfo.username}.extraGroups = [
