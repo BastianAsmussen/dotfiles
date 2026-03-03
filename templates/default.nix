@@ -45,7 +45,7 @@ rec {
       ## Getting Started
 
       - Enter the development shell with `nix develop`.
-      - Run the `init.sh` script to rename the project files automatically.
+      - Run `chmod +x init.sh && ./init.sh` to rename the project files automatically.
     '';
   };
 }
