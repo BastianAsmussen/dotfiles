@@ -12,6 +12,7 @@
       pkgs.android-studio
     ];
 
+    programs.java.enable = true;
     users.users.${userInfo.username}.extraGroups = [
       "kvm" # Hardware acceleration.
       "adbusers" # Access to the Android Debugger Bridge.
