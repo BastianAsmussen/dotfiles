@@ -1,6 +1,10 @@
 {lib, ...}: {
   dconf.settings = {
-    "org/gnome/desktop/interface".show-battery-percentage = true;
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      show-battery-percentage = true;
+    };
+
     "org/gnome/desktop/peripherals/touchpad" = {
       tap-to-click = true;
       two-finger-scrolling-enabled = true;
