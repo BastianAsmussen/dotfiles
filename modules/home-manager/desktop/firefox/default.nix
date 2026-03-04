@@ -13,7 +13,11 @@
 
     extensions = import ./extensions.nix;
     misc = import ./misc.nix;
-    search.defaultSearchEngine = "DuckDuckGo";
+    search = {
+      defaultSearchEngine = "Searx";
+      searxRandomizer.enable = true;
+    };
+
     settings = import ./settings.nix;
     security.sandbox.enable = true;
     theme = import ./theme.nix osConfig;
