@@ -3,7 +3,7 @@
   base,
 }: let
   inherit (base) mod pow floor;
-  inherit (builtins) currentTime currentSystem nixVersion langVersion nixPath storeDir toJSON hashString toString;
+  inherit (builtins) currentTime currentSystem nixVersion langVersion nixPath storeDir toJSON hashString;
   inherit (lib) stringToCharacters substring foldl;
 
   inPureMode = lib.trivial.inPureEvalMode;
@@ -53,6 +53,7 @@
     value = x / m;
   in {
     inherit value;
+
     nextSeed = mod (a * seed) m;
   };
 in {
