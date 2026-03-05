@@ -3,13 +3,13 @@
 in {
   imports = [
     ./hardening
+    ./vpn
     ./gpg.nix
     ./ssh.nix
-    ./vpn.nix
     ./yubiKey.nix
   ];
 
   gpg.enable = mkDefault true;
-  vpn.enable = mkDefault true;
+  tailscale.enable = mkDefault true;
   yubiKey.enable = mkDefault true;
 }

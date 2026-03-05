@@ -113,7 +113,7 @@ in {
               (mkFloating "org.gnome.Weather")
               (mkFloating "com.github.Aylur.ags")
             ]
-            (mkIf osConfig.vpn.enable [
+            (mkIf osConfig.mullvad-vpn.enable [
               "${mullvadVPN}, float on"
               "${mullvadVPN}, move 100%-w-20 5%"
               "${mullvadVPN}, pin on"
