@@ -14,7 +14,7 @@
     extensions = import ./extensions.nix;
     misc = import ./misc.nix;
     search = {
-      defaultSearchEngine = "Searx";
+      defaultSearchEngine = "DuckDuckGo";
       searxRandomizer.enable = true;
     };
 
