@@ -46,20 +46,23 @@ in {
     # Load NVIDIA drivers for Xorg and Wayland.
     services.xserver.videoDrivers = ["nvidia"];
 
-    environment.variables = {
-      # Required to run the correct GBM backend for NVIDIA GPUs on Wayland.
-      GBM_BACKEND = mkIf config.desktop.greeter.useWayland "nvidia-drm";
-      # Select NVIDIA's GLX and VA-API drivers instead of nouveau.
-      __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    environment = {
+      systemPackages = [pkgs.nvtopPackages.nvidia];
+      variables = {
+        # Required to run the correct GBM backend for NVIDIA GPUs on Wayland.
+        GBM_BACKEND = mkIf config.desktop.greeter.useWayland "nvidia-drm";
+        # Select NVIDIA's GLX and VA-API drivers instead of nouveau.
+        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
 
-      LIBVA_DRIVER_NAME = "nvidia";
-      __GL_GSYNC_ALLOWED = "1";
-      __GL_VRR_ALLOWED = "0";
-      WLR_DRM_NO_ATOMIC = "1";
-      WLR_RENDERER = "vulkan";
+        LIBVA_DRIVER_NAME = "nvidia";
+        __GL_GSYNC_ALLOWED = "1";
+        __GL_VRR_ALLOWED = "0";
+        WLR_DRM_NO_ATOMIC = "1";
+        WLR_RENDERER = "vulkan";
 
-      # Hardware cursors are currently broken on NVIDIA.
-      WLR_NO_HARDWARE_CURSORS = "1";
+        # Hardware cursors are currently broken on NVIDIA.
+        WLR_NO_HARDWARE_CURSORS = "1";
+      };
     };
   };
 }
