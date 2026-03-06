@@ -1,4 +1,8 @@
-{inputs, ...}: let
+{
+  inputs,
+  pkgs,
+  ...
+}: let
   hardware = inputs.nixos-hardware.nixosModules;
 in {
   imports = [
@@ -41,4 +45,14 @@ in {
   };
 
   bootloader.isMultiboot = true;
+
+  services = {
+    ollama = {
+      enable = true;
+
+      package = pkgs.ollama-cuda;
+    };
+
+    open-webui.enable = true;
+  };
 }
