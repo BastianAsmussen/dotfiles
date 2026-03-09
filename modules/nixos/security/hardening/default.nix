@@ -1,6 +1,0 @@
-{
-  imports = [
-    ./security
-    ./kernel.nix
-  ];
-}
