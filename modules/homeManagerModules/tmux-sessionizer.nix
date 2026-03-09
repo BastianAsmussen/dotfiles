@@ -1,0 +1,25 @@
+{
+  flake.homeModules.tmuxSessionizer = {
+    pkgs,
+    config,
+    ...
+  }: {
+    home.packages = [pkgs.tmux-sessionizer];
+
+    xdg.configFile."tms/config.toml".text = let
+      inherit (config.home) homeDirectory;
+    in
+      # toml
+      ''
+        session_sort_order = "LastAttached"
+
+        [[search_dirs]]
+        path = "${homeDirectory}/Projects"
+        depth = 2
+
+        [[search_dirs]]
+        path = "${homeDirectory}/dotfiles"
+        depth = 1
+      '';
+  };
+}
