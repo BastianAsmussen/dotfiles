@@ -11,11 +11,8 @@ around problems.
 - [Impermanence Setup](#impermanence-setup)
 - [AGS Migration](#ags-migration)
 - [Linux Hardening](#linux-hardening)
-- [File Structure](#file-structure)
 - [Secrets Management](#secrets-management)
 - [SSH](#ssh)
-- [CI](#ci)
-- [Glove80](#glove80)
 
 ## Development Environments
 
@@ -49,7 +46,7 @@ server.
 - **Desyncs**:
   Fresh installs don't always match long-running ones.
   - **Example**: If I change something in my
-    [Firefox setup](./modules/home-manager/desktop/firefox), like tweaking
+    [Firefox setup](./modules/homeManagerModules/firefox.nix), like tweaking
     uBlock Origin settings, those changes don't carry over to new installs
     because they're done imperatively.
 - **Installation Problems**:
@@ -78,18 +75,9 @@ good section on this.
 
 ## Linux Hardening
 
-I'm currently working on [hardening](./modules/nixos/security/hardening.nix) my
+I'm currently working on [hardening](./modules/nixosModules/features/security.nix) my
 systems. I'd like to look into SELinux some more for that reason and see what
 other people do to harden their systems.
-
-## File Structure
-
-I'm not exactly super thrilled about how my dotfiles structure is at the moment,
-so I'd like to look into possibly restructuring it in the future.
-
-Some things I'd really like to change would be how I separate modules. The
-setup used in [EmergentMind's dotfiles](https://github.com/EmergentMind/nix-config)
-looks very promising, and appears to cover all my pain points.
 
 ## Secrets Management
 
@@ -104,14 +92,3 @@ requiring GPG signing, authentication or encryption. Because my GPG keys are
 stored on my YubiKey I'll need to find a way to forward that key somehow.
 [RemoteForward](https://wiki.gnupg.org/AgentForwarding) looks rather promising
 in that regard.
-
-## CI
-
-Look into making `nix flake check` run the entire lint suite, too.
-
-## Glove80
-
-I've added a script to the flake that can flash my [Glove80](https://www.moergo.com/collections/glove80-keyboards/products/glove80-split-ergonomic-keyboard-revision-2)
-firmware to the keyboard (`nix run .#glove80`), the end goal is having a
-reproducible keyboard layout. I'm thinking this can be achieved using something
-like a systemd service.
