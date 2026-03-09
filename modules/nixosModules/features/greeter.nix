@@ -16,8 +16,6 @@
       };
 
       gdm.enable = mkEnableOption "Enables the `GDM` greeter.";
-
-      sddm.enable = mkEnableOption "Enables the `SDDM` greeter.";
     };
 
     config = lib.mkMerge [
@@ -40,16 +38,6 @@
 
           wayland = cfg.useWayland;
           autoSuspend = false;
-        };
-      })
-
-      (mkIf cfg.sddm.enable {
-        services = {
-          xserver.enable = !cfg.useWayland;
-          displayManager.sddm = {
-            enable = true;
-            wayland.enable = cfg.useWayland;
-          };
         };
       })
     ];
