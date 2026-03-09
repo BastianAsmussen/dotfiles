@@ -54,7 +54,7 @@
       self.nixosModules.goxlr
       self.nixosModules.gaming
       self.nixosModules.monero
-      # self.nixosModules.virtualisation
+      self.nixosModules.virtualisation
 
       # Host-specific hardware
       ./_hardware-configuration.nix
