@@ -1,0 +1,71 @@
+{
+  inputs,
+  self,
+  ...
+}: {
+  flake.nixosConfigurations.mu = inputs.nixpkgs.lib.nixosSystem {
+    specialArgs = {
+      inherit inputs self;
+      inherit (self) lib;
+
+      outputs = self;
+    };
+
+    modules = [
+      self.nixosModules.hostMu
+    ];
+  };
+
+  flake.nixosModules.hostMu = {
+    config,
+    lib,
+    ...
+  }: {
+    imports = [
+      # Base modules
+      self.nixosModules.base
+      self.nixosModules.language
+      self.nixosModules.stylix
+
+      # Features
+      self.nixosModules.homeManager
+
+      # External modules
+      inputs.nixos-avf.nixosModules.avf
+      inputs.nix-index-database.nixosModules.nix-index
+      inputs.stylix.nixosModules.stylix
+    ];
+
+    networking.hostName = "mu";
+
+    avf.defaultUser = config.preferences.user.name;
+    users.users.${config.preferences.user.name}.initialPassword = lib.mkForce "";
+
+    nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+
+    home-manager.userModules.bastian = with self.homeModules; [
+      # Terminal
+      nixvim
+      git
+      zsh
+      zoxide
+      nixIndex
+      tmux
+      tmuxSessionizer
+      gpg
+      ohMyPosh
+      bat
+      btop
+      direnv
+      distrobox
+      eza
+      fastfetch
+      fzf
+      ripgrep
+      rust
+
+      # Shared user profile
+      # bastian
+    ];
+  };
+}

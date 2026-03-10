@@ -13,6 +13,7 @@
 
     import-tree.url = "github:vic/import-tree";
 
+    nixos-avf.url = "github:nix-community/nixos-avf";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
