@@ -7,12 +7,22 @@
     };
   in
     import nixpkgs {},
-}:
-pkgs.mkShell {
-  NIX_CONFIG = "extra-experimental-features = nix-command flakes";
+  nixvim ? let
+    lock = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixvim.locked;
+  in
+    builtins.getFlake "github:${lock.owner}/${lock.repo}/${lock.rev}",
+}: let
+  neovim = nixvim.legacyPackages.${pkgs.stdenv.hostPlatform.system}.makeNixvimWithModule {
+    module = import ./modules/homeManagerModules/_nixvim-config.nix;
+  };
+in
+  pkgs.mkShell {
+    NIX_CONFIG = "extra-experimental-features = nix-command flakes";
 
-  packages = with pkgs; [
-    git
-    fzf
-  ];
-}
+    packages = with pkgs; [
+      git
+      fzf
+
+      neovim
+    ];
+  }

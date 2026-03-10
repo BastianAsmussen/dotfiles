@@ -1,5 +1,5 @@
 {inputs, ...}: {
   flake.lib = inputs.nixpkgs.lib.extend (final: _prev: {
-    custom = import ../lib final;
+    custom = import ./_lib final;
   });
 }

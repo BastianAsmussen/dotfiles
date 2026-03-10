@@ -1,9 +1,9 @@
-{config, ...}: {
+{self, ...}: {
   perSystem = {pkgs, ...}: {
     checks = {
-      library = pkgs.callPackage ../tests {
+      library = pkgs.callPackage ./_tests {
         inherit pkgs;
-        inherit (config.flake) lib;
+        inherit (self) lib;
       };
 
       # Check for dead Nix code.

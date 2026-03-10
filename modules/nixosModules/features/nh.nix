@@ -1,13 +1,13 @@
 {
   flake.nixosModules.nh = {
-    userInfo,
+    config,
     pkgs,
     ...
   }: {
     programs.nh = {
       enable = true;
 
-      flake = "/home/${userInfo.username}/dotfiles";
+      flake = "/home/${config.preferences.user.name}/dotfiles";
     };
 
     environment.systemPackages = with pkgs; [

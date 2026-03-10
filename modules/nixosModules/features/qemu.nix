@@ -1,7 +1,7 @@
 {
-  flake.nixosModules.qemuVirtualisation = {userInfo, ...}: {
+  flake.nixosModules.qemuVirtualisation = {config, ...}: {
     virtualisation.libvirtd.enable = true;
-    users.extraGroups.libvirt.members = [userInfo.username];
+    users.extraGroups.libvirt.members = [config.preferences.user.name];
 
     boot.binfmt.emulatedSystems = [
       "aarch64-linux"
