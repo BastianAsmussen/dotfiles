@@ -1,7 +1,7 @@
 {
   flake.homeModules.git = {
     config,
-    userInfo,
+    osConfig,
     lib,
     pkgs,
     ...
@@ -30,9 +30,9 @@
         deltaBin = lib.getExe pkgs.delta;
       in {
         user = {
-          inherit (userInfo) email;
+          inherit (osConfig.preferences.user) email;
 
-          name = userInfo.fullName;
+          name = osConfig.preferences.user.fullName;
         };
 
         alias = {

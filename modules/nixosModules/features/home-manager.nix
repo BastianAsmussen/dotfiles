@@ -3,11 +3,11 @@
     config,
     lib,
     pkgs,
-    userInfo,
     self,
     ...
   }: let
     inherit (lib) mkOption types mapAttrs;
+
     cfg = config.home-manager;
   in {
     imports = [
@@ -28,7 +28,7 @@
 
     config = {
       home-manager = {
-        extraSpecialArgs = {inherit inputs pkgs userInfo self;};
+        extraSpecialArgs = {inherit inputs pkgs self;};
         useUserPackages = true;
         useGlobalPkgs = true;
         backupFileExtension = "backup";

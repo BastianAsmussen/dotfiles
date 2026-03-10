@@ -1,7 +1,7 @@
 {
   flake.nixosModules.android = {
     pkgs,
-    userInfo,
+    config,
     ...
   }: {
     environment.systemPackages = [
@@ -9,7 +9,7 @@
     ];
 
     programs.java.enable = true;
-    users.users.${userInfo.username}.extraGroups = [
+    users.users.${config.preferences.user.name}.extraGroups = [
       "kvm"
       "adbusers"
     ];

@@ -1,15 +1,12 @@
 {
   inputs,
   self,
-  config,
   ...
 }: {
   flake.nixosConfigurations.lambda = inputs.nixpkgs.lib.nixosSystem {
     specialArgs = {
       inherit inputs self;
-
-      inherit (config.flake) lib;
-      inherit (config.flake.meta) userInfo;
+      inherit (self) lib;
 
       outputs = self;
     };
@@ -23,7 +20,6 @@
     imports = [
       # Base modules
       self.nixosModules.base
-      self.nixosModules.user
       self.nixosModules.language
       self.nixosModules.misc
       self.nixosModules.bootloader
@@ -57,8 +53,7 @@
       self.nixosModules.virtualisation
 
       # Host-specific hardware
-      ./_hardware-configuration.nix
-      ./_disko-config.nix
+      self.diskoConfigurations.hostLambda
 
       # External modules
       inputs.disko.nixosModules.disko

@@ -1,15 +1,12 @@
 {
   inputs,
   self,
-  config,
   ...
 }: {
   flake.nixosConfigurations.delta = inputs.nixpkgs.lib.nixosSystem {
     specialArgs = {
       inherit inputs self;
-
-      inherit (config.flake) lib;
-      inherit (config.flake.meta) userInfo;
+      inherit (self) lib;
 
       outputs = self;
     };
@@ -19,11 +16,10 @@
     ];
   };
 
-  flake.nixosModules.hostDelta = {
+  flake.nixosModules.hostDelta = {pkgs, ...}: {
     imports = [
       # Base modules
       self.nixosModules.base
-      self.nixosModules.user
       self.nixosModules.language
       self.nixosModules.misc
       self.nixosModules.bootloader
@@ -51,14 +47,13 @@
       self.nixosModules.homeManager
       self.nixosModules.virtualisation
 
+      # Host-specific hardware
+      self.diskoConfigurations.hostDelta
+
       # External modules
       inputs.disko.nixosModules.disko
       inputs.stylix.nixosModules.stylix
       inputs.nix-index-database.nixosModules.nix-index
-
-      # Host-specific hardware
-      ./_hardware-configuration.nix
-      ./_disko-config.nix
 
       # Hardware-specific
       inputs.nixos-hardware.nixosModules.common-cpu-intel
@@ -72,6 +67,18 @@
       environment.hyprland.monitors = ["eDP-1, 1920x1080@60, 0x0, 1"];
       greeter.gdm.enable = true;
     };
+
+    nix.buildMachines = [
+      {
+        inherit (pkgs.stdenv.hostPlatform) system;
+
+        hostName = "builder";
+        protocol = "ssh-ng";
+        speedFactor = 10;
+
+        supportedFeatures = ["nixos-test" "big-parallel" "kvm"];
+      }
+    ];
 
     home-manager.userModules.bastian = with self.homeModules; [
       # Terminal

@@ -1,7 +1,7 @@
 {
-  flake.nixosModules.networkManager = {userInfo, ...}: {
+  flake.nixosModules.networkManager = {config, ...}: {
     networking.networkmanager.enable = true;
 
-    users.extraGroups.networkmanager.members = [userInfo.username];
+    users.extraGroups.networkmanager.members = [config.preferences.user.name];
   };
 }

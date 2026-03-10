@@ -33,7 +33,7 @@
     builderPaths = map (k: k.fullPath) builderKeys;
   };
 
-  defaultDir = ../keys;
+  defaultDir = ../../keys;
 in rec {
   # Main entry points.
   load = dir: let

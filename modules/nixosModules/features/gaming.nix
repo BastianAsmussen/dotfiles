@@ -1,7 +1,7 @@
 {
   flake.nixosModules.gaming = {
     pkgs,
-    userInfo,
+    config,
     ...
   }: {
     programs = {
@@ -14,7 +14,7 @@
       gamemode.enable = true;
     };
 
-    users.extraGroups.gamemode.members = [userInfo.username];
+    users.extraGroups.gamemode.members = [config.preferences.user.name];
     environment = {
       systemPackages = with pkgs; [
         protonup-ng
@@ -22,7 +22,7 @@
         bottles
       ];
 
-      sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/${userInfo.username}/.steam/root/compatibilitytools.d";
+      sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/${config.preferences.user.name}/.steam/root/compatibilitytools.d";
     };
   };
 }

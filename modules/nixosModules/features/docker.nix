@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.docker = {userInfo, ...}: {
+  flake.nixosModules.docker = {config, ...}: {
     virtualisation.docker = {
       enable = true;
 
@@ -7,6 +7,6 @@
       autoPrune.enable = true;
     };
 
-    users.extraGroups.docker.members = [userInfo.username];
+    users.extraGroups.docker.members = [config.preferences.user.name];
   };
 }

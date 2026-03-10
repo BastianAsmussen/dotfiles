@@ -1,7 +1,14 @@
-{inputs, ...}: {
+{
+  withSystem,
+  inputs,
+  ...
+}: {
   flake.overlays = {
-    # Bring our custom packages from the 'pkgs' directory into scope.
-    additions = final: _: import ../pkgs {pkgs = final;};
+    # Bring our custom packages into scope.
+    additions = _: prev:
+      withSystem prev.stdenv.hostPlatform.system (
+        {config, ...}: {inherit (config) packages;}
+      );
 
     # User-defined overlays.
     modifications = _: prev: {
