@@ -43,7 +43,6 @@
     networking.hostName = "mu";
 
     avf.defaultUser = config.preferences.user.name;
-    users.users.${config.preferences.user.name}.initialPassword = lib.mkForce "";
 
     nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 
