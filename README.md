@@ -28,13 +28,13 @@ This is a repository for my NixOS configuration.
    3. Enter the provided Nix development shell.
 
       ```sh
-      nix-shell
+      nix-shell --experimental-features 'nix-command flakes'
       ```
 
    4. Or, as a one-liner.
 
       ```sh
-      nix-shell -p git --run "git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && cd ~/dotfiles && nix-shell"
+      nix-shell -p git --run "git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && cd ~/dotfiles && nix-shell --experimental-features 'nix-command flakes'"
       ```
 
 2. Choose a host.
