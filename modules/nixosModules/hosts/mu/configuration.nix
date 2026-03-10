@@ -27,6 +27,10 @@
       self.nixosModules.language
       self.nixosModules.stylix
 
+      # Nix
+      self.nixosModules.nix
+      self.nixosModules.nh
+
       # Features
       self.nixosModules.homeManager
 
