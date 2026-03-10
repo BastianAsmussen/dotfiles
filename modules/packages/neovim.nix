@@ -10,7 +10,7 @@
 
     apps.neovim = {
       type = "app";
-      program = "${config.packages.nvim}/bin/nvim";
+      program = "${config.packages.neovim}/bin/nvim";
     };
   };
 }
