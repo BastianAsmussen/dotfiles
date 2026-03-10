@@ -16,7 +16,7 @@
     ];
   };
 
-  flake.nixosModules.hostDelta = {pkgs, ...}: {
+  flake.nixosModules.hostDelta = {
     imports = [
       # Base modules
       self.nixosModules.base
@@ -54,11 +54,6 @@
       inputs.disko.nixosModules.disko
       inputs.stylix.nixosModules.stylix
       inputs.nix-index-database.nixosModules.nix-index
-
-      # Hardware-specific
-      inputs.nixos-hardware.nixosModules.common-cpu-intel
-      inputs.nixos-hardware.nixosModules.common-gpu-intel
-      inputs.nixos-hardware.nixosModules.common-pc-laptop
     ];
 
     networking.hostName = "delta";
@@ -67,18 +62,6 @@
       environment.hyprland.monitors = ["eDP-1, 1920x1080@60, 0x0, 1"];
       greeter.gdm.enable = true;
     };
-
-    nix.buildMachines = [
-      {
-        inherit (pkgs.stdenv.hostPlatform) system;
-
-        hostName = "builder";
-        protocol = "ssh-ng";
-        speedFactor = 10;
-
-        supportedFeatures = ["nixos-test" "big-parallel" "kvm"];
-      }
-    ];
 
     home-manager.userModules.bastian = with self.homeModules; [
       # Terminal
