@@ -855,6 +855,24 @@
         "type": "github"
       }
     },
+    "nixos-avf": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_4"
+      },
+      "locked": {
+        "lastModified": 1769132082,
+        "narHash": "sha256-cJVUBVP3qmRO2HGHqj18ChjOSztyo7eqElQJMRpWXw8=",
+        "owner": "nix-community",
+        "repo": "nixos-avf",
+        "rev": "d0a62c3f64b45a39570fde31a3a490b214bf19ee",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixos-avf",
+        "type": "github"
+      }
+    },
     "nixos-hardware": {
       "locked": {
         "lastModified": 1772972630,
@@ -993,6 +1011,22 @@
     },
     "nixpkgs_4": {
       "locked": {
+        "lastModified": 1765608474,
+        "narHash": "sha256-9Wx53UK0z8Di5iesJID0tS1dRKwGxI4i7tsSanOHhF0=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "28bb483c11a1214a73f9fd2d9928a6e2ea86ec71",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_5": {
+      "locked": {
         "lastModified": 1772773019,
         "narHash": "sha256-E1bxHxNKfDoQUuvriG71+f+s/NT0qWkImXsYZNFFfCs=",
         "owner": "NixOS",
@@ -1007,7 +1041,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_5": {
+    "nixpkgs_6": {
       "locked": {
         "lastModified": 1767227401,
         "narHash": "sha256-hLsBkzavn9t6VjOhc9HNP0+Z9HKMaTrRg6YgS73R3dY=",
@@ -1023,7 +1057,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_6": {
+    "nixpkgs_7": {
       "locked": {
         "lastModified": 1772773019,
         "narHash": "sha256-nbKkTH2oRlWaAjeDh/QMraqjfj/C2xJFa53twFzRd8o=",
@@ -1138,8 +1172,9 @@
         "import-tree": "import-tree",
         "nix-index-database": "nix-index-database",
         "nixcord": "nixcord",
+        "nixos-avf": "nixos-avf",
         "nixos-hardware": "nixos-hardware",
-        "nixpkgs": "nixpkgs_4",
+        "nixpkgs": "nixpkgs_5",
         "nixpkgs-fork": "nixpkgs-fork",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
@@ -1155,7 +1190,7 @@
         "flake-parts": "flake-parts_4",
         "home-manager": "home-manager_2",
         "nixpak": "nixpak",
-        "nixpkgs": "nixpkgs_5",
+        "nixpkgs": "nixpkgs_6",
         "searx-randomizer": "searx-randomizer",
         "systems": "systems_4"
       },
@@ -1197,7 +1232,7 @@
     },
     "spicetify-nix": {
       "inputs": {
-        "nixpkgs": "nixpkgs_6",
+        "nixpkgs": "nixpkgs_7",
         "systems": "systems_5"
       },
       "locked": {
