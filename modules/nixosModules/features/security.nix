@@ -47,6 +47,9 @@
       polkit.enable = true;
       rtkit.enable = true;
 
+      sudo.enable = false;
+      sudo-rs.enable = true;
+
       # Always flush L1 cache before entering a guest.
       virtualisation.flushL1DataCache = "always";
     };
