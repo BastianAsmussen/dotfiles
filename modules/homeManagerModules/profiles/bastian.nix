@@ -5,7 +5,10 @@
     gpg = {
       enable = true;
 
-      keyTrustMap."0x0FE5A355DBC92568-2024-08-09.asc" = "ultimate";
+      keyTrustMap = {
+        "0x0FE5A355DBC92568-2024-08-09.asc" = "ultimate";
+        "0x3B89704887DFEF65-2024-08-23.asc" = "marginal";
+      };
     };
 
     home.packages = with pkgs; [
