@@ -9,6 +9,7 @@
     programs.git = {
       enable = true;
 
+      package = pkgs.gitFull;
       lfs.enable = true;
       maintenance = {
         enable = true;
@@ -28,11 +29,13 @@
 
       settings = let
         deltaBin = lib.getExe pkgs.delta;
+
+        inherit (osConfig.preferences) user;
       in {
         user = {
-          inherit (osConfig.preferences.user) email;
+          inherit (user) email;
 
-          name = osConfig.preferences.user.fullName;
+          name = user.fullName;
         };
 
         alias = {
@@ -91,8 +94,18 @@
         };
 
         interactive.diffFilter = "${deltaBin} --color-only";
-        delta.navigate = true;
+        delta = {
+          navigate = true;
+          dark = true;
+        };
+
+        sendemail = {
+          sendmailCmd = "${pkgs.git-protonmail}/bin/git-protonmail";
+          from = "${user.email}";
+        };
       };
     };
+
+    home.packages = [pkgs.git-protonmail];
   };
 }
