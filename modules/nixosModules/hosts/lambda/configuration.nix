@@ -20,9 +20,9 @@
     imports = [
       # Base modules
       self.nixosModules.base
+      self.nixosModules.bootloader
       self.nixosModules.language
       self.nixosModules.misc
-      self.nixosModules.bootloader
       self.nixosModules.stylix
 
       # Desktop
@@ -35,21 +35,22 @@
       self.nixosModules.nh
 
       # Security
-      self.nixosModules.security
       self.nixosModules.gpg
+      self.nixosModules.security
       self.nixosModules.ssh
-      self.nixosModules.yubiKey
       self.nixosModules.tailscale
+      self.nixosModules.yubiKey
 
       # Features
       self.nixosModules.bluetooth
       self.nixosModules.btrfs
-      self.nixosModules.networkManager
+      self.nixosModules.ccache
       self.nixosModules.homeManager
-      self.nixosModules.nvidia
-      self.nixosModules.goxlr
-      self.nixosModules.gaming
       self.nixosModules.monero
+      self.nixosModules.networkManager
+      self.nixosModules.nvidia
+      self.nixosModules.gaming
+      self.nixosModules.goxlr
       self.nixosModules.virtualisation
 
       # Host-specific hardware
