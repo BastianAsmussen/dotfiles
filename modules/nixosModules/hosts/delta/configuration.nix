@@ -43,6 +43,7 @@
       # Features
       self.nixosModules.bluetooth
       self.nixosModules.btrfs
+      self.nixosModules.ccache
       self.nixosModules.networkManager
       self.nixosModules.homeManager
       self.nixosModules.virtualisation
