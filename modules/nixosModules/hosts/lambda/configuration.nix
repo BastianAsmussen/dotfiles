@@ -46,6 +46,7 @@
       self.nixosModules.btrfs
       self.nixosModules.ccache
       self.nixosModules.homeManager
+      self.nixosModules.jellyfin
       self.nixosModules.monero
       self.nixosModules.networkManager
       self.nixosModules.nvidia
