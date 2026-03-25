@@ -4,6 +4,8 @@ on: [push]
 jobs:
   flake-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout Repository
