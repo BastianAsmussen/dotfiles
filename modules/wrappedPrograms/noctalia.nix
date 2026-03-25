@@ -20,7 +20,7 @@
         mOnTertiary = "#1e1e2e";
         mOutline = "#6c7086";
         mPrimary = "#89b4fa";
-        mSecondary = "#fab387";
+        mSecondary = "#cdd6f4";
         mShadow = "#1e1e2e";
         mSurface = "#1e1e2e";
         mSurfaceVariant = "#313244";
