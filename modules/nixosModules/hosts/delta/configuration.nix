@@ -37,6 +37,7 @@
 
       # Security
       self.nixosModules.security
+      self.nixosModules.sops
       self.nixosModules.gpg
       self.nixosModules.yubiKey
       self.nixosModules.tailscale
