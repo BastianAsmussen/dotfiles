@@ -27,7 +27,8 @@
 
       # Desktop
       self.nixosModules.greeter
-      self.nixosModules.hyprland
+      self.nixosModules.niri
+      self.nixosModules.wallpaper
       self.nixosModules.pipewire
 
       # Nix
@@ -67,13 +68,27 @@
     ];
 
     networking.hostName = "lambda";
-    desktop = {
-      environment.hyprland.monitors = [
-        "DP-1, 1920x1080@240, 1920x0, 1, vrr, 2"
-        "HDMI-A-1, 1920x1080@60, 0x0, 1"
-      ];
+    desktop.greeter.gdm.enable = true;
 
-      greeter.gdm.enable = true;
+    preferences.monitors = {
+      "DP-1" = {
+        width = 1920;
+        height = 1080;
+        refreshRate = 240.0;
+        x = 1920;
+        y = 0;
+        scale = 1.0;
+        vrr = true;
+      };
+
+      "HDMI-A-1" = {
+        width = 1920;
+        height = 1080;
+        refreshRate = 60.0;
+        x = 0;
+        y = 0;
+        scale = 1.0;
+      };
     };
 
     monero.mining = {
@@ -118,9 +133,6 @@
       # Desktop
       alacritty
       firefox
-      hyprland
-      hyprlock
-      ags
       spicetify
       nixcord
       goxlr
@@ -133,11 +145,6 @@
 
       # Shared user profile
       bastian
-
-      # Host-specific overrides
-      {
-        wayland.windowManager.hyprland.settings.input.accel_profile = "flat";
-      }
     ];
   };
 }

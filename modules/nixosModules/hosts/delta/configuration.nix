@@ -27,7 +27,8 @@
 
       # Desktop
       self.nixosModules.greeter
-      self.nixosModules.hyprland
+      self.nixosModules.niri
+      self.nixosModules.wallpaper
       self.nixosModules.pipewire
 
       # Nix
@@ -59,10 +60,7 @@
 
     networking.hostName = "delta";
 
-    desktop = {
-      environment.hyprland.monitors = ["eDP-1, 1920x1080@60, 0x0, 1"];
-      greeter.gdm.enable = true;
-    };
+    desktop.greeter.gdm.enable = true;
 
     home-manager.userModules.bastian = with self.homeModules; [
       # Terminal
@@ -88,9 +86,6 @@
       # Desktop
       alacritty
       firefox
-      hyprland
-      hyprlock
-      ags
       spicetify
       nixcord
 
