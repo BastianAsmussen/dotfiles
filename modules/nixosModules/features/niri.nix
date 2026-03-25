@@ -44,8 +44,10 @@
           imports = [
             self.wrapperModules.niri
             {
-              settings.spawn-at-startup = autostartEntries;
-              settings.outputs = monitorsToOutputs;
+              settings = {
+                spawn-at-startup = autostartEntries;
+                outputs = monitorsToOutputs;
+              };
             }
           ];
         };
