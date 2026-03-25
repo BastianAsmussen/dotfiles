@@ -87,7 +87,7 @@
           "Mod+Shift+0".move-column-to-workspace = "w9";
 
           "Mod+S".spawn-sh = "${noctaliaExe} ipc call launcher toggle";
-          "Mod+V".spawn-sh = ''${config.pkgs.alsa-utils}/bin/amixer sset Capture toggle'';
+          "Mod+V".spawn-sh = ''${pkgs.alsa-utils}/bin/amixer sset Capture toggle'';
 
           "XF86AudioRaiseVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+";
           "XF86AudioLowerVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-";
@@ -102,17 +102,17 @@
           "Mod+Ctrl+WheelScrollDown".focus-workspace-down = null;
           "Mod+Ctrl+WheelScrollUp".focus-workspace-up = null;
 
-          "Mod+Ctrl+S".spawn-sh = ''${lib.getExe config.pkgs.grim} -l 0 - | ${config.pkgs.wl-clipboard}/bin/wl-copy'';
-          "Mod+Shift+E".spawn-sh = ''${config.pkgs.wl-clipboard}/bin/wl-paste | ${lib.getExe config.pkgs.swappy} -f -'';
-          "Mod+Shift+S".spawn-sh = lib.getExe (config.pkgs.writeShellApplication {
+          "Mod+Ctrl+S".spawn-sh = ''${lib.getExe pkgs.grim} -l 0 - | ${pkgs.wl-clipboard}/bin/wl-copy'';
+          "Mod+Shift+E".spawn-sh = ''${pkgs.wl-clipboard}/bin/wl-paste | ${lib.getExe pkgs.swappy} -f -'';
+          "Mod+Shift+S".spawn-sh = lib.getExe (pkgs.writeShellApplication {
             name = "screenshot";
             text = ''
-              ${lib.getExe config.pkgs.grim} -g "$(${lib.getExe config.pkgs.slurp} -w 0)" - \
-              | ${config.pkgs.wl-clipboard}/bin/wl-copy
+              ${lib.getExe pkgs.grim} -g "$(${lib.getExe pkgs.slurp} -w 0)" - \
+              | ${pkgs.wl-clipboard}/bin/wl-copy
             '';
           });
 
-          "Mod+d".spawn-sh = self.mkWhichKeyExe config.pkgs [
+          "Mod+d".spawn-sh = self.mkWhichKeyExe pkgs [
             {
               key = "b";
               desc = "Bluetooth";
@@ -129,9 +129,14 @@
               cmd = "firefox";
             }
             {
+              key = "d";
+              desc = "Discord";
+              cmd = "discord";
+            }
+            {
               key = "s";
               desc = "Pavucontrol";
-              cmd = "${lib.getExe config.pkgs.pavucontrol}";
+              cmd = "${lib.getExe pkgs.pavucontrol}";
             }
           ];
         };
@@ -141,7 +146,7 @@
 
           focus-ring = {
             width = 2;
-            active-color = "#${self.themeNoHash.base09}";
+            active-color = "#${self.themeNoHash.base0D}";
           };
         };
 
@@ -161,7 +166,7 @@
         };
 
         xwayland-satellite.path =
-          lib.getExe config.pkgs.xwayland-satellite;
+          lib.getExe pkgs.xwayland-satellite;
       };
     };
   };
