@@ -7,6 +7,7 @@
   mkWhichKey = pkgs: menu:
     (self.wrapperModules.which-key.apply {
       inherit pkgs;
+
       settings = {
         inherit menu;
 
