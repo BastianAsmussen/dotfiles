@@ -74,7 +74,7 @@
       "DP-1" = {
         width = 1920;
         height = 1080;
-        refreshRate = 240.0;
+        refreshRate = 239.76;
         x = 1920;
         y = 0;
         scale = 1.0;
