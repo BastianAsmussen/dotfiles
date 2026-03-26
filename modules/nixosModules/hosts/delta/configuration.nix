@@ -91,6 +91,7 @@
       nixcord
 
       # Other
+      sops
       dconf
       dotnet
       rust
