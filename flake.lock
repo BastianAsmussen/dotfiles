@@ -516,10 +516,10 @@
     },
     "nix-secrets": {
       "locked": {
-        "lastModified": 1774526509,
-        "narHash": "sha256-qH+tKajPP252rciQ/62gXQoONbguP/w5GioEipWDY1w=",
+        "lastModified": 1774529185,
+        "narHash": "sha256-FU+A5wNhk8RmBSjgl8znuCMyibtpIp/98vdqIXlXSpQ=",
         "ref": "refs/heads/master",
-        "rev": "1cf7587e12f5fd7bf8be618e95dc1ed76acb765a",
+        "rev": "6859b3722c0212699d0501b171949cc07bc3e46d",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/nix-secrets.git"
