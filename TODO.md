@@ -6,11 +6,22 @@ around problems.
 
 ## Table of Contents
 
+- [Just](#just)
+- [Colemak-DH on Delta](#colemak-dh-on-delta)
 - [Development Environments](#development-environments)
 - [Neovim](#neovim)
 - [Impermanence Setup](#impermanence-setup)
 - [Linux Hardening](#linux-hardening)
 - [SSH](#ssh)
+
+## Just
+
+Add a [Just](https://github.com/casey/just) file. This will make it much easier
+to rebuild with/without caching, as well as updating secrets.
+
+## Colemak-DH on Delta
+
+I want to add Colemak-DH with home-row mod support for Delta.
 
 ## Development Environments
 
