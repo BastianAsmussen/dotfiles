@@ -282,7 +282,7 @@
         };
 
         location = {
-          name = inputs.secrets.user.city;
+          name = inputs.nix-secrets.user.city;
           analogClockInCalendar = false;
           firstDayOfWeek = -1;
           showCalendarEvents = true;

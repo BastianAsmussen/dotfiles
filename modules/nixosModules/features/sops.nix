@@ -1,7 +1,5 @@
 {inputs, ...}: {
-  flake.nixosModules.sops = {pkgs, ...}: let
-    secretsPath = toString inputs.secrets;
-  in {
+  flake.nixosModules.sops = {pkgs, ...}: {
     imports = [inputs.sops-nix.nixosModules.sops];
 
     environment.systemPackages = with pkgs; [
@@ -10,7 +8,7 @@
     ];
 
     sops = {
-      defaultSopsFile = "${secretsPath}/secrets.yaml";
+      defaultSopsFile = "${toString inputs.nix-secrets}/secrets.yaml";
 
       age = {
         # Use the host's SSH host ed25519 key as the age identity. sops-nix

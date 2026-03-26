@@ -20,6 +20,10 @@
         [[search_dirs]]
         path = "${homeDirectory}/dotfiles"
         depth = 1
+
+        [[search_dirs]]
+        path = "${homeDirectory}/nix-secrets"
+        depth = 1
       '';
   };
 }
