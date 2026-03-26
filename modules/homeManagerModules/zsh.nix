@@ -113,6 +113,7 @@
             hash -d work=~/Projects/Work
             hash -d school=~/Projects/School
             hash -d cfg=~/dotfiles
+            hash -d sec=~/nix-secrets
             hash -d dl=~/Downloads
 
             # Clear screen but keep current command buffer.

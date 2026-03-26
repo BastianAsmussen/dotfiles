@@ -17,8 +17,9 @@
         repositories = let
           makePath = dir: config.home.homeDirectory + dir;
         in [
-          (makePath "/dotfiles")
           (makePath "/Projects/*/*")
+          (makePath "/dotfiles")
+          (makePath "/nix-secrets")
         ];
       };
 
