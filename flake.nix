@@ -26,6 +26,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    secrets.url = "git+ssh://git@codeberg.org/BastianA/nix-secrets.git?shallow=1";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
