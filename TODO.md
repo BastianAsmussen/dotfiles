@@ -9,9 +9,7 @@ around problems.
 - [Development Environments](#development-environments)
 - [Neovim](#neovim)
 - [Impermanence Setup](#impermanence-setup)
-- [AGS Migration](#ags-migration)
 - [Linux Hardening](#linux-hardening)
-- [Secrets Management](#secrets-management)
 - [SSH](#ssh)
 
 ## Development Environments
@@ -78,12 +76,6 @@ good section on this.
 I'm currently working on [hardening](./modules/nixosModules/features/security.nix) my
 systems. I'd like to look into SELinux some more for that reason and see what
 other people do to harden their systems.
-
-## Secrets Management
-
-I want to use [sops.nix](https://github.com/Mic92/sops-nix) to manage
-repository secrets but my current setup with my GPG keys on my YubiKey doesn't
-seem to really work all too well for that.
 
 ## SSH
 
