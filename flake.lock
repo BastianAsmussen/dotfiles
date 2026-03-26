@@ -883,6 +883,7 @@
         "nixvim": "nixvim",
         "pre-commit-hooks": "pre-commit-hooks",
         "schizofox": "schizofox",
+        "secrets": "secrets",
         "sops-nix": "sops-nix",
         "spicetify-nix": "spicetify-nix",
         "stylix": "stylix",
@@ -934,6 +935,22 @@
         "owner": "schizofox",
         "repo": "searx-randomizer",
         "type": "github"
+      }
+    },
+    "secrets": {
+      "locked": {
+        "lastModified": 1774526509,
+        "narHash": "sha256-qH+tKajPP252rciQ/62gXQoONbguP/w5GioEipWDY1w=",
+        "ref": "refs/heads/master",
+        "rev": "1cf7587e12f5fd7bf8be618e95dc1ed76acb765a",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@codeberg.org/BastianA/nix-secrets.git"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@codeberg.org/BastianA/nix-secrets.git"
       }
     },
     "sops-nix": {
