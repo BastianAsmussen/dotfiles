@@ -139,6 +139,7 @@
       goxlr
 
       # Other
+      sops
       dconf
       dotnet
       rust
