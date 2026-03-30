@@ -43,3 +43,16 @@ disko HOST:
 [group("install")]
 install HOST:
     sudo nixos-install --flake .#{{ HOST }}
+
+# Build a custom ISO image.
+[group("building")]
+iso:
+    rm -rf result
+    nix build .#nixosConfigurations.iso.config.system.build.isoImage --impure
+    ln -sf result/iso/*.iso latest.iso
+
+# Write the latest ISO to a flash drive.
+[group("building")]
+iso-install DRIVE:
+    just iso
+    sudo dd if=latest.iso of={{ DRIVE }} bs=4M status=progress oflag=sync
