@@ -22,13 +22,15 @@
       _: m:
         {
           mode = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
-          position._attrs = {
-            inherit (m) x y;
+          position = _: {
+            _attrs = {
+              inherit (m) x y;
+            };
           };
 
           inherit (m) scale;
         }
-        // lib.optionalAttrs m.vrr {variable-refresh-rate = null;}
+        // lib.optionalAttrs m.vrr {variable-refresh-rate = _: {};}
     ) (lib.filterAttrs (_: m: m.enabled) config.preferences.monitors);
   in {
     config = {
