@@ -17,13 +17,14 @@
   };
 
   flake.nixosModules.hostIso = {
+    modulesPath,
     pkgs,
     lib,
     ...
   }: {
     imports = [
-      "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
-      "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
+      (modulesPath + "/installer/cd-dvd/installation-cd-graphical-gnome.nix")
+      (modulesPath + "/installer/cd-dvd/channel.nix")
 
       # Base modules.
       self.nixosModules.base
