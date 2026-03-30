@@ -39,7 +39,7 @@
       qbittorrent
       libreoffice-fresh
       mpv
-      winboat
+      # winboat
       freerdp
       anki
       diesel-cli
