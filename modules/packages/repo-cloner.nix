@@ -121,7 +121,7 @@
             echo "[$((i + 1))/''${total}] [''${category}] ''${name}"
 
             if [ -d "$repo_path/.git" ]; then
-              # Repo already exists — check for local changes.
+              # Repo already exists - check for local changes.
               if ${getExe pkgs.git} -C "$repo_path" diff --quiet && ${getExe pkgs.git} -C "$repo_path" diff --staged --quiet; then
                 echo "  -> Already exists, working tree clean. Pulling latest changes..."
 
