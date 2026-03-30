@@ -23,7 +23,7 @@
         {
           mode = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
           position = _: {
-            _attrs = {
+            props = {
               inherit (m) x y;
             };
           };
