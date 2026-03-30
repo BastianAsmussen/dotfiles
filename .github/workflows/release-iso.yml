@@ -1,0 +1,72 @@
+name: Release ISO
+on:
+  workflow_run:
+    workflows: ["Flake Check"]
+    types: [completed]
+    branches: [master]
+
+jobs:
+  release-iso:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "write"
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Compute deterministic ISO derivation path
+        id: drv
+        run: |
+          STORE_PATH=$(nix eval --raw \
+            '.#nixosConfigurations.iso' \
+            --apply '
+              iso: (iso.extendModules {
+                modules = [
+                  ({ lib, ... }: {
+                    environment.etc.isoBuildTime.text = lib.mkForce "deterministic";
+                  })
+                ];
+              }).config.system.build.isoImage.drvPath
+            ')
+          echo "store_path=$STORE_PATH" >> "$GITHUB_OUTPUT"
+          echo "Deterministic ISO derivation path: $STORE_PATH"
+      - name: Check if ISO changed since last release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT="${{ steps.drv.outputs.store_path }}"
+          LATEST=$(gh release view --json body --jq '.body' 2>/dev/null \
+            | grep -oP '(?<=drv_path: ).*' || true)
+          if [ "$CURRENT" = "$LATEST" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "ISO unchanged, skipping release..."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "ISO changed ($LATEST -> $CURRENT), building release..."
+          fi
+      - name: Build ISO image
+        if: steps.check.outputs.changed == 'true'
+        run: nix build .#nixosConfigurations.iso.config.system.build.isoImage --impure
+
+      - name: Create GitHub release
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="iso-$(date -u +%Y%m%d-%H%M%S)"
+          ISO=$(ls result/iso/*.iso)
+          SHORT=$(git rev-parse --short HEAD)
+          LONG=$(git rev-parse HEAD)
+          URL="${{ github.server_url }}/${{ github.repository }}/commit/$LONG"
+          DRV="${{ steps.drv.outputs.store_path }}"
+          NOTES="Automated ISO build from [\`$SHORT\`]($URL).
+          drv_path: $DRV"
+
+          gh release create "$TAG" "$ISO" \
+            --title "NixOS Installer ISO - $(date -u +%Y-%m-%d)" \
+            --latest \
+            --notes "$NOTES"

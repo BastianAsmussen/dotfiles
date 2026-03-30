@@ -1,5 +1,9 @@
 name: Flake Check
-on: [push]
+
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   check:
