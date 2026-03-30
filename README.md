@@ -11,37 +11,57 @@ This is a repository for my NixOS configuration.
 
 ## Installation Guide
 
-1. Get the source code.
-   1. Enter a Nix shell with Git.
+### Boot Medium
 
-      ```sh
-      nix-shell -p git
-      ```
+You can boot from the custom ISO which comes with Git, my custom Neovim build,
+and flakes pre-enabled.
 
-   2. Clone the Git repository.
+```sh
+just iso
+```
 
-      ```sh
-      git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
-      cd ~/dotfiles
-      ```
+Then write it to a flash drive:
 
-   3. Enter the provided Nix development shell.
+```sh
+just iso-install /dev/sdX
+```
 
-      ```sh
-      nix-shell --experimental-features 'nix-command flakes'
-      ```
+> [!NOTE]
+> If you don't have the custom ISO, a standard NixOS installer works too. You
+> will just need to enter a Nix shell with Git first:
+>
+> ```sh
+> nix-shell -p git
+> ```
 
-   4. Or, as a one-liner.
+### Steps
 
-      ```sh
-      nix-shell -p git --run "git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles && cd ~/dotfiles && nix-shell --experimental-features 'nix-command flakes'"
-      ```
+1. Clone the Git repository.
 
-2. Choose a host.
+   ```sh
+   git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
+   cd ~/dotfiles
+   ```
+
+2. Enter the provided Nix development shell.
+
+   ```sh
+   nix develop
+   ```
+
+   > [!NOTE]
+   > On a standard NixOS installer without flakes enabled, use the compatibility
+   > shell instead:
+   >
+   > ```sh
+   > nix-shell --experimental-features 'nix-command flakes'
+   > ```
+
+3. Choose a host.
    1. View available host options.
 
       ```sh
-      HOSTNAME=$(ls hosts | fzf)
+      HOSTNAME=$(ls modules/nixosModules/hosts | fzf)
       ```
 
    2. Set manually, e.g. `lambda`.
@@ -50,18 +70,16 @@ This is a repository for my NixOS configuration.
       HOSTNAME=lambda
       ```
 
-3. Set up the disk configuration.
+4. Set up the disk configuration.
 
    ```sh
-   sudo nix run github:nix-community/disko/latest \
-       --experimental-features 'nix-command flakes' -- \
-       --mode destroy,format,mount hosts/$HOSTNAME/disko-config.nix
+   just disko $HOSTNAME
    ```
 
-4. Finally, install NixOS with the given configuration.
+5. Finally, install NixOS with the given configuration.
 
    ```sh
-   sudo nixos-install --flake .#$HOSTNAME
+   just install $HOSTNAME
    ```
 
 ### Possible Errors and Workarounds
@@ -79,7 +97,7 @@ This is a repository for my NixOS configuration.
   It's worth to consider increasing the download buffer during installation.
   Like the warning suggests, this can be accomplished by increasing the
   `download-buffer-size` setting; pass `--option download-buffer-size n` where
-  `n` is the buffer size to the `nixos-install` command from step 4.
+  `n` is the buffer size to the `nixos-install` command from step 5.
 
 > [!IMPORTANT]
 > Remember to change the password of the user!
@@ -89,7 +107,7 @@ This is a repository for my NixOS configuration.
 1. I recommend updating the [flake.lock](./flake.lock) file about once per week.
 
    ```sh
-   nh os switch --update
+   just upgrade
    ```
 
 > [!NOTE]
@@ -102,13 +120,13 @@ This is a repository for my NixOS configuration.
 1. Move the host directory, e.g. `lambda` -> `epsilon`.
 
    ```sh
-   mv hosts/lambda hosts/epsilon
+   mv modules/nixosModules/hosts/lambda modules/nixosModules/hosts/epsilon
    ```
 
 2. Switch to new configuration.
 
    ```sh
-   nh os switch -H epsilon
+   just rebuild epsilon
    ```
 
 > [!WARNING]
