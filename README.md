@@ -49,13 +49,13 @@ just iso-install /dev/sdX
    nix develop
    ```
 
-   > [!NOTE]
-   > On a standard NixOS installer without flakes enabled, use the compatibility
-   > shell instead:
-   >
-   > ```sh
-   > nix-shell --experimental-features 'nix-command flakes'
-   > ```
+> [!NOTE]
+> On a standard NixOS installer without flakes enabled, use the compatibility
+> shell instead:
+>
+> ```sh
+> nix-shell --experimental-features 'nix-command flakes'
+> ```
 
 3. Choose a host.
    1. View available host options.
