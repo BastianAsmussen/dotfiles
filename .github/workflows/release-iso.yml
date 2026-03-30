@@ -17,6 +17,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
+      # Make the ISO derivation path independent of time.
       - name: Compute deterministic ISO derivation path
         id: drv
         run: |
@@ -48,7 +49,7 @@ jobs:
             echo "ISO unchanged, skipping release..."
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "ISO changed ($LATEST -> $CURRENT), building release..."
+            echo "ISO changed ($LATEST → $CURRENT), building release..."
           fi
       - name: Build ISO image
         if: steps.check.outputs.changed == 'true'
