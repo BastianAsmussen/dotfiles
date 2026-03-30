@@ -42,6 +42,7 @@
       anki
       diesel-cli
       postman
+      just
     ];
 
     programs.man.generateCaches = true;
