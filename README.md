@@ -16,6 +16,10 @@ This is a repository for my NixOS configuration.
 You can boot from the custom ISO which comes with Git, my custom Neovim build,
 and flakes pre-enabled.
 
+Download the latest pre-built ISO from the
+[Releases](https://github.com/BastianAsmussen/dotfiles/releases/latest) page,
+or build it locally:
+
 ```sh
 just iso
 ```
@@ -57,7 +61,7 @@ just iso-install /dev/sdX
 > nix-shell --experimental-features 'nix-command flakes'
 > ```
 
-3. Choose a host.
+1. Choose a host.
    1. View available host options.
 
       ```sh
@@ -70,13 +74,13 @@ just iso-install /dev/sdX
       HOSTNAME=lambda
       ```
 
-4. Set up the disk configuration.
+2. Set up the disk configuration.
 
    ```sh
    just disko $HOSTNAME
    ```
 
-5. Finally, install NixOS with the given configuration.
+3. Finally, install NixOS with the given configuration.
 
    ```sh
    just install $HOSTNAME

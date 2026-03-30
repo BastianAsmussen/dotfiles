@@ -47,11 +47,13 @@
     isoImage.squashfsCompression = "zstd -Xcompression-level 3";
 
     # Embed the build timestamp into /etc/isoBuildTime for easy identification.
-    environment.etc.isoBuildTime.text = lib.readFile "${
-      pkgs.runCommand "timestamp" {
-        env.when = builtins.currentTime;
-      } "echo -n `date -d @$when +%Y-%m-%d_%H-%M-%S` > $out"
-    }";
+    environment.etc.isoBuildTime.text = lib.mkDefault (
+      lib.readFile "${
+        pkgs.runCommand "timestamp" {
+          env.when = builtins.currentTime;
+        } "echo -n `date -d @$when +%Y-%m-%d_%H-%M-%S` > $out"
+      }"
+    );
 
     # Show the ISO build time in the bash prompt.
     programs.bash.promptInit = ''
