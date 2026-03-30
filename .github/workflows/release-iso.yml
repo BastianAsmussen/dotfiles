@@ -46,7 +46,7 @@ jobs:
         run: |
           CURRENT="${{ steps.drv.outputs.store_path }}"
           LATEST=$(gh release view --json body --jq '.body' 2>/dev/null \
-            | grep -oP '(?<=drv_path: ).*' || true)
+            | grep -oP '(?<=Derivation Path:\*\* `)[^`]+' || true)
 
           if [ "$CURRENT" = "$LATEST" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -66,12 +66,15 @@ jobs:
         run: |
           TAG="iso-$(date -u +%Y%m%d-%H%M%S)"
           ISO=$(ls result/iso/*.iso)
+          SHA256=$(sha256sum "$ISO" | cut -d' ' -f1)
           SHORT=$(git rev-parse --short HEAD)
           LONG=$(git rev-parse HEAD)
           URL="${{ github.server_url }}/${{ github.repository }}/commit/$LONG"
           DRV="${{ steps.drv.outputs.store_path }}"
           NOTES="Automated ISO build from [\`$SHORT\`]($URL).
-          drv_path: $DRV"
+
+          **SHA-256:** \`$SHA256\`
+          **Derivation Path:** \`$DRV\`"
 
           gh release create "$TAG" "$ISO" \
             --title "NixOS Installer ISO - $(date -u +%Y-%m-%d)" \
