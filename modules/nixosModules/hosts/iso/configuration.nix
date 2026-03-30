@@ -63,7 +63,7 @@
 
     environment.systemPackages = [
       pkgs.git
-      self.packages.${pkgs.stdenv.hostPlatform.system}.neovim
+      self.packages.${pkgs.stdenv.hostPlatform.system}.neovim-minimal
     ];
 
     services = {
