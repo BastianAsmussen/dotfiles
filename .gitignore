@@ -1,5 +1,6 @@
 # Ignore results from `nix build`.
 result*
+*.iso
 
 # Ignore the auto-generated pre-commit hook configuration.
 .pre-commit-config.yaml
