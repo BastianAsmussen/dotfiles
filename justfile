@@ -21,6 +21,11 @@ upgrade HOST=`hostname`:
     just update
     just rebuild {{ HOST }}
 
+# Clean up NixOS generations.
+[group("building")]
+clean:
+    nh clean all --keep-since 7d --keep 3
+
 # Update all flake inputs (or a specific one).
 [group("update")]
 update *INPUT:
