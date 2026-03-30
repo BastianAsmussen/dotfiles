@@ -31,6 +31,7 @@ jobs:
                 ];
               }).config.system.build.isoImage.drvPath
             ')
+
           echo "store_path=$STORE_PATH" >> "$GITHUB_OUTPUT"
           echo "Deterministic ISO derivation path: $STORE_PATH"
       - name: Check if ISO changed since last release
@@ -41,6 +42,7 @@ jobs:
           CURRENT="${{ steps.drv.outputs.store_path }}"
           LATEST=$(gh release view --json body --jq '.body' 2>/dev/null \
             | grep -oP '(?<=drv_path: ).*' || true)
+
           if [ "$CURRENT" = "$LATEST" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "ISO unchanged, skipping release..."
