@@ -2,17 +2,31 @@ name: Flake Check
 on: [push]
 
 jobs:
-  flake-check:
+  check:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: "read"
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: extra-platforms = aarch64-linux
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v27
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Setup SSH Key
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          ssh-keyscan -t ed25519 codeberg.org >> ~/.ssh/known_hosts
 
       - name: Nix Flake Check
         run: nix flake check --all-systems
