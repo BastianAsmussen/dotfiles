@@ -2,6 +2,10 @@
 
 This is a repository for my NixOS configuration.
 
+## Topology
+
+![Network Topology](docs/topology.svg)
+
 ## Table of Contents
 
 - [Installation Guide](#installation-guide)
