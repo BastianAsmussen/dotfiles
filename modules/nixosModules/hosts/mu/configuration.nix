@@ -33,6 +33,7 @@
 
       # Features
       self.nixosModules.homeManager
+      self.nixosModules.topology
 
       # External modules
       inputs.nixos-avf.nixosModules.avf
@@ -41,6 +42,7 @@
     ];
 
     networking.hostName = "mu";
+    topology.self.hardware.info = "Android Phone";
 
     avf.defaultUser = config.preferences.user.name;
 

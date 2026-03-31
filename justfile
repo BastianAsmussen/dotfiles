@@ -61,3 +61,11 @@ iso:
 iso-install DRIVE:
     just iso
     sudo dd if=latest.iso of={{ DRIVE }} bs=4M status=progress oflag=sync
+
+# Generate the topology diagram and move it to `docs/`.
+[group("building")]
+topology:
+    mkdir -p docs/
+    rm -f docs/topology.svg
+    nix build .#topology.x86_64-linux.config.output
+    cp result/main.svg docs/topology.svg

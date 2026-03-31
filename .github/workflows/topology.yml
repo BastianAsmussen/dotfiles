@@ -1,0 +1,48 @@
+name: Topology
+on:
+  workflow_run:
+    workflows: ["Flake Check"]
+    types: [completed]
+    branches: [master]
+
+jobs:
+  topology:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: extra-platforms = aarch64-linux
+
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Setup SSH Key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          ssh-keyscan -t ed25519 codeberg.org >> ~/.ssh/known_hosts
+
+      - name: Build Topology
+        run: nix build .#topology.x86_64-linux.config.output
+
+      - name: Copy Topology Image
+        run: |
+          mkdir -p docs
+          cp result/main.svg docs/topology.svg
+
+      - name: Commit & Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/topology.svg
+          git diff --cached --quiet || git commit -m "docs: update topology diagram"
+          git push
