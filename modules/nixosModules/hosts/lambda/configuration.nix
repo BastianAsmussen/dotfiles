@@ -16,7 +16,7 @@
     ];
   };
 
-  flake.nixosModules.hostLambda = {pkgs, ...}: {
+  flake.nixosModules.hostLambda = {
     imports = [
       # Base modules
       self.nixosModules.base
@@ -47,13 +47,15 @@
       self.nixosModules.bluetooth
       self.nixosModules.btrfs
       self.nixosModules.ccache
+      self.nixosModules.gaming
+      self.nixosModules.goxlr
       self.nixosModules.homeManager
       self.nixosModules.jellyfin
       self.nixosModules.monero
       self.nixosModules.networkManager
+      self.nixosModules.nginx
       self.nixosModules.nvidia
-      self.nixosModules.gaming
-      self.nixosModules.goxlr
+      self.nixosModules.ollama
       self.nixosModules.virtualisation
 
       # Host-specific hardware
@@ -95,20 +97,11 @@
     monero.mining = {
       enable = false;
       pool = "pool.hashvault.pro:80";
-      wallet = "8AzWTLBtPhkBqAU1m9TQW42LTtPwoKb4s4Sgo4uYY6TY1pNrrKYj2vFgGW9D5sBqi8VStmgViAZC82GfVcsqqLq77uJtWE7";
+      wallet = inputs.nix-secrets.user.monero-wallet;
       maxUsagePercentage = 25;
     };
 
     bootloader.isMultiboot = true;
-
-    services = {
-      ollama = {
-        enable = true;
-        package = pkgs.ollama-cuda;
-      };
-
-      open-webui.enable = true;
-    };
 
     home-manager.userModules.bastian = with self.homeModules; [
       # Terminal
