@@ -60,22 +60,6 @@ server.
 - Get rid of desyncs so fresh installs work the same as a system I've been
   using for a long time.
 
-## AGS Migration
-
-I'm considering [migrating AGS](https://aylur.github.io/ags/guide/migrate.html)
-to [Astal](https://aylur.github.io/astal).
-
-Another possibility is moving to a more traditional setup like Waybar. The
-[Hyprland Wiki](https://wiki.hypr.land/Useful-Utilities/Status-Bars/) has a
-good section on this.
-
-### Status
-
-- Currently, I'm pinning the flake input to
-  [v1](https://github.com/Aylur/ags/tree/v1).
-- Astal introduced quite a bit of breaking changes, so it'll probably take me a
-  while to migrate.
-
 ## Linux Hardening
 
 I'm currently working on [hardening](./modules/nixosModules/features/security.nix) my
