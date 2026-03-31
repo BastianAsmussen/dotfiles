@@ -16,6 +16,11 @@
     nixos-avf.url = "github:nix-community/nixos-avf";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    nix-topology = {
+      url = "github:oddlama/nix-topology";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";

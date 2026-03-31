@@ -56,6 +56,7 @@
       self.nixosModules.nginx
       self.nixosModules.nvidia
       self.nixosModules.ollama
+      self.nixosModules.topology
       self.nixosModules.virtualisation
 
       # Host-specific hardware
@@ -71,8 +72,16 @@
     ];
 
     networking.hostName = "lambda";
-    desktop.greeter.gdm.enable = true;
+    topology.self = {
+      hardware.info = "AMD Ryzen Desktop, NVIDIA GPU";
+      interfaces.lan = {
+        network = "home";
+        type = "ethernet";
+        addresses = ["192.168.1.64"];
+      };
+    };
 
+    desktop.greeter.gdm.enable = true;
     preferences.monitors = {
       "DP-1" = {
         width = 1920;

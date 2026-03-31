@@ -46,8 +46,9 @@
       self.nixosModules.bluetooth
       self.nixosModules.btrfs
       self.nixosModules.ccache
-      self.nixosModules.networkManager
       self.nixosModules.homeManager
+      self.nixosModules.networkManager
+      self.nixosModules.topology
       self.nixosModules.virtualisation
 
       # Host-specific hardware
@@ -60,6 +61,14 @@
     ];
 
     networking.hostName = "delta";
+    topology.self = {
+      hardware.info = "Intel Laptop";
+      interfaces.wifi = {
+        network = "home";
+        type = "wifi";
+        addresses = ["DHCP"];
+      };
+    };
 
     desktop.greeter.gdm.enable = true;
 
