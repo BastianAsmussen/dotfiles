@@ -55,7 +55,6 @@
       self.nixosModules.networkManager
       self.nixosModules.nginx
       self.nixosModules.nvidia
-      self.nixosModules.ollama
       self.nixosModules.topology
       self.nixosModules.virtualisation
 
