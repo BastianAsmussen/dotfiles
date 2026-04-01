@@ -31,11 +31,6 @@ to implement a template for each language I use, which, as of now consists of:
 
 ## Neovim
 
-### SSH
-
-I want to be able to use the paste buffer of the client when using Neovim on a
-server.
-
 ### Plugin Issues
 
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
@@ -64,4 +59,3 @@ server.
 I'm currently working on [hardening](./modules/nixosModules/features/security.nix) my
 systems. I'd like to look into SELinux some more for that reason and see what
 other people do to harden their systems.
-
