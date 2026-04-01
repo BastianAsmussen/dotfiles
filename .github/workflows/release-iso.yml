@@ -17,7 +17,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      # Make the ISO derivation path independent of time.
+      # Make the ISO derivation path independent of time and commit revision.
       - name: Compute deterministic ISO derivation path
         id: drv
         run: |
@@ -28,6 +28,7 @@ jobs:
                 modules = [
                   ({ lib, ... }: {
                     environment.etc.isoBuildTime.text = lib.mkForce "deterministic";
+                    system.configurationRevision = lib.mkForce "deterministic";
                   })
                 ];
               }).config.system.build.isoImage.drvPath
@@ -35,6 +36,7 @@ jobs:
 
           echo "store_path=$STORE_PATH" >> "$GITHUB_OUTPUT"
           echo "Deterministic ISO derivation path: $STORE_PATH"
+
       - name: Check if ISO changed since last release
         id: check
         env:
@@ -51,6 +53,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "ISO changed ($LATEST → $CURRENT), building release..."
           fi
+
       - name: Build ISO image
         if: steps.check.outputs.changed == 'true'
         run: nix build .#nixosConfigurations.iso.config.system.build.isoImage --impure
