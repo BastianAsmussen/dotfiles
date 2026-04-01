@@ -3,6 +3,7 @@
     programs.ssh = {
       enable = true;
 
+      enableDefaultConfig = false;
       matchBlocks."home" = {
         hostname = inputs.nix-secrets.hosts.lambda.ipv4_address;
         port = 22;

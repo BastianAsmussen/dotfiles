@@ -11,7 +11,6 @@ around problems.
 - [Neovim](#neovim)
 - [Impermanence Setup](#impermanence-setup)
 - [Linux Hardening](#linux-hardening)
-- [SSH](#ssh)
 
 ## Colemak-DH on Delta
 
@@ -66,10 +65,3 @@ I'm currently working on [hardening](./modules/nixosModules/features/security.ni
 systems. I'd like to look into SELinux some more for that reason and see what
 other people do to harden their systems.
 
-## SSH
-
-When I'm connected to a remote machine I'd like to be able to perform actions
-requiring GPG signing, authentication or encryption. Because my GPG keys are
-stored on my YubiKey I'll need to find a way to forward that key somehow.
-[RemoteForward](https://wiki.gnupg.org/AgentForwarding) looks rather promising
-in that regard.
