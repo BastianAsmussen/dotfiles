@@ -10,6 +10,17 @@
       perSystem = {pkgs, ...}: let
         dotnet = pkgs.dotnetCorePackages.sdk_9_0;
       in {
+        packages.default = pkgs.buildDotnetModule {
+          pname = "sample-project";
+          version = "0.1.0";
+
+          src = ./.;
+          projectFile = "SampleProject/SampleProject.csproj";
+          nugetDeps = ./deps.json;
+          dotnet-sdk = dotnet;
+          dotnet-runtime = pkgs.dotnetCorePackages.runtime_9_0;
+        };
+
         devShells.default = pkgs.mkShell {
           buildInputs = [
             dotnet

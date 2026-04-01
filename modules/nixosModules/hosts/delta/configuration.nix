@@ -41,6 +41,7 @@
       self.nixosModules.gpg
       self.nixosModules.yubiKey
       self.nixosModules.tailscale
+      self.nixosModules.luksFido2
 
       # Keyboard
       self.nixosModules.kanata
