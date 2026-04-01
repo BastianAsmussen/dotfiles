@@ -18,10 +18,12 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
       # Compute a deterministic derivation path for the ISO image. The ISO
-      # config embeds `builtins.currentTime` (impure). `mkForce` (priority 50)
-      # beats `mkDefault` (priority 1000), so the impure thunk is never
-      # evaluated and the derivation path only changes when the real config
-      # changes.
+      # config embeds `builtins.currentTime` (impure) and
+      # `system.configurationRevision` (depends on `self.shortRev`, which
+      # changes every commit). `mkForce` (priority 50) beats `mkDefault`
+      # (priority 1000), so these impure/volatile values are replaced with
+      # static strings and the derivation path only changes when the real
+      # config changes.
       - name: Compute deterministic ISO derivation path
         id: drv
         run: |
@@ -32,6 +34,7 @@ jobs:
                 modules = [
                   ({ lib, ... }: {
                     environment.etc.isoBuildTime.text = lib.mkForce "deterministic";
+                    system.configurationRevision = lib.mkForce "deterministic";
                   })
                 ];
               }).config.system.build.isoImage.drvPath
@@ -39,6 +42,7 @@ jobs:
 
           echo "store_path=$STORE_PATH" >> "$GITHUB_OUTPUT"
           echo "Deterministic ISO derivation path: $STORE_PATH"
+
       - name: Check if ISO changed since last release
         id: check
         env:
@@ -55,6 +59,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "ISO changed ($LATEST → $CURRENT), building release..."
           fi
+
       - name: Build ISO image
         if: steps.check.outputs.changed == 'true'
         run: nix build .#nixosConfigurations.iso.config.system.build.isoImage --impure
