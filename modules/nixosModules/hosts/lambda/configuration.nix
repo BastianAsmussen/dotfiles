@@ -42,6 +42,7 @@
       self.nixosModules.ssh
       self.nixosModules.tailscale
       self.nixosModules.yubiKey
+      self.nixosModules.luksFido2
 
       # Features
       self.nixosModules.bluetooth

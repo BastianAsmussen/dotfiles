@@ -48,10 +48,6 @@
     vim.fn.sign_define("diagnosticsigninfo", { text = " ", texthl = "diagnosticinfo", linehl = "", numhl = "" })
   '';
 
-  # Use the OSC 52 escape sequence for clipboard operations over SSH.
-  # Neovim 0.10+ supports this natively. When connected via SSH, the terminal
-  # emulator interprets OSC 52 and copies text to the client's system
-  # clipboard — no X11/Wayland forwarding needed.
   extraConfigLuaPost = ''
     if os.getenv('SSH_TTY') then
       vim.g.clipboard = {
@@ -1092,11 +1088,6 @@
     dap.listeners.before.event_terminated['dapui_config'] = require('dapui').close
     dap.listeners.before.event_exited['dapui_config'] = require('dapui').close
 
-    -- Default LLDB debug configuration for C and C++. Without this,
-    -- dap.continue() has no configurations for these filetypes and falls back
-    -- to prompting the user to pick an adapter manually.
-    -- Rust is handled by rustaceanvim which registers its own dap
-    -- configurations, so it does not need an entry here.
     local lldb_config = {
       {
         name = 'Launch',
