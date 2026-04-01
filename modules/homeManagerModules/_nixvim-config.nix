@@ -1066,9 +1066,28 @@
   ];
 
   extraConfigLua = ''
-    require('dap').listeners.after.event_initialized['dapui_config'] = require('dapui').open
-    require('dap').listeners.before.event_terminated['dapui_config'] = require('dapui').close
-    require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
-    require('cmp').event:on('confirm_done', require('nvim-autopairs.completion.cmp').on_confirm_done())
+    local dap = require("dap")
+
+    dap.listeners.after.event_initialized["dapui_config"] = require("dapui").open
+    dap.listeners.before.event_terminated["dapui_config"] = require("dapui").close
+    dap.listeners.before.event_exited["dapui_config"] = require("dapui").close
+
+    local lldb_config = {
+      {
+        name = "Launch",
+        type = "lldb",
+        request = "launch",
+        program = function()
+          return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+        end,
+        cwd = vim.fn.getcwd(),
+        stopOnEntry = false,
+      },
+    }
+
+    dap.configurations.c = lldb_config
+    dap.configurations.cpp = lldb_config
+
+    require("cmp").event:on("confirm_done", require("nvim-autopairs.completion.cmp").on_confirm_done())
   '';
 }
