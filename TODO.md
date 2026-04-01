@@ -8,7 +8,6 @@ around problems.
 
 - [Colemak-DH on Delta](#colemak-dh-on-delta)
 - [Development Environments](#development-environments)
-- [Neovim](#neovim)
 - [Impermanence Setup](#impermanence-setup)
 - [Linux Hardening](#linux-hardening)
 
@@ -28,13 +27,6 @@ to implement a template for each language I use, which, as of now consists of:
 - [ ] Haskell
 - [ ] C
 - [x] Python
-
-## Neovim
-
-### Plugin Issues
-
-- [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
-  multiple different runners when I press `<F5>`.
 
 ## Impermanence Setup
 
