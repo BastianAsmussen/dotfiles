@@ -42,6 +42,9 @@
       self.nixosModules.yubiKey
       self.nixosModules.tailscale
 
+      # Keyboard
+      self.nixosModules.kanata
+
       # Features
       self.nixosModules.bluetooth
       self.nixosModules.btrfs
@@ -82,6 +85,7 @@
       tmux
       tmuxSessionizer
       gpg
+      ssh
       ohMyPosh
       bat
       btop

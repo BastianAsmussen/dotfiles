@@ -27,9 +27,31 @@
         "net.ipv4.tcp_fastopen" = 3;
         "net.ipv4.tcp_congestion_control" = "bbr";
         "net.core.default_qdisc" = "cake";
+
+        ## Kernel pointer and dmesg restrictions.
+        "kernel.kptr_restrict" = 2;
+        "kernel.dmesg_restrict" = 1;
+
+        ## Disable unprivileged user namespaces (reduces attack surface).
+        "kernel.unprivileged_userns_clone" = 0;
+
+        ## Restrict ptrace to direct child processes only.
+        "kernel.yama.ptrace_scope" = 1;
+
+        ## Disable core dumps.
+        "fs.suid_dumpable" = 0;
       };
 
       kernelModules = ["tcp_bbr"];
+
+      # Kernel parameters for additional hardening.
+      kernelParams = [
+        "slab_nomerge"
+        "init_on_alloc=1"
+        "init_on_free=1"
+        "page_alloc.shuffle=1"
+        "randomize_kstack_offset=on"
+      ];
     };
 
     # Security hardening
@@ -43,6 +65,7 @@
       };
 
       protectKernelImage = true;
+      lockKernelModules = false;
       forcePageTableIsolation = true;
       polkit.enable = true;
       rtkit.enable = true;
@@ -53,5 +76,18 @@
       # Always flush L1 cache before entering a guest.
       virtualisation.flushL1DataCache = "always";
     };
+
+    # Enable the firewall with a deny-all-inbound default.
+    networking.firewall = {
+      enable = true;
+      allowPing = false;
+      logReversePathDrops = true;
+    };
+
+    # Harden systemd services.
+    systemd.coredump.extraConfig = ''
+      Storage=none
+      ProcessSizeMax=0
+    '';
   };
 }

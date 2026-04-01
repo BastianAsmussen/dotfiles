@@ -1,0 +1,14 @@
+cabal-version:   3.0
+name:            sample-project
+version:         0.1.0.0
+license:         MIT
+license-file:    LICENSE
+author:          Bastian Asmussen
+maintainer:      bastian@asmussen.tech
+build-type:      Simple
+
+executable sample-project
+    main-is:       Main.hs
+    hs-source-dirs: src
+    default-language: Haskell2010
+    build-depends: base >=4.7 && <5

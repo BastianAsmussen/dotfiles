@@ -11,8 +11,11 @@
 
     boot = {
       initrd = {
-        availableKernelModules = ["xhci_pci" "thunderbolt" "vmd" "nvme" "usbhid"];
-        kernelModules = ["dm-snapshot"];
+        availableKernelModules = ["xhci_pci" "thunderbolt" "vmd" "nvme" "usbhid" "usb_storage" "uas"];
+        kernelModules = ["dm-snapshot" "dm-crypt"];
+
+        # systemd-based initrd is required for FIDO2-based LUKS unlocking.
+        systemd.enable = true;
       };
 
       kernelModules = ["kvm-intel"];

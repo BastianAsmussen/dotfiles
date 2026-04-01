@@ -25,6 +25,7 @@
           PermitUserEnvironment = "no";
           AllowAgentForwarding = "no";
           AllowTcpForwarding = "no";
+          StreamLocalBindUnlink = "yes";
           PermitTunnel = "no";
           UsePAM = false;
           KbdInteractiveAuthentication = false;

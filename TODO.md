@@ -15,7 +15,8 @@ around problems.
 
 ## Colemak-DH on Delta
 
-I want to add Colemak-DH with home-row mod support for Delta.
+- [x] Add Colemak-DH with home-row mod support for Delta via
+  [kanata](./modules/nixosModules/features/kanata.nix).
 
 ## Development Environments
 
@@ -25,51 +26,64 @@ to implement a template for each language I use, which, as of now consists of:
 
 - [x] Rust
 - [x] Go
-- [ ] C#
-- [ ] Haskell
-- [ ] C
+- [x] C#
+- [x] Haskell
+- [x] C
 - [x] Python
 
 ## Neovim
 
 ### SSH
 
-I want to be able to use the paste buffer of the client when using Neovim on a
-server.
+- [x] Use the paste buffer of the client when using Neovim on a server via
+  OSC 52 clipboard support.
 
 ### Plugin Issues
 
-- [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
-  multiple different runners when I press `<F5>`.
+- [x] [nvim-dap](https://github.com/mfussenegger/nvim-dap) runner selection
+  fixed by adding default LLDB configurations for C/C++.
 
 ## Impermanence Setup
 
 ### Current Issues
 
-- **Desyncs**:
-  Fresh installs don't always match long-running ones.
-  - **Example**: If I change something in my
-    [Firefox setup](./modules/homeManagerModules/firefox.nix), like tweaking
-    uBlock Origin settings, those changes don't carry over to new installs
-    because they're done imperatively.
-- **Installation Problems**:
-  When booting a fresh install, LUKS can't find the disk and just hangs.
+- [x] **Desyncs**: Added an
+  [impermanence module](./modules/nixosModules/features/impermanence.nix) that
+  explicitly persists needed user and system state directories (Firefox
+  profile, GPG, password store, etc.).
+- [x] **Installation Problems**: Fixed LUKS boot issues by enabling the
+  systemd-based initrd (required for FIDO2 unlocking), adding `dm-crypt` to
+  initrd kernel modules, and including additional USB storage drivers.
 
 ### Goal
 
-- Get rid of desyncs so fresh installs work the same as a system I've been
-  using for a long time.
+- [x] Get rid of desyncs so fresh installs work the same as a system I've
+  been using for a long time.
+
+### Remaining Work
+
+- Enable `self.nixosModules.impermanence` in host configurations once the
+  `/nix/persist` subvolume is created on existing installs.
 
 ## Linux Hardening
 
-I'm currently working on [hardening](./modules/nixosModules/features/security.nix) my
-systems. I'd like to look into SELinux some more for that reason and see what
-other people do to harden their systems.
+- [x] Added kernel pointer and dmesg restrictions (`kptr_restrict`,
+  `dmesg_restrict`).
+- [x] Added ptrace restrictions (`yama.ptrace_scope`).
+- [x] Disabled core dumps (`fs.suid_dumpable`, `systemd.coredump`).
+- [x] Added kernel boot parameters for slab hardening and memory
+  initialization.
+- [x] Enabled firewall with deny-all-inbound default.
+
+### Remaining Work
+
+- Investigate SELinux once NixOS support matures.
+- Consider per-service systemd hardening (`ProtectSystem`, `PrivateTmp`, etc.).
 
 ## SSH
 
-When I'm connected to a remote machine I'd like to be able to perform actions
-requiring GPG signing, authentication or encryption. Because my GPG keys are
-stored on my YubiKey I'll need to find a way to forward that key somehow.
-[RemoteForward](https://wiki.gnupg.org/AgentForwarding) looks rather promising
-in that regard.
+- [x] GPG agent forwarding configured via
+  [SSH client module](./modules/homeManagerModules/ssh.nix) and
+  `enableExtraSocket` in
+  [GPG module](./modules/nixosModules/features/gpg.nix). Remote machines can
+  now use the local YubiKey for GPG operations over SSH.

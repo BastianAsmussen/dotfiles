@@ -48,6 +48,8 @@
     vim.fn.sign_define("diagnosticsigninfo", { text = " ", texthl = "diagnosticinfo", linehl = "", numhl = "" })
   '';
 
+  clipboard.providers.osc52.enable = true;
+
   opts = {
     number = true;
     relativenumber = true;
@@ -1066,9 +1068,30 @@
   ];
 
   extraConfigLua = ''
-    require('dap').listeners.after.event_initialized['dapui_config'] = require('dapui').open
-    require('dap').listeners.before.event_terminated['dapui_config'] = require('dapui').close
-    require('dap').listeners.before.event_exited['dapui_config'] = require('dapui').close
+    local dap = require('dap')
+
+    dap.listeners.after.event_initialized['dapui_config'] = require('dapui').open
+    dap.listeners.before.event_terminated['dapui_config'] = require('dapui').close
+    dap.listeners.before.event_exited['dapui_config'] = require('dapui').close
+
+    -- Default LLDB configurations for C/C++ so dap.continue() doesn't prompt
+    -- for an adapter selection.
+    local lldb_config = {
+      {
+        name = 'Launch',
+        type = 'lldb',
+        request = 'launch',
+        program = function()
+          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+      },
+    }
+
+    dap.configurations.c = lldb_config
+    dap.configurations.cpp = lldb_config
+
     require('cmp').event:on('confirm_done', require('nvim-autopairs.completion.cmp').on_confirm_done())
   '';
 }

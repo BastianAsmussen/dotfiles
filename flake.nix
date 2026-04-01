@@ -31,6 +31,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    impermanence.url = "github:nix-community/impermanence";
+
     nix-secrets.url = "git+ssh://git@codeberg.org/BastianA/nix-secrets.git?shallow=1";
     sops-nix = {
       url = "github:Mic92/sops-nix";

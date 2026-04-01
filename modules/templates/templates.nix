@@ -1,6 +1,40 @@
 {
   flake.templates = rec {
     default = rust;
+    c = {
+      path = ./_c;
+      description = "C development environment.";
+      welcomeText = ''
+        # C Project Template
+
+        ## Intended Usage
+
+        Development of C programs and libraries.
+
+        ## Getting Started
+
+        - Enter the development shell with `nix develop`.
+        - Run `cmake -B build && cmake --build build` to compile.
+      '';
+    };
+
+    csharp = {
+      path = ./_csharp;
+      description = "C# development environment.";
+      welcomeText = ''
+        # C# Project Template
+
+        ## Intended Usage
+
+        Development of C# programs and libraries.
+
+        ## Getting Started
+
+        - Enter the development shell with `nix develop`.
+        - Run `dotnet new console -n MyProject` to scaffold a new project.
+      '';
+    };
+
     go = {
       path = ./_go;
       description = "Go development environment.";
@@ -18,6 +52,23 @@
         I highly recommend giving Adam Hoese's
         [gomod2nix blog post](https://www.tweag.io/blog/2021-03-04-gomod2nix) a
         read before continuing.
+      '';
+    };
+
+    haskell = {
+      path = ./_haskell;
+      description = "Haskell development environment.";
+      welcomeText = ''
+        # Haskell Project Template
+
+        ## Intended Usage
+
+        Development of Haskell programs and libraries.
+
+        ## Getting Started
+
+        - Enter the development shell with `nix develop`.
+        - Run `cabal build` to compile.
       '';
     };
 

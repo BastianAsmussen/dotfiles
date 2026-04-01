@@ -121,6 +121,7 @@
       tmux
       tmuxSessionizer
       gpg
+      ssh
       ohMyPosh
       bat
       btop
