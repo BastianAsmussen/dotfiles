@@ -8,10 +8,8 @@ around problems.
 
 - [Colemak-DH on Delta](#colemak-dh-on-delta)
 - [Development Environments](#development-environments)
-- [Neovim](#neovim)
 - [Impermanence Setup](#impermanence-setup)
 - [Linux Hardening](#linux-hardening)
-- [SSH](#ssh)
 
 ## Colemak-DH on Delta
 
@@ -29,18 +27,6 @@ to implement a template for each language I use, which, as of now consists of:
 - [ ] Haskell
 - [ ] C
 - [x] Python
-
-## Neovim
-
-### SSH
-
-I want to be able to use the paste buffer of the client when using Neovim on a
-server.
-
-### Plugin Issues
-
-- [nvim-dap](https://github.com/mfussenegger/nvim-dap) opens a window to select
-  multiple different runners when I press `<F5>`.
 
 ## Impermanence Setup
 
@@ -65,11 +51,3 @@ server.
 I'm currently working on [hardening](./modules/nixosModules/features/security.nix) my
 systems. I'd like to look into SELinux some more for that reason and see what
 other people do to harden their systems.
-
-## SSH
-
-When I'm connected to a remote machine I'd like to be able to perform actions
-requiring GPG signing, authentication or encryption. Because my GPG keys are
-stored on my YubiKey I'll need to find a way to forward that key somehow.
-[RemoteForward](https://wiki.gnupg.org/AgentForwarding) looks rather promising
-in that regard.
