@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.kanata = {lib, ...}: {
+  flake.nixosModules.kanata = {
     services.kanata = {
       enable = true;
 

@@ -4,6 +4,8 @@
     config,
     ...
   }: let
+    inherit (lib) mkIf mkAfter mkDefault mkOption mkEnableOption types;
+
     cfg = config.persistance;
   in {
     imports = [
@@ -11,68 +13,66 @@
     ];
 
     options.persistance = {
-      enable = lib.mkEnableOption "enable persistance";
+      enable = mkEnableOption "enable persistance";
 
-      nukeRoot.enable = lib.mkEnableOption "destroy /root on every boot";
+      nukeRoot.enable = mkEnableOption "destroy /root on every boot";
 
-      volumeGroup = lib.mkOption {
+      volumeGroup = mkOption {
         default = "nix";
         description = "LVM volume group name containing the btrfs root.";
-        type = lib.types.str;
+        type = types.str;
       };
 
-      directories = lib.mkOption {
+      directories = mkOption {
         default = [];
         description = "Extra system directories to persist.";
-        type = lib.types.listOf (lib.types.either lib.types.str lib.types.attrs);
+        type = types.listOf (types.either types.str types.attrs);
       };
 
-      files = lib.mkOption {
+      files = mkOption {
         default = [];
         description = "Extra system files to persist.";
-        type = lib.types.listOf (lib.types.either lib.types.str lib.types.attrs);
+        type = types.listOf (types.either types.str types.attrs);
       };
 
-      data.directories = lib.mkOption {
+      data.directories = mkOption {
         default = [];
         description = "User data directories to persist.";
-        type = lib.types.listOf (lib.types.either lib.types.str lib.types.attrs);
+        type = types.listOf (types.either types.str types.attrs);
       };
 
-      data.files = lib.mkOption {
+      data.files = mkOption {
         default = [];
         description = "User data files to persist.";
-        type = lib.types.listOf (lib.types.either lib.types.str lib.types.attrs);
+        type = types.listOf (types.either types.str types.attrs);
       };
 
-      cache.directories = lib.mkOption {
+      cache.directories = mkOption {
         default = [];
         description = "User cache directories to persist.";
-        type = lib.types.listOf (lib.types.either lib.types.str lib.types.attrs);
+        type = types.listOf (types.either types.str types.attrs);
       };
 
-      cache.files = lib.mkOption {
+      cache.files = mkOption {
         default = [];
         description = "User cache files to persist.";
-        type = lib.types.listOf (lib.types.either lib.types.str lib.types.attrs);
+        type = types.listOf (types.either types.str types.attrs);
       };
     };
 
-    config = lib.mkIf cfg.enable {
+    config = mkIf cfg.enable {
       fileSystems."/persist".neededForBoot = true;
 
       programs.fuse.userAllowOther = true;
-      boot.tmp.cleanOnBoot = lib.mkDefault true;
+      boot.tmp.cleanOnBoot = mkDefault true;
 
       environment.persistence = {
         "/persist/userdata".users."${config.preferences.user.name}" = {
-          directories = cfg.data.directories;
-          files = cfg.data.files;
+          inherit (cfg.data) directories files;
         };
 
         "/persist/usercache".users."${config.preferences.user.name}" = {
-          directories = cfg.cache.directories;
-          files = cfg.cache.files;
+          inherit (cfg.cache) directories files;
         };
 
         "/persist/system" = {
@@ -95,8 +95,8 @@
       };
 
       boot.initrd.postDeviceCommands =
-        lib.mkIf cfg.nukeRoot.enable
-        (lib.mkAfter ''
+        mkIf cfg.nukeRoot.enable
+        (mkAfter ''
           mkdir /btrfs_tmp
           mount /dev/${cfg.volumeGroup}/root /btrfs_tmp
           if [[ -e /btrfs_tmp/root ]]; then

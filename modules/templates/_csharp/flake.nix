@@ -9,14 +9,14 @@
       systems = ["x86_64-linux"];
       perSystem = {pkgs, ...}: let
         dotnet = pkgs.dotnetCorePackages.sdk_9_0;
+        runtime = pkgs.dotnetCorePackages.runtime_9_0;
       in {
         packages.default = pkgs.stdenv.mkDerivation {
           pname = "sample-project";
           version = "0.1.0";
 
           src = ./.;
-
-          nativeBuildInputs = [dotnet];
+          nativeBuildInputs = [dotnet pkgs.makeWrapper];
 
           buildPhase = ''
             export HOME=$TMPDIR
@@ -28,8 +28,10 @@
           '';
 
           installPhase = ''
-            mkdir -p $out/bin
-            cp -r out/* $out/bin/
+            mkdir -p $out/lib/sample-project $out/bin
+            cp -r out/* $out/lib/sample-project/
+            makeWrapper ${runtime}/bin/dotnet $out/bin/sample-project \
+              --add-flags "$out/lib/sample-project/SampleProject.dll"
           '';
         };
 
