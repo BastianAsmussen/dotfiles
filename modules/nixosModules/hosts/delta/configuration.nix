@@ -101,6 +101,7 @@
 
       # Other
       sops
+      ssh
       dconf
       dotnet
       rust
