@@ -7,6 +7,7 @@
     services.jellyfin = {
       enable = true;
 
+      openFirewall = true;
       user = "${config.preferences.user.name}";
     };
 
