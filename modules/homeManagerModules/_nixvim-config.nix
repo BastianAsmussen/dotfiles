@@ -803,7 +803,7 @@
           google_java_format.enable = false;
           markdownlint.enable = true;
           prettier = {
-            enable = true;
+            enable = false;
 
             disableTsServerFormatter = true;
           };
@@ -812,7 +812,6 @@
     };
 
     nvim-autopairs.enable = true;
-
     oil = {
       enable = true;
 
@@ -883,7 +882,6 @@
     };
 
     sleuth.enable = true;
-
     telescope = {
       enable = true;
 
