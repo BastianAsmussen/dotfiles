@@ -58,7 +58,7 @@
       environment.systemPackages = [
         self.packages.${system}.noctalia-shell
         pkgs.xwayland-satellite
-        pkgs.swww
+        pkgs.awww
         pkgs.grim
         pkgs.slurp
         pkgs.swappy
