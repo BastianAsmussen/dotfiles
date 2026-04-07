@@ -50,6 +50,7 @@
       self.nixosModules.gaming
       self.nixosModules.goxlr
       self.nixosModules.homeManager
+      self.nixosModules.ipfs
       self.nixosModules.jellyfin
       self.nixosModules.monero
       self.nixosModules.networkManager
