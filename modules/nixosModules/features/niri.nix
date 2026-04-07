@@ -67,7 +67,11 @@
       ];
 
       security.polkit.enable = true;
-      services.upower.enable = true;
+      services = {
+        power-profiles-daemon.enable = true;
+        upower.enable = true;
+      };
+
       hardware.bluetooth = {
         enable = lib.mkDefault true;
         powerOnBoot = lib.mkDefault true;
