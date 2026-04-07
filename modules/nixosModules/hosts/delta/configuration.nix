@@ -47,6 +47,7 @@
       self.nixosModules.btrfs
       self.nixosModules.ccache
       self.nixosModules.homeManager
+      self.nixosModules.ipfs
       self.nixosModules.networkManager
       self.nixosModules.topology
       self.nixosModules.virtualisation
