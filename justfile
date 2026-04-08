@@ -46,8 +46,8 @@ disko HOST:
 
 # Install NixOS for the specified host (run after disko).
 [group("install")]
-install HOST:
-    sudo nixos-install --flake .#{{ HOST }}
+install HOST *ARGS:
+    sudo nixos-install --flake .#{{ HOST }} {{ ARGS }}
 
 # Build a custom ISO image.
 [group("building")]

@@ -105,7 +105,7 @@ just iso-install /dev/sdX
   It's worth to consider increasing the download buffer during installation.
   Like the warning suggests, this can be accomplished by increasing the
   `download-buffer-size` setting; pass `--option download-buffer-size n` where
-  `n` is the buffer size to the `nixos-install` command from step 5.
+  `n` is the buffer size to the `just install` command from step 3.
 
 > [!IMPORTANT]
 > Remember to change the password of the user!
