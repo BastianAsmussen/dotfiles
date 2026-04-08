@@ -6,5 +6,7 @@
       enable = true;
       autoStart.xdg = true;
     };
+
+    preferences.autostart = ["${pkgs.goxlr-utility}/bin/goxlr-launcher &"];
   };
 }
