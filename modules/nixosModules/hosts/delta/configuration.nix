@@ -48,6 +48,7 @@
       self.nixosModules.ccache
       self.nixosModules.homeManager
       self.nixosModules.ipfs
+      self.nixosModules.kanata
       self.nixosModules.networkManager
       self.nixosModules.topology
       self.nixosModules.virtualisation
