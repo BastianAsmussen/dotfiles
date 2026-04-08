@@ -6,6 +6,7 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-fork.url = "github:BastianAsmussen/nixpkgs";
 
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
