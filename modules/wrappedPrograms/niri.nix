@@ -44,7 +44,7 @@
           "Mod+Return".spawn = config.terminal;
 
           "Mod+Q".close-window = _: {};
-          "Mod+F".maximize-column = _: {};
+          "Mod+F".maximize-window-to-edges = _: {};
           "Mod+G".fullscreen-window = _: {};
           "Mod+Shift+F".toggle-window-floating = _: {};
           "Mod+C".center-column = _: {};
