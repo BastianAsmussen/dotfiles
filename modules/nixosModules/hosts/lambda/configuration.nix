@@ -55,6 +55,7 @@
       self.nixosModules.monero
       self.nixosModules.networkManager
       self.nixosModules.nginx
+      self.nixosModules.nix-serve
       self.nixosModules.nvidia
       self.nixosModules.topology
       self.nixosModules.virtualisation

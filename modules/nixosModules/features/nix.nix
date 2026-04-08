@@ -34,7 +34,14 @@
           ];
 
           trusted-users = ["root" "@wheel"];
+          trusted-public-keys = [
+            inputs.nix-secrets.hosts.lambda.cache-public-key
+          ];
+
           trusted-substituters = config.nix.settings.substituters;
+          substituters = lib.mkIf (!config.services.nix-serve.enable) [
+            "https://internal.asmussen.tech/nix-cache"
+          ];
 
           http-connections = 32;
           connect-timeout = 5;
