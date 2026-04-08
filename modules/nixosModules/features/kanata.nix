@@ -16,7 +16,7 @@
               grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
               tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
               caps a    s    d    f    g    h    j    k    l    ;    '    ret
-              lsft z    x    c    v    b    n    m    ,    .    /    rsft
+              lsft lsgt z    x    c    v    b    n    m    ,    .    /    rsft
               lctl lmet lalt           spc            ralt rmet rctl
             )
 
@@ -24,7 +24,7 @@
               grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
               tab  q    w    f    p    b    j    l    u    y    ;    [    ]    \
               esc  @a_g @r_a @s_c @t_s g    m    @n_s @e_c @i_a @o_g '    ret
-              lsft x    c    d    v    z    k    h    ,    .    /    rsft
+              lsft z    x    c    d    v    z    k    h    ,    .    /    rsft
               lctl lmet lalt           spc            ralt rmet rctl
             )
 
