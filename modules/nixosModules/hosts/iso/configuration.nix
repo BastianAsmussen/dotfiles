@@ -23,7 +23,8 @@
     ...
   }: {
     imports = [
-      (modulesPath + "/installer/cd-dvd/installation-cd-minimal-combined.nix")
+      (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
+      (modulesPath + "/installer/cd-dvd/channel.nix")
 
       # Base modules.
       self.nixosModules.base
