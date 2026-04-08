@@ -15,12 +15,6 @@ check ARGS="":
 rebuild HOST=`hostname`:
     nh os switch --hostname {{ HOST }} .
 
-# Rebuild and switch, updating all flake inputs first.
-[group("building")]
-upgrade HOST=`hostname`:
-    just update
-    just rebuild {{ HOST }}
-
 # Clean up NixOS generations.
 [group("building")]
 clean:
@@ -30,6 +24,12 @@ clean:
 [group("update")]
 update *INPUT:
     nix flake update {{ INPUT }}
+
+# Rebuild and switch, updating all flake inputs first.
+[group("update")]
+upgrade HOST=`hostname`:
+    just update
+    just rebuild {{ HOST }}
 
 # Format all Nix files.
 [group("checks")]
