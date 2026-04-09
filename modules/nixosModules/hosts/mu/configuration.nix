@@ -30,6 +30,10 @@
       # Nix
       self.nixosModules.nix
       self.nixosModules.nh
+      self.nixosModules.remote-builder
+
+      # Security
+      self.nixosModules.sops
 
       # Features
       self.nixosModules.homeManager
