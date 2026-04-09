@@ -34,6 +34,7 @@
       # Nix
       self.nixosModules.nix
       self.nixosModules.nh
+      self.nixosModules.remote-builder
 
       # Security
       self.nixosModules.security
