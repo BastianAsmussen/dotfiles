@@ -10,8 +10,6 @@
       enable = true;
 
       package = pkgs.nix-serve-ng;
-      bindAddress = "0.0.0.0";
-      port = 5000;
       secretKeyFile = config.sops.secrets."cache-private-key".path;
     };
 
@@ -21,7 +19,7 @@
       enable = true;
 
       domain = "internal.asmussen.tech";
-      location = "/nix-cache";
+      location = "/";
       upstream = "http://${cfg.bindAddress}:${toString cfg.port}";
 
       ssl = {
