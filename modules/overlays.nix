@@ -7,7 +7,7 @@
     # Bring our custom packages into scope.
     additions = _: prev:
       withSystem prev.stdenv.hostPlatform.system (
-        {config, ...}: {inherit (config) packages;}
+        {config, ...}: config.packages
       );
 
     # User-defined overlays.
@@ -22,21 +22,21 @@
     };
 
     # Custom nixpkgs fork.
-    fork = final: _: {
-      fork = import inputs.nixpkgs-fork {
-        inherit (final.stdenv.hostPlatform) system;
-
-        config.allowUnfree = true;
-      };
+    fork = _: prev: {
+      fork = withSystem prev.stdenv.hostPlatform.system (
+        import inputs.nixpkgs-fork {
+          config.allowUnfree = true;
+        }
+      );
     };
 
     # Convenient access to the nixpkgs stable branch.
-    stable-packages = final: _: {
-      stable = import inputs.nixpkgs-stable {
-        inherit (final.stdenv.hostPlatform) system;
-
-        config.allowUnfree = true;
-      };
+    stable-packages = _: prev: {
+      stable = withSystem prev.stdenv.hostPlatform.system (
+        import inputs.nixpkgs-stable {
+          config.allowUnfree = true;
+        }
+      );
     };
   };
 }

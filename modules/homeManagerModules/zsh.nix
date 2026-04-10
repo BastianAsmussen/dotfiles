@@ -155,7 +155,7 @@
             zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 
             # Extra completions.
-            # source <(${lib.getExe pkgs.todo} completion zsh)
+            source <(${lib.getExe pkgs.todo} completion zsh)
           '';
 
         shellAliases = {

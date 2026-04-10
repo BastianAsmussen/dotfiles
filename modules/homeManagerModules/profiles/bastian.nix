@@ -21,11 +21,11 @@
       manix
       tlrc
       cabal-install
-      # mit
-      # calculator
-      # copy-file
-      # repo-cloner
-      # todo
+      mit
+      calculator
+      copy-file
+      repo-cloner
+      todo
       just
       bacon
       cargo-info
