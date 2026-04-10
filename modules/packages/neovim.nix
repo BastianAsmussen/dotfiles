@@ -1,15 +1,16 @@
-{inputs, ...}: {
+{
   perSystem = {
+    inputs',
     pkgs,
     config,
     ...
   }: {
     packages = {
-      neovim = inputs.nixvim.legacyPackages.${pkgs.stdenv.hostPlatform.system}.makeNixvimWithModule {
+      neovim = inputs'.nixvim.legacyPackages.makeNixvimWithModule {
         module = import ../homeManagerModules/_nixvim-config.nix;
       };
 
-      neovim-minimal = inputs.nixvim.legacyPackages.${pkgs.stdenv.hostPlatform.system}.makeNixvimWithModule {
+      neovim-minimal = inputs'.nixvim.legacyPackages.makeNixvimWithModule {
         module = {lib, ...}: {
           imports = [(import ../homeManagerModules/_nixvim-config.nix)];
           plugins = {
