@@ -18,9 +18,8 @@
 
   flake.nixosModules.hostIso = {
     modulesPath,
-    lib,
     pkgs,
-    system,
+    lib,
     ...
   }: {
     imports = [
@@ -76,7 +75,7 @@
 
     environment.systemPackages = [
       pkgs.git
-      self.packages.${system}.neovim-minimal
+      self.packages.${pkgs.stdenv.hostPlatform.system}.neovim-minimal
     ];
 
     services = {
