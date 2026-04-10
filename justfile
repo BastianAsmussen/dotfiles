@@ -12,8 +12,8 @@ check ARGS="":
 
 # Rebuild and switch to the specified host (defaults to current hostname).
 [group("building")]
-rebuild HOST=`hostname` *ARGS:
-    nh os switch --hostname {{ HOST }} {{ ARGS }} .
+rebuild *ARGS:
+    nh os switch . {{ ARGS }}
 
 # Clean up NixOS generations.
 [group("building")]
@@ -27,15 +27,15 @@ update *INPUT:
 
 # Rebuild and switch, updating all flake inputs first.
 [group("update")]
-upgrade HOST=`hostname` *ARGS:
+upgrade *ARGS:
     just update
-    just rebuild {{ HOST }} {{ ARGS }}
+    just rebuild {{ ARGS }}
 
 # Roll back a bad upgrade by restoring flake.lock and rebuilding.
 [group("update")]
-rollback HOST=`hostname` *ARGS:
+rollback *ARGS:
     git restore flake.lock
-    just rebuild {{ HOST }} {{ ARGS }}
+    just rebuild {{ ARGS }}
 
 # Scaffold a new host with a minimal configuration.
 [group("install")]
