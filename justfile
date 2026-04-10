@@ -12,8 +12,8 @@ check ARGS="":
 
 # Rebuild and switch to the specified host (defaults to current hostname).
 [group("building")]
-rebuild HOST=`hostname`:
-    nh os switch --hostname {{ HOST }} .
+rebuild HOST=`hostname` *ARGS:
+    nh os switch --hostname {{ HOST }} {{ ARGS }} .
 
 # Clean up NixOS generations.
 [group("building")]
@@ -27,16 +27,47 @@ update *INPUT:
 
 # Rebuild and switch, updating all flake inputs first.
 [group("update")]
-upgrade HOST=`hostname`:
+upgrade HOST=`hostname` *ARGS:
     just update
-    just rebuild {{ HOST }}
+    just rebuild {{ HOST }} {{ ARGS }}
+
+# Roll back a bad upgrade by restoring flake.lock and rebuilding.
+[group("update")]
+rollback HOST=`hostname` *ARGS:
+    git restore flake.lock
+    just rebuild {{ HOST }} {{ ARGS }}
+
+# Scaffold a new host with a minimal configuration.
+[group("install")]
+add-host NAME:
+    #!/usr/bin/env bash
+
+    set -euo pipefail
+
+    dir="modules/nixosModules/hosts/{{ NAME }}"
+    template="modules/nixosModules/hosts/_example"
+    if [ -d "$dir" ]; then
+        echo "Error: Host '{{ NAME }}' already exists at $dir!" >&2
+        exit 1
+    fi
+
+    cp -r "$template" "$dir"
+
+    # Capitalise the first letter for the module name.
+    module="$(echo '{{ NAME }}' | sed 's/./\U&/')"
+    sed -i "s/hostHOSTNAME/host$module/g; s/HOSTNAME/{{ NAME }}/g" "$dir"/*.nix
+
+    # Generate hardware configuration for the current machine.
+    sudo nixos-generate-config --show-hardware-config > "$dir/hardware-configuration.nix"
+    echo "Created host '{{ NAME }}' at $dir/"
+    echo "Edit $dir/configuration.nix to add modules, hardware configuration, etc."
 
 # Format all Nix files.
 [group("checks")]
 fmt:
     nix fmt .
 
-# Set up disks for a host using disko (DESTRUCTIVE - destroys existing data!).
+# Set up disks for a host using disko. DESTRUCTIVE: Destroys existing data!
 [group("install")]
 disko HOST:
     sudo nix run github:nix-community/disko/latest \
@@ -61,6 +92,23 @@ iso:
 iso-install DRIVE:
     just iso
     sudo dd if=latest.iso of={{ DRIVE }} bs=4M status=progress oflag=sync
+
+# Enroll a FIDO2 token (e.g. YubiKey) for LUKS disk decryption.
+[group("install")]
+fido2-enroll DEVICE:
+    sudo systemd-cryptenroll --fido2-device=auto {{ DEVICE }}
+
+# Generate a standalone age key for sops-nix (user/dev key).
+[group("secrets")]
+age-keygen:
+    mkdir -p ~/.config/sops/age
+    age-keygen -o ~/.config/sops/age/keys.txt
+    @echo "Back up ~/.config/sops/age/keys.txt to a password manager!"
+
+# Derive an age public key from this host's SSH host key.
+[group("secrets")]
+age-host-key:
+    nix-shell -p ssh-to-age --run 'cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age'
 
 # Generate the topology diagram and move it to `docs/`.
 [group("building")]
