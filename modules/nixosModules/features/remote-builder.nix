@@ -33,7 +33,7 @@
 
     programs.ssh.knownHosts."builder" = {
       hostNames = ["internal.asmussen.tech"];
-      publicKey = inputs.nix-secrets.hosts.lambda.builder-ssh-public-key;
+      publicKey = inputs.nix-secrets.hosts.lambda.ssh-public-key;
     };
 
     sops.secrets."builder-ssh-private-key" = {};
