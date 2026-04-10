@@ -16,10 +16,6 @@
             bind.address = "/run/user/1000/gnupg/S.gpg-agent";
             host.address = "/run/user/1000/gnupg/S.gpg-agent.extra";
           }
-          {
-            bind.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
-            host.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
-          }
         ];
 
         extraOptions.StreamLocalBindUnlink = "yes";

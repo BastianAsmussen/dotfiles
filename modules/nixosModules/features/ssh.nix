@@ -30,6 +30,7 @@
           UsePAM = false;
           KbdInteractiveAuthentication = false;
           StreamLocalBindUnlink = "yes";
+          GatewayPorts = "yes";
           KexAlgorithms = [
             "curve25519-sha256"
             "curve25519-sha256@libssh.org"
