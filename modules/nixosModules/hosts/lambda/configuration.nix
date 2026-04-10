@@ -41,6 +41,7 @@
       self.nixosModules.sops
       self.nixosModules.ssh
       self.nixosModules.tailscale
+      self.nixosModules.luksFido2
       self.nixosModules.yubiKey
 
       # Features
@@ -112,6 +113,7 @@
     };
 
     bootloader.isMultiboot = true;
+    btrfs.scrub.fileSystems = ["/" "/run/media/bastian/Extra"];
 
     home-manager.userModules.bastian = with self.homeModules; [
       # Terminal

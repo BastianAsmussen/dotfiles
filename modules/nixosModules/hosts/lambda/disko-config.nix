@@ -46,6 +46,35 @@
           };
         };
 
+        extra = {
+          type = "disk";
+          device = "/dev/nvme1n1";
+          content = {
+            type = "gpt";
+            partitions = {
+              luks = {
+                size = "100%";
+                content = {
+                  type = "luks";
+                  name = "extra_lvm";
+                  settings = {
+                    allowDiscards = true;
+                    crypttabExtraOpts = [
+                      "fido2-device=auto"
+                      "token-timeout=10"
+                    ];
+                  };
+
+                  content = {
+                    type = "lvm_pv";
+                    vg = "extra";
+                  };
+                };
+              };
+            };
+          };
+        };
+
         backup = {
           device = "/dev/sda";
           type = "disk";
@@ -57,7 +86,30 @@
                 type = "filesystem";
                 format = "ext4";
                 mountpoint = "/run/media/bastian/Backup";
+                mountOptions = ["nofail"];
               };
+            };
+          };
+        };
+      };
+
+      lvm_vg.extra = {
+        type = "lvm_vg";
+        lvs = {
+          root = {
+            size = "100%FREE";
+            content = {
+              type = "btrfs";
+              extraArgs = ["-f"];
+              mountpoint = "/run/media/bastian/Extra";
+              mountOptions = [
+                "compress=zstd:3"
+                "noatime"
+                "ssd"
+                "discard=async"
+                "space_cache=v2"
+                "nofail"
+              ];
             };
           };
         };
