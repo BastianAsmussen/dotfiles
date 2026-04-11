@@ -7,7 +7,18 @@
     # Bring our custom packages into scope.
     additions = _: prev:
       withSystem prev.stdenv.hostPlatform.system (
-        {config, ...}: config.packages
+        {config, ...}: {
+          inherit
+            (config.packages)
+            mit
+            calculator
+            copy-file
+            neovim
+            neovim-minimal
+            repo-cloner
+            todo
+            ;
+        }
       );
 
     # User-defined overlays.
