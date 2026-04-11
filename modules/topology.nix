@@ -11,15 +11,12 @@
     topology.self.interfaces.tailscale0 = lib.mkIf config.services.tailscale.enable {
       type = "wireguard";
       network = "tailscale";
-      renderer.hidePhysicalConnections = true;
     };
   };
 
   perSystem = {
     topology.modules = [
-      ({config, ...}: let
-        inherit (config.lib.topology) mkInternet mkRouter mkConnection;
-      in {
+      ({config, ...}: {
         networks = {
           home = {
             name = "Home Network";
@@ -33,32 +30,22 @@
         };
 
         nodes = {
-          internet = mkInternet {
-            connections = mkConnection "router" "wan";
+          internet = config.lib.topology.mkInternet {
+            connections = config.lib.topology.mkConnection "router" "wan";
           };
 
-          router = mkRouter "Router" {
+          router = config.lib.topology.mkRouter "Router" {
             info = "Home Router";
             interfaceGroups = [
               ["eth1" "wifi"]
               ["wan"]
             ];
 
-            connections = {
-              eth1 = mkConnection "lambda" "lan";
-              wifi = mkConnection "delta" "wifi";
-            };
-
             interfaces = {
               eth1.network = "home";
               wifi.network = "home";
             };
           };
-
-          # Tailscale Mesh.
-          delta.interfaces.tailscale0.physicalConnections = [
-            (mkConnection "lambda" "tailscale0")
-          ];
         };
       })
     ];

@@ -16,7 +16,7 @@
     ];
   };
 
-  flake.nixosModules.hostDelta = {
+  flake.nixosModules.hostDelta = {config, ...}: {
     imports = [
       # Base modules
       self.nixosModules.base
@@ -34,7 +34,6 @@
       # Nix
       self.nixosModules.nix
       self.nixosModules.nh
-      self.nixosModules.remote-builder
 
       # Security
       self.nixosModules.security
@@ -66,11 +65,9 @@
     networking.hostName = "delta";
     topology.self = {
       hardware.info = "Intel Laptop";
-      interfaces.wifi = {
-        network = "home";
-        type = "wifi";
-        addresses = ["DHCP"];
-      };
+      interfaces.wifi.physicalConnections = [
+        (config.lib.topology.mkConnection "router" "wifi")
+      ];
     };
 
     desktop.greeter.gdm.enable = true;

@@ -30,10 +30,6 @@
       # Nix
       self.nixosModules.nix
       self.nixosModules.nh
-      self.nixosModules.remote-builder
-
-      # Security
-      self.nixosModules.sops
 
       # Features
       self.nixosModules.homeManager
@@ -46,7 +42,12 @@
     ];
 
     networking.hostName = "mu";
-    topology.self.hardware.info = "Android Phone";
+    topology.self = {
+      hardware.info = "Android Phone";
+      interfaces.wifi.physicalConnections = [
+        (config.lib.topology.mkConnection "router" "wifi")
+      ];
+    };
 
     avf.defaultUser = config.preferences.user.name;
 
