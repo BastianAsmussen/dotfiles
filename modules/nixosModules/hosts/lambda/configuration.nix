@@ -16,7 +16,7 @@
     ];
   };
 
-  flake.nixosModules.hostLambda = {
+  flake.nixosModules.hostLambda = {config, ...}: {
     imports = [
       # Base modules
       self.nixosModules.base
@@ -74,12 +74,23 @@
     ];
 
     networking.hostName = "lambda";
-    topology.self = {
+    topology.self = let
+      inherit (config.lib.topology) mkConnection;
+    in {
       hardware.info = "AMD Ryzen Desktop, NVIDIA GPU";
-      interfaces.lan = {
-        network = "home";
-        type = "ethernet";
-        addresses = ["192.168.1.64"];
+      interfaces = {
+        lan = {
+          network = "home";
+          type = "ethernet";
+          addresses = ["192.168.1.64"];
+          physicalConnections = [
+            (mkConnection "router" "eth1")
+          ];
+        };
+
+        tailscale0.physicalConnections = [
+          (mkConnection "delta" "tailscale0")
+        ];
       };
     };
 
