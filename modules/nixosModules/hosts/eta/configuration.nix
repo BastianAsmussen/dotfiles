@@ -19,6 +19,7 @@
   flake.nixosModules.hostEta = {
     config,
     lib,
+    pkgs,
     ...
   }: {
     imports = [
@@ -83,9 +84,12 @@
       ../../../../keys/ssh-yubikey.pub
     ];
 
+    environment.systemPackages = [
+      pkgs.neovim-minimal
+    ];
+
     home-manager.userModules.bastian = with self.homeModules; [
       # Terminal
-      nixvim
       git
       zsh
       zoxide
@@ -102,7 +106,6 @@
       # Other
       sops
       qemu
-      rust
     ];
   };
 }
