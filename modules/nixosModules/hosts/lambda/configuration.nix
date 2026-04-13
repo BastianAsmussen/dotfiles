@@ -84,7 +84,7 @@
           type = "ethernet";
           addresses = ["192.168.1.64"];
           physicalConnections = [
-            (mkConnection "router" "eth1")
+            (mkConnection "homeRouter" "eth1")
           ];
         };
 

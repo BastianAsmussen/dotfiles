@@ -45,7 +45,7 @@
     topology.self = {
       hardware.info = "Android Phone";
       interfaces.wifi.physicalConnections = [
-        (config.lib.topology.mkConnection "router" "wifi")
+        (config.lib.topology.mkConnection "homeRouter" "wifi")
       ];
     };
 
