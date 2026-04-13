@@ -42,6 +42,7 @@
       # Features
       self.nixosModules.btrfs
       self.nixosModules.homeManager
+      self.nixosModules.lambdaMirror
       self.nixosModules.networkManager
       self.nixosModules.nginx
       self.nixosModules.nix-serve
@@ -77,6 +78,7 @@
     };
 
     btrfs.scrub.fileSystems = ["/"];
+    lambdaMirror.enable = true;
 
     # Remote deployment.
     services.openssh.settings.PermitRootLogin = lib.mkForce "yes";

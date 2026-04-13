@@ -1,11 +1,12 @@
 {inputs, ...}: {
-  flake.nixosModules.remote-builder = {config, ...}: {
+  flake.nixosModules.remoteBuilder = {config, ...}: {
     nix = {
       distributedBuilds = true;
 
       buildMachines = [
         {
-          hostName = "internal.asmussen.tech";
+          # Build directly on lambda over Tailscale, not through eta.
+          hostName = "lambda";
           system = "x86_64-linux";
           maxJobs = 32;
           speedFactor = 2;
@@ -21,6 +22,7 @@
       settings = {
         builders-use-substitutes = true;
 
+        # Use eta's HTTPS cache, which mirrors lambda's store.
         substituters = [
           "https://internal.asmussen.tech/"
         ];
@@ -32,7 +34,7 @@
     };
 
     programs.ssh.knownHosts."builder" = {
-      hostNames = ["internal.asmussen.tech"];
+      hostNames = ["lambda"];
       publicKey = inputs.nix-secrets.hosts.lambda.ssh-public-key;
     };
 
