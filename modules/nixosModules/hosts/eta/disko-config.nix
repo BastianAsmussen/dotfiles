@@ -1,32 +1,35 @@
 {
   flake.diskoConfigurations.hostEta = {
     disko.devices = {
-      disk.main = {
-        type = "disk";
-        device = "/dev/sda";
-        content = {
-          type = "gpt";
-          partitions = {
-            boot = {
-              size = "512M";
-              type = "EF02"; # For GRUB MBR.
-            };
-
-            ESP = {
-              size = "4G";
-              type = "EF00";
-              content = {
-                type = "filesystem";
-                format = "vfat";
-                mountpoint = "/boot";
+      disk = {
+        main = {
+          type = "disk";
+          device = "/dev/sda";
+          content = {
+            type = "gpt";
+            partitions = {
+              boot = {
+                size = "512M";
+                type = "EF02"; # For GRUB MBR.
               };
-            };
 
-            primary = {
-              size = "100%";
-              content = {
-                type = "lvm_pv";
-                vg = "main";
+              ESP = {
+                size = "4G";
+                type = "EF00";
+                content = {
+                  type = "filesystem";
+                  format = "vfat";
+                  mountpoint = "/boot";
+                  mountOptions = ["umask=0077"];
+                };
+              };
+
+              primary = {
+                size = "100%";
+                content = {
+                  type = "lvm_pv";
+                  vg = "main";
+                };
               };
             };
           };
