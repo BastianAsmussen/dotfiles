@@ -20,6 +20,7 @@
     imports = [
       # Base modules
       self.nixosModules.base
+      self.nixosModules.bootloader
       self.nixosModules.language
 
       # Nix
@@ -44,6 +45,7 @@
 
       # External modules
       inputs.disko.nixosModules.disko
+      inputs.stylix.nixosModules.stylix
     ];
 
     networking.hostName = "eta";
@@ -66,5 +68,7 @@
         ];
       };
     };
+
+    btrfs.scrub.fileSystems = ["/"];
   };
 }
