@@ -53,6 +53,7 @@
       self.nixosModules.homeManager
       self.nixosModules.ipfs
       self.nixosModules.jellyfin
+      self.nixosModules.lambdaBusy
       self.nixosModules.monero
       self.nixosModules.networkManager
       self.nixosModules.nginx
@@ -124,6 +125,7 @@
     };
 
     bootloader.isMultiboot = true;
+    lambdaBusy.enable = true;
     btrfs.scrub.fileSystems = ["/" "/run/media/bastian/Extra"];
 
     home-manager.userModules.bastian = with self.homeModules; [
