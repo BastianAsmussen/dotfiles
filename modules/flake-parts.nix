@@ -1,5 +1,6 @@
 {inputs, ...}: {
   imports = [
+    inputs.flake-parts.flakeModules.modules
     inputs.disko.flakeModules.default
     inputs.home-manager.flakeModules.home-manager
   ];
