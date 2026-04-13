@@ -66,7 +66,7 @@
     topology.self = {
       hardware.info = "Intel Laptop";
       interfaces.wifi.physicalConnections = [
-        (config.lib.topology.mkConnection "router" "wifi")
+        (config.lib.topology.mkConnection "homeRouter" "wifi")
       ];
     };
 

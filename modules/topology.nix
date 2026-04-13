@@ -23,6 +23,12 @@
             cidrv4 = "192.168.1.0/24";
           };
 
+          cloud = {
+            name = "Hetzner Network";
+            cidrv4 = "49.13.7.174/32";
+            cidrv6 = "2a01:4f8:c014:4725::/64";
+          };
+
           tailscale = {
             name = "Tailscale VPN";
             cidrv4 = "100.64.0.0/10";
@@ -31,10 +37,23 @@
 
         nodes = {
           internet = config.lib.topology.mkInternet {
-            connections = config.lib.topology.mkConnection "router" "wan";
+            connections = [
+              (config.lib.topology.mkConnection "cloudRouter" "wan")
+              (config.lib.topology.mkConnection "homeRouter" "wan")
+            ];
           };
 
-          router = config.lib.topology.mkRouter "Router" {
+          cloudRouter = config.lib.topology.mkRouter "Hetzner" {
+            info = "Cloud Router";
+            interfaceGroups = [
+              ["eth1"]
+              ["wan"]
+            ];
+
+            interfaces.eth1.network = "cloud";
+          };
+
+          homeRouter = config.lib.topology.mkRouter "Home" {
             info = "Home Router";
             interfaceGroups = [
               ["eth1" "wifi"]
