@@ -16,12 +16,17 @@
     ];
   };
 
-  flake.nixosModules.hostEta = {config, ...}: {
+  flake.nixosModules.hostEta = {
+    config,
+    lib,
+    ...
+  }: {
     imports = [
       # Base modules
       self.nixosModules.base
       self.nixosModules.bootloader
       self.nixosModules.language
+      self.nixosModules.stylix
 
       # Nix
       self.nixosModules.nix
@@ -35,6 +40,7 @@
 
       # Features
       self.nixosModules.btrfs
+      self.nixosModules.homeManager
       self.nixosModules.networkManager
       self.nixosModules.nginx
       self.nixosModules.nix-serve
@@ -70,5 +76,33 @@
     };
 
     btrfs.scrub.fileSystems = ["/"];
+
+    # Remote deployment.
+    services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
+    users.users.root.openssh.authorizedKeys.keyFiles = [
+      ../../../../keys/ssh-yubikey.pub
+    ];
+
+    home-manager.userModules.bastian = with self.homeModules; [
+      # Terminal
+      nixvim
+      git
+      zsh
+      zoxide
+      tmux
+      ohMyPosh
+      bat
+      btop
+      direnv
+      eza
+      fastfetch
+      fzf
+      ripgrep
+
+      # Other
+      sops
+      qemu
+      rust
+    ];
   };
 }
