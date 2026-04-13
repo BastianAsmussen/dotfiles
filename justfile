@@ -31,6 +31,11 @@ upgrade *ARGS:
     just update
     just rebuild {{ ARGS }}
 
+# Build a host without switching to it.
+[group("building")]
+build HOST *ARGS:
+    nh os build . --hostname {{ HOST }} {{ ARGS }}
+
 # Roll back a bad upgrade by restoring flake.lock and rebuilding.
 [group("update")]
 rollback *ARGS:
