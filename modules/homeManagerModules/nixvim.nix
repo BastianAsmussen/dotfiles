@@ -25,7 +25,9 @@
       plugins = {
         # `nixd` needs flake context that is only available inside a NixOS/HM
         # activation.
-        lsp.servers.nixd.settings = let
+        # nixd needs osConfig to resolve the host's NixOS configuration.
+        # In standalone home-manager (osConfig == null) these settings are skipped.
+        lsp.servers.nixd.settings = lib.optionalAttrs (osConfig != null) (let
           inherit (osConfig.networking) hostName;
 
           flake = ''(builtins.getFlake "${self}")'';
@@ -41,7 +43,7 @@
             lib.expr = ''${nixos.cfg}.lib'';
             home-manager.expr = ''${nixos.opts}.home-manager.users.type.getSubOptions []'';
           };
-        };
+        });
 
         # RUSTFLAGS is set via home.sessionVariables, only available inside HM.
         rustaceanvim.settings.server.default_settings.rust-analyzer.check.extraArgs =

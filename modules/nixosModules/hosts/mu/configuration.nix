@@ -54,28 +54,8 @@
     nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 
     home-manager.userModules.bastian = with self.homeModules; [
-      # Terminal
-      nixvim
-      git
-      zsh
-      zoxide
-      nixIndex
-      tmux
-      tmuxSessionizer
-      gpg
-      ohMyPosh
-      bat
-      btop
-      direnv
-      distrobox
-      eza
-      fastfetch
-      fzf
-      ripgrep
+      terminal
       rust
-
-      # Shared user profile
-      # bastian
     ];
   };
 }

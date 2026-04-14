@@ -28,12 +28,12 @@
     cloneProject = pkgs.writeShellScriptBin "clone-project" ''
       set -euo pipefail
 
-      # ── Helpers ──────────────────────────────────────────────
+      # Helpers
       die()  { printf '\033[1;31m✗\033[0m %b\n' "$1"; sleep 2; exit 1; }
       info() { printf '\033[1;34m›\033[0m %b\n' "$1"; }
       ok()   { printf '\033[1;32m✓\033[0m %b\n' "$1"; }
 
-      # ── 1. Category ──────────────────────────────────────────
+      # 1. Category
       category=$(printf 'Personal\nSchool' \
         | ${fzf} --prompt=' Category › ' \
                 --height=~50% \
@@ -44,7 +44,7 @@
                 --color='pointer:blue,prompt:blue,border:dim')
       [ -z "''${category:-}" ] && exit 0
 
-      # ── 2. Repository URL ────────────────────────────────────
+      # 2. Repository URL
       printf '\033[1;34m›\033[0m Repo \033[2m(owner/repo or full URL)\033[0m: '
       read -r repo_input
       [ -z "''${repo_input:-}" ] && exit 0
@@ -59,9 +59,9 @@
       project_name=$(basename "$repo_url" .git)
       target_dir="${homeDir}/Projects/''${category}/''${project_name}"
 
-      # ── 3. Clone / reuse ─────────────────────────────────────
+      # 3. Clone / reuse
       if [ -d "$target_dir" ]; then
-        info "Already exists – opening \033[1m$project_name\033[0m"
+        info "Already exists, opening \033[1m$project_name\033[0m"
       else
         info "Cloning into \033[2m$target_dir\033[0m …"
         printf '\n'
@@ -77,7 +77,7 @@
         ok "Cloned \033[1m$project_name\033[0m"
       fi
 
-      # ── 4. Sessionize ────────────────────────────────────────
+      # 4. Sessionize
       session_name=$(echo "$project_name" | tr '.' '-')
       if ! ${tmux} has-session -t "=$session_name" 2>/dev/null; then
         ${tmux} new-session -d -s "$session_name" -c "$target_dir"
@@ -113,8 +113,12 @@
           extraConfig = ''
             set -g @catppuccin_flavor 'mocha'
             set -g @catppuccin_window_status_style 'basic'
-            set -g @catppuccin_window_tabs_enabled on
-            set -g @catppuccin_date_time "%H:%M"
+
+            set -g status-left-length 100
+            set -g status-right-length 100
+            set -g status-left ""
+            set -g status-right "#{E:@catppuccin_status_session}"
+            set -ag status-right "#{E:@catppuccin_status_date_time}"
           '';
         }
       ];

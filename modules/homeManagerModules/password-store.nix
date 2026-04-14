@@ -6,9 +6,9 @@
     ...
   }: let
     clipboardDependency =
-      if osConfig.desktop.greeter.useWayland
-      then pkgs.wl-clipboard
-      else pkgs.xclip;
+      if osConfig != null && !osConfig.desktop.greeter.useWayland
+      then pkgs.xclip
+      else pkgs.wl-clipboard;
   in {
     home.packages = [clipboardDependency];
 

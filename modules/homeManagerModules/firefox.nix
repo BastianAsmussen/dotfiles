@@ -1,5 +1,9 @@
 {inputs, ...}: {
-  flake.homeModules.firefox = {osConfig, ...}: {
+  flake.homeModules.firefox = {
+    osConfig,
+    lib,
+    ...
+  }: {
     imports = [
       inputs.schizofox.homeManagerModule
     ];
@@ -67,7 +71,7 @@
 
       security.sandbox.enable = true;
 
-      theme = let
+      theme = lib.optionalAttrs (osConfig != null) (let
         inherit (osConfig.lib.stylix) colors;
       in {
         colors = {
@@ -75,7 +79,7 @@
           background = colors.base00;
           foreground = colors.base05;
         };
-      };
+      });
     };
   };
 }
