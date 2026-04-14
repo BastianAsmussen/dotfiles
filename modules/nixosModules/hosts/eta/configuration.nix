@@ -47,6 +47,7 @@
       self.nixosModules.nginx
       self.nixosModules.nix-serve
       self.nixosModules.topology
+      self.nixosModules.website
 
       # Host-specific hardware
       self.diskoConfigurations.hostEta
