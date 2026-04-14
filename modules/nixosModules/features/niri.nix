@@ -30,7 +30,12 @@
 
           inherit (m) scale;
         }
-        // lib.optionalAttrs m.vrr {variable-refresh-rate = _: {};}
+        // lib.optionalAttrs (m.vrr != "off") {
+          "variable-refresh-rate" =
+            if m.vrr == "on-demand"
+            then _: {props = {"on-demand" = true;};}
+            else _: {};
+        }
     ) (lib.filterAttrs (_: m: m.enabled) config.preferences.monitors);
   in {
     config = {

@@ -40,9 +40,9 @@
           };
 
           vrr = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-            description = "Enable variable refresh rate (VRR / FreeSync / G-Sync).";
+            type = lib.types.enum ["off" "on" "on-demand"];
+            default = "off";
+            description = "VRR mode: off, always on, or on-demand (only when fullscreen app requests it).";
           };
 
           enabled = lib.mkOption {
