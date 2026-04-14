@@ -1,9 +1,8 @@
-{
+{inputs, ...}: {
   flake.homeModules.git = {
     config,
     lib,
     pkgs,
-    self,
     ...
   }: {
     programs.git = {
@@ -32,9 +31,9 @@
         deltaBin = lib.getExe pkgs.delta;
       in {
         user = {
-          inherit (self.preferences) email;
+          inherit (inputs.nix-secrets.user) email;
 
-          name = self.preferences.full-name;
+          name = inputs.nix-secrets.user.full-name;
         };
 
         alias = {
@@ -100,7 +99,7 @@
 
         sendemail = {
           sendmailCmd = "${pkgs.git-protonmail}/bin/git-protonmail";
-          from = "${self.preferences.email}";
+          from = "${inputs.nix-secrets.user.email}";
         };
       };
     };
