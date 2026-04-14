@@ -61,6 +61,7 @@
       self.nixosModules.nvidia
       self.nixosModules.topology
       self.nixosModules.virtualisation
+      self.nixosModules.website
 
       # Host-specific hardware
       self.diskoConfigurations.hostLambda

@@ -64,6 +64,8 @@
 
     wrappers.url = "github:Lassulus/wrappers";
     wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
+
+    website.url = "github:BastianAsmussen/website";
   };
 
   # Import every Nix file under `./modules` as a flake-parts module.
