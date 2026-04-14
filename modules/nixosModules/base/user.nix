@@ -1,4 +1,4 @@
-{self, ...}: {
+{inputs, ...}: {
   flake.nixosModules.base = {
     lib,
     config,
@@ -12,19 +12,19 @@
     options.preferences.user = {
       name = mkOption {
         type = types.str;
-        default = self.preferences.name;
+        default = inputs.nix-secrets.user.name;
         description = "The user's login name.";
       };
 
       fullName = mkOption {
         type = types.str;
-        default = self.preferences.full-name;
+        default = inputs.nix-secrets.user.full-name;
         description = "The user's full display name.";
       };
 
       email = mkOption {
         type = types.str;
-        default = self.preferences.email;
+        default = inputs.nix-secrets.user.email;
         description = "The user's email address.";
       };
 
