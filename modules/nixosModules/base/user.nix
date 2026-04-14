@@ -1,4 +1,4 @@
-{
+{self, ...}: {
   flake.nixosModules.base = {
     lib,
     config,
@@ -12,19 +12,19 @@
     options.preferences.user = {
       name = mkOption {
         type = types.str;
-        default = "bastian";
+        default = self.preferences.name;
         description = "The user's login name.";
       };
 
       fullName = mkOption {
         type = types.str;
-        default = "Bastian Asmussen";
+        default = self.preferences.full-name;
         description = "The user's full display name.";
       };
 
       email = mkOption {
         type = types.str;
-        default = "bastian@asmussen.tech";
+        default = self.preferences.email;
         description = "The user's email address.";
       };
 
@@ -32,6 +32,12 @@
         type = types.path;
         default = ../../../assets/icons/bastian.png;
         description = "Path to the user's account icon image.";
+      };
+
+      authorizedKeyFiles = mkOption {
+        type = types.listOf types.path;
+        default = lib.custom.keys.default.sshPaths;
+        description = "SSH authorized key files to install for the user.";
       };
     };
 
@@ -45,7 +51,7 @@
         extraGroups = ["wheel"];
         shell = pkgs.zsh;
 
-        openssh.authorizedKeys.keyFiles = lib.custom.keys.default.sshPaths;
+        openssh.authorizedKeys.keyFiles = cfg.authorizedKeyFiles;
       };
 
       # Set the user's icon.

@@ -1,5 +1,5 @@
 {inputs, ...}: {
-  flake.homeModules.ssh = {osConfig, ...}: {
+  flake.homeModules.ssh = {self, ...}: {
     home.file.".ssh/yubikey.pub".source = ../../keys/ssh-yubikey.pub;
 
     programs.ssh = {
@@ -9,7 +9,7 @@
       matchBlocks."home" = {
         hostname = inputs.nix-secrets.hosts.lambda.ipv4_address;
         port = 22;
-        user = osConfig.preferences.user.name;
+        user = self.preferences.name;
         identityFile = "~/.ssh/yubikey.pub";
         remoteForwards = [
           {

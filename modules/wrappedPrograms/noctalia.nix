@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  inputs,
+  self,
+  ...
+}: {
   perSystem = {pkgs, ...}: {
     packages.noctalia-shell = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
       inherit pkgs;
@@ -282,7 +286,7 @@
         };
 
         location = {
-          name = inputs.nix-secrets.user.city;
+          name = self.preferences.city;
           analogClockInCalendar = false;
           firstDayOfWeek = -1;
           showCalendarEvents = true;
