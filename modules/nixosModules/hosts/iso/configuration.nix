@@ -73,6 +73,14 @@
       export PS1="\\[\\033[01;32m\\]\\u@\\h-$ISO_BUILD_TIME\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ "
     '';
 
+    preferences.user = {
+      name = "nixos";
+      fullName = "NixOS Live";
+      email = "root@localhost";
+    };
+
+    users.users.nixos.initialPassword = lib.mkForce null;
+
     environment.systemPackages = [
       pkgs.git
       self.packages.${pkgs.stdenv.hostPlatform.system}.neovim-minimal
