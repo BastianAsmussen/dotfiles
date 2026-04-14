@@ -104,7 +104,7 @@
         x = 1920;
         y = 0;
         scale = 1.0;
-        vrr = true;
+        vrr = "on-demand";
       };
 
       "HDMI-A-1" = {
@@ -120,7 +120,7 @@
     monero.mining = {
       enable = false;
       pool = "pool.hashvault.pro:80";
-      wallet = inputs.nix-secrets.user.monero-wallet;
+      wallet = self.preferences.monero-wallet;
       maxUsagePercentage = 25;
     };
 
@@ -129,41 +129,14 @@
     btrfs.scrub.fileSystems = ["/" "/run/media/bastian/Extra"];
 
     home-manager.userModules.bastian = with self.homeModules; [
-      # Terminal
-      nixvim
-      git
-      zsh
-      zoxide
-      nixIndex
-      tmux
-      tmuxSessionizer
-      gpg
-      ohMyPosh
-      bat
-      btop
-      direnv
-      distrobox
-      eza
-      fastfetch
-      fzf
-      ripgrep
-      passwordStore
-
-      # Desktop
-      alacritty
-      firefox
-      spicetify
-      nixcord
+      terminal
+      desktop
       goxlr
-
-      # Other
       sops
       dconf
       dotnet
       rust
       qemu
-
-      # Shared user profile
       bastian
     ];
   };

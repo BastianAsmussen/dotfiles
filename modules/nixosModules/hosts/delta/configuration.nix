@@ -73,41 +73,14 @@
     desktop.greeter.gdm.enable = true;
 
     home-manager.userModules.bastian = with self.homeModules; [
-      # Terminal
-      nixvim
-      git
-      zsh
-      zoxide
-      nixIndex
-      tmux
-      tmuxSessionizer
-      gpg
-      ohMyPosh
-      bat
-      btop
-      direnv
-      distrobox
-      eza
-      fastfetch
-      fzf
-      ripgrep
-      passwordStore
-
-      # Desktop
-      alacritty
-      firefox
-      spicetify
-      nixcord
-
-      # Other
+      terminal
+      desktop
       sops
       ssh
       dconf
       dotnet
       rust
       qemu
-
-      # Shared user profile
       bastian
 
       # Host-specific user packages
