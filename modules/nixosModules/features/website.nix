@@ -13,7 +13,7 @@
 
       domain = "internal.asmussen.tech";
       location = "/";
-      upstream = "http://localhost:${toString config.services.website.port}";
+      upstream = "http://localhost:${toString config.services.website.port}/";
 
       ssl = {
         dnsProvider = "cloudflare";

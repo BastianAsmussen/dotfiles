@@ -83,9 +83,11 @@
 
     # Remote deployment.
     services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
-    users.users.root.openssh.authorizedKeys.keyFiles = [
-      ../../../../keys/ssh-yubikey.pub
-    ];
+    users.users.root.openssh.authorizedKeys.keyFiles = let
+      keys = lib.custom.keys.default;
+      wanted = ["ssh-lambda.pub" "ssh-delta.pub"];
+    in
+      map (k: k.fullPath) (lib.filter (k: builtins.elem k.name wanted) keys.sshKeys);
 
     environment.systemPackages = [
       pkgs.neovim-minimal
