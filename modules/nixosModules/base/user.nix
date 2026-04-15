@@ -1,4 +1,8 @@
-{inputs, ...}: {
+{
+  inputs,
+  self,
+  ...
+}: {
   flake.nixosModules.base = {
     lib,
     config,
@@ -9,6 +13,10 @@
 
     cfg = config.preferences.user;
   in {
+    imports = [
+      self.nixosModules.sops
+    ];
+
     options.preferences.user = {
       name = mkOption {
         type = types.str;
@@ -42,12 +50,14 @@
     };
 
     config = {
+      sops.secrets."user/bastian/password-hash".neededForUsers = true;
+
       programs.zsh.enable = true;
 
       users.users.${cfg.name} = {
         isNormalUser = true;
         description = cfg.fullName;
-        initialPassword = "Password123!";
+        hashedPasswordFile = config.sops.secrets."user/bastian/password-hash".path;
         extraGroups = ["wheel"];
         shell = pkgs.zsh;
 
