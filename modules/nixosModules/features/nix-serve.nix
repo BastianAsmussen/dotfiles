@@ -82,6 +82,7 @@
           uid = 500;
           group = "builder";
           useDefaultShell = true;
+          hashedPassword = "*";
 
           openssh.authorizedKeys.keys = [
             inputs.nix-secrets.hosts.lambda.builder-ssh-public-key
