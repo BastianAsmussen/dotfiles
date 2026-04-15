@@ -10,5 +10,9 @@
         max-cache-ttl = 120;
       };
     };
+
+    # gpg-agent's profile.d script runs for all users including root.
+    # Without a .gnupg dir, root's shell spews gpg-connect-agent errors on login.
+    systemd.tmpfiles.rules = ["d /root/.gnupg 0700 root root -"];
   };
 }
