@@ -88,6 +88,10 @@
           publicKey = inputs.nix-secrets.hosts.lambda.wg-public-key;
           allowedIPs = ["10.10.0.2/32"];
         }
+        {
+          publicKey = inputs.nix-secrets.hosts.delta.wg-public-key;
+          allowedIPs = ["10.10.0.3/32"];
+        }
       ];
     };
 
