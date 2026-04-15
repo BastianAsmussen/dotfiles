@@ -36,6 +36,11 @@ upgrade *ARGS:
 build HOST *ARGS:
     nh os build . --hostname {{ HOST }} {{ ARGS }}
 
+# Deploy a configuration to a target.
+[group("building")]
+deploy HOST TARGET:
+    nixos-rebuild switch --flake .#{{ HOST }} --target-host {{ TARGET }} --sudo --ask-sudo-password
+
 # Roll back a bad upgrade by restoring flake.lock and rebuilding.
 [group("update")]
 rollback *ARGS:
