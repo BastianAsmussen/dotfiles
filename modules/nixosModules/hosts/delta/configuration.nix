@@ -51,6 +51,7 @@
       self.nixosModules.networkManager
       self.nixosModules.topology
       self.nixosModules.virtualisation
+      self.nixosModules.wireguard
 
       # Host-specific hardware
       self.diskoConfigurations.hostDelta
@@ -63,10 +64,31 @@
 
     networking.hostName = "delta";
     remoteBuilder.jumpHost = inputs.nix-secrets.hosts.eta.ipv4_address;
-    topology.self = {
+    topology.self = let
+      inherit (config.lib.topology) mkConnection;
+    in {
       hardware.info = "Intel Laptop";
-      interfaces.wifi.physicalConnections = [
-        (config.lib.topology.mkConnection "homeRouter" "wifi")
+      interfaces = {
+        wifi.physicalConnections = [
+          (mkConnection "homeRouter" "wifi")
+        ];
+
+        wg0.physicalConnections = [
+          (mkConnection "eta" "wg0")
+        ];
+      };
+    };
+
+    wireguard = {
+      enable = true;
+      ips = ["10.10.0.3/24"];
+      peers = [
+        {
+          publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
+          allowedIPs = ["10.10.0.1/32"];
+          endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
+          persistentKeepalive = 25;
+        }
       ];
     };
 
