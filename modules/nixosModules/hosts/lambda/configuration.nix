@@ -41,6 +41,7 @@
       self.nixosModules.sops
       self.nixosModules.ssh
       self.nixosModules.tailscale
+      self.nixosModules.wireguard
       self.nixosModules.luksFido2
       self.nixosModules.yubiKey
 
@@ -51,9 +52,8 @@
       self.nixosModules.gaming
       self.nixosModules.goxlr
       self.nixosModules.homeManager
-      self.nixosModules.ipfs
       self.nixosModules.jellyfin
-      self.nixosModules.lambdaBusy
+      self.nixosModules.primaryBusy
       self.nixosModules.monero
       self.nixosModules.networkManager
       self.nixosModules.nginx
@@ -90,11 +90,37 @@
           ];
         };
 
+        wg0.physicalConnections = [
+          (mkConnection "eta" "wg0")
+        ];
+
         tailscale0.physicalConnections = [
           (mkConnection "delta" "tailscale0")
         ];
       };
     };
+
+    wireguard = {
+      enable = true;
+      ips = ["10.10.0.2/24"];
+      peers = [
+        {
+          publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
+          allowedIPs = ["10.10.0.1/32"];
+          endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
+          persistentKeepalive = 25;
+        }
+      ];
+    };
+
+    nix-serve-extras.bindAddress = "10.10.0.2";
+
+    # Allow the mirror host to reach proxied services over WireGuard.
+    networking.firewall.interfaces.wg0.allowedTCPPorts = [
+      config.services.nix-serve.port
+      config.services.website.port
+      8096 # jellyfin
+    ];
 
     desktop.greeter.gdm.enable = true;
     preferences.monitors = {
@@ -126,7 +152,7 @@
     };
 
     bootloader.isMultiboot = true;
-    lambdaBusy.enable = true;
+    primaryBusy.enable = true;
     btrfs.scrub.fileSystems = ["/" "/run/media/bastian/Extra"];
 
     home-manager.userModules.bastian = with self.homeModules; [
