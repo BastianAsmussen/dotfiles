@@ -54,14 +54,21 @@
 
       programs.zsh.enable = true;
 
-      users.users.${cfg.name} = {
-        isNormalUser = true;
-        description = cfg.fullName;
-        hashedPasswordFile = config.sops.secrets."user/bastian/password-hash".path;
-        extraGroups = ["wheel"];
-        shell = pkgs.zsh;
+      users = {
+        mutableUsers = false;
+        users = {
+          root.hashedPassword = "*";
 
-        openssh.authorizedKeys.keyFiles = cfg.authorizedKeyFiles;
+          "${cfg.name}" = {
+            isNormalUser = true;
+            description = cfg.fullName;
+            hashedPasswordFile = config.sops.secrets."user/bastian/password-hash".path;
+            extraGroups = ["wheel"];
+            shell = pkgs.zsh;
+
+            openssh.authorizedKeys.keyFiles = cfg.authorizedKeyFiles;
+          };
+        };
       };
 
       # Set the user's icon.
