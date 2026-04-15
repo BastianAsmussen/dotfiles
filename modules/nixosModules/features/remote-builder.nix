@@ -1,46 +1,81 @@
 {inputs, ...}: {
-  flake.nixosModules.remoteBuilder = {config, ...}: {
-    nix = {
-      distributedBuilds = true;
+  flake.nixosModules.remoteBuilder = {
+    config,
+    lib,
+    ...
+  }: let
+    inherit (lib) mkOption mkIf types;
 
-      buildMachines = [
-        {
-          # Connect to lambda directly over Tailscale for builds.  The
-          # public DNS (internal.asmussen.tech) now points to eta which
-          # is not a build machine.
-          hostName = "lambda";
-          system = "x86_64-linux";
-          maxJobs = 32;
-          speedFactor = 2;
-          protocol = "ssh-ng";
-          sshUser = "builder";
-          sshKey = config.sops.secrets."builder-ssh-private-key".path;
-
-          supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
-          mandatoryFeatures = [];
-        }
-      ];
-
-      settings = {
-        builders-use-substitutes = true;
-
-        # The HTTPS cache at internal.asmussen.tech is served by eta
-        # and mirrors lambda's nix store.
-        substituters = [
-          "https://internal.asmussen.tech/"
-        ];
-
-        trusted-public-keys = [
-          inputs.nix-secrets.hosts.lambda.cache-public-key
-        ];
+    cfg = config.remoteBuilder;
+    hostname = config.networking.hostName;
+  in {
+    options.remoteBuilder = {
+      jumpHost = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = ''
+          SSH hostname or IP to use as a ProxyJump when connecting to the
+          build machine.  Required when the build machine is not directly
+          reachable from this host.
+        '';
       };
     };
 
-    programs.ssh.knownHosts."builder" = {
-      hostNames = ["lambda"];
-      publicKey = inputs.nix-secrets.hosts.lambda.ssh-public-key;
-    };
+    config = {
+      nix = {
+        distributedBuilds = true;
 
-    sops.secrets."builder-ssh-private-key" = {};
+        buildMachines = [
+          {
+            hostName = "10.10.0.2";
+            system = "x86_64-linux";
+            maxJobs = 32;
+            speedFactor = 2;
+            protocol = "ssh-ng";
+            sshUser = "builder";
+            sshKey = config.sops.secrets."hosts/${hostname}/builder-ssh-private-key".path;
+
+            supportedFeatures = ["nixos-test" "benchmark" "big-parallel" "kvm"];
+            mandatoryFeatures = [];
+          }
+        ];
+
+        settings = {
+          builders-use-substitutes = true;
+
+          substituters = [
+            "https://cache.asmussen.tech/"
+          ];
+
+          trusted-public-keys = [
+            inputs.nix-secrets.hosts.lambda.cache-public-key
+            inputs.nix-secrets.hosts.eta.cache-public-key
+          ];
+        };
+      };
+
+      programs.ssh = {
+        knownHosts =
+          {
+            "lambda-wg" = {
+              hostNames = ["10.10.0.2"];
+              publicKey = inputs.nix-secrets.hosts.lambda.ssh-public-key;
+            };
+          }
+          // lib.optionalAttrs (cfg.jumpHost != null) {
+            "eta-public" = {
+              hostNames = [cfg.jumpHost];
+              publicKey = inputs.nix-secrets.hosts.eta.ssh-public-key;
+            };
+          };
+
+        extraConfig = mkIf (cfg.jumpHost != null) ''
+          Host 10.10.0.2
+            ProxyJump ${cfg.jumpHost}
+        '';
+      };
+
+      sops.secrets."hosts/${hostname}/builder-ssh-private-key" = {};
+    };
   };
 }

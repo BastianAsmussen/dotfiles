@@ -47,7 +47,7 @@
       self.nixosModules.btrfs
       self.nixosModules.ccache
       self.nixosModules.homeManager
-      self.nixosModules.ipfs
+      self.nixosModules.remoteBuilder
       self.nixosModules.kanata
       self.nixosModules.networkManager
       self.nixosModules.topology
@@ -63,6 +63,7 @@
     ];
 
     networking.hostName = "delta";
+    remoteBuilder.jumpHost = inputs.nix-secrets.hosts.eta.ipv4_address;
     topology.self = {
       hardware.info = "Intel Laptop";
       interfaces.wifi.physicalConnections = [

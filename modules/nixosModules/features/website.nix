@@ -11,7 +11,7 @@
     nginx.reverseProxies.website = {
       enable = true;
 
-      domain = "internal.asmussen.tech";
+      domain = "asmussen.tech";
       location = "/";
       upstream = "http://localhost:${toString config.services.website.port}/";
 

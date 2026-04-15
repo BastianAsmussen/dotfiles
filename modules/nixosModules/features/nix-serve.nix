@@ -15,35 +15,44 @@
         default = true;
         description = ''
           Whether to expose the binary cache through an nginx reverse proxy
-          with ACME TLS on internal.asmussen.tech.  Set to false on hosts
-          that only need to serve the cache to other machines on the
-          Tailscale network (e.g. lambda, where eta handles the public
-          face).
+          with ACME TLS on cache.asmussen.tech.
+        '';
+      };
+
+      bindAddress = mkOption {
+        type = types.str;
+        default = "localhost";
+        description = ''
+          Address nix-serve listens on.  Override to the host's WireGuard IP
+          on peers whose cache must be reachable from remote machines over the
+          WireGuard tunnel.
         '';
       };
     };
 
-    config = {
-      sops.secrets."cache-private-key" = {};
+    config = let
+      hostname = config.networking.hostName;
+      cacheKeySecret = "hosts/${hostname}/cache-private-key";
+    in {
+      sops.secrets.${cacheKeySecret} = {};
 
       services.nix-serve = {
+        inherit (cfg) bindAddress;
+
         enable = true;
 
         package = pkgs.nix-serve-ng;
-        secretKeyFile = config.sops.secrets."cache-private-key".path;
-
-        # Listen on all interfaces so the cache is reachable over
-        # Tailscale by other hosts even without the nginx reverse proxy.
-        bindAddress = "0.0.0.0";
+        secretKeyFile = config.sops.secrets.${cacheKeySecret}.path;
       };
 
       nix.settings = {
         secret-key-files = [
-          config.sops.secrets."cache-private-key".path
+          config.sops.secrets.${cacheKeySecret}.path
         ];
 
         trusted-public-keys = [
           inputs.nix-secrets.hosts.lambda.cache-public-key
+          inputs.nix-secrets.hosts.eta.cache-public-key
         ];
 
         trusted-users = ["builder"];
@@ -55,7 +64,7 @@
       in {
         enable = true;
 
-        domain = "internal.asmussen.tech";
+        domain = "cache.asmussen.tech";
         location = "/";
         upstream = "http://${serveCfg.bindAddress}:${toString serveCfg.port}";
 
@@ -76,6 +85,8 @@
 
           openssh.authorizedKeys.keys = [
             inputs.nix-secrets.hosts.lambda.builder-ssh-public-key
+            inputs.nix-secrets.hosts.delta.builder-ssh-public-key
+            inputs.nix-secrets.hosts.eta.builder-ssh-public-key
           ];
         };
 

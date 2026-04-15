@@ -37,12 +37,13 @@
       self.nixosModules.security
       self.nixosModules.sops
       self.nixosModules.ssh
-      self.nixosModules.tailscale
+      self.nixosModules.wireguard
 
       # Features
       self.nixosModules.btrfs
       self.nixosModules.homeManager
-      self.nixosModules.lambdaMirror
+      self.nixosModules.remoteBuilder
+      self.nixosModules.primaryMirror
       self.nixosModules.networkManager
       self.nixosModules.nginx
       self.nixosModules.nix-serve
@@ -66,20 +67,59 @@
         lan = {
           network = "cloud";
           type = "ethernet";
-          addresses = ["49.13.7.174"];
+          addresses = [inputs.nix-secrets.hosts.eta.ipv4_address];
           physicalConnections = [
             (mkConnection "cloudRouter" "eth1")
           ];
         };
 
-        tailscale0.physicalConnections = [
-          (mkConnection "lambda" "tailscale0")
+        wg0.physicalConnections = [
+          (mkConnection "lambda" "wg0")
         ];
       };
     };
 
+    wireguard = {
+      enable = true;
+      ips = ["10.10.0.1/24"];
+      listenPort = 51820;
+      peers = [
+        {
+          publicKey = inputs.nix-secrets.hosts.lambda.wg-public-key;
+          allowedIPs = ["10.10.0.2/32"];
+        }
+      ];
+    };
+
+    # Eta is not fit for building, offload everything to Lambda.
+    # If Lambda is unreachable, builds fail rather than running locally.
+    nix.settings.max-jobs = lib.mkForce 0;
+
     btrfs.scrub.fileSystems = ["/"];
-    lambdaMirror.enable = true;
+    nginx.reverseProxies.jellyfin = {
+      enable = true;
+      domain = "asmussen.tech";
+      location = "/jellyfin";
+      upstream = "http://10.10.0.2:8096";
+      ssl = {
+        dnsProvider = "cloudflare";
+        environmentFile = config.sops.templates."cloudflare-acme-env".path;
+      };
+    };
+
+    primaryMirror = {
+      enable = true;
+      services = {
+        nix-cache = {
+          primaryPort = config.services.nix-serve.port;
+          localFallback = "localhost:${toString config.services.nix-serve.port}";
+        };
+        website = {
+          primaryPort = config.services.website.port;
+          localFallback = "localhost:${toString config.services.website.port}";
+        };
+      };
+    };
 
     # Remote deployment.
     services.openssh.settings.PermitRootLogin = lib.mkForce "yes";

@@ -25,7 +25,7 @@
 
           cloud = {
             name = "Hetzner Network";
-            cidrv4 = "49.13.7.174/32";
+            cidrv4 = "${inputs.nix-secrets.hosts.eta.ipv4_address}/32";
             cidrv6 = "2a01:4f8:c014:4725::/64";
           };
 
