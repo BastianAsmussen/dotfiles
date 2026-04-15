@@ -6,10 +6,10 @@
       enable = true;
 
       enableDefaultConfig = false;
-      matchBlocks."lambda" = {
+      matchBlocks."epsilon" = {
         inherit user;
 
-        hostname = inputs.nix-secrets.hosts.lambda.ipv4_address;
+        hostname = inputs.nix-secrets.hosts.epsilon.ipv4_address;
         port = 22;
         remoteForwards = [
           {

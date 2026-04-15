@@ -1,5 +1,5 @@
 {
-  flake.diskoConfigurations.hostLambda = {
+  flake.diskoConfigurations.hostEpsilon = {
     disko.devices = {
       disk = {
         main = {

@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.hostLambda = {
+  flake.nixosModules.hostEpsilon = {
     config,
     lib,
     modulesPath,

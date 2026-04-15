@@ -3,7 +3,7 @@
   self,
   ...
 }: {
-  flake.nixosConfigurations.lambda = inputs.nixpkgs.lib.nixosSystem {
+  flake.nixosConfigurations.epsilon = inputs.nixpkgs.lib.nixosSystem {
     specialArgs = {
       inherit inputs self;
       inherit (self) lib;
@@ -12,11 +12,11 @@
     };
 
     modules = [
-      self.nixosModules.hostLambda
+      self.nixosModules.hostEpsilon
     ];
   };
 
-  flake.nixosModules.hostLambda = {config, ...}: {
+  flake.nixosModules.hostEpsilon = {config, ...}: {
     imports = [
       # Base modules
       self.nixosModules.base
@@ -63,7 +63,7 @@
       self.nixosModules.website
 
       # Host-specific hardware
-      self.diskoConfigurations.hostLambda
+      self.diskoConfigurations.hostEpsilon
 
       # External modules
       inputs.disko.nixosModules.disko
@@ -74,7 +74,7 @@
       inputs.nixos-hardware.nixosModules.common-cpu-amd
     ];
 
-    networking.hostName = "lambda";
+    networking.hostName = "epsilon";
     topology.self = let
       inherit (config.lib.topology) mkConnection;
     in {

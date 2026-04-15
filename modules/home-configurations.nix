@@ -36,7 +36,7 @@
     };
 in {
   flake.homeConfigurations = {
-    "bastian@lambda" = mkHome {
+    "bastian@epsilon" = mkHome {
       system = "x86_64-linux";
       modules = with self.homeModules; [
         terminal

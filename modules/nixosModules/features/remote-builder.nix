@@ -48,7 +48,7 @@
           ];
 
           trusted-public-keys = [
-            inputs.nix-secrets.hosts.lambda.cache-public-key
+            inputs.nix-secrets.hosts.epsilon.cache-public-key
             inputs.nix-secrets.hosts.eta.cache-public-key
           ];
         };
@@ -57,9 +57,9 @@
       programs.ssh = {
         knownHosts =
           {
-            "lambda-wg" = {
+            "epsilon-wg" = {
               hostNames = ["10.10.0.2"];
-              publicKey = inputs.nix-secrets.hosts.lambda.ssh-public-key;
+              publicKey = inputs.nix-secrets.hosts.epsilon.ssh-public-key;
             };
           }
           // lib.optionalAttrs (cfg.jumpHost != null) {

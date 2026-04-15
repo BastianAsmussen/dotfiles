@@ -74,10 +74,10 @@ just iso-install /dev/sdX
       HOSTNAME=$(ls modules/nixosModules/hosts | fzf)
       ```
 
-   2. Set manually, e.g. `lambda`.
+   2. Set manually, e.g. `delta`.
 
       ```sh
-      HOSTNAME=lambda
+      HOSTNAME=delta
       ```
 
 2. Set up the disk configuration.
@@ -111,7 +111,7 @@ just iso-install /dev/sdX
 
 ### LUKS & FIDO2
 
-Hosts with LUKS-encrypted disks (e.g. `lambda`, `delta`) use
+Hosts with LUKS-encrypted disks (e.g. `epsilon`, `delta`) use
 `fido2-device=auto` in their disko configs so the LUKS volume can be unlocked
 with a FIDO2 token (such as a YubiKey) instead of typing a passphrase.
 
@@ -213,14 +213,14 @@ Add the public keys to the `.sops.yaml` file in your secrets repository:
 ```yaml
 keys:
   - &user_alice age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  - &host_lambda age1yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+  - &host_kappa age1yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
 creation_rules:
   - path_regex: secrets\.yaml$
     key_groups:
       - age:
           - *user_alice
-          - *host_lambda
+          - *host_kappa
 ```
 
 After updating `.sops.yaml`, re-encrypt `secrets.yaml` so the new keys can
@@ -251,21 +251,21 @@ sops updatekeys secrets.yaml
 > hostname. For example, to enable verbose trace output:
 >
 > ```sh
-> just rebuild lambda --show-trace
+> just rebuild kappa --show-trace
 > ```
 
 ### Rename Host
 
-1. Move the host directory, e.g. `lambda` -> `epsilon`.
+1. Move the host directory, e.g. `kappa` -> `sigma`.
 
    ```sh
-   mv modules/nixosModules/hosts/lambda modules/nixosModules/hosts/epsilon
+   mv modules/nixosModules/hosts/kappa modules/nixosModules/hosts/sigma
    ```
 
 2. Switch to new configuration.
 
    ```sh
-   just rebuild epsilon
+   just rebuild sigma
    ```
 
 > [!WARNING]
@@ -277,17 +277,17 @@ sops updatekeys secrets.yaml
 1. Scaffold a new host from the minimal template.
 
    ```sh
-   just add-host epsilon
+   just add-host zeta
    ```
 
-2. Edit `modules/nixosModules/hosts/epsilon/configuration.nix` to add the
+2. Edit `modules/nixosModules/hosts/zeta/configuration.nix` to add the
    modules and settings your new machine needs (hardware config, desktop,
-   features, etc.). See `lambda` or `mu` for reference.
+   features, etc.). See `epsilon` or `delta` for reference.
 
 3. Build and switch to the new host.
 
    ```sh
-   just rebuild epsilon
+   just rebuild zeta
    ```
 
 ## To-Do Tracking
