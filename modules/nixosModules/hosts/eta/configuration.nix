@@ -74,7 +74,7 @@
         };
 
         wg0.physicalConnections = [
-          (mkConnection "lambda" "wg0")
+          (mkConnection "epsilon" "wg0")
         ];
       };
     };
@@ -85,7 +85,7 @@
       listenPort = 51820;
       peers = [
         {
-          publicKey = inputs.nix-secrets.hosts.lambda.wg-public-key;
+          publicKey = inputs.nix-secrets.hosts.epsilon.wg-public-key;
           allowedIPs = ["10.10.0.2/32"];
         }
         {
@@ -95,7 +95,8 @@
       ];
     };
 
-    # Offload all builds to lambda; do not build locally when it is unavailable.
+    # Offload all builds to epsilon; do not build locally when it is
+    # unavailable.
     nix.settings.max-jobs = lib.mkForce 0;
 
     btrfs.scrub.fileSystems = ["/"];
@@ -128,7 +129,7 @@
     services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
     users.users.root.openssh.authorizedKeys.keyFiles = let
       keys = lib.custom.keys.default;
-      wanted = ["ssh-lambda.pub" "ssh-delta.pub"];
+      wanted = ["ssh-epsilon.pub" "ssh-delta.pub"];
     in
       map (k: k.fullPath) (lib.filter (k: builtins.elem k.name wanted) keys.sshKeys);
 

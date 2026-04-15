@@ -51,7 +51,7 @@
         ];
 
         trusted-public-keys = [
-          inputs.nix-secrets.hosts.lambda.cache-public-key
+          inputs.nix-secrets.hosts.epsilon.cache-public-key
           inputs.nix-secrets.hosts.eta.cache-public-key
         ];
 
@@ -85,7 +85,7 @@
           hashedPassword = "*";
 
           openssh.authorizedKeys.keys = [
-            inputs.nix-secrets.hosts.lambda.builder-ssh-public-key
+            inputs.nix-secrets.hosts.epsilon.builder-ssh-public-key
             inputs.nix-secrets.hosts.delta.builder-ssh-public-key
             inputs.nix-secrets.hosts.eta.builder-ssh-public-key
           ];
