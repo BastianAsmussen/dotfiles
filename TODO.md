@@ -6,14 +6,17 @@ around problems.
 
 ## Table of Contents
 
-- [Colemak-DH on Delta](#colemak-dh-on-delta)
+- [Neovim Plugins](#neovim-plugins)
 - [Development Environments](#development-environments)
 - [Impermanence Setup](#impermanence-setup)
-- [Linux Hardening](#linux-hardening)
 
-## Colemak-DH on Delta
+## Neovim Plugins
 
-I want to add Colemak-DH with home-row mod support for Delta.
+The `harpoon` and `tmux-navigator` plugins have overlapping keybinds:
+
+- `<C-j>`
+- `<C-k>`
+- `<C-l>`
 
 ## Development Environments
 
@@ -45,9 +48,3 @@ to implement a template for each language I use, which, as of now consists of:
 
 - Get rid of desyncs so fresh installs work the same as a system I've been
   using for a long time.
-
-## Linux Hardening
-
-I'm currently working on [hardening](./modules/nixosModules/features/security.nix) my
-systems. I'd like to look into SELinux some more for that reason and see what
-other people do to harden their systems.
