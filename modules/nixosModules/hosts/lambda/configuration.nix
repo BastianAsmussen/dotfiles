@@ -40,7 +40,6 @@
       self.nixosModules.security
       self.nixosModules.sops
       self.nixosModules.ssh
-      self.nixosModules.tailscale
       self.nixosModules.wireguard
       self.nixosModules.luksFido2
       self.nixosModules.yubiKey
@@ -92,10 +91,6 @@
 
         wg0.physicalConnections = [
           (mkConnection "eta" "wg0")
-        ];
-
-        tailscale0.physicalConnections = [
-          (mkConnection "delta" "tailscale0")
         ];
       };
     };

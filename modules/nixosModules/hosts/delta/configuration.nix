@@ -40,7 +40,6 @@
       self.nixosModules.sops
       self.nixosModules.gpg
       self.nixosModules.yubiKey
-      self.nixosModules.tailscale
 
       # Features
       self.nixosModules.bluetooth

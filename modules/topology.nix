@@ -2,16 +2,7 @@
   imports = [inputs.nix-topology.flakeModule];
 
   flake.nixosModules.topology = {
-    config,
-    lib,
-    ...
-  }: {
     imports = [inputs.nix-topology.nixosModules.default];
-
-    topology.self.interfaces.tailscale0 = lib.mkIf config.services.tailscale.enable {
-      type = "wireguard";
-      network = "tailscale";
-    };
   };
 
   perSystem = {
@@ -27,11 +18,6 @@
             name = "Hetzner Network";
             cidrv4 = "${inputs.nix-secrets.hosts.eta.ipv4_address}/32";
             cidrv6 = "2a01:4f8:c014:4725::/64";
-          };
-
-          tailscale = {
-            name = "Tailscale VPN";
-            cidrv4 = "100.64.0.0/10";
           };
         };
 
