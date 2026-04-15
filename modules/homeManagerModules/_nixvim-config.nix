@@ -288,21 +288,21 @@
       '';
     })
 
-    (mapKey "n" "<C-S-j>" {
+    (mapKey "n" "<C-j>" {
       __raw = ''
         function()
           require('harpoon'):list():select(1)
         end
       '';
     })
-    (mapKey "n" "<C-S-k>" {
+    (mapKey "n" "<C-k>" {
       __raw = ''
         function()
           require('harpoon'):list():select(2)
         end
       '';
     })
-    (mapKey "n" "<C-S-l>" {
+    (mapKey "n" "<C-l>" {
       __raw = ''
         function()
           require('harpoon'):list():select(3)
@@ -310,7 +310,7 @@
       '';
     })
 
-    (mapKey "n" "<C-S-m>" {
+    (mapKey "n" "<C-m>" {
       __raw = ''
         function()
           require('harpoon'):list():select(4)

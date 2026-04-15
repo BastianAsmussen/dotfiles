@@ -12,8 +12,11 @@ around problems.
 
 ## Neovim Plugins
 
-- [x] Resolved `harpoon` / `tmux-navigator` keybind overlap (`<C-j>`, `<C-k>`,
-  `<C-l>`). Harpoon slots moved to `<C-S-j/k/l/m>`.
+The `harpoon` and `tmux-navigator` plugins have overlapping keybinds:
+
+- `<C-j>`
+- `<C-k>`
+- `<C-l>`
 
 ## Development Environments
 
