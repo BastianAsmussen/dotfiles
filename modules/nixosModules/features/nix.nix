@@ -31,6 +31,7 @@
           ];
 
           trusted-users = ["root" "@wheel"];
+          substituters = lib.mkBefore ["https://cache.asmussen.tech/"];
           trusted-substituters = config.nix.settings.substituters;
 
           http-connections = 32;
