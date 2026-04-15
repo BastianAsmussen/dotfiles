@@ -10,5 +10,8 @@
         max-cache-ttl = 120;
       };
     };
+
+    # Create root's .gnupg to avoid gpg-agent profile errors on login.
+    systemd.tmpfiles.rules = ["d /root/.gnupg 0700 root root -"];
   };
 }
