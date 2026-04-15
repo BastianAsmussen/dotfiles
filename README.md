@@ -109,9 +109,6 @@ just iso-install /dev/sdX
   `download-buffer-size` setting; pass `--option download-buffer-size n` where
   `n` is the buffer size to the `just install` command from step 3.
 
-> [!IMPORTANT]
-> Remember to change the password of the user!
-
 ### LUKS & FIDO2
 
 Hosts with LUKS-encrypted disks (e.g. `lambda`, `delta`) use
