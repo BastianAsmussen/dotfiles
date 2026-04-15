@@ -15,9 +15,14 @@
       shellInit =
         # sh
         ''
-          gpg-connect-agent /bye
-
           export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+
+          if [ -z "$SSH_CONNECTION" ]; then
+            export GPG_TTY=$(tty)
+
+            gpgconf --launch gpg-agent
+            gpg-connect-agent updatestartuptty /bye > /dev/null
+          fi
         '';
     };
   };

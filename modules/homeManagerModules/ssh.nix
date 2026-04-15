@@ -1,17 +1,20 @@
 {inputs, ...}: {
-  flake.homeModules.ssh = {
+  flake.homeModules.ssh = let
+    user = inputs.nix-secrets.user.name;
+  in {
     programs.ssh = {
       enable = true;
 
       enableDefaultConfig = false;
-      matchBlocks."home" = {
+      matchBlocks."lambda" = {
+        inherit user;
+
         hostname = inputs.nix-secrets.hosts.lambda.ipv4_address;
         port = 22;
-        user = inputs.nix-secrets.user.name;
         remoteForwards = [
           {
-            bind.address = "/run/user/1000/gnupg/S.gpg-agent";
-            host.address = "/run/user/1000/gnupg/S.gpg-agent.extra";
+            bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
+            host.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
           }
         ];
 
