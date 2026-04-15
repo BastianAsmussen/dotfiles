@@ -1486,11 +1486,11 @@
         "nixpkgs": "nixpkgs_9"
       },
       "locked": {
-        "lastModified": 1776222001,
-        "narHash": "sha256-wnbVNLZdZXWI1MFSuSrwT8j3vSgi3ltJxw3GJhQnZrw=",
+        "lastModified": 1776250292,
+        "narHash": "sha256-cnQlrb/mGieHuN2rF58b2KvlRVMG04qTUvevkjX276M=",
         "owner": "BastianAsmussen",
         "repo": "website",
-        "rev": "bdef6cb246d874b41b484a1449701353ae96d910",
+        "rev": "23b2fcd675f471223d23fb4e452beace733a725b",
         "type": "github"
       },
       "original": {
