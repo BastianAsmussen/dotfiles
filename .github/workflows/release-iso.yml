@@ -17,6 +17,13 @@ jobs:
       - uses: actions/checkout@v6
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Setup SSH Key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          ssh-keyscan -t ed25519 codeberg.org >> ~/.ssh/known_hosts
 
       # Compute a deterministic derivation path for the ISO image. The ISO
       # config embeds `builtins.currentTime` (impure) and
