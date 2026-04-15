@@ -8,8 +8,6 @@
       settings = {
         default-cache-ttl = 60;
         max-cache-ttl = 120;
-        ttyname = "$GPG_TTY";
-        extra-socket = "/run/user/1000/gnupg/S.gpg-agent.extra";
       };
     };
   };

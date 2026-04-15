@@ -24,13 +24,13 @@
           X11Forwarding = false;
           PermitUserEnvironment = "no";
           AllowAgentForwarding = "no";
-          AllowTcpForwarding = "no";
+          AllowTcpForwarding = "remote";
           AllowStreamLocalForwarding = "yes";
           PermitTunnel = "no";
           UsePAM = false;
           KbdInteractiveAuthentication = false;
           StreamLocalBindUnlink = "yes";
-          GatewayPorts = "yes";
+          GatewayPorts = "no";
           KexAlgorithms = [
             "curve25519-sha256"
             "curve25519-sha256@libssh.org"
