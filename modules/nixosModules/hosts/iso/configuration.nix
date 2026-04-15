@@ -79,7 +79,7 @@
       email = "root@localhost";
     };
 
-    users.users.nixos.initialPassword = lib.mkForce null;
+    users.users.nixos.hashedPasswordFile = lib.mkForce null;
 
     environment.systemPackages = [
       pkgs.git
