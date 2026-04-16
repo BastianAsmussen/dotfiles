@@ -130,8 +130,14 @@
             };
 
             localFallback = mkOption {
-              type = types.str;
-              description = "Local upstream address (host:port) served as backup when the primary host is unavailable.";
+              type = types.nullOr types.str;
+              default = null;
+              description = ''
+                Local upstream address (host:port) served as backup when the
+                primary host is unavailable.  When null, no fallback is
+                configured and nginx returns 502 immediately once the health
+                check has marked the primary as down.
+              '';
             };
           };
         }));
@@ -186,6 +192,7 @@
           value = {
             upstream = lib.mkForce "http://${upstreamName svc.nginxProxy}";
             extraConfig = lib.mkDefault ''
+              proxy_connect_timeout 5s;
               proxy_next_upstream error timeout http_502 http_503 http_504;
               proxy_next_upstream_timeout 10s;
               proxy_next_upstream_tries 2;
@@ -203,7 +210,7 @@
         }: ''
           upstream ${upstreamName value.nginxProxy} {
             include ${upstreamConf name};
-            server ${value.localFallback} backup;
+            ${lib.optionalString (value.localFallback != null) "server ${value.localFallback} backup;"}
           }
         '')
         serviceList;
