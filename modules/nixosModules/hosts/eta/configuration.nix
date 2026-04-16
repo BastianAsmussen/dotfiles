@@ -81,6 +81,11 @@
       };
     };
 
+    sops.secrets = {
+      "wireguard/psk-eta-epsilon" = {};
+      "wireguard/psk-eta-delta" = {};
+    };
+
     wireguard = {
       enable = true;
       ips = ["10.10.0.1/24"];
@@ -89,10 +94,12 @@
         {
           publicKey = inputs.nix-secrets.hosts.epsilon.wg-public-key;
           allowedIPs = ["10.10.0.2/32"];
+          presharedKeyFile = config.sops.secrets."wireguard/psk-eta-epsilon".path;
         }
         {
           publicKey = inputs.nix-secrets.hosts.delta.wg-public-key;
           allowedIPs = ["10.10.0.3/32"];
+          presharedKeyFile = config.sops.secrets."wireguard/psk-eta-delta".path;
         }
       ];
     };
@@ -156,7 +163,6 @@
       ohMyPosh
       bat
       btop
-      direnv
       eza
       fastfetch
       fzf
@@ -164,7 +170,6 @@
 
       # Other
       sops
-      qemu
     ];
   };
 }

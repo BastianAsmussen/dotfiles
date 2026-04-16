@@ -95,6 +95,8 @@
       };
     };
 
+    sops.secrets."wireguard/psk-eta-epsilon" = {};
+
     wireguard = {
       enable = true;
       ips = ["10.10.0.2/24"];
@@ -104,6 +106,7 @@
           allowedIPs = ["10.10.0.1/32"];
           endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
           persistentKeepalive = 25;
+          presharedKeyFile = config.sops.secrets."wireguard/psk-eta-epsilon".path;
         }
       ];
     };
@@ -165,6 +168,7 @@
       rust
       qemu
       bastian
+      ssh
     ];
   };
 }
