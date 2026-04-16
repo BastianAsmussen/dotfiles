@@ -57,6 +57,12 @@
               default = null;
               description = "Keepalive interval in seconds.  Recommended for peers behind NAT.";
             };
+
+            presharedKeyFile = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Path to pre-shared key file for this peer. Provides post-quantum resistance.";
+            };
           };
         });
       };
@@ -74,7 +80,7 @@
           privateKeyFile = config.sops.secrets.${secretName}.path;
           peers =
             map (peer: {
-              inherit (peer) publicKey allowedIPs endpoint persistentKeepalive;
+              inherit (peer) publicKey allowedIPs endpoint persistentKeepalive presharedKeyFile;
             })
             cfg.peers;
         };
