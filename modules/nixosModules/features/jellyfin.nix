@@ -7,7 +7,7 @@
   }: {
     options.jellyfin.baseUrl = lib.mkOption {
       type = lib.types.str;
-      default = "/jellyfin";
+      default = "";
       description = "Base URL path written into Jellyfin's network.xml.";
     };
 

@@ -11,51 +11,33 @@
 
     stateDir = "/var/lib/primary-mirror";
     busyFlag = "${stateDir}/busy";
+    streamStateFile = "${stateDir}/stream-upstream.conf";
 
-    # nginx upstream identifiers must not contain hyphens.
-    upstreamName = name: "primary_mirror_${builtins.replaceStrings ["-"] ["_"] name}";
-    upstreamConf = name: "${stateDir}/${name}.conf";
-
-    serviceList = lib.mapAttrsToList (name: value: {inherit name value;}) cfg.services;
-
-    healthCheckUrl =
-      if cfg.healthCheck != null
-      then cfg.healthCheck
-      else "http://${cfg.primaryHost}:5000/nix-cache-info";
+    upstream = "${cfg.primaryHost}:${toString cfg.primaryPort}";
 
     healthCheckScript = pkgs.writeShellScript "primary-mirror-health-check" ''
       set -euo pipefail
 
       if [ ! -f "${busyFlag}" ] && \
-         ${lib.getExe pkgs.curl} -sf --max-time 5 "${healthCheckUrl}" > /dev/null 2>&1; then
+         ${lib.getExe pkgs.curl} -sf --max-time 5 \
+           --resolve "${cfg.healthCheckHost}:${toString cfg.primaryPort}:${cfg.primaryHost}" \
+           "https://${cfg.healthCheckHost}${cfg.healthCheckPath}" > /dev/null 2>&1; then
         state="up"
       else
         state="down"
       fi
 
-      changed=0
-      ${lib.concatMapStrings ({
-          name,
-          value,
-        }: let
-          addr = "${cfg.primaryHost}:${toString value.primaryPort}";
-          conf = upstreamConf name;
-        in ''
-          if [ "$state" = "up" ]; then
-            new_conf="server ${addr};"
-          else
-            new_conf="server ${addr} down;"
-          fi
-          old_conf=""
-          [ -f "${conf}" ] && old_conf=$(cat "${conf}")
-          if [ "$new_conf" != "$old_conf" ]; then
-            echo "$new_conf" > "${conf}"
-            changed=1
-          fi
-        '')
-        serviceList}
+      if [ "$state" = "up" ]; then
+        new_conf="server ${upstream};"
+      else
+        new_conf="server ${upstream} down;"
+      fi
 
-      if [ "$changed" -eq 1 ]; then
+      old_conf=""
+      [ -f "${streamStateFile}" ] && old_conf=$(cat "${streamStateFile}")
+
+      if [ "$new_conf" != "$old_conf" ]; then
+        echo "$new_conf" > "${streamStateFile}"
         ${lib.getExe' pkgs.systemd "systemctl"} reload nginx 2>/dev/null || true
       fi
     '';
@@ -87,86 +69,51 @@
   in {
     options.primaryMirror = {
       enable = mkEnableOption ''
-        Mirror/proxy for remote services.  When enabled, nginx routes each
-        registered service to the primary host when it is available and not
-        busy, falling back to a local instance otherwise.
+        Stream-level TLS passthrough mirror. Forwards all HTTPS traffic to the
+        primary host when available, falling back to a local nginx on the
+        configured fallback port otherwise.
       '';
 
       primaryHost = mkOption {
         type = types.str;
         default = "10.10.0.2";
-        description = "WireGuard IP address of the primary host.";
+        description = "WireGuard IP of the primary host.";
       };
 
-      healthCheck = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = ''
-          URL polled to determine the primary host's availability.  Defaults
-          to the nix-cache health endpoint when null.
-        '';
+      primaryPort = mkOption {
+        type = types.port;
+        default = 443;
+        description = "HTTPS port on the primary host.";
+      };
+
+      healthCheckHost = mkOption {
+        type = types.str;
+        description = "Hostname used for SNI/cert verification in the health check.";
+      };
+
+      healthCheckPath = mkOption {
+        type = types.str;
+        default = "/";
+        description = "Path to request during the health check.";
       };
 
       checkInterval = mkOption {
         type = types.ints.positive;
         default = 30;
-        description = "How often (in seconds) to check the primary host's availability.";
-      };
-
-      services = mkOption {
-        default = {};
-        description = "Services to mirror from the primary host with local fallback.";
-        type = types.attrsOf (types.submodule ({name, ...}: {
-          options = {
-            nginxProxy = mkOption {
-              type = types.str;
-              default = name;
-              description = "Key in nginx.reverseProxies to override with the mirrored upstream.";
-            };
-
-            primaryPort = mkOption {
-              type = types.port;
-              description = "Port the service listens on on the primary host.";
-            };
-
-            localFallback = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              description = ''
-                Local upstream address (host:port) served as backup when the
-                primary host is unavailable.  When null, no fallback is
-                configured and nginx returns 502 immediately once the health
-                check has marked the primary as down.
-              '';
-            };
-          };
-        }));
+        description = "How often (in seconds) to check primary host availability.";
       };
     };
 
     config = mkIf cfg.enable {
-      assertions = [
-        {
-          assertion = cfg.services != {};
-          message = "primaryMirror.enable = true but primaryMirror.services is empty.";
-        }
-      ];
-
       systemd = {
-        tmpfiles.rules =
-          ["d ${stateDir} 0775 root builder -"]
-          ++ map (
-            {
-              name,
-              value,
-            }: let
-              addr = "${cfg.primaryHost}:${toString value.primaryPort}";
-            in "f ${upstreamConf name} 0644 root root - server ${addr} down;"
-          )
-          serviceList;
+        tmpfiles.rules = [
+          "d ${stateDir} 0775 root builder -"
+          "f ${streamStateFile} 0644 root root - 'server ${upstream} down;'"
+          "f ${busyFlag} 0644 root builder -"
+        ];
 
         services.primary-mirror-health = {
-          description = "Check primary host availability for mirrored services";
+          description = "Check primary host availability for stream passthrough";
           after = ["network-online.target" "wireguard-wg0.service"];
           wants = ["network-online.target"];
           serviceConfig = {
@@ -184,36 +131,6 @@
           };
         };
       };
-
-      # Override each registered proxy's upstream with the mirrored backend.
-      nginx.reverseProxies =
-        lib.mapAttrs' (_: svc: {
-          name = svc.nginxProxy;
-          value = {
-            upstream = lib.mkForce "http://${upstreamName svc.nginxProxy}";
-            extraConfig = lib.mkDefault ''
-              proxy_connect_timeout 5s;
-              proxy_next_upstream error timeout http_502 http_503 http_504;
-              proxy_next_upstream_timeout 10s;
-              proxy_next_upstream_tries 2;
-            '';
-          };
-        })
-        cfg.services;
-
-      # One nginx upstream block per service: primary as active (toggled via
-      # the included state file), local instance as backup.
-      services.nginx.appendHttpConfig =
-        lib.concatMapStrings ({
-          name,
-          value,
-        }: ''
-          upstream ${upstreamName value.nginxProxy} {
-            include ${upstreamConf name};
-            ${lib.optionalString (value.localFallback != null) "server ${value.localFallback} backup;"}
-          }
-        '')
-        serviceList;
 
       environment.systemPackages = [ctlScript];
     };

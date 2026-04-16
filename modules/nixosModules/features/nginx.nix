@@ -8,18 +8,54 @@
 
     cfg = config.nginx;
     enabledProxies = lib.filterAttrs (_: proxy: proxy.enable) cfg.reverseProxies;
+
+    streamStateFile = "/var/lib/primary-mirror/stream-upstream.conf";
   in {
     options.nginx = {
-      acme.email = mkOption {
-        type = types.str;
-        default = config.preferences.user.email;
-        description = "Email address used for ACME/Let's Encrypt certificate registration.";
+      acme = {
+        email = mkOption {
+          type = types.str;
+          default = config.preferences.user.email;
+          description = "Email address used for ACME/Let's Encrypt certificate registration.";
+        };
+
+        sharedHost = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = ''
+            When set, all reverse-proxy virtual hosts use this ACME certificate
+            via useACMEHost instead of obtaining individual per-domain certificates.
+            The certificate (typically a wildcard) must be declared separately via
+            security.acme.certs.
+          '';
+        };
       };
 
       openFirewall = mkOption {
         type = types.bool;
         default = true;
         description = "Whether to open TCP ports 80 and 443 in the firewall.";
+      };
+
+      streamProxy = {
+        enable = lib.mkEnableOption "TLS stream passthrough with dynamic upstream switching";
+
+        upstream = mkOption {
+          type = types.str;
+          description = "Primary upstream (host:port) for TLS passthrough.";
+        };
+
+        fallbackPort = mkOption {
+          type = types.nullOr types.port;
+          default = null;
+          description = "Loopback port serving as backup when the primary upstream is unavailable.";
+        };
+
+        connectTimeout = mkOption {
+          type = types.str;
+          default = "3s";
+          description = "Timeout for connecting to the upstream before trying the fallback.";
+        };
       };
 
       reverseProxies = mkOption {
@@ -132,147 +168,196 @@
       };
     };
 
-    config = mkIf (enabledProxies != {}) (let
-      # Group proxies by domain so multiple services can share a single virtual
-      # host at different URL paths.
-      proxiesByDomain =
-        lib.foldlAttrs (
-          acc: _: proxy:
-            acc
-            // {
-              ${proxy.domain} = (acc.${proxy.domain} or []) ++ [proxy];
+    config = lib.mkMerge [
+      (mkIf cfg.streamProxy.enable {
+        networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [80 443];
+
+        services.nginx = {
+          enable = true;
+
+          streamConfig = ''
+            upstream tls_passthrough {
+              include ${streamStateFile};
+              ${lib.optionalString (cfg.streamProxy.fallbackPort != null)
+              "server 127.0.0.1:${toString cfg.streamProxy.fallbackPort} backup;"}
             }
-        ) {}
-        enabledProxies;
+            server {
+              listen 443;
+              proxy_pass tls_passthrough;
+              ssl_preread on;
+              proxy_connect_timeout ${cfg.streamProxy.connectTimeout};
+            }
+          '';
 
-      # For SSL / ACME configuration we pick the first proxy per domain, all
-      # proxies on the same domain must agree on SSL settings (asserted below).
-      representativeProxy = lib.mapAttrs (_: builtins.head) proxiesByDomain;
-    in {
-      assertions =
-        (mapAttrsToList (name: proxy: {
-            assertion =
-              !proxy.forceSSL
-              || proxy.ssl.useACME
-              || (proxy.ssl.certificate != null && proxy.ssl.certificateKey != null);
-            message = ''
-              nginx.reverseProxies.${name}: forceSSL is enabled but neither
-              ssl.useACME nor both ssl.certificate + ssl.certificateKey are set.
-            '';
-          })
-          enabledProxies)
-        ++ (mapAttrsToList (name: proxy: {
-            assertion =
-              proxy.ssl.dnsProvider == null || proxy.ssl.environmentFile != null;
-            message = ''
-              nginx.reverseProxies.${name}: ssl.dnsProvider is set but
-              ssl.environmentFile is not.  The environment file must supply the
-              provider's API credentials (e.g. CF_DNS_API_TOKEN=...).
-            '';
-          })
-          enabledProxies)
-        # All proxies that share a domain must agree on SSL settings.
-        ++ (lib.concatLists (lib.mapAttrsToList (domain: proxies: let
-          first = builtins.head proxies;
-          rest = builtins.tail proxies;
-        in
-          map (p: {
-            assertion =
-              p.ssl.useACME
-              == first.ssl.useACME
-              && p.ssl.dnsProvider == first.ssl.dnsProvider
-              && p.forceSSL == first.forceSSL;
-            message = ''
-              nginx: all reverseProxies sharing the domain "${domain}" must
-              have identical ssl.useACME, ssl.dnsProvider, and forceSSL
-              settings.
-            '';
-          })
-          rest)
-        proxiesByDomain));
-
-      sops =
-        mkIf (
-          lib.any (proxy: proxy.ssl.dnsProvider == "cloudflare") (lib.attrValues enabledProxies)
-        ) {
-          secrets."cloudflare-api-token" = {};
-          templates."cloudflare-acme-env" = {
-            owner = "acme";
-            content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
+          virtualHosts."_stream_http_redirect" = {
+            listen = [
+              {
+                addr = "0.0.0.0";
+                port = 80;
+              }
+            ];
+            locations."/".return = "301 https://$host$request_uri";
           };
         };
 
-      security.acme =
-        mkIf (
-          lib.any (proxy: proxy.ssl.useACME) (lib.attrValues enabledProxies)
-        ) {
-          acceptTerms = true;
-          defaults.email = cfg.acme.email;
+        systemd.tmpfiles.rules = [
+          "d /var/lib/primary-mirror 0775 root builder -"
+          "f ${streamStateFile} 0644 root root - 'server ${cfg.streamProxy.upstream} down;'"
+        ];
+      })
 
-          # DNS-01 challenge certificates need explicit cert entries.
-          # Set group to the nginx service group so nginx can read the
-          # obtained certificate files (useACMEHost certs default to the
-          # "acme" group, which nginx cannot read).
-          certs = builtins.listToAttrs (
-            mapAttrsToList (_: proxy: {
-              name = proxy.domain;
-              value = {
-                inherit (proxy.ssl) dnsProvider environmentFile;
-                inherit (config.services.nginx) group;
-              };
+      (mkIf (enabledProxies != {}) (let
+        # Group proxies by domain so multiple services can share a single virtual
+        # host at different URL paths.
+        proxiesByDomain =
+          lib.foldlAttrs (
+            acc: _: proxy:
+              acc
+              // {
+                ${proxy.domain} = (acc.${proxy.domain} or []) ++ [proxy];
+              }
+          ) {}
+          enabledProxies;
+
+        # For SSL / ACME configuration we pick the first proxy per domain, all
+        # proxies on the same domain must agree on SSL settings (asserted below).
+        representativeProxy = lib.mapAttrs (_: builtins.head) proxiesByDomain;
+      in {
+        assertions =
+          (mapAttrsToList (name: proxy: {
+              assertion =
+                !proxy.forceSSL
+                || proxy.ssl.useACME
+                || (proxy.ssl.certificate != null && proxy.ssl.certificateKey != null);
+              message = ''
+                nginx.reverseProxies.${name}: forceSSL is enabled but neither
+                ssl.useACME nor both ssl.certificate + ssl.certificateKey are set.
+              '';
             })
-            (lib.filterAttrs (_: proxy: proxy.ssl.useACME && proxy.ssl.dnsProvider != null) representativeProxy)
-          );
+            enabledProxies)
+          ++ (mapAttrsToList (name: proxy: {
+              assertion =
+                proxy.ssl.dnsProvider == null || proxy.ssl.environmentFile != null;
+              message = ''
+                nginx.reverseProxies.${name}: ssl.dnsProvider is set but
+                ssl.environmentFile is not.  The environment file must supply the
+                provider's API credentials (e.g. CF_DNS_API_TOKEN=...).
+              '';
+            })
+            enabledProxies)
+          # All proxies that share a domain must agree on SSL settings.
+          ++ (lib.concatLists (lib.mapAttrsToList (domain: proxies: let
+            first = builtins.head proxies;
+            rest = builtins.tail proxies;
+          in
+            map (p: {
+              assertion =
+                p.ssl.useACME
+                == first.ssl.useACME
+                && p.ssl.dnsProvider == first.ssl.dnsProvider
+                && p.forceSSL == first.forceSSL;
+              message = ''
+                nginx: all reverseProxies sharing the domain "${domain}" must
+                have identical ssl.useACME, ssl.dnsProvider, and forceSSL
+                settings.
+              '';
+            })
+            rest)
+          proxiesByDomain));
+
+        sops =
+          mkIf (
+            lib.any (proxy: proxy.ssl.dnsProvider == "cloudflare") (lib.attrValues enabledProxies)
+          ) {
+            secrets."cloudflare-api-token" = {};
+            templates."cloudflare-acme-env" = {
+              owner = "acme";
+              content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
+            };
+          };
+
+        security.acme =
+          mkIf (
+            lib.any (proxy: proxy.ssl.useACME) (lib.attrValues enabledProxies)
+          ) {
+            acceptTerms = true;
+            defaults.email = cfg.acme.email;
+
+            # DNS-01 challenge certificates need explicit cert entries.
+            # Set group to the nginx service group so nginx can read the
+            # obtained certificate files (useACMEHost certs default to the
+            # "acme" group, which nginx cannot read).
+            certs = builtins.listToAttrs (
+              mapAttrsToList (_: proxy: {
+                name = proxy.domain;
+                value = {
+                  inherit (proxy.ssl) dnsProvider environmentFile;
+                  inherit (config.services.nginx) group;
+                };
+              })
+              (lib.filterAttrs (
+                  _: proxy:
+                    proxy.ssl.useACME
+                    && proxy.ssl.dnsProvider != null
+                    && cfg.acme.sharedHost == null
+                )
+                representativeProxy)
+            );
+          };
+
+        # Allow the ACME user to read DNS-01 credential files managed by sops-nix.
+        users.users.acme.extraGroups = mkIf (
+          lib.any (proxy: proxy.ssl.dnsProvider != null) (lib.attrValues enabledProxies)
+        ) ["keys"];
+
+        networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [80 443];
+
+        services.nginx = {
+          enable = true;
+
+          recommendedProxySettings = true;
+          recommendedTlsSettings = true;
+          recommendedGzipSettings = true;
+          recommendedOptimisation = true;
+
+          virtualHosts =
+            lib.mapAttrs (domain: proxies: let
+              # SSL settings come from the first proxy for this domain.
+              rep = builtins.head proxies;
+              useDns01 = rep.ssl.useACME && rep.ssl.dnsProvider != null;
+              useShared = cfg.acme.sharedHost != null;
+            in {
+              inherit (rep) forceSSL;
+
+              enableACME = !useShared && rep.ssl.useACME && !useDns01;
+              useACMEHost =
+                if useShared
+                then cfg.acme.sharedHost
+                else mkIf useDns01 domain;
+              sslCertificate = mkIf (!rep.ssl.useACME && !useShared) rep.ssl.certificate;
+              sslCertificateKey = mkIf (!rep.ssl.useACME && !useShared) rep.ssl.certificateKey;
+
+              # Merge locations from every proxy on this domain.
+              locations = let
+                proxyLocations = builtins.listToAttrs (map (proxy: {
+                    name = proxy.location;
+                    value = {
+                      inherit (proxy) proxyWebsockets extraConfig;
+
+                      proxyPass = proxy.upstream;
+                    };
+                  })
+                  proxies);
+                hasRoot = builtins.any (p: p.location == "/") proxies;
+              in
+                proxyLocations
+                // lib.optionalAttrs (!hasRoot) {
+                  "/".return = "404";
+                };
+            })
+            proxiesByDomain;
         };
-
-      # Allow the ACME user to read DNS-01 credential files managed by sops-nix.
-      users.users.acme.extraGroups = mkIf (
-        lib.any (proxy: proxy.ssl.dnsProvider != null) (lib.attrValues enabledProxies)
-      ) ["keys"];
-
-      networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [80 443];
-
-      services.nginx = {
-        enable = true;
-
-        recommendedProxySettings = true;
-        recommendedTlsSettings = true;
-        recommendedGzipSettings = true;
-        recommendedOptimisation = true;
-
-        virtualHosts =
-          lib.mapAttrs (domain: proxies: let
-            # SSL settings come from the first proxy for this domain.
-            rep = builtins.head proxies;
-            useDns01 = rep.ssl.useACME && rep.ssl.dnsProvider != null;
-          in {
-            inherit (rep) forceSSL;
-
-            enableACME = rep.ssl.useACME && !useDns01;
-            useACMEHost = mkIf useDns01 domain;
-            sslCertificate = mkIf (!rep.ssl.useACME) rep.ssl.certificate;
-            sslCertificateKey = mkIf (!rep.ssl.useACME) rep.ssl.certificateKey;
-
-            # Merge locations from every proxy on this domain.
-            locations = let
-              proxyLocations = builtins.listToAttrs (map (proxy: {
-                  name = proxy.location;
-                  value = {
-                    inherit (proxy) proxyWebsockets extraConfig;
-
-                    proxyPass = proxy.upstream;
-                  };
-                })
-                proxies);
-              hasRoot = builtins.any (p: p.location == "/") proxies;
-            in
-              proxyLocations
-              // lib.optionalAttrs (!hasRoot) {
-                "/".return = "404";
-              };
-          })
-          proxiesByDomain;
-      };
-    });
+      }))
+    ];
   };
 }
