@@ -33,6 +33,11 @@
     config = let
       hostname = config.networking.hostName;
       cacheKeySecret = "hosts/${hostname}/cache-private-key";
+
+      # Block nix-secrets flake source from being served.
+      secretsStoreHash =
+        builtins.unsafeDiscardStringContext
+        (builtins.substring 11 32 inputs.nix-secrets.outPath);
     in {
       sops.secrets.${cacheKeySecret} = {};
 
@@ -48,6 +53,11 @@
       nix.settings = {
         secret-key-files = [config.sops.secrets.${cacheKeySecret}.path];
         trusted-users = ["builder"];
+      };
+
+      # Deny access to the nix-secrets flake source store path.
+      services.nginx.virtualHosts."cache.asmussen.tech".locations = mkIf cfg.exposePublicly {
+        "= /${secretsStoreHash}.narinfo".return = "403";
       };
 
       # Expose the cache behind nginx with HTTPS only when requested.
