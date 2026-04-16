@@ -24,18 +24,10 @@
   }: {
     imports = [
       (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
-      (modulesPath + "/installer/cd-dvd/channel.nix")
 
       # Base modules.
       self.nixosModules.base
       self.nixosModules.language
-
-      # Features.
-      self.nixosModules.stylix
-
-      # External modules.
-      inputs.determinate.nixosModules.default
-      inputs.stylix.nixosModules.stylix
     ];
 
     networking.hostName = "iso";
@@ -50,22 +42,17 @@
       "flakes"
     ];
 
-    # The default compression-level is very slow; zstd level 3 is much faster.
-    isoImage.squashfsCompression = "zstd -Xcompression-level 3";
+    isoImage.squashfsCompression = "zstd -Xcompression-level 6";
 
-    environment = {
-      # Embed the build timestamp into /etc/isoBuildTime for easy identification.
-      etc.isoBuildTime.text = lib.mkDefault (
-        lib.readFile "${
-          pkgs.runCommand "timestamp" {
-            env.when = builtins.currentTime;
-          } "echo -n `date -d @$when +%Y-%m-%d_%H-%M-%S` > $out"
-        }"
-      );
+    documentation.dev.enable = lib.mkForce false;
 
-      # Disable Determinate Systems telemetry.
-      variables.DETSYS_IDS_TELEMETRY = "disabled";
-    };
+    environment.etc.isoBuildTime.text = lib.mkDefault (
+      lib.readFile "${
+        pkgs.runCommand "timestamp" {
+          env.when = builtins.currentTime;
+        } "echo -n `date -d @$when +%Y-%m-%d_%H-%M-%S` > $out"
+      }"
+    );
 
     # Show the ISO build time in the bash prompt.
     programs.bash.promptInit = ''
