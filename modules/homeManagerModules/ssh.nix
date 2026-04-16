@@ -33,7 +33,7 @@
           remoteForwards = [
             {
               bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
-              host.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
+              host.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
             }
           ];
 
