@@ -81,11 +81,6 @@
       };
     };
 
-    sops.secrets = {
-      "wireguard/psk-eta-epsilon" = {};
-      "wireguard/psk-eta-delta" = {};
-    };
-
     wireguard = {
       enable = true;
       ips = ["10.10.0.1/24"];
@@ -109,34 +104,82 @@
     nix.settings.max-jobs = lib.mkForce 0;
 
     btrfs.scrub.fileSystems = ["/"];
-    nginx.reverseProxies.jellyfin = {
+
+    nginx.streamProxy = {
       enable = true;
-      domain = "asmussen.tech";
-      location = "/jellyfin";
-      upstream = "http://10.10.0.2:8096";
-      ssl = {
+      upstream = "10.10.0.2:443";
+      fallbackPort = 8443;
+    };
+
+    primaryMirror = {
+      enable = true;
+      healthCheckHost = "cache.asmussen.tech";
+      healthCheckPath = "/nix-cache-info";
+    };
+
+    sops = {
+      secrets = {
+        "cloudflare-api-token" = {};
+        "wireguard/psk-eta-epsilon" = {};
+        "wireguard/psk-eta-delta" = {};
+      };
+
+      templates."cloudflare-acme-env" = {
+        owner = "acme";
+        content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
+      };
+    };
+
+    users.users.acme.extraGroups = ["keys"];
+    security.acme = {
+      acceptTerms = true;
+      defaults.email = config.preferences.user.email;
+      certs."asmussen.tech" = {
+        inherit (config.services.nginx) group;
+
+        extraDomainNames = ["*.asmussen.tech"];
         dnsProvider = "cloudflare";
         environmentFile = config.sops.templates."cloudflare-acme-env".path;
       };
     };
 
-    primaryMirror = {
-      enable = true;
-      services = {
-        nix-cache = {
-          primaryPort = config.services.nix-serve.port;
-          localFallback = "localhost:${toString config.services.nix-serve.port}";
-        };
+    nix-serve-extras.exposePublicly = false;
+    website-extras.exposePublicly = false;
 
-        website = {
-          primaryPort = config.services.website.port;
-          localFallback = "localhost:${toString config.services.website.port}";
-        };
+    services.nginx.virtualHosts = let
+      acmeDir = "/var/lib/acme/asmussen.tech";
+      fallbackListen = [
+        {
+          addr = "127.0.0.1";
+          port = 8443;
+          ssl = true;
+        }
+      ];
 
-        jellyfin = {
-          nginxProxy = "jellyfin";
-          primaryPort = 8096;
+      sslConfig = ''
+        ssl_certificate ${acmeDir}/fullchain.pem;
+        ssl_certificate_key ${acmeDir}/key.pem;
+      '';
+    in {
+      "asmussen.tech" = {
+        listen = fallbackListen;
+        extraConfig = sslConfig;
+        locations."/" = {
+          proxyPass = "http://localhost:${toString config.services.website.port}";
+          proxyWebsockets = true;
         };
+      };
+
+      "jellyfin.asmussen.tech" = {
+        listen = fallbackListen;
+        extraConfig = sslConfig;
+        locations."/".return = "503";
+      };
+
+      "cache.asmussen.tech" = {
+        listen = fallbackListen;
+        extraConfig = sslConfig;
+        locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
       };
     };
 

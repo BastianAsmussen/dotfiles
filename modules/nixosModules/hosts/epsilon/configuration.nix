@@ -113,8 +113,40 @@
 
     nix-serve-extras.bindAddress = "10.10.0.2";
 
-    # Restrict SSH to WireGuard interface.
-    services.openssh.openFirewall = false;
+    nginx.acme.sharedHost = "asmussen.tech";
+
+    security.acme.certs."asmussen.tech" = {
+      extraDomainNames = ["*.asmussen.tech"];
+      dnsProvider = "cloudflare";
+      environmentFile = config.sops.templates."cloudflare-acme-env".path;
+      inherit (config.services.nginx) group;
+    };
+
+    nginx.reverseProxies.jellyfin = {
+      enable = true;
+      domain = "jellyfin.asmussen.tech";
+      location = "/";
+      upstream = "http://localhost:8096";
+      ssl = {
+        dnsProvider = "cloudflare";
+        environmentFile = config.sops.templates."cloudflare-acme-env".path;
+      };
+    };
+
+    services = {
+      nginx.virtualHosts = {
+        "www.asmussen.tech" = {
+          useACMEHost = "asmussen.tech";
+          forceSSL = true;
+          locations."/".return = "301 https://asmussen.tech$request_uri";
+        };
+
+        # Redirect legacy path to subdomain for existing bookmarks.
+        "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+      };
+
+      openssh.openFirewall = false;
+    };
 
     # Allow eta (mirror) and local SSH to reach proxied services over WireGuard.
     networking.firewall.interfaces.wg0.allowedTCPPorts =
