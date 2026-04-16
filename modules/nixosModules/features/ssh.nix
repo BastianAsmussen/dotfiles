@@ -13,6 +13,7 @@
         settings = {
           PermitRootLogin = "no";
           MaxAuthTries = 3;
+          MaxStartups = "10:30:60";
           LoginGraceTime = 20;
           ClientAliveCountMax = 5;
           ClientAliveInterval = 60;
@@ -23,13 +24,14 @@
           ChallengeResponseAuthentication = false;
           X11Forwarding = false;
           PermitUserEnvironment = "no";
-          AllowAgentForwarding = "yes";
-          AllowTcpForwarding = "local";
+          AllowAgentForwarding = "no";
+          AllowTcpForwarding = "yes";
           AllowStreamLocalForwarding = "yes";
           PermitTunnel = "no";
           UsePAM = false;
           KbdInteractiveAuthentication = false;
           StreamLocalBindUnlink = "yes";
+          LogLevel = "VERBOSE";
           KexAlgorithms = [
             "curve25519-sha256"
             "curve25519-sha256@libssh.org"
@@ -37,6 +39,11 @@
             "diffie-hellman-group18-sha512"
             "diffie-hellman-group-exchange-sha256"
             "sntrup761x25519-sha512@openssh.com"
+          ];
+
+          Ciphers = [
+            "chacha20-poly1305@openssh.com"
+            "aes256-gcm@openssh.com"
           ];
 
           Macs = [
@@ -61,10 +68,10 @@
           "10.0.0.0/8"
         ];
 
-        maxretry = 5;
+        maxretry = 3;
         banaction = "nftables-multiport";
         banaction-allports = lib.mkDefault "nftables-allport";
-        bantime = "10m";
+        bantime = "1h";
         bantime-increment = {
           enable = true;
 

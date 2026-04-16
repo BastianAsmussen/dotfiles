@@ -12,7 +12,6 @@
 
           hostname = inputs.nix-secrets.hosts.eta.ipv4_address;
           port = 22;
-          forwardAgent = true;
           remoteForwards = [
             {
               bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
@@ -29,7 +28,6 @@
           hostname = "10.10.0.2";
           port = 22;
           proxyJump = "eta";
-          forwardAgent = true;
           remoteForwards = [
             {
               bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
