@@ -23,18 +23,11 @@
                 properties.style = "full";
               }
               {
-                type = "session";
-                style = "plain";
-                foreground = "red";
-                background = "transparent";
-                template = "{{ if .SSHSession }}  {{ end }}";
-              }
-              {
                 type = "git";
                 style = "plain";
                 foreground = "p:grey";
                 background = "transparent";
-                template = "{{ if .HEAD }} {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>{{ end }}";
+                template = "{{ if .HEAD }} {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }}{{ if gt .Behind 0 }} <cyan>⇣</>{{ end }}{{ if gt .Ahead 0 }} <cyan>⇡</>{{ end }}{{ end }}";
                 properties = {
                   branch_icon = "";
                   commit_icon = "@";
@@ -46,7 +39,26 @@
                 style = "plain";
                 foreground = "p:grey";
                 background = "transparent";
-                template = "{{ if not .Segments.Git.HEAD }} {{ end }}{{ if .Env.CONTAINER_ID }}in {{ .Env.CONTAINER_ID }}{{ end }}";
+                template = ''
+                  {{- $nix := env "IN_NIX_SHELL" -}}
+                  {{- $box := env "CONTAINER_ID" -}}
+                  {{- if or $nix $box }} ({{ end -}}
+                  {{- if and $nix $box -}}
+                    {{ if eq $nix "pure" }}<green>nix-shell</>{{ else }}nix-shell{{ end }} in {{ $box }}
+                  {{- else if $nix -}}
+                    in {{ if eq $nix "pure" }}<green>nix-shell</>{{ else }}nix-shell{{ end }}
+                  {{- else if $box -}}
+                    in {{ $box }}
+                  {{- end -}}
+                  {{- if or $nix $box }}){{ end -}}
+                '';
+              }
+              {
+                type = "session";
+                style = "plain";
+                foreground = "red";
+                background = "transparent";
+                template = "{{ if .SSHSession }}  {{ end }}";
               }
             ];
           }
