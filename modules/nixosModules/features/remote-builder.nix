@@ -38,18 +38,7 @@
           }
         ];
 
-        settings = {
-          builders-use-substitutes = true;
-
-          substituters = [
-            "https://cache.asmussen.tech/"
-          ];
-
-          trusted-public-keys = [
-            inputs.nix-secrets.hosts.epsilon.cache-public-key
-            inputs.nix-secrets.hosts.eta.cache-public-key
-          ];
-        };
+        settings.builders-use-substitutes = true;
       };
 
       programs.ssh = {

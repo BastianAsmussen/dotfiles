@@ -46,15 +46,7 @@
       };
 
       nix.settings = {
-        secret-key-files = [
-          config.sops.secrets.${cacheKeySecret}.path
-        ];
-
-        trusted-public-keys = [
-          inputs.nix-secrets.hosts.epsilon.cache-public-key
-          inputs.nix-secrets.hosts.eta.cache-public-key
-        ];
-
+        secret-key-files = [config.sops.secrets.${cacheKeySecret}.path];
         trusted-users = ["builder"];
       };
 

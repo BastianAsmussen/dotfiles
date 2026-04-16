@@ -33,6 +33,10 @@
           trusted-users = ["root" "@wheel"];
           substituters = lib.mkBefore ["https://cache.asmussen.tech/"];
           trusted-substituters = config.nix.settings.substituters;
+          trusted-public-keys = [
+            inputs.nix-secrets.hosts.epsilon.cache-public-key
+            inputs.nix-secrets.hosts.eta.cache-public-key
+          ];
 
           http-connections = 32;
           connect-timeout = 5;
