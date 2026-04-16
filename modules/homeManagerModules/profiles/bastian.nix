@@ -44,7 +44,5 @@
       postman
       just
     ];
-
-    programs.man.generateCaches = true;
   };
 }
