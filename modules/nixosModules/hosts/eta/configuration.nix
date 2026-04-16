@@ -36,6 +36,7 @@
       # Security
       self.nixosModules.security
       self.nixosModules.sops
+      self.nixosModules.gpg
       self.nixosModules.ssh
       self.nixosModules.wireguard
 
@@ -75,6 +76,7 @@
 
         wg0.physicalConnections = [
           (mkConnection "epsilon" "wg0")
+          (mkConnection "delta" "wg0")
         ];
       };
     };
@@ -118,15 +120,22 @@
           primaryPort = config.services.nix-serve.port;
           localFallback = "localhost:${toString config.services.nix-serve.port}";
         };
+
         website = {
           primaryPort = config.services.website.port;
           localFallback = "localhost:${toString config.services.website.port}";
+        };
+
+        jellyfin = {
+          nginxProxy = "jellyfin";
+          primaryPort = 8096;
         };
       };
     };
 
     # Remote deployment.
     services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
+
     users.users.root.openssh.authorizedKeys.keyFiles = let
       keys = lib.custom.keys.default;
       wanted = ["ssh-epsilon.pub" "ssh-delta.pub"];
@@ -140,6 +149,7 @@
     home-manager.userModules.bastian = with self.homeModules; [
       # Terminal
       git
+      gpg
       zsh
       zoxide
       tmux
