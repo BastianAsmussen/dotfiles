@@ -6,19 +6,39 @@
       enable = true;
 
       enableDefaultConfig = false;
-      matchBlocks."epsilon" = {
-        inherit user;
+      matchBlocks = {
+        "eta" = {
+          inherit user;
 
-        hostname = inputs.nix-secrets.hosts.epsilon.ipv4_address;
-        port = 22;
-        remoteForwards = [
-          {
-            bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
-            host.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
-          }
-        ];
+          hostname = inputs.nix-secrets.hosts.eta.ipv4_address;
+          port = 22;
+          forwardAgent = true;
+          remoteForwards = [
+            {
+              bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
+              host.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
+            }
+          ];
 
-        extraOptions.StreamLocalBindUnlink = "yes";
+          extraOptions.StreamLocalBindUnlink = "yes";
+        };
+
+        "epsilon" = {
+          inherit user;
+
+          hostname = "10.10.0.2";
+          port = 22;
+          proxyJump = "eta";
+          forwardAgent = true;
+          remoteForwards = [
+            {
+              bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
+              host.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
+            }
+          ];
+
+          extraOptions.StreamLocalBindUnlink = "yes";
+        };
       };
     };
   };
