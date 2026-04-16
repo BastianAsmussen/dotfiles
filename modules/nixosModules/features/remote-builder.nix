@@ -9,16 +9,14 @@
     cfg = config.remoteBuilder;
     hostname = config.networking.hostName;
   in {
-    options.remoteBuilder = {
-      jumpHost = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = ''
-          SSH hostname or IP to use as a ProxyJump when connecting to the
-          build machine.  Required when the build machine is not directly
-          reachable from this host.
-        '';
-      };
+    options.remoteBuilder.jumpHost = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        SSH hostname or IP to use as a ProxyJump when connecting to the
+        build machine.  Required when the build machine is not directly
+        reachable from this host.
+      '';
     };
 
     config = {
@@ -70,12 +68,23 @@
           };
 
         extraConfig = mkIf (cfg.jumpHost != null) ''
+          # Authenticate to the jump host as the builder user, using the same
+          # key nix passes for the final destination.  Eta's builder user
+          # already has this host's builder public key authorised, so no
+          # separate key material is needed.
+          Host ${cfg.jumpHost}
+            User builder
+            IdentityFile ${config.sops.secrets."hosts/${hostname}/builder-ssh-private-key".path}
+
           Host 10.10.0.2
-            ProxyJump ${cfg.jumpHost}
+            ProxyJump builder@${cfg.jumpHost}
         '';
       };
 
-      sops.secrets."hosts/${hostname}/builder-ssh-private-key" = {};
+      sops.secrets."hosts/${hostname}/builder-ssh-private-key" = {
+        mode = "0440";
+        group = "wheel";
+      };
     };
   };
 }

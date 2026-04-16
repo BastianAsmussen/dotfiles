@@ -23,14 +23,13 @@
           ChallengeResponseAuthentication = false;
           X11Forwarding = false;
           PermitUserEnvironment = "no";
-          AllowAgentForwarding = "no";
+          AllowAgentForwarding = "yes";
           AllowTcpForwarding = "local";
           AllowStreamLocalForwarding = "yes";
           PermitTunnel = "no";
           UsePAM = false;
           KbdInteractiveAuthentication = false;
           StreamLocalBindUnlink = "yes";
-          GatewayPorts = "no";
           KexAlgorithms = [
             "curve25519-sha256"
             "curve25519-sha256@libssh.org"

@@ -110,12 +110,17 @@
 
     nix-serve-extras.bindAddress = "10.10.0.2";
 
-    # Allow the mirror host to reach proxied services over WireGuard.
-    networking.firewall.interfaces.wg0.allowedTCPPorts = [
-      config.services.nix-serve.port
-      config.services.website.port
-      8096 # jellyfin
-    ];
+    # Restrict SSH to WireGuard interface.
+    services.openssh.openFirewall = false;
+
+    # Allow eta (mirror) and local SSH to reach proxied services over WireGuard.
+    networking.firewall.interfaces.wg0.allowedTCPPorts =
+      config.services.openssh.ports
+      ++ [
+        config.services.nix-serve.port
+        config.services.website.port
+        8096 # Jellyfin
+      ];
 
     desktop.greeter.gdm.enable = true;
     preferences.monitors = {
