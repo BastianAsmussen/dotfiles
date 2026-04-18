@@ -43,4 +43,16 @@ in rec {
     makeKeyCollection dir keySets;
 
   default = load defaultDir;
+
+  # Filter SSH keys from a collection by filename.
+  filterSshKeys = names: collection:
+    filter (k: builtins.elem k.name names) collection.sshKeys;
+
+  # Full paths of SSH keys filtered by filename.
+  selectSshPaths = names: collection:
+    map (k: k.fullPath) (filterSshKeys names collection);
+
+  # File contents of SSH keys filtered by filename.
+  selectSshContents = names: collection:
+    map (k: builtins.readFile k.fullPath) (filterSshKeys names collection);
 }

@@ -44,7 +44,12 @@
 
       authorizedKeyFiles = mkOption {
         type = types.listOf types.path;
-        default = lib.custom.keys.default.sshPaths;
+        default = let
+          keys = lib.custom.keys.default;
+          # Exclude mu: phone is highest-attack-surface device, should be trust consumer not issuer.
+          trustedKeys = lib.filter (k: k.name != "ssh-mu.pub") keys.sshKeys;
+        in
+          map (k: k.fullPath) trustedKeys;
         description = "SSH authorized key files to install for the user.";
       };
     };
