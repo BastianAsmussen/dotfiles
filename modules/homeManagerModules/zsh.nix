@@ -180,17 +180,8 @@
         oh-my-zsh = {
           enable = true;
 
-          extraConfig =
-            # sh
-            ''
-              zstyle ':completion:*:*:docker:*' option-stacking yes
-              zstyle ':completion:*:*:docker-*:*' option-stacking yes
-            '';
-
           plugins = [
             "archlinux"
-            "docker"
-            "docker-compose"
             "dotnet"
             "eza"
             "git"
