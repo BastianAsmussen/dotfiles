@@ -9,7 +9,7 @@
       openssh = {
         enable = true;
 
-        allowSFTP = true;
+        allowSFTP = false;
         settings = {
           PermitRootLogin = "no";
           MaxAuthTries = 3;
@@ -21,7 +21,6 @@
           AuthenticationMethods = "publickey";
           PubkeyAuthentication = "yes";
           PermitEmptyPasswords = false;
-          ChallengeResponseAuthentication = false;
           X11Forwarding = false;
           PermitUserEnvironment = "no";
           AllowAgentForwarding = "no";
@@ -64,8 +63,7 @@
 
         ignoreIP = [
           "127.0.0.0/8"
-          "192.168.0.0/16"
-          "10.0.0.0/8"
+          "10.10.0.0/24"
         ];
 
         maxretry = 3;
