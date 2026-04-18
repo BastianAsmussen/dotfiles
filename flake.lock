@@ -133,7 +133,7 @@
       },
       "original": {
         "type": "tarball",
-        "url": "https://flakehub.com/f/DeterminateSystems/determinate/%2A"
+        "url": "https://flakehub.com/f/DeterminateSystems/determinate/%3D3.17.3"
       }
     },
     "determinate-nixd-aarch64-darwin": {
@@ -862,21 +862,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-fork": {
-      "locked": {
-        "lastModified": 1764826505,
-        "narHash": "sha256-u0Fp9Z/7yH8oBmL4Oa7r6B2OKLW9WCI+GkmuO0+sedw=",
-        "owner": "BastianAsmussen",
-        "repo": "nixpkgs",
-        "rev": "4bac17ce7bc7542d38819b6710714ffc89311978",
-        "type": "github"
-      },
-      "original": {
-        "owner": "BastianAsmussen",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1774748309,
@@ -1209,7 +1194,6 @@
         "nixos-avf": "nixos-avf",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_6",
-        "nixpkgs-fork": "nixpkgs-fork",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
         "pre-commit-hooks": "pre-commit-hooks",
