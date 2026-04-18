@@ -2,11 +2,21 @@
   flake.homeModules.ssh = let
     user = inputs.nix-secrets.user.name;
   in {
+    home.file.".ssh/known_hosts_static".text = ''
+      [${inputs.nix-secrets.hosts.eta.ipv4_address}]:2222 ${inputs.nix-secrets.hosts.eta.initrd-ssh-public-key}
+    '';
+
     programs.ssh = {
       enable = true;
 
       enableDefaultConfig = false;
       matchBlocks = {
+        "eta-initrd" = {
+          hostname = inputs.nix-secrets.hosts.eta.ipv4_address;
+          port = 2222;
+          extraOptions.UserKnownHostsFile = "~/.ssh/known_hosts ~/.ssh/known_hosts_static";
+        };
+
         "eta" = {
           inherit user;
 

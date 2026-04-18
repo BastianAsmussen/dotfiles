@@ -1,4 +1,4 @@
-{
+{inputs, ...}: {
   flake.nixosModules.primaryBusy = {
     config,
     lib,
@@ -47,6 +47,11 @@
     };
 
     config = mkIf cfg.enable {
+      programs.ssh.knownHosts."eta-wg" = {
+        hostNames = [cfg.mirrorHost];
+        publicKey = inputs.nix-secrets.hosts.eta.ssh-public-key;
+      };
+
       # Let the desktop user read the builder key used by gamemode's SSH hooks.
       sops.secrets."hosts/${config.networking.hostName}/builder-ssh-private-key" = {
         owner = config.preferences.user.name;
