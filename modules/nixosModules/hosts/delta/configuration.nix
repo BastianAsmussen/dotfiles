@@ -22,7 +22,7 @@
       self.nixosModules.base
       self.nixosModules.language
       self.nixosModules.misc
-      self.nixosModules.bootloader
+      self.nixosModules.grub
       self.nixosModules.stylix
 
       # Desktop
