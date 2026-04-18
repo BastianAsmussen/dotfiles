@@ -15,6 +15,14 @@
 
         luks.forceLuksSupportInInitrd = true;
 
+        systemd.network = {
+          enable = true;
+          networks."10-eth" = {
+            matchConfig.Type = "ether";
+            networkConfig.DHCP = "ipv4";
+          };
+        };
+
         network = {
           enable = true;
           ssh = {
