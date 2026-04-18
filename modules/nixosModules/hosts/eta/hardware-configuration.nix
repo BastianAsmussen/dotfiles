@@ -10,8 +10,20 @@
 
     boot = {
       initrd = {
-        availableKernelModules = ["xhci_pci" "virtio_pci" "virtio_scsi" "usbhid" "sr_mod"];
+        availableKernelModules = ["xhci_pci" "virtio_pci" "virtio_scsi" "virtio_net" "usbhid" "sr_mod"];
         kernelModules = [];
+
+        luks.forceLuksSupportInInitrd = true;
+
+        network = {
+          enable = true;
+          ssh = {
+            enable = true;
+            port = 2222;
+            hostKeys = ["/boot/initrd-host-key"];
+            authorizedKeys = lib.custom.keys.selectSshContents ["ssh-delta.pub" "ssh-epsilon.pub"] lib.custom.keys.default;
+          };
+        };
       };
 
       kernelModules = [];

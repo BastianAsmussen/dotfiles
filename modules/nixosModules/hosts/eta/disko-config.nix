@@ -8,11 +8,6 @@
           content = {
             type = "gpt";
             partitions = {
-              boot = {
-                size = "512M";
-                type = "EF02"; # For GRUB MBR.
-              };
-
               ESP = {
                 size = "4G";
                 type = "EF00";
@@ -27,8 +22,13 @@
               primary = {
                 size = "100%";
                 content = {
-                  type = "lvm_pv";
-                  vg = "main";
+                  type = "luks";
+                  name = "cryptroot";
+                  settings.allowDiscards = true;
+                  content = {
+                    type = "lvm_pv";
+                    vg = "main";
+                  };
                 };
               };
             };
