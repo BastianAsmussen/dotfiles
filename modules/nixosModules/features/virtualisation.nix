@@ -2,7 +2,7 @@
   flake.nixosModules.virtualisation = {pkgs, ...}: {
     imports = [
       self.nixosModules.android
-      self.nixosModules.docker
+      self.nixosModules.podman
       # self.nixosModules.qemuVirtualisation
     ];
 
