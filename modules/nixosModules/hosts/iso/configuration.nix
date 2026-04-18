@@ -93,6 +93,6 @@
     ];
 
     users.users.root.openssh.authorizedKeys.keyFiles =
-      lib.custom.keys.default.sshPaths;
+      lib.custom.keys.selectSshPaths ["ssh-delta.pub" "ssh-epsilon.pub"] lib.custom.keys.default;
   };
 }

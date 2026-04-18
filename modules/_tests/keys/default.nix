@@ -43,4 +43,39 @@ in {
       "builder-sigma.pub"
     ];
   };
+
+  testFilterSshKeys = {
+    expr = map (k: k.name) (lib.custom.keys.filterSshKeys ["ssh-theta.pub"] keys);
+    expected = ["ssh-theta.pub"];
+  };
+
+  testFilterSshKeysExcludesNonSsh = {
+    expr = lib.custom.keys.filterSshKeys ["builder-kappa.pub"] keys;
+    expected = [];
+  };
+
+  testFilterSshKeysEmpty = {
+    expr = lib.custom.keys.filterSshKeys [] keys;
+    expected = [];
+  };
+
+  testSelectSshPaths = {
+    expr = lib.custom.keys.selectSshPaths ["ssh-theta.pub"] keys;
+    expected = mapKeys ["ssh-theta.pub"];
+  };
+
+  testSelectSshPathsMissingName = {
+    expr = lib.custom.keys.selectSshPaths ["ssh-theta.pub" "ssh-nonexistent.pub"] keys;
+    expected = mapKeys ["ssh-theta.pub"];
+  };
+
+  testSelectSshContents = {
+    expr = lib.custom.keys.selectSshContents ["ssh-theta.pub"] keys;
+    expected = [(builtins.readFile (mockDir + "/ssh-theta.pub"))];
+  };
+
+  testSelectSshContentsEmpty = {
+    expr = lib.custom.keys.selectSshContents ["ssh-nonexistent.pub"] keys;
+    expected = [];
+  };
 }

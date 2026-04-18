@@ -183,14 +183,10 @@
       };
     };
 
-    # Remote deployment.
-    services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
+    services.openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
 
-    users.users.root.openssh.authorizedKeys.keyFiles = let
-      keys = lib.custom.keys.default;
-      wanted = ["ssh-epsilon.pub" "ssh-delta.pub"];
-    in
-      map (k: k.fullPath) (lib.filter (k: builtins.elem k.name wanted) keys.sshKeys);
+    users.users.root.openssh.authorizedKeys.keyFiles =
+      lib.custom.keys.selectSshPaths ["ssh-epsilon.pub" "ssh-delta.pub"] lib.custom.keys.default;
 
     environment.systemPackages = [
       pkgs.neovim-minimal
