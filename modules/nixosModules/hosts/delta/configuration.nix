@@ -42,6 +42,7 @@
       self.nixosModules.yubiKey
 
       # Features
+      self.nixosModules.japanese
       self.nixosModules.bluetooth
       self.nixosModules.btrfs
       self.nixosModules.ccache
