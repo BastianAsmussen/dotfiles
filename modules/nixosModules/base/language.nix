@@ -1,24 +1,26 @@
 {
   flake.nixosModules.language = {pkgs, ...}: {
     time.timeZone = "Europe/Copenhagen";
-    i18n = {
-      defaultLocale = "en_DK.UTF-8";
-      supportedLocales = [
+    i18n = let
+      locale = "en_DK.UTF-8";
+    in {
+      defaultLocale = locale;
+      extraLocales = [
         "en_US.UTF-8/UTF-8"
         "en_DK.UTF-8/UTF-8"
         "da_DK.UTF-8/UTF-8"
       ];
 
       extraLocaleSettings = {
-        LC_ADDRESS = "en_DK.UTF-8";
-        LC_IDENTIFICATION = "en_DK.UTF-8";
-        LC_MEASUREMENT = "en_DK.UTF-8";
-        LC_MONETARY = "en_DK.UTF-8";
-        LC_NAME = "en_DK.UTF-8";
-        LC_NUMERIC = "en_DK.UTF-8";
-        LC_PAPER = "en_DK.UTF-8";
-        LC_TELEPHONE = "en_DK.UTF-8";
-        LC_TIME = "en_DK.UTF-8";
+        LC_ADDRESS = locale;
+        LC_IDENTIFICATION = locale;
+        LC_MEASUREMENT = locale;
+        LC_MONETARY = locale;
+        LC_NAME = locale;
+        LC_NUMERIC = locale;
+        LC_PAPER = locale;
+        LC_TELEPHONE = locale;
+        LC_TIME = locale;
       };
     };
 
@@ -30,7 +32,8 @@
     ];
 
     fonts.packages = with pkgs; [
-      kochi-substitute
+      noto-fonts-cjk-sans
+      noto-fonts-cjk-serif
     ];
   };
 }
