@@ -1,4 +1,4 @@
-{
+{inputs, ...}: {
   flake.nixosModules.primaryBusy = {
     config,
     lib,
@@ -47,6 +47,11 @@
     };
 
     config = mkIf cfg.enable {
+      programs.ssh.knownHosts."eta-wg" = {
+        hostNames = [cfg.mirrorHost];
+        publicKey = inputs.nix-secrets.hosts.eta.ssh-public-key;
+      };
+
       # The gamemode custom hooks run as the logged-in user, so the SSH key
       # must be readable by that user.  A dedicated key pair would be more
       # restrictive; for now we reuse the builder key.
