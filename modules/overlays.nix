@@ -23,22 +23,9 @@
 
     # User-defined overlays.
     modifications = _: prev: {
-      docker = prev.docker.override {
-        initSupport = true;
-      };
-
       bottles = prev.bottles.override {
         removeWarningPopup = true;
       };
-    };
-
-    # Custom nixpkgs fork.
-    fork = _: prev: {
-      fork = withSystem prev.stdenv.hostPlatform.system (
-        import inputs.nixpkgs-fork {
-          config.allowUnfree = true;
-        }
-      );
     };
 
     # Convenient access to the nixpkgs stable branch.
