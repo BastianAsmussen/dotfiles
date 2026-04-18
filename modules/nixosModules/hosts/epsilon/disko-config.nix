@@ -101,7 +101,7 @@
             content = {
               type = "btrfs";
               extraArgs = ["-f"];
-              mountpoint = "/run/media/bastian/Extra";
+              mountpoint = "/srv/media";
               mountOptions = [
                 "compress=zstd:3"
                 "noatime"

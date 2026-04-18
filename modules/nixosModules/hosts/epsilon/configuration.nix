@@ -186,9 +186,8 @@
       maxUsagePercentage = 25;
     };
 
-    bootloader.isMultiboot = true;
     primaryBusy.enable = true;
-    btrfs.scrub.fileSystems = ["/" "/run/media/bastian/Extra"];
+    btrfs.scrub.fileSystems = ["/" "/srv/media"];
 
     home-manager.userModules.bastian = with self.homeModules; [
       terminal

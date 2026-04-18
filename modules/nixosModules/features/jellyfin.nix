@@ -1,38 +1,35 @@
 {
   flake.nixosModules.jellyfin = {
     config,
-    lib,
     pkgs,
     ...
-  }: {
-    options.jellyfin.baseUrl = lib.mkOption {
-      type = lib.types.str;
-      default = "";
-      description = "Base URL path written into Jellyfin's network.xml.";
-    };
-
-    config = {
-      services.jellyfin = {
-        enable = true;
-        openFirewall = false;
-        user = config.preferences.user.name;
-      };
-
-      environment.systemPackages = with pkgs; [
-        jellyfin
-        jellyfin-web
-        jellyfin-ffmpeg
+  }: let
+    user = config.preferences.user.name;
+  in {
+    users = {
+      groups.media = {};
+      extraGroups.media.members = [
+        user
+        config.services.jellyfin.user
       ];
-
-      systemd.services.jellyfin.preStart = let
-        networkXml = "${config.services.jellyfin.dataDir}/config/network.xml";
-      in ''
-        if [ -f "${networkXml}" ]; then
-          ${pkgs.gnused}/bin/sed -i \
-            's|<BaseUrl>[^<]*</BaseUrl>|<BaseUrl>${config.jellyfin.baseUrl}</BaseUrl>|' \
-            "${networkXml}"
-        fi
-      '';
     };
+
+    systemd.tmpfiles.rules = [
+      "d  /srv/media                   0755 root    media - -"
+      "d  /srv/media/shared            3770 root    media - -"
+      "d  /srv/media/bastian           0750 ${user} media - -"
+      "d  /srv/media/bastian/.jellyfin 0750 ${user} media - -"
+    ];
+
+    services.jellyfin = {
+      enable = true;
+      openFirewall = false;
+    };
+
+    environment.systemPackages = with pkgs; [
+      jellyfin
+      jellyfin-web
+      jellyfin-ffmpeg
+    ];
   };
 }
