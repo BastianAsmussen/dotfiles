@@ -58,14 +58,16 @@
       sops.secrets."user/bastian/password-hash".neededForUsers = true;
 
       programs.zsh.enable = true;
-
       users = {
         mutableUsers = false;
+
+        groups."${cfg.name}".gid = 1000;
         users = {
           root.hashedPassword = "*";
-
           "${cfg.name}" = {
             isNormalUser = true;
+            uid = 1000;
+            group = cfg.name;
             description = cfg.fullName;
             hashedPasswordFile = config.sops.secrets."user/bastian/password-hash".path;
             extraGroups = ["wheel"];
@@ -77,7 +79,7 @@
       };
 
       # Set the user's icon.
-      system.activationScripts.script.text = ''
+      system.activationScripts.userIcon.text = ''
         mkdir -p /var/lib/AccountsService/{icons,users}
 
         cp ${cfg.icon} /var/lib/AccountsService/icons/${cfg.name}
