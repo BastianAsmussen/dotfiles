@@ -25,7 +25,7 @@
     imports = [
       # Base modules
       self.nixosModules.base
-      self.nixosModules.bootloader
+      self.nixosModules.systemdBoot
       self.nixosModules.language
       self.nixosModules.stylix
 

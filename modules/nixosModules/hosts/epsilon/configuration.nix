@@ -20,7 +20,7 @@
     imports = [
       # Base modules
       self.nixosModules.base
-      self.nixosModules.bootloader
+      self.nixosModules.grub
       self.nixosModules.language
       self.nixosModules.misc
       self.nixosModules.stylix
