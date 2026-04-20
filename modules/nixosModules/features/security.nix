@@ -3,8 +3,8 @@
     # Kernel hardening.
     boot = {
       kernel.sysctl = {
-        # Disable Magic SysRq key.
-        "kernel.sysrq" = 0;
+        # Allow only safe SysRq functions (keyboard/console control for REISUB).
+        "kernel.sysrq" = 4;
 
         ## TCP Hardening
         "net.ipv4.icmp_ignore_bogus_error_responses" = 1;
