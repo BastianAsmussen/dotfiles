@@ -1,5 +1,5 @@
 {inputs, ...}: {
-  flake.homeModules.nixcord = {
+  flake.homeModules.nixcord = {pkgs, ...}: {
     imports = [
       inputs.nixcord.homeModules.nixcord
     ];
@@ -10,9 +10,14 @@
       discord.enable = true;
       vesktop.enable = true;
       config = {
-        themeLinks = [
-          "https://catppuccin.github.io/discord/dist/catppuccin-mocha.theme.css"
-        ];
+        themes = {
+          "catppuccin-mocha" = pkgs.fetchurl {
+            url = "https://catppuccin.github.io/discord/dist/catppuccin-mocha.theme.css";
+            hash = "sha256-KVv9vfqI+WADn3w4yE1eNsmtm7PQq9ugKiSL3EOLheI=";
+          };
+        };
+
+        enabledThemes = ["catppuccin-mocha.css"];
 
         plugins = {
           callTimer.enable = true;
