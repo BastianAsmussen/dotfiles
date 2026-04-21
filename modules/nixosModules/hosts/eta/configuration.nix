@@ -105,10 +105,29 @@
 
     btrfs.scrub.fileSystems = ["/"];
 
-    nginx.streamProxy = {
-      enable = true;
-      upstream = "10.10.0.2:443";
-      fallbackPort = 8443;
+    nginx = {
+      streamProxy = {
+        enable = true;
+        upstream = "10.10.0.2:443";
+        fallbackPort = 8443;
+      };
+
+      redirects = let
+        dkRedirect = domain: {
+          enable = true;
+          inherit domain;
+          target = "https://asmussen.tech";
+          ssl = {
+            dnsProvider = "cloudflare";
+            environmentFile = config.sops.templates."cloudflare-acme-env".path;
+          };
+        };
+      in {
+        dotfiles-dk = dkRedirect "dotfiles.dk";
+        fansly-dk = dkRedirect "fansly.dk";
+        tech-college-dk = dkRedirect "tech-college.dk";
+        harvard-dk = dkRedirect "harvard.dk";
+      };
     };
 
     primaryMirror = {
