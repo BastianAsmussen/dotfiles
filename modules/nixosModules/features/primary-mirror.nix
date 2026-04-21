@@ -107,9 +107,9 @@
     config = mkIf cfg.enable {
       systemd = {
         tmpfiles.rules = [
-          "d ${stateDir} 0775 root builder -"
-          "f ${streamStateFile} 0644 root root - 'server ${upstream} down;'"
-          "f ${busyFlag} 0644 root builder -"
+          "d ${stateDir}        0775 root builder -"
+          "f ${streamStateFile} 0644 root root    - 'server ${upstream} down;'"
+          "f ${busyFlag}        0644 root builder -"
         ];
 
         services.primary-mirror-health = {
