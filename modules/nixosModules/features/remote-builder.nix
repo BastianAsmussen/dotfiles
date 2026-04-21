@@ -28,7 +28,7 @@
             hostName = "10.10.0.2";
             system = "x86_64-linux";
             maxJobs = 32;
-            speedFactor = 2;
+            speedFactor = 10;
             protocol = "ssh-ng";
             sshUser = "builder";
             sshKey = config.sops.secrets."hosts/${hostname}/builder-ssh-private-key".path;
