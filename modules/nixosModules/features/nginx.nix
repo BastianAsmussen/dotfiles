@@ -58,6 +58,58 @@
         };
       };
 
+      redirects = mkOption {
+        default = {};
+        description = "Set of domain redirect definitions. Each domain issues a 301 to the target URL.";
+        type = types.attrsOf (types.submodule {
+          options = {
+            enable = lib.mkEnableOption "This nginx redirect virtual host.";
+
+            domain = mkOption {
+              type = types.str;
+              description = "Source domain to redirect from (e.g. old-domain.com).";
+            };
+
+            target = mkOption {
+              type = types.str;
+              description = "Target URL to redirect to (e.g. https://asmussen.tech).";
+            };
+
+            forceSSL = mkOption {
+              type = types.bool;
+              default = true;
+              description = "Whether to redirect HTTP to HTTPS before issuing the domain redirect.";
+            };
+
+            ssl = mkOption {
+              default = {};
+              description = "SSL/TLS certificate configuration for this virtual host.";
+              type = types.submodule {
+                options = {
+                  useACME = mkOption {
+                    type = types.bool;
+                    default = true;
+                    description = "Obtain and renew a certificate automatically via ACME/Let's Encrypt.";
+                  };
+
+                  dnsProvider = mkOption {
+                    type = types.nullOr types.str;
+                    default = null;
+                    description = "ACME DNS-01 challenge provider (e.g. \"cloudflare\").";
+                  };
+
+                  environmentFile = mkOption {
+                    type = types.nullOr types.path;
+                    default = null;
+                    description = "Path to an environment file with credentials for the DNS provider.";
+                  };
+                };
+              };
+            };
+          };
+        });
+      };
+
       reverseProxies = mkOption {
         default = {};
         description = "Set of reverse proxy virtual host definitions for nginx with HTTPS support.";
@@ -358,6 +410,87 @@
             proxiesByDomain;
         };
       }))
+
+      (let
+        enabledRedirects = lib.filterAttrs (_: r: r.enable) cfg.redirects;
+        redirectList = lib.attrValues enabledRedirects;
+        streamMode = cfg.streamProxy.enable;
+      in
+        mkIf (enabledRedirects != {}) (lib.mkMerge [
+          {
+            sops = mkIf (lib.any (r: r.ssl.dnsProvider == "cloudflare") redirectList) {
+              secrets."cloudflare-api-token" = {};
+              templates."cloudflare-acme-env" = {
+                owner = "acme";
+                content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
+              };
+            };
+
+            security.acme = mkIf (lib.any (r: r.ssl.useACME) redirectList) {
+              acceptTerms = true;
+              defaults.email = cfg.acme.email;
+
+              certs = builtins.listToAttrs (
+                mapAttrsToList (_: r: {
+                  name = r.domain;
+                  value = {
+                    inherit (r.ssl) dnsProvider environmentFile;
+                    inherit (config.services.nginx) group;
+                  };
+                })
+                (lib.filterAttrs (_: r: r.ssl.useACME && r.ssl.dnsProvider != null) enabledRedirects)
+              );
+            };
+
+            users.users.acme.extraGroups =
+              mkIf (lib.any (r: r.ssl.dnsProvider != null) redirectList) ["keys"];
+
+            networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [80 443];
+
+            services.nginx.enable = true;
+          }
+
+          # Stream-proxy host: serve redirects on the local fallback port so they
+          # work when the primary upstream (epsilon) is unreachable.
+          (mkIf streamMode {
+            services.nginx.virtualHosts =
+              lib.mapAttrs' (_: r: {
+                name = r.domain;
+                value = {
+                  listen = [
+                    {
+                      addr = "127.0.0.1";
+                      port = cfg.streamProxy.fallbackPort;
+                      ssl = true;
+                    }
+                  ];
+                  extraConfig = ''
+                    ssl_certificate /var/lib/acme/${r.domain}/fullchain.pem;
+                    ssl_certificate_key /var/lib/acme/${r.domain}/key.pem;
+                  '';
+                  locations."/".return = "301 ${r.target}$request_uri";
+                };
+              })
+              enabledRedirects;
+          })
+
+          # Normal host: regular vhosts with ACME-managed certs.
+          (mkIf (!streamMode) {
+            services.nginx.virtualHosts =
+              lib.mapAttrs' (_: r: let
+                useDns01 = r.ssl.useACME && r.ssl.dnsProvider != null;
+              in {
+                name = r.domain;
+                value = {
+                  inherit (r) forceSSL;
+                  enableACME = r.ssl.useACME && !useDns01;
+                  useACMEHost = mkIf useDns01 r.domain;
+                  locations."/".return = "301 ${r.target}$request_uri";
+                };
+              })
+              enabledRedirects;
+          })
+        ]))
     ];
   };
 }
