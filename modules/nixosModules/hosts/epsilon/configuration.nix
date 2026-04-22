@@ -152,6 +152,7 @@
       extraDomainNames = ["*.asmussen.tech"];
       dnsProvider = "cloudflare";
       environmentFile = config.sops.templates."cloudflare-acme-env".path;
+
       inherit (config.services.nginx) group;
     };
 
@@ -165,19 +166,42 @@
 
         # Redirect legacy path to subdomain for existing bookmarks.
         "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+
+        # qBittorrent WebUI proxied over TLS, bound to WG interface only.
+        "qbittorrent.asmussen.tech" = {
+          listen = [
+            {
+              addr = "10.10.0.2";
+              port = 443;
+              ssl = true;
+            }
+          ];
+
+          onlySSL = true;
+          useACMEHost = "asmussen.tech";
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
+            proxyWebsockets = true;
+          };
+        };
       };
 
       openssh.openFirewall = false;
     };
 
-    # Allow eta (mirror) and local SSH to reach proxied services over WireGuard.
-    networking.firewall.interfaces.wg0.allowedTCPPorts =
-      config.services.openssh.ports
-      ++ [
-        config.services.nix-serve.port
-        config.services.website.port
-        8096 # Jellyfin
-      ];
+    # Resolve qbittorrent via WG IP locally so public DNS (*.asmussen.tech -> eta) is bypassed.
+    networking = {
+      hosts."10.10.0.2" = ["qbittorrent.asmussen.tech"];
+
+      # Allow eta (mirror) and local SSH to reach proxied services over WireGuard.
+      firewall.interfaces.wg0.allowedTCPPorts =
+        config.services.openssh.ports
+        ++ [
+          config.services.nix-serve.port
+          config.services.website.port
+          8096 # Jellyfin
+        ];
+    };
 
     desktop.greeter.gdm.enable = true;
     preferences.monitors = {
