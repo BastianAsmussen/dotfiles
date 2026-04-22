@@ -1,7 +1,7 @@
 {
   flake.nixosModules.hostEta = {
-    lib,
     modulesPath,
+    lib,
     ...
   }: {
     imports = [
@@ -14,19 +14,34 @@
         kernelModules = [];
 
         luks.forceLuksSupportInInitrd = true;
+        systemd = {
+          network = {
+            enable = true;
 
-        systemd.network = {
-          enable = true;
-          networks."10-eth" = {
-            matchConfig.Type = "ether";
-            networkConfig.DHCP = "ipv4";
+            networks."10-eth" = {
+              matchConfig.Type = "ether";
+              networkConfig.DHCP = "ipv4";
+            };
+          };
+
+          services.remote-disk-unlock = {
+            description = "Unlock LUKS encrypted partitions.";
+            wantedBy = ["initrd.target"];
+            after = ["systemd-networkd.service"];
+            serviceConfig.Type = "oneshot";
+            script = ''
+              echo "systemd-ask-password" >> /var/empty/.profile
+            '';
           };
         };
 
         network = {
           enable = true;
+
+          flushBeforeStage2 = true;
           ssh = {
             enable = true;
+
             port = 2222;
             hostKeys = ["/boot/initrd-host-key"];
             authorizedKeys = lib.custom.keys.selectSshContents ["ssh-delta.pub" "ssh-epsilon.pub"] lib.custom.keys.default;
