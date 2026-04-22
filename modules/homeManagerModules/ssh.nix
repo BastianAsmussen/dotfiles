@@ -20,7 +20,7 @@
         "eta" = {
           inherit user;
 
-          hostname = inputs.nix-secrets.hosts.eta.ipv4_address;
+          hostname = "10.10.0.1";
           port = 22;
           remoteForwards = [
             {
