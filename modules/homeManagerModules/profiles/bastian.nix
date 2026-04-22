@@ -34,7 +34,6 @@
       tokei
       fselect
       xh
-      qbittorrent
       libreoffice-fresh
       mpv
       # winboat
