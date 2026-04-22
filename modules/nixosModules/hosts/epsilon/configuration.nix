@@ -119,8 +119,9 @@
 
       redirects = let
         dkRedirect = domain: {
-          enable = true;
           inherit domain;
+
+          enable = true;
           target = "https://asmussen.tech";
           ssl = {
             dnsProvider = "cloudflare";
