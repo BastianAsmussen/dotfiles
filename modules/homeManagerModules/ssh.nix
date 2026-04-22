@@ -12,14 +12,13 @@
       enableDefaultConfig = false;
       matchBlocks = {
         "eta-initrd" = {
+          user = "root";
           hostname = inputs.nix-secrets.hosts.eta.ipv4_address;
           port = 2222;
           extraOptions.UserKnownHostsFile = "~/.ssh/known_hosts ~/.ssh/known_hosts_static";
         };
 
         "eta" = {
-          inherit user;
-
           hostname = "10.10.0.1";
           port = 22;
           remoteForwards = [
