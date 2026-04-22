@@ -53,6 +53,7 @@
       self.nixosModules.goxlr
       self.nixosModules.homeManager
       self.nixosModules.jellyfin
+      self.nixosModules.qbittorrent
       self.nixosModules.primaryBusy
       self.nixosModules.monero
       self.nixosModules.networkManager
