@@ -1,5 +1,7 @@
 {
   flake.nixosModules.misc = {pkgs, ...}: {
+    boot.tmp.useTmpfs = true;
+
     environment.wordlist = {
       enable = true;
 
