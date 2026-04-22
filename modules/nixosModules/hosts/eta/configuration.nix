@@ -167,44 +167,45 @@
     nix-serve-extras.exposePublicly = false;
     website-extras.exposePublicly = false;
 
-    services.nginx.virtualHosts = let
-      acmeDir = "/var/lib/acme/asmussen.tech";
-      fallbackListen = [
-        {
-          addr = "127.0.0.1";
-          port = 8443;
-          ssl = true;
-        }
-      ];
+    services = {
+      openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
+      nginx.virtualHosts = let
+        acmeDir = "/var/lib/acme/asmussen.tech";
+        fallbackListen = [
+          {
+            addr = "127.0.0.1";
+            port = 8443;
+            ssl = true;
+          }
+        ];
 
-      sslConfig = ''
-        ssl_certificate ${acmeDir}/fullchain.pem;
-        ssl_certificate_key ${acmeDir}/key.pem;
-      '';
-    in {
-      "asmussen.tech" = {
-        listen = fallbackListen;
-        extraConfig = sslConfig;
-        locations."/" = {
-          proxyPass = "http://localhost:${toString config.services.website.port}";
-          proxyWebsockets = true;
+        sslConfig = ''
+          ssl_certificate ${acmeDir}/fullchain.pem;
+          ssl_certificate_key ${acmeDir}/key.pem;
+        '';
+      in {
+        "asmussen.tech" = {
+          listen = fallbackListen;
+          extraConfig = sslConfig;
+          locations."/" = {
+            proxyPass = "http://localhost:${toString config.services.website.port}";
+            proxyWebsockets = true;
+          };
+        };
+
+        "jellyfin.asmussen.tech" = {
+          listen = fallbackListen;
+          extraConfig = sslConfig;
+          locations."/".return = "503";
+        };
+
+        "cache.asmussen.tech" = {
+          listen = fallbackListen;
+          extraConfig = sslConfig;
+          locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
         };
       };
-
-      "jellyfin.asmussen.tech" = {
-        listen = fallbackListen;
-        extraConfig = sslConfig;
-        locations."/".return = "503";
-      };
-
-      "cache.asmussen.tech" = {
-        listen = fallbackListen;
-        extraConfig = sslConfig;
-        locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
-      };
     };
-
-    services.openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
 
     users.users.root.openssh.authorizedKeys.keyFiles =
       lib.custom.keys.selectSshPaths ["ssh-epsilon.pub" "ssh-delta.pub"] lib.custom.keys.default;

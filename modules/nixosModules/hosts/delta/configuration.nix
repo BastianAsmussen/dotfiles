@@ -64,7 +64,11 @@
     ];
 
     networking.hostName = "delta";
+
+    # Resolve qbittorrent WebUI to eta's WG IP so the wildcard cert validates.
+    networking.hosts."10.10.0.1" = ["qbittorrent.asmussen.tech"];
     remoteBuilder.jumpHost = inputs.nix-secrets.hosts.eta.ipv4_address;
+
     topology.self = let
       inherit (config.lib.topology) mkConnection;
     in {
@@ -109,7 +113,7 @@
       qemu
       bastian
 
-      # Host-specific user packages
+      # Host-specific user packages.
       ({pkgs, ...}: {
         home.packages = with pkgs; [
           airtame
