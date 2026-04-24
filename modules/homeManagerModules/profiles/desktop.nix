@@ -2,7 +2,6 @@
 {self, ...}: {
   flake.homeModules.desktop = {
     imports = with self.homeModules; [
-      passwordStore
       alacritty
       firefox
       spicetify
