@@ -167,21 +167,17 @@
         # Redirect legacy path to subdomain for existing bookmarks.
         "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
 
-        # qBittorrent WebUI proxied over TLS, bound to WG interface only.
+        # qBittorrent WebUI proxied over TLS, restricted to WG subnet.
         "qbittorrent.asmussen.tech" = {
-          listen = [
-            {
-              addr = "10.10.0.2";
-              port = 443;
-              ssl = true;
-            }
-          ];
-
-          onlySSL = true;
+          forceSSL = true;
           useACMEHost = "asmussen.tech";
           locations."/" = {
             proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
             proxyWebsockets = true;
+            extraConfig = ''
+              allow 10.10.0.0/24;
+              deny all;
+            '';
           };
         };
       };
