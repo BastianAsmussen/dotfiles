@@ -1,20 +1,12 @@
 {
   flake.homeModules.passwordStore = {
-    osConfig,
     pkgs,
     config,
     ...
-  }: let
-    clipboardDependency =
-      if osConfig != null && !osConfig.desktop.greeter.useWayland
-      then pkgs.xclip
-      else pkgs.wl-clipboard;
-  in {
-    home.packages = [clipboardDependency];
-
+  }: {
     programs.password-store = {
       enable = true;
-      package = pkgs.pass.withExtensions (exts: with exts; [pass-import pass-otp]);
+      package = pkgs.pass.withExtensions (exts: with exts; [pass-update pass-import]);
 
       settings.PASSWORD_STORE_DIR = "${config.home.homeDirectory}/.password-store";
     };

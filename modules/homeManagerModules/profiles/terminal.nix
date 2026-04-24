@@ -1,5 +1,5 @@
 # Full terminal environment shared across all desktop/laptop/phone hosts.
-# Server hosts (eta) intentionally omit this — they use a smaller explicit set.
+# Server hosts (eta) intentionally omit this as they use a smaller explicit set.
 {self, ...}: {
   flake.homeModules.terminal = {
     imports = with self.homeModules; [
@@ -20,6 +20,7 @@
       fastfetch
       fzf
       ripgrep
+      passwordStore
     ];
   };
 }
