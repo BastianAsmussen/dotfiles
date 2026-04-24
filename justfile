@@ -41,7 +41,12 @@ build host=HOST *args:
 # Deploy a configuration to a target.
 [group("building")]
 deploy host=HOST target=host:
-    nixos-rebuild switch --flake .#{{ host }} --target-host {{ target }} --sudo --ask-sudo-password
+    nixos-rebuild switch \
+        --no-reexec \
+        --target-host {{ target }} \
+        --sudo \
+        --ask-sudo-password \
+        --flake .#{{ host }}
 
 # Roll back a bad upgrade by restoring flake.lock and rebuilding.
 [group("update")]
