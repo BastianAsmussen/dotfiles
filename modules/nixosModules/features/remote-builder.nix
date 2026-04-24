@@ -70,10 +70,7 @@
         '';
       };
 
-      sops.secrets."hosts/${hostname}/builder-ssh-private-key" = {
-        mode = "0440";
-        group = "wheel";
-      };
+      sops.secrets."hosts/${hostname}/builder-ssh-private-key".mode = "0400";
     };
   };
 }

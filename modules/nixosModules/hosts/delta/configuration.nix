@@ -67,7 +67,7 @@
 
     # Resolve qbittorrent WebUI to eta's WG IP so the wildcard cert validates.
     networking.hosts."10.10.0.1" = ["qbittorrent.asmussen.tech"];
-    remoteBuilder.jumpHost = inputs.nix-secrets.hosts.eta.ipv4_address;
+    remoteBuilder.jumpHost = "10.10.0.1";
 
     topology.self = let
       inherit (config.lib.topology) mkConnection;
