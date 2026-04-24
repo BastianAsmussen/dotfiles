@@ -59,6 +59,12 @@
       inputs.stylix.nixosModules.stylix
     ];
 
+    # Support building from x86_64.
+    nixpkgs = {
+      # buildPlatform.system = "x86_64-linux";
+      hostPlatform.system = "aarch64-linux";
+    };
+
     networking.hostName = "eta";
     topology.self = let
       inherit (config.lib.topology) mkConnection;
