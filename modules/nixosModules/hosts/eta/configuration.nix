@@ -114,9 +114,7 @@
     nginx = {
       streamProxy = {
         enable = true;
-
-        sniRoutes."jellyfin.asmussen.tech" = "10.10.0.2:8920";
-        defaultUpstream = "10.10.0.2:443";
+        stateFile = "/var/lib/primary-mirror/stream-upstream.conf";
       };
 
       redirects = let
@@ -145,6 +143,8 @@
       fallbackAddress = "127.0.0.1:8443";
       healthCheckHost = "cache.asmussen.tech";
       healthCheckPath = "/nix-cache-info";
+
+      sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
     };
 
     sops = {

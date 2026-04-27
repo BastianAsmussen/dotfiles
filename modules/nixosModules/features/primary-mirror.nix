@@ -15,6 +15,24 @@
 
     upstream = "${cfg.primaryHost}:${toString cfg.primaryPort}";
 
+    sniEntriesUp = lib.mapAttrsToList (sni: route: "${sni} ${route.primaryAddress};") cfg.sniRoutes;
+    sniEntriesDown =
+      lib.mapAttrsToList (
+        sni: route: "${sni} ${
+          if route.fallbackAddress != null
+          then route.fallbackAddress
+          else cfg.fallbackAddress
+        };"
+      )
+      cfg.sniRoutes;
+
+    upStateFile = pkgs.writeText "stream-upstream-up.conf" (
+      lib.concatStringsSep "\n" (sniEntriesUp ++ ["default ${upstream};"]) + "\n"
+    );
+    downStateFile = pkgs.writeText "stream-upstream-down.conf" (
+      lib.concatStringsSep "\n" (sniEntriesDown ++ ["default ${cfg.fallbackAddress};"]) + "\n"
+    );
+
     healthCheckScript = pkgs.writeShellScript "primary-mirror-health-check" ''
       set -euo pipefail
 
@@ -22,16 +40,14 @@
          ${lib.getExe pkgs.curl} -sf --max-time 5 \
            --resolve "${cfg.healthCheckHost}:${toString cfg.primaryPort}:${cfg.primaryHost}" \
            "https://${cfg.healthCheckHost}${cfg.healthCheckPath}" > /dev/null 2>&1; then
-        new_conf="default ${upstream};"
+        target_conf="${upStateFile}"
       else
-        new_conf="default ${cfg.fallbackAddress};"
+        target_conf="${downStateFile}"
       fi
 
-      old_conf=""
-      [ -f "${streamStateFile}" ] && old_conf=$(cat "${streamStateFile}")
-
-      if [ "$new_conf" != "$old_conf" ]; then
-        echo "$new_conf" > "${streamStateFile}"
+      if ! cmp -s "$target_conf" "${streamStateFile}"; then
+        cat "$target_conf" > "${streamStateFile}"
+        ${lib.getExe' pkgs.systemd "systemctl"} reload nginx 2>/dev/null || true
       fi
     '';
 
@@ -100,13 +116,37 @@
         default = 30;
         description = "How often (in seconds) to check primary host availability.";
       };
+
+      sniRoutes = mkOption {
+        type = types.attrsOf (types.submodule {
+          options = {
+            primaryAddress = mkOption {
+              type = types.str;
+              description = "Upstream (host:port) written into the state file when the primary is up.";
+            };
+
+            fallbackAddress = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Upstream (host:port) when the primary is down. Defaults to primaryMirror.fallbackAddress.";
+            };
+          };
+        });
+        default = {};
+        description = ''
+          Per-SNI routes whose upstreams the health check controls. Each entry
+          is written into the stream state file pointing to primaryAddress when
+          the primary is available, and fallbackAddress (or
+          primaryMirror.fallbackAddress) when it is not.
+        '';
+      };
     };
 
     config = mkIf cfg.enable {
       systemd = {
         tmpfiles.rules = [
           "d ${stateDir}        0775 root builder -"
-          "f ${streamStateFile} 0644 root root    - 'default ${cfg.fallbackAddress};'"
+          "C ${streamStateFile} 0644 root root    - ${downStateFile}"
           "f ${busyFlag}        0644 root builder -"
         ];
 
