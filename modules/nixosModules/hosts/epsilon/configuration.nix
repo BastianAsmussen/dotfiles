@@ -140,7 +140,8 @@
         enable = true;
         domain = "jellyfin.asmussen.tech";
         location = "/";
-        upstream = "http://localhost:8096";
+        upstream = "https://localhost:8920";
+        extraConfig = "proxy_ssl_verify off;";
         ssl = {
           dnsProvider = "cloudflare";
           environmentFile = config.sops.templates."cloudflare-acme-env".path;
@@ -157,27 +158,33 @@
     };
 
     services = {
-      nginx.virtualHosts = {
-        "www.asmussen.tech" = {
-          useACMEHost = "asmussen.tech";
-          forceSSL = true;
-          locations."/".return = "301 https://asmussen.tech$request_uri";
-        };
+      nginx = {
+        appendHttpConfig = ''
+          add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+        '';
 
-        # Redirect legacy path to subdomain for existing bookmarks.
-        "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+        virtualHosts = {
+          "www.asmussen.tech" = {
+            useACMEHost = "asmussen.tech";
+            forceSSL = true;
+            locations."/".return = "301 https://asmussen.tech$request_uri";
+          };
 
-        # qBittorrent WebUI proxied over TLS, restricted to WG subnet.
-        "qbittorrent.asmussen.tech" = {
-          forceSSL = true;
-          useACMEHost = "asmussen.tech";
-          locations."/" = {
-            proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
-            proxyWebsockets = true;
-            extraConfig = ''
-              allow 10.10.0.0/24;
-              deny all;
-            '';
+          # Redirect legacy path to subdomain for existing bookmarks.
+          "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+
+          # qBittorrent WebUI proxied over TLS, restricted to WG subnet.
+          "qbittorrent.asmussen.tech" = {
+            forceSSL = true;
+            useACMEHost = "asmussen.tech";
+            locations."/" = {
+              proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
+              proxyWebsockets = true;
+              extraConfig = ''
+                allow 10.10.0.0/24;
+                deny all;
+              '';
+            };
           };
         };
       };
@@ -189,13 +196,15 @@
     networking = {
       hosts."10.10.0.2" = ["qbittorrent.asmussen.tech"];
 
-      # Allow eta (mirror) and local SSH to reach proxied services over WireGuard.
+      # Allow WireGuard peers (eta, delta) to reach proxied services on epsilon.
       firewall.interfaces.wg0.allowedTCPPorts =
         config.services.openssh.ports
         ++ [
           config.services.nix-serve.port
           config.services.website.port
-          8096 # Jellyfin
+          443 # nginx, WG peers reach epsilon directly
+          8096 # Jellyfin HTTP
+          8920 # Jellyfin HTTPS
         ];
     };
 
@@ -226,6 +235,11 @@
       pool = "pool.hashvault.pro:80";
       wallet = self.preferences.monero-wallet;
       maxUsagePercentage = 25;
+    };
+
+    jellyfin.https = {
+      enable = true;
+      acmeHost = "asmussen.tech";
     };
 
     primaryBusy.enable = true;
