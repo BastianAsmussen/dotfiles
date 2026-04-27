@@ -49,8 +49,20 @@
           default = null;
           description = ''
             Upstream (host:port) for unmatched SNI. When null, connections with
-            unknown SNI are dropped. All values are compiled into nginx.conf at
-            deploy time, no mutable state file is consulted at runtime.
+            unknown SNI are dropped. Ignored when stateFile is set (the state
+            file owns the default entry in that case).
+          '';
+        };
+
+        stateFile = mkOption {
+          type = types.nullOr types.path;
+          default = null;
+          description = ''
+            Path to a mutable file included at the start of the SNI map block.
+            The file may contain per-SNI entries and a default entry, all
+            written by an external process (e.g. primaryMirror health check).
+            When set, defaultUpstream is ignored. nginx must be reloaded after
+            the file changes for them to take effect.
           '';
         };
 
@@ -225,21 +237,22 @@
 
     config = lib.mkMerge [
       (mkIf cfg.streamProxy.enable (let
+        includeLines =
+          lib.optional (cfg.streamProxy.stateFile != null)
+          "include ${cfg.streamProxy.stateFile};";
         sniLines = lib.mapAttrsToList (host: addr: "${host} ${addr};") cfg.streamProxy.sniRoutes;
         defaultLine =
-          lib.optionalString (cfg.streamProxy.defaultUpstream != null)
+          lib.optional (cfg.streamProxy.stateFile == null && cfg.streamProxy.defaultUpstream != null)
           "default ${cfg.streamProxy.defaultUpstream};";
         mapEntries =
           lib.concatStringsSep "\n    "
-          (sniLines ++ lib.optional (defaultLine != "") defaultLine);
+          (includeLines ++ sniLines ++ defaultLine);
       in {
         networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [80 443];
 
         services.nginx = {
           enable = true;
 
-          # All routing is compiled into nginx.conf at deploy time.
-          # No mutable state file is consulted; nginx.conf is the only source of truth.
           streamConfig = ''
             map $ssl_preread_server_name $tls_backend {
               ${mapEntries}
