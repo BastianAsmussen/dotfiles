@@ -114,8 +114,9 @@
     nginx = {
       streamProxy = {
         enable = true;
-        upstream = "10.10.0.2:443";
-        fallbackPort = 8443;
+
+        sniRoutes."jellyfin.asmussen.tech" = "10.10.0.2:8920";
+        defaultUpstream = "10.10.0.2:443";
       };
 
       redirects = let
@@ -140,6 +141,8 @@
 
     primaryMirror = {
       enable = true;
+
+      fallbackAddress = "127.0.0.1:8443";
       healthCheckHost = "cache.asmussen.tech";
       healthCheckPath = "/nix-cache-info";
     };
@@ -175,40 +178,46 @@
 
     services = {
       openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
-      nginx.virtualHosts = let
-        acmeDir = "/var/lib/acme/asmussen.tech";
-        fallbackListen = [
-          {
-            addr = "127.0.0.1";
-            port = 8443;
-            ssl = true;
-          }
-        ];
-
-        sslConfig = ''
-          ssl_certificate ${acmeDir}/fullchain.pem;
-          ssl_certificate_key ${acmeDir}/key.pem;
+      nginx = {
+        appendHttpConfig = ''
+          add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
         '';
-      in {
-        "asmussen.tech" = {
-          listen = fallbackListen;
-          extraConfig = sslConfig;
-          locations."/" = {
-            proxyPass = "http://localhost:${toString config.services.website.port}";
-            proxyWebsockets = true;
+
+        virtualHosts = let
+          acmeDir = "/var/lib/acme/asmussen.tech";
+          fallbackListen = [
+            {
+              addr = "127.0.0.1";
+              port = 8443;
+              ssl = true;
+            }
+          ];
+
+          sslConfig = ''
+            ssl_certificate ${acmeDir}/fullchain.pem;
+            ssl_certificate_key ${acmeDir}/key.pem;
+          '';
+        in {
+          "asmussen.tech" = {
+            listen = fallbackListen;
+            extraConfig = sslConfig;
+            locations."/" = {
+              proxyPass = "http://localhost:${toString config.services.website.port}";
+              proxyWebsockets = true;
+            };
           };
-        };
 
-        "jellyfin.asmussen.tech" = {
-          listen = fallbackListen;
-          extraConfig = sslConfig;
-          locations."/".return = "503";
-        };
+          "jellyfin.asmussen.tech" = {
+            listen = fallbackListen;
+            extraConfig = sslConfig;
+            locations."/".return = "503";
+          };
 
-        "cache.asmussen.tech" = {
-          listen = fallbackListen;
-          extraConfig = sslConfig;
-          locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
+          "cache.asmussen.tech" = {
+            listen = fallbackListen;
+            extraConfig = sslConfig;
+            locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
+          };
         };
       };
     };
