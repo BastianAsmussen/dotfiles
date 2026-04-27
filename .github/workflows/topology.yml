@@ -39,7 +39,6 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          # Pinned Codeberg host key — avoids TOFU attack on ssh-keyscan
           echo "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB" >> ~/.ssh/known_hosts
 
       - name: Build Topology
