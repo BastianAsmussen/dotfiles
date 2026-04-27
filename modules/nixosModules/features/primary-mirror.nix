@@ -22,15 +22,9 @@
          ${lib.getExe pkgs.curl} -sf --max-time 5 \
            --resolve "${cfg.healthCheckHost}:${toString cfg.primaryPort}:${cfg.primaryHost}" \
            "https://${cfg.healthCheckHost}${cfg.healthCheckPath}" > /dev/null 2>&1; then
-        state="up"
+        new_conf="default ${upstream};"
       else
-        state="down"
-      fi
-
-      if [ "$state" = "up" ]; then
-        new_conf="server ${upstream};"
-      else
-        new_conf="server ${upstream} down;"
+        new_conf="default ${cfg.fallbackAddress};"
       fi
 
       old_conf=""
@@ -38,7 +32,6 @@
 
       if [ "$new_conf" != "$old_conf" ]; then
         echo "$new_conf" > "${streamStateFile}"
-        ${lib.getExe' pkgs.systemd "systemctl"} reload nginx 2>/dev/null || true
       fi
     '';
 
@@ -86,6 +79,11 @@
         description = "HTTPS port on the primary host.";
       };
 
+      fallbackAddress = mkOption {
+        type = types.str;
+        description = "Address (host:port) to use in the state file when the primary is unavailable or busy.";
+      };
+
       healthCheckHost = mkOption {
         type = types.str;
         description = "Hostname used for SNI/cert verification in the health check.";
@@ -108,7 +106,7 @@
       systemd = {
         tmpfiles.rules = [
           "d ${stateDir}        0775 root builder -"
-          "f ${streamStateFile} 0644 root root    - 'server ${upstream} down;'"
+          "f ${streamStateFile} 0644 root root    - 'default ${cfg.fallbackAddress};'"
           "f ${busyFlag}        0644 root builder -"
         ];
 

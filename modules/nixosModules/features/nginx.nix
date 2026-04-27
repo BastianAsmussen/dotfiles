@@ -8,8 +8,6 @@
 
     cfg = config.nginx;
     enabledProxies = lib.filterAttrs (_: proxy: proxy.enable) cfg.reverseProxies;
-
-    streamStateFile = "/var/lib/primary-mirror/stream-upstream.conf";
   in {
     options.nginx = {
       acme = {
@@ -38,23 +36,28 @@
       };
 
       streamProxy = {
-        enable = lib.mkEnableOption "TLS stream passthrough with dynamic upstream switching";
+        enable = lib.mkEnableOption "TLS stream passthrough with static SNI routing";
 
-        upstream = mkOption {
-          type = types.str;
-          description = "Primary upstream (host:port) for TLS passthrough.";
+        sniRoutes = mkOption {
+          type = types.attrsOf types.str;
+          default = {};
+          description = "Per-SNI upstream overrides: hostname → host:port.";
         };
 
-        fallbackPort = mkOption {
-          type = types.nullOr types.port;
+        defaultUpstream = mkOption {
+          type = types.nullOr types.str;
           default = null;
-          description = "Loopback port serving as backup when the primary upstream is unavailable.";
+          description = ''
+            Upstream (host:port) for unmatched SNI. When null, connections with
+            unknown SNI are dropped. All values are compiled into nginx.conf at
+            deploy time, no mutable state file is consulted at runtime.
+          '';
         };
 
         connectTimeout = mkOption {
           type = types.str;
           default = "3s";
-          description = "Timeout for connecting to the upstream before trying the fallback.";
+          description = "Timeout for connecting to the upstream.";
         };
       };
 
@@ -221,22 +224,30 @@
     };
 
     config = lib.mkMerge [
-      (mkIf cfg.streamProxy.enable {
+      (mkIf cfg.streamProxy.enable (let
+        sniLines = lib.mapAttrsToList (host: addr: "${host} ${addr};") cfg.streamProxy.sniRoutes;
+        defaultLine =
+          lib.optionalString (cfg.streamProxy.defaultUpstream != null)
+          "default ${cfg.streamProxy.defaultUpstream};";
+        mapEntries =
+          lib.concatStringsSep "\n    "
+          (sniLines ++ lib.optional (defaultLine != "") defaultLine);
+      in {
         networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [80 443];
 
         services.nginx = {
           enable = true;
 
+          # All routing is compiled into nginx.conf at deploy time.
+          # No mutable state file is consulted; nginx.conf is the only source of truth.
           streamConfig = ''
-            upstream tls_passthrough {
-              include ${streamStateFile};
-              ${lib.optionalString (cfg.streamProxy.fallbackPort != null)
-              "server 127.0.0.1:${toString cfg.streamProxy.fallbackPort} backup;"}
+            map $ssl_preread_server_name $tls_backend {
+              ${mapEntries}
             }
             server {
               listen 443;
-              proxy_pass tls_passthrough;
               ssl_preread on;
+              proxy_pass $tls_backend;
               proxy_connect_timeout ${cfg.streamProxy.connectTimeout};
             }
           '';
@@ -254,9 +265,8 @@
 
         systemd.tmpfiles.rules = [
           "d /var/lib/primary-mirror 0775 root builder -"
-          "f ${streamStateFile} 0644 root root - 'server ${cfg.streamProxy.upstream} down;'"
         ];
-      })
+      }))
 
       (mkIf (enabledProxies != {}) (let
         # Group proxies by domain so multiple services can share a single virtual
@@ -449,30 +459,6 @@
 
             services.nginx.enable = true;
           }
-
-          # Stream-proxy host: serve redirects on the local fallback port so they
-          # work when the primary upstream (epsilon) is unreachable.
-          (mkIf streamMode {
-            services.nginx.virtualHosts =
-              lib.mapAttrs' (_: r: {
-                name = r.domain;
-                value = {
-                  listen = [
-                    {
-                      addr = "127.0.0.1";
-                      port = cfg.streamProxy.fallbackPort;
-                      ssl = true;
-                    }
-                  ];
-                  extraConfig = ''
-                    ssl_certificate /var/lib/acme/${r.domain}/fullchain.pem;
-                    ssl_certificate_key /var/lib/acme/${r.domain}/key.pem;
-                  '';
-                  locations."/".return = "301 ${r.target}$request_uri";
-                };
-              })
-              enabledRedirects;
-          })
 
           # Normal host: regular vhosts with ACME-managed certs.
           (mkIf (!streamMode) {
