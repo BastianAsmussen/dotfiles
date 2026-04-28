@@ -1,6 +1,7 @@
 {
   inputs,
   self,
+  lib,
   ...
 }: {
   flake.nixosConfigurations.delta = inputs.nixpkgs.lib.nixosSystem {
@@ -63,7 +64,14 @@
       inputs.nix-index-database.nixosModules.nix-index
     ];
 
-    networking.hostName = "delta";
+    networking = let
+      epsilonIps = map (ip: builtins.head (lib.splitString "/" ip)) self.nixosConfigurations.epsilon.config.wireguard.ips;
+    in {
+      hostName = "delta";
+
+      # Automatically map all of Epsilon's WG IPs to the qbittorrent domain
+      hosts = lib.genAttrs epsilonIps (_: ["qbittorrent.asmussen.tech"]);
+    };
 
     remoteBuilder.jumpHost = "10.10.0.1";
 
@@ -90,7 +98,7 @@
       peers = [
         {
           publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
-          allowedIPs = ["10.10.0.1/32" "fd00:10:10::1/128"];
+          peerIps = self.nixosConfigurations.eta.config.wireguard.ips;
           endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
           persistentKeepalive = 25;
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-delta".path;

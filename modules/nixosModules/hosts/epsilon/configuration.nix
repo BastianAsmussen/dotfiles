@@ -1,6 +1,7 @@
 {
   inputs,
   self,
+  lib,
   ...
 }: {
   flake.nixosConfigurations.epsilon = inputs.nixpkgs.lib.nixosSystem {
@@ -105,7 +106,7 @@
       peers = [
         {
           publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
-          allowedIPs = ["10.10.0.1/32" "fd00:10:10::1/128"];
+          peerIps = self.nixosConfigurations.eta.config.wireguard.ips;
           endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
           persistentKeepalive = 25;
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-epsilon".path;
@@ -173,12 +174,21 @@
           # Redirect legacy path to subdomain for existing bookmarks.
           "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
 
-          "qbittorrent.asmussen.tech" = {
+          "qbittorrent.asmussen.tech" = let
+            localIps = map (ip: builtins.head (lib.splitString "/" ip)) config.wireguard.ips;
+            deltaIps = map (ip: builtins.head (lib.splitString "/" ip)) self.nixosConfigurations.delta.config.wireguard.ips;
+
+            allowedIps = localIps ++ deltaIps;
+          in {
             forceSSL = true;
             useACMEHost = "asmussen.tech";
             locations."/" = {
               proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
               proxyWebsockets = true;
+              extraConfig = ''
+                ${lib.concatMapStringsSep "\n" (ip: "allow ${ip};") allowedIps}
+                deny all;
+              '';
             };
           };
         };
