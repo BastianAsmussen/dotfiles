@@ -65,6 +65,24 @@
       hostPlatform.system = "aarch64-linux";
     };
 
+    environment.memoryAllocator.provider = "graphene-hardened";
+
+    boot = {
+      kernelParams = [
+        "slab_nomerge"
+        "init_on_alloc=1"
+        "init_on_free=1"
+        "randomize_kstack_offset=on"
+        "vsyscall=none"
+        "debugfs=off"
+        "lockdown=confidentiality"
+      ];
+
+      kernel.sysctl."vm.mmap_rnd_bits" = 32;
+    };
+
+    security.lockKernelModules = true;
+
     networking.hostName = "eta";
     topology.self = let
       inherit (config.lib.topology) mkConnection;
@@ -178,6 +196,15 @@
 
     services = {
       openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
+
+      chrony = {
+        enable = true;
+        enableNTS = true;
+        servers = [
+          "time.cloudflare.com"
+          "ntppool1.time.nl"
+        ];
+      };
       nginx = {
         appendHttpConfig = ''
           add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
