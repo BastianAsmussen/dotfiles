@@ -65,12 +65,6 @@
 
     networking.hostName = "delta";
 
-    # Resolve qbittorrent WebUI to eta's WG IP so the wildcard cert validates.
-    networking.hosts = {
-      "10.10.0.1" = ["qbittorrent.asmussen.tech"];
-      "fd00:10:10::1" = ["qbittorrent.asmussen.tech"];
-    };
-
     remoteBuilder.jumpHost = "10.10.0.1";
 
     topology.self = let

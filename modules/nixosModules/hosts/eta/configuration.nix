@@ -180,13 +180,7 @@
       healthCheckHost = "cache.asmussen.tech";
       healthCheckPath = "/nix-cache-info";
 
-      sniRoutes = {
-        "jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
-        "qbittorrent.asmussen.tech" = {
-          primaryAddress = "127.0.0.1:8443";
-          fallbackAddress = "127.0.0.1:8443";
-        };
-      };
+      sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
     };
 
     sops = {
@@ -263,12 +257,6 @@
             listen = fallbackListen;
             extraConfig = sslConfig;
             locations."/".return = "503";
-          };
-
-          "qbittorrent.asmussen.tech" = {
-            listen = fallbackListen;
-            extraConfig = sslConfig;
-            locations."/".return = "403";
           };
 
           "cache.asmussen.tech" = {
