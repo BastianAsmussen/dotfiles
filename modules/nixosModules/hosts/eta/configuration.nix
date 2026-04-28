@@ -92,7 +92,10 @@
         lan = {
           network = "cloud";
           type = "ethernet";
-          addresses = [inputs.nix-secrets.hosts.eta.ipv4_address];
+          addresses = [
+            inputs.nix-secrets.hosts.eta.ipv4_address
+            inputs.nix-secrets.hosts.eta.ipv6_address
+          ];
           physicalConnections = [
             (mkConnection "cloudRouter" "eth1")
           ];
@@ -107,17 +110,17 @@
 
     wireguard = {
       enable = true;
-      ips = ["10.10.0.1/24"];
+      ips = ["10.10.0.1/24" "fd00:10:10::1/64"];
       listenPort = 51820;
       peers = [
         {
           publicKey = inputs.nix-secrets.hosts.epsilon.wg-public-key;
-          allowedIPs = ["10.10.0.2/32"];
+          allowedIPs = ["10.10.0.2/32" "fd00:10:10::2/128"];
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-epsilon".path;
         }
         {
           publicKey = inputs.nix-secrets.hosts.delta.wg-public-key;
-          allowedIPs = ["10.10.0.3/32"];
+          allowedIPs = ["10.10.0.3/32" "fd00:10:10::3/128"];
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-delta".path;
         }
       ];

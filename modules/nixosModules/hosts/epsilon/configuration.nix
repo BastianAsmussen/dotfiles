@@ -101,11 +101,11 @@
 
     wireguard = {
       enable = true;
-      ips = ["10.10.0.2/24"];
+      ips = ["10.10.0.2/24" "fd00:10:10::2/64"];
       peers = [
         {
           publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
-          allowedIPs = ["10.10.0.1/32"];
+          allowedIPs = ["10.10.0.1/32" "fd00:10:10::1/128"];
           endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
           persistentKeepalive = 25;
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-epsilon".path;
@@ -182,6 +182,7 @@
               proxyWebsockets = true;
               extraConfig = ''
                 allow 10.10.0.0/24;
+                allow fd00:10:10::/64;
                 deny all;
               '';
             };
@@ -194,7 +195,10 @@
 
     # Resolve qbittorrent via WG IP locally so public DNS (*.asmussen.tech -> eta) is bypassed.
     networking = {
-      hosts."10.10.0.2" = ["qbittorrent.asmussen.tech"];
+      hosts = {
+        "10.10.0.2" = ["qbittorrent.asmussen.tech"];
+        "fd00:10:10::2" = ["qbittorrent.asmussen.tech"];
+      };
 
       # Allow WireGuard peers (eta, delta) to reach proxied services on epsilon.
       firewall.interfaces.wg0.allowedTCPPorts =

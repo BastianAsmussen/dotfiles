@@ -19,7 +19,10 @@
 
           networks."10-eth" = {
             matchConfig.Type = "ether";
-            networkConfig.DHCP = "ipv4";
+            networkConfig = {
+              DHCP = "ipv4";
+              IPv6AcceptRA = true;
+            };
           };
         };
 
