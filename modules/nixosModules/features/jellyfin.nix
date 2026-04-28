@@ -56,6 +56,10 @@
           -u '/NetworkConfiguration/CertificatePath' -v '${pfxPath}' \
           -s '/NetworkConfiguration[not(CertificatePassword)]' -t elem -n CertificatePassword -v "" \
           -u '/NetworkConfiguration/CertificatePassword' -v "" \
+          -s '/NetworkConfiguration[not(PublicHttpsPort)]' -t elem -n PublicHttpsPort -v '443' \
+          -u '/NetworkConfiguration/PublicHttpsPort' -v '443' \
+          -s '/NetworkConfiguration[not(KnownProxies)]' -t elem -n KnownProxies -v '127.0.0.1' \
+          -u '/NetworkConfiguration/KnownProxies' -v '127.0.0.1' \
           "${networkXml}"
       fi
     '';
