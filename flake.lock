@@ -1470,11 +1470,11 @@
         "nixpkgs": "nixpkgs_9"
       },
       "locked": {
-        "lastModified": 1777273092,
-        "narHash": "sha256-nKBsiSsIeWHrYL1SoLs6yiR1WAD7to/6oU6qrYHXaSA=",
+        "lastModified": 1777358636,
+        "narHash": "sha256-olhKE29vqdHt8yJqWDTHO/smPQrqR2UUXoPnbJuFZq4=",
         "owner": "BastianAsmussen",
         "repo": "website",
-        "rev": "1e58e7628b0279a6435e6183a0b5b12ed882cddb",
+        "rev": "83b1869b67bbe7c9139c56315c2f45ea16661239",
         "type": "github"
       },
       "original": {
