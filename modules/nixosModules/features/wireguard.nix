@@ -34,28 +34,42 @@
       peers = mkOption {
         default = [];
         description = "WireGuard peers.";
-        type = types.listOf (types.submodule {
+        type = types.listOf (types.submodule ({config, ...}: {
           options = {
             publicKey = mkOption {
               type = types.str;
               description = "WireGuard public key of the peer.";
             };
 
+            peerIps = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              description = "The raw wireguard.ips array of the peer to automatically compute allowedIPs from.";
+            };
+
             allowedIPs = mkOption {
               type = types.listOf types.str;
-              description = "Allowed source IP ranges for traffic from this peer (CIDR).";
+              default = map (ip: let
+                addr = builtins.head (lib.splitString "/" ip);
+                mask =
+                  if lib.hasInfix ":" addr
+                  then "128"
+                  else "32";
+              in "${addr}/${mask}")
+              config.peerIps;
+              description = "Allowed source IP ranges for traffic from this peer (CIDR). Defaults to strict host routing based on peerIps.";
             };
 
             endpoint = mkOption {
               type = types.nullOr types.str;
               default = null;
-              description = "Peer endpoint as host:port.  Set when we initiate the connection.";
+              description = "Peer endpoint as host:port. Set when we initiate the connection.";
             };
 
             persistentKeepalive = mkOption {
               type = types.nullOr types.int;
               default = null;
-              description = "Keepalive interval in seconds.  Recommended for peers behind NAT.";
+              description = "Keepalive interval in seconds. Recommended for peers behind NAT.";
             };
 
             presharedKeyFile = mkOption {
@@ -64,7 +78,7 @@
               description = "Path to pre-shared key file for this peer. Provides post-quantum resistance.";
             };
           };
-        });
+        }));
       };
     };
 

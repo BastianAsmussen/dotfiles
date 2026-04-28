@@ -130,12 +130,12 @@
       peers = [
         {
           publicKey = inputs.nix-secrets.hosts.epsilon.wg-public-key;
-          allowedIPs = ["10.10.0.2/32" "fd00:10:10::2/128"];
+          peerIps = self.nixosConfigurations.epsilon.config.wireguard.ips;
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-epsilon".path;
         }
         {
           publicKey = inputs.nix-secrets.hosts.delta.wg-public-key;
-          allowedIPs = ["10.10.0.3/32" "fd00:10:10::3/128"];
+          peerIps = self.nixosConfigurations.delta.config.wireguard.ips;
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-delta".path;
         }
       ];
