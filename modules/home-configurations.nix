@@ -34,71 +34,83 @@
         ]
         ++ modules;
     };
+
+  bastianModules = {
+    epsilon = with self.homeModules; [
+      terminal
+      desktop
+      goxlr
+      sops
+      ssh
+      dconf
+      dotnet
+      rust
+      qemu
+      bastian
+    ];
+
+    delta = with self.homeModules; [
+      terminal
+      desktop
+      sops
+      ssh
+      dconf
+      dotnet
+      rust
+      qemu
+      bastian
+
+      ({pkgs, ...}: {
+        home.packages = with pkgs; [
+          airtame
+          freecad-wayland
+        ];
+      })
+    ];
+
+    mu = with self.homeModules; [
+      terminal
+      rust
+    ];
+
+    eta = with self.homeModules; [
+      git
+      gpg
+      zsh
+      zoxide
+      tmux
+      ohMyPosh
+      bat
+      btop
+      eza
+      fastfetch
+      fzf
+      ripgrep
+      sops
+    ];
+  };
 in {
+  flake.homeModuleSets = bastianModules;
+
   flake.homeConfigurations = {
     "bastian@epsilon" = mkHome {
       system = "x86_64-linux";
-      modules = with self.homeModules; [
-        terminal
-        desktop
-        goxlr
-        sops
-        dconf
-        dotnet
-        rust
-        qemu
-        bastian
-      ];
+      modules = bastianModules.epsilon;
     };
 
     "bastian@delta" = mkHome {
       system = "x86_64-linux";
-      modules = with self.homeModules; [
-        terminal
-        desktop
-        sops
-        ssh
-        dconf
-        dotnet
-        rust
-        qemu
-        bastian
-
-        ({pkgs, ...}: {
-          home.packages = with pkgs; [
-            airtame
-            freecad-wayland
-          ];
-        })
-      ];
+      modules = bastianModules.delta;
     };
 
     "bastian@mu" = mkHome {
       system = "aarch64-linux";
-      modules = with self.homeModules; [
-        terminal
-        rust
-      ];
+      modules = bastianModules.mu;
     };
 
     "bastian@eta" = mkHome {
       system = "aarch64-linux";
-      modules = with self.homeModules; [
-        git
-        zsh
-        zoxide
-        tmux
-        ohMyPosh
-        bat
-        btop
-        direnv
-        eza
-        fastfetch
-        fzf
-        ripgrep
-        sops
-        qemu
-      ];
+      modules = bastianModules.eta;
     };
   };
 }
