@@ -50,12 +50,8 @@
     };
 
     avf.defaultUser = config.preferences.user.name;
-
     nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 
-    home-manager.userModules.bastian = with self.homeModules; [
-      terminal
-      rust
-    ];
+    home-manager.userModules.bastian = self.homeModuleSets.mu;
   };
 }

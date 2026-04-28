@@ -102,24 +102,6 @@
 
     desktop.greeter.gdm.enable = true;
 
-    home-manager.userModules.bastian = with self.homeModules; [
-      terminal
-      desktop
-      sops
-      ssh
-      dconf
-      dotnet
-      rust
-      qemu
-      bastian
-
-      # Host-specific user packages.
-      ({pkgs, ...}: {
-        home.packages = with pkgs; [
-          airtame
-          freecad-wayland
-        ];
-      })
-    ];
+    home-manager.userModules.bastian = self.homeModuleSets.delta;
   };
 }

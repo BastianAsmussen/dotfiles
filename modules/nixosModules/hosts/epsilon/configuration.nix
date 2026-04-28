@@ -245,17 +245,6 @@
     primaryBusy.enable = true;
     btrfs.scrub.fileSystems = ["/" "/srv/media"];
 
-    home-manager.userModules.bastian = with self.homeModules; [
-      terminal
-      desktop
-      goxlr
-      sops
-      dconf
-      dotnet
-      rust
-      qemu
-      bastian
-      ssh
-    ];
+    home-manager.userModules.bastian = self.homeModuleSets.epsilon;
   };
 }

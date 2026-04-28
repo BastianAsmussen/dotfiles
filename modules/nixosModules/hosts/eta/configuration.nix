@@ -229,23 +229,6 @@
       pkgs.neovim-minimal
     ];
 
-    home-manager.userModules.bastian = with self.homeModules; [
-      # Terminal
-      git
-      gpg
-      zsh
-      zoxide
-      tmux
-      ohMyPosh
-      bat
-      btop
-      eza
-      fastfetch
-      fzf
-      ripgrep
-
-      # Other
-      sops
-    ];
+    home-manager.userModules.bastian = self.homeModuleSets.eta;
   };
 }
