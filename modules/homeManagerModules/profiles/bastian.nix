@@ -27,7 +27,6 @@
       just
       bacon
       cargo-info
-      bitwarden-desktop
       teams-for-linux
       rusty-man
       hyperfine
