@@ -83,7 +83,22 @@
 
     security.lockKernelModules = true;
 
-    networking.hostName = "eta";
+    networking = {
+      hostName = "eta";
+
+      interfaces.enp1s0.ipv6.addresses = [
+        {
+          address = inputs.nix-secrets.hosts.eta.ipv6_address;
+          prefixLength = 64;
+        }
+      ];
+
+      defaultGateway6 = {
+        address = "fe80::1";
+        interface = "enp1s0";
+      };
+    };
+
     topology.self = let
       inherit (config.lib.topology) mkConnection;
     in {
@@ -165,7 +180,13 @@
       healthCheckHost = "cache.asmussen.tech";
       healthCheckPath = "/nix-cache-info";
 
-      sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
+      sniRoutes = {
+        "jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
+        "qbittorrent.asmussen.tech" = {
+          primaryAddress = "127.0.0.1:8443";
+          fallbackAddress = "127.0.0.1:8443";
+        };
+      };
     };
 
     sops = {
@@ -208,6 +229,7 @@
           "ntppool1.time.nl"
         ];
       };
+
       nginx = {
         appendHttpConfig = ''
           add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
@@ -241,6 +263,12 @@
             listen = fallbackListen;
             extraConfig = sslConfig;
             locations."/".return = "503";
+          };
+
+          "qbittorrent.asmussen.tech" = {
+            listen = fallbackListen;
+            extraConfig = sslConfig;
+            locations."/".return = "403";
           };
 
           "cache.asmussen.tech" = {
