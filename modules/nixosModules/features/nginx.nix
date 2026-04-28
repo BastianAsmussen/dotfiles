@@ -259,6 +259,7 @@
             }
             server {
               listen 443;
+              listen [::]:443;
               ssl_preread on;
               proxy_pass $tls_backend;
               proxy_connect_timeout ${cfg.streamProxy.connectTimeout};
@@ -269,6 +270,10 @@
             listen = [
               {
                 addr = "0.0.0.0";
+                port = 80;
+              }
+              {
+                addr = "[::]";
                 port = 80;
               }
             ];

@@ -66,7 +66,11 @@
     networking.hostName = "delta";
 
     # Resolve qbittorrent WebUI to eta's WG IP so the wildcard cert validates.
-    networking.hosts."10.10.0.1" = ["qbittorrent.asmussen.tech"];
+    networking.hosts = {
+      "10.10.0.1" = ["qbittorrent.asmussen.tech"];
+      "fd00:10:10::1" = ["qbittorrent.asmussen.tech"];
+    };
+
     remoteBuilder.jumpHost = "10.10.0.1";
 
     topology.self = let
@@ -88,11 +92,11 @@
 
     wireguard = {
       enable = true;
-      ips = ["10.10.0.3/24"];
+      ips = ["10.10.0.3/24" "fd00:10:10::3/64"];
       peers = [
         {
           publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
-          allowedIPs = ["10.10.0.1/32"];
+          allowedIPs = ["10.10.0.1/32" "fd00:10:10::1/128"];
           endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
           persistentKeepalive = 25;
           presharedKeyFile = config.sops.secrets."wireguard/psk-eta-delta".path;
