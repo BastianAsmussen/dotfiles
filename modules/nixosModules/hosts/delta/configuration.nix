@@ -29,7 +29,6 @@
       # Desktop
       self.nixosModules.greeter
       self.nixosModules.niri
-      self.nixosModules.wallpaper
       self.nixosModules.pipewire
 
       # Nix
