@@ -46,6 +46,7 @@
       self.nixosModules.wireguard
       self.nixosModules.luksFido2
       self.nixosModules.yubiKey
+      self.nixosModules.impermanence
       self.nixosModules.mtls
 
       # Features
@@ -102,6 +103,19 @@
     };
 
     sops.secrets."wireguard/psk-eta-epsilon" = {};
+
+    persistence = {
+      enable = true;
+
+      # System state that must survive reboot.
+      directories = [
+        "/var/lib/acme" # ACME/Let's Encrypt certificates.
+        "/var/lib/bluetooth"
+        "/var/lib/fail2ban"
+        "/var/lib/jellyfin"
+        "/var/lib/qBittorrent"
+      ];
+    };
 
     mtls.signer = {
       enable = true;
@@ -189,12 +203,26 @@
 
             extraConfig = ''
               ssl_client_certificate ${../../../../keys/mtls-ca.crt};
-              ssl_verify_client on;
+              ssl_verify_client optional;
             '';
 
             locations."/" = {
               proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
               proxyWebsockets = true;
+              extraConfig = ''
+                if ($ssl_client_verify != SUCCESS) {
+                  set $reject "no_cert";
+                }
+                if ($remote_addr = 127.0.0.1) {
+                  set $reject "";
+                }
+                if ($remote_addr = ::1) {
+                  set $reject "";
+                }
+                if ($reject) {
+                  return 403;
+                }
+              '';
             };
           };
         };
