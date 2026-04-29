@@ -50,6 +50,8 @@
     };
 
     avf.defaultUser = config.preferences.user.name;
+    preferences.user.uid = 1001;
+
     nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 
     home-manager.userModules.bastian = self.homeModuleSets.mu;

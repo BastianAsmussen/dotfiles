@@ -36,6 +36,12 @@
         description = "The user's email address.";
       };
 
+      uid = mkOption {
+        type = types.int;
+        default = 1000;
+        description = "The user's UID (and GID for their primary group).";
+      };
+
       icon = mkOption {
         type = types.path;
         default = ../../../assets/icons/bastian.png;
@@ -61,12 +67,12 @@
       users = {
         mutableUsers = false;
 
-        groups."${cfg.name}".gid = 1000;
         users = {
           root.hashedPassword = "*";
           "${cfg.name}" = {
+            inherit (cfg) uid;
+
             isNormalUser = true;
-            uid = 1000;
             group = cfg.name;
             description = cfg.fullName;
             hashedPasswordFile = config.sops.secrets."user/bastian/password-hash".path;
@@ -76,6 +82,8 @@
             openssh.authorizedKeys.keyFiles = cfg.authorizedKeyFiles;
           };
         };
+
+        groups."${cfg.name}".gid = cfg.uid;
       };
 
       # Set the user's icon.
