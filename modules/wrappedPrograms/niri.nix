@@ -92,6 +92,9 @@
           "XF86AudioRaiseVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+";
           "XF86AudioLowerVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-";
 
+          "XF86MonBrightnessUp".spawn-sh = "${pkgs.brightnessctl}/bin/brightnessctl set 5%+";
+          "XF86MonBrightnessDown".spawn-sh = "${pkgs.brightnessctl}/bin/brightnessctl set 5%-";
+
           "Mod+Ctrl+H".set-column-width = "-5%";
           "Mod+Ctrl+L".set-column-width = "+5%";
           "Mod+Ctrl+J".set-window-height = "-5%";
@@ -144,11 +147,22 @@
         layout = {
           gaps = 5;
 
+          # Transparent so noctalia's wallpaper on the backdrop is visible at all times.
+          background-color = "transparent";
+
           focus-ring = {
             width = 2;
             active-color = "#${self.themeNoHash.base0D}";
           };
         };
+
+        # Noctalia manages the wallpaper so the lockscreen can also read it.
+        layer-rules = [
+          {
+            matches = [{namespace = "^noctalia-wallpaper.*";}];
+            place-within-backdrop = true;
+          }
+        ];
 
         workspaces = let
           settings = {layout.gaps = 5;};
