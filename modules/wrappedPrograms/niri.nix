@@ -141,25 +141,25 @@
               desc = "Pavucontrol";
               cmd = "${lib.getExe pkgs.pavucontrol}";
             }
+            {
+              key = "l";
+              desc = "Lock Screen";
+              cmd = "${noctaliaExe} ipc call lockScreen lock";
+            }
           ];
         };
 
         layout = {
           gaps = 5;
-
-          # Transparent so noctalia's wallpaper on the backdrop is visible at all times.
-          background-color = "transparent";
-
           focus-ring = {
             width = 2;
             active-color = "#${self.themeNoHash.base0D}";
           };
         };
 
-        # Noctalia manages the wallpaper so the lockscreen can also read it.
         layer-rules = [
           {
-            matches = [{namespace = "^noctalia-wallpaper.*";}];
+            matches = [{namespace = "^noctalia-overview*";}];
             place-within-backdrop = true;
           }
         ];

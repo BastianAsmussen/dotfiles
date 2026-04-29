@@ -146,26 +146,24 @@
           enforceMinimum = true;
         };
 
-        calendar = {
-          cards = [
-            {
-              enabled = true;
-              id = "calendar-header-card";
-            }
-            {
-              enabled = true;
-              id = "calendar-month-card";
-            }
-            {
-              enabled = true;
-              id = "timer-card";
-            }
-            {
-              enabled = true;
-              id = "weather-card";
-            }
-          ];
-        };
+        calendar.cards = [
+          {
+            enabled = true;
+            id = "calendar-header-card";
+          }
+          {
+            enabled = true;
+            id = "calendar-month-card";
+          }
+          {
+            enabled = true;
+            id = "timer-card";
+          }
+          {
+            enabled = true;
+            id = "weather-card";
+          }
+        ];
 
         controlCenter = {
           cards = [
@@ -269,6 +267,8 @@
           showHibernateOnLockScreen = false;
           showScreenCorners = false;
           showSessionButtonsOnLockScreen = true;
+          lockScreenBlur = 0.4;
+          lockScreenTint = 0.6;
         };
 
         hooks = {
@@ -281,13 +281,20 @@
           wallpaperChange = "";
         };
 
+        idle = {
+          enabled = true;
+          screenOffTimeout = 300;
+          lockTimeout = 330;
+          suspendTimeout = 0;
+        };
+
         location = {
           name = inputs.nix-secrets.user.city;
           analogClockInCalendar = false;
           firstDayOfWeek = -1;
           showCalendarEvents = true;
           showCalendarWeather = true;
-          showWeekNumberInCalendar = false;
+          showWeekNumberInCalendar = true;
           use12hourFormat = false;
           useFahrenheit = false;
           weatherEnabled = true;
@@ -411,7 +418,7 @@
           diskCriticalThreshold = 90;
           diskPollingInterval = 3000;
           diskWarningThreshold = 80;
-          enableDgpuMonitoring = false;
+          enableDgpuMonitoring = true;
           gpuCriticalThreshold = 90;
           gpuPollingInterval = 3000;
           gpuWarningThreshold = 80;
@@ -468,7 +475,14 @@
           wifiDetailsViewMode = "grid";
         };
 
-        wallpaper.enabled = false;
+        wallpaper = {
+          enabled = true;
+          overviewEnabled = true;
+          fillMode = "crop";
+          useOriginalImages = true;
+          automationEnabled = false;
+          directory = "${../../assets/wallpapers}";
+        };
       };
     };
   };
