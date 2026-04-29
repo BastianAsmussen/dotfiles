@@ -478,10 +478,18 @@
         wallpaper = {
           enabled = true;
           overviewEnabled = true;
-          fillMode = "crop";
           useOriginalImages = true;
           automationEnabled = false;
           directory = "${../../assets/wallpapers}";
+          favorites = ["tokyo.png"];
+          fillMode = "crop";
+          overviewBlur = 0.4;
+          overviewTint = 0.6;
+          transitionType = [
+            "fade"
+            "disc"
+            "wipe"
+          ];
         };
       };
     };
