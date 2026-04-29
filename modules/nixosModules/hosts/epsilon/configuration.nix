@@ -1,7 +1,6 @@
 {
   inputs,
   self,
-  lib,
   ...
 }: {
   flake.nixosConfigurations.epsilon = inputs.nixpkgs.lib.nixosSystem {
@@ -17,7 +16,11 @@
     ];
   };
 
-  flake.nixosModules.hostEpsilon = {config, ...}: {
+  flake.nixosModules.hostEpsilon = {
+    config,
+    lib,
+    ...
+  }: {
     imports = [
       # Base modules
       self.nixosModules.base
@@ -43,6 +46,7 @@
       self.nixosModules.wireguard
       self.nixosModules.luksFido2
       self.nixosModules.yubiKey
+      self.nixosModules.mtls
 
       # Features
       self.nixosModules.japanese
@@ -98,6 +102,12 @@
     };
 
     sops.secrets."wireguard/psk-eta-epsilon" = {};
+
+    mtls.signer = {
+      enable = true;
+      caCertPath = ../../../../keys/mtls-ca.crt;
+      authorizedKeyFiles = lib.custom.keys.selectSshPaths ["ssh-delta.pub"] lib.custom.keys.default;
+    };
 
     wireguard = {
       enable = true;
@@ -173,24 +183,18 @@
           # Redirect legacy path to subdomain for existing bookmarks.
           "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
 
-          "qbittorrent.asmussen.tech" = let
-            stripCIDR = ips: map (ip: builtins.head (lib.splitString "/" ip)) ips;
-
-            allowedIps = stripCIDR (lib.flatten [
-              config.wireguard.ips
-              self.nixosConfigurations.eta.config.wireguard.ips
-              self.nixosConfigurations.delta.config.wireguard.ips
-            ]);
-          in {
+          "qbittorrent.asmussen.tech" = {
             forceSSL = true;
             useACMEHost = "asmussen.tech";
+
+            extraConfig = ''
+              ssl_client_certificate ${../../../../keys/mtls-ca.crt};
+              ssl_verify_client on;
+            '';
+
             locations."/" = {
               proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
               proxyWebsockets = true;
-              extraConfig = ''
-                ${lib.concatMapStringsSep "\n" (ip: "allow ${ip};") allowedIps}
-                deny all;
-              '';
             };
           };
         };

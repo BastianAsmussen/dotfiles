@@ -1,7 +1,6 @@
 {
   inputs,
   self,
-  lib,
   ...
 }: {
   flake.nixosConfigurations.delta = inputs.nixpkgs.lib.nixosSystem {
@@ -53,6 +52,7 @@
       self.nixosModules.topology
       self.nixosModules.virtualisation
       self.nixosModules.wireguard
+      self.nixosModules.mtls
 
       # Host-specific hardware
       self.diskoConfigurations.hostDelta
@@ -63,13 +63,65 @@
       inputs.nix-index-database.nixosModules.nix-index
     ];
 
-    networking = let
-      etaIps = map (ip: builtins.head (lib.splitString "/" ip)) self.nixosConfigurations.eta.config.wireguard.ips;
-    in {
+    networking = {
       hostName = "delta";
 
-      # Resolve qbittorrent WebUI to eta's WG IP so the wildcard cert validates.
-      hosts = lib.genAttrs etaIps (_: ["qbittorrent.asmussen.tech"]);
+      # Resolve qbittorrent to localhost; local nginx handles mTLS upstream.
+      hosts."127.0.0.1" = ["qbittorrent.asmussen.tech"];
+    };
+
+    mtls.client = {
+      enable = true;
+      user = config.preferences.user.name;
+      caCertPath = ../../../../keys/mtls-ca.crt;
+      domains = ["qbittorrent.asmussen.tech"];
+    };
+
+    # Local reverse proxy: terminates TLS for the browser, presents ephemeral
+    # mTLS client cert to epsilon upstream. Loopback only.
+    services.nginx = {
+      enable = true;
+      recommendedProxySettings = true;
+      recommendedTlsSettings = true;
+
+      virtualHosts."qbittorrent.asmussen.tech" = {
+        listen = [
+          {
+            addr = "127.0.0.1";
+            port = 443;
+            ssl = true;
+          }
+          {
+            addr = "127.0.0.1";
+            port = 80;
+          }
+          {
+            addr = "[::1]";
+            port = 443;
+            ssl = true;
+          }
+          {
+            addr = "[::1]";
+            port = 80;
+          }
+        ];
+        forceSSL = true;
+        sslCertificate = "/run/mtls/local-qbittorrent.asmussen.tech.crt";
+        sslCertificateKey = "/run/mtls/local-qbittorrent.asmussen.tech.key";
+
+        locations."/" = {
+          proxyPass = "https://10.10.0.1";
+          proxyWebsockets = true;
+          extraConfig = ''
+            # Present ephemeral mTLS client cert to epsilon through eta's SNI proxy.
+            proxy_ssl_certificate     /run/mtls/client.crt;
+            proxy_ssl_certificate_key /run/mtls/client.key;
+            proxy_ssl_server_name on;
+            proxy_ssl_name qbittorrent.asmussen.tech;
+            proxy_set_header Host qbittorrent.asmussen.tech;
+          '';
+        };
+      };
     };
 
     remoteBuilder.jumpHost = "10.10.0.1";
