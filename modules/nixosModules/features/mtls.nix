@@ -171,7 +171,6 @@
           ssh $SSH_OPTS mtls-signer@"$SIGNER" < "$DIR/client.csr" > "$DIR/client.crt"
 
           ${lib.concatMapStringsSep "\n" (domain: ''
-              # ── Local server cert: ${domain} ──
               openssl ecparam -genkey -name prime256v1 \
                 -out "$DIR/local-${domain}.key" 2>/dev/null
               openssl req -new \
