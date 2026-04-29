@@ -480,8 +480,8 @@
           overviewEnabled = true;
           useOriginalImages = true;
           automationEnabled = false;
-          directory = "${../../assets/wallpapers}";
-          favorites = ["tokyo.png"];
+          directory = ../../assets/wallpapers;
+          favorites = [../../assets/wallpapers/tokyo.png];
           fillMode = "crop";
           overviewBlur = 0.4;
           overviewTint = 0.6;
