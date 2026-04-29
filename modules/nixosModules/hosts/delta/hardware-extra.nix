@@ -5,7 +5,6 @@
     ...
   }: {
     imports = [
-      # Hardware-specific.
       inputs.nixos-hardware.nixosModules.common-cpu-intel
       inputs.nixos-hardware.nixosModules.common-pc
       inputs.nixos-hardware.nixosModules.common-pc-laptop
@@ -23,6 +22,8 @@
         libvdpau-va-gl
       ];
     };
+
+    hardware.acpilight.enable = true;
 
     environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
   };
