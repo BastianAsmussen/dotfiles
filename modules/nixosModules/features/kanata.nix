@@ -32,7 +32,7 @@
 
       idleTimeout = mkOption {
         type = types.int;
-        default = 300;
+        default = 150;
         description = ''
           Keyboard idle timeout (milliseconds) after which the `typing`
           layer automatically reverts to `base` via on-idle-fakekey.
