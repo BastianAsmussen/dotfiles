@@ -174,10 +174,13 @@
           "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
 
           "qbittorrent.asmussen.tech" = let
-            localIps = map (ip: builtins.head (lib.splitString "/" ip)) config.wireguard.ips;
-            deltaIps = map (ip: builtins.head (lib.splitString "/" ip)) self.nixosConfigurations.delta.config.wireguard.ips;
+            stripCIDR = ips: map (ip: builtins.head (lib.splitString "/" ip)) ips;
 
-            allowedIps = localIps ++ deltaIps;
+            allowedIps = stripCIDR (lib.flatten [
+              config.wireguard.ips
+              self.nixosConfigurations.eta.config.wireguard.ips
+              self.nixosConfigurations.delta.config.wireguard.ips
+            ]);
           in {
             forceSSL = true;
             useACMEHost = "asmussen.tech";
