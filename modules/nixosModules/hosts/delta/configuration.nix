@@ -64,12 +64,12 @@
     ];
 
     networking = let
-      epsilonIps = map (ip: builtins.head (lib.splitString "/" ip)) self.nixosConfigurations.epsilon.config.wireguard.ips;
+      etaIps = map (ip: builtins.head (lib.splitString "/" ip)) self.nixosConfigurations.eta.config.wireguard.ips;
     in {
       hostName = "delta";
 
-      # Automatically map all of Epsilon's WG IPs to the qbittorrent domain
-      hosts = lib.genAttrs epsilonIps (_: ["qbittorrent.asmussen.tech"]);
+      # Resolve qbittorrent WebUI to eta's WG IP so the wildcard cert validates.
+      hosts = lib.genAttrs etaIps (_: ["qbittorrent.asmussen.tech"]);
     };
 
     remoteBuilder.jumpHost = "10.10.0.1";
