@@ -479,9 +479,8 @@
           enabled = true;
           overviewEnabled = true;
           useOriginalImages = true;
-          automationEnabled = false;
+          automationEnabled = true;
           directory = ../../assets/wallpapers;
-          favorites = [../../assets/wallpapers/tokyo.png];
           fillMode = "crop";
           overviewBlur = 0.4;
           overviewTint = 0.6;
