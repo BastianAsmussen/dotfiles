@@ -2,7 +2,6 @@
   flake.nixosModules.nix = {
     lib,
     pkgs,
-    config,
     outputs,
     ...
   }: {
@@ -64,13 +63,6 @@
           # Disable the global registry.
           flake-registry = "";
         };
-      };
-
-      system.activationScripts.diff = {
-        supportsDryActivation = true;
-        text = ''
-          ${lib.getExe pkgs.nvd} --nix-bin-dir=${config.nix.package}/bin diff /run/current-system "$systemConfig"
-        '';
       };
 
       nixpkgs = {
