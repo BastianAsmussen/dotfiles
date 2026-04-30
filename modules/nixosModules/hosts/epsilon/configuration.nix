@@ -115,6 +115,42 @@
         "/var/lib/jellyfin"
         "/var/lib/qBittorrent"
       ];
+
+      user = {
+        directories = [
+          "Desktop"
+          "Documents"
+          "Downloads"
+          "Music"
+          "Pictures"
+          "Public"
+          "Templates"
+          "Videos"
+          "Projects"
+          "dotfiles"
+          "nix-secrets"
+          "go"
+          "Games"
+          "Postman"
+          ".gnupg"
+          ".mozilla"
+          ".local/share"
+          ".local/state"
+          ".password-store"
+          ".pki"
+        ];
+
+        files = [
+          ".ssh/known_hosts"
+          ".ssh/known_hosts.old"
+        ];
+
+        cache.directories = [
+          ".cache"
+          ".cargo"
+          ".rustup"
+        ];
+      };
     };
 
     mtls.signer = {
