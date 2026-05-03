@@ -73,6 +73,11 @@
       # Persist subvolume must be available before anything else.
       fileSystems."${cfg.persistPath}".neededForBoot = true;
 
+      # Point sops at the persist source directly, since /persist is mounted early.
+      sops.age.sshKeyPaths = [
+        "${cfg.persistPath}/system/etc/ssh/ssh_host_ed25519_key"
+      ];
+
       # Allow bind-mount FUSE access for user home persistence.
       programs.fuse.userAllowOther = true;
 

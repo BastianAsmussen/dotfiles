@@ -10,7 +10,7 @@
       disk = {
         main = {
           type = "disk";
-          device = "/dev/nvme0n1";
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_980_PRO_2TB_S69ENX0TC01246L";
           content = {
             type = "gpt";
             partitions = {
@@ -69,7 +69,7 @@
 
         mirror = {
           type = "disk";
-          device = "/dev/nvme1n1";
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_980_PRO_2TB_S69ENF0W776583R";
           content = {
             type = "gpt";
             partitions = {
@@ -98,12 +98,22 @@
                     subvolumes = {
                       "/persist" = {
                         mountpoint = "/persist";
-                        mountOptions = ["compress=zstd" "noatime" "ssd" "discard=async"];
+                        mountOptions = [
+                          "compress=zstd"
+                          "noatime"
+                          "ssd"
+                          "discard=async"
+                        ];
                       };
 
                       "/nix" = {
                         mountpoint = "/nix";
-                        mountOptions = ["compress=zstd" "noatime" "ssd" "discard=async"];
+                        mountOptions = [
+                          "compress=zstd"
+                          "noatime"
+                          "ssd"
+                          "discard=async"
+                        ];
                       };
                     };
                   };
@@ -115,7 +125,7 @@
 
         media = {
           type = "disk";
-          device = "/dev/sdb";
+          device = "/dev/disk/by-id/ata-ST24000DM001-3Y7103_ZXA19QC0";
           content = {
             type = "gpt";
             partitions = {
@@ -150,7 +160,7 @@
         };
 
         backup = {
-          device = "/dev/sda";
+          device = "/dev/disk/by-id/ata-WDC_WD10EZEX-08WN4A0_WD-WCC6Y5FXA989";
           type = "disk";
           content = {
             type = "gpt";
