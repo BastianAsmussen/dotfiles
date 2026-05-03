@@ -110,14 +110,21 @@
       # System state that must survive reboot.
       directories = [
         "/var/lib/acme" # ACME/Let's Encrypt certificates.
+        "/var/lib/AccountsService" # GDM user list / icons.
         "/var/lib/bluetooth"
         "/var/lib/fail2ban"
         "/var/lib/jellyfin"
         "/var/lib/qBittorrent"
+        "/var/lib/systemd/coredump"
+      ];
+
+      files = [
+        "/var/lib/systemd/random-seed" # Better entropy at boot.
       ];
 
       user = {
         directories = [
+          # XDG user dirs.
           "Desktop"
           "Documents"
           "Downloads"
@@ -126,29 +133,24 @@
           "Public"
           "Templates"
           "Videos"
+
+          # Personal.
           "Projects"
           "dotfiles"
           "nix-secrets"
           "go"
           "Games"
           "Postman"
+
+          # App state / configs not fully managed by HM.
+          ".config"
           ".gnupg"
           ".mozilla"
           ".local/share"
           ".local/state"
           ".password-store"
           ".pki"
-        ];
-
-        files = [
-          ".ssh/known_hosts"
-          ".ssh/known_hosts.old"
-        ];
-
-        cache.directories = [
-          ".cache"
-          ".cargo"
-          ".rustup"
+          ".ssh"
         ];
       };
     };
@@ -321,7 +323,7 @@
     };
 
     primaryBusy.enable = true;
-    btrfs.scrub.fileSystems = ["/" "/srv/media"];
+    btrfs.scrub.fileSystems = ["/persist" "/srv/media"];
 
     home-manager.userModules.bastian = self.homeModuleSets.epsilon;
   };
