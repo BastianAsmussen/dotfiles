@@ -7,7 +7,6 @@
         name = "noctalia";
       };
 
-      env."NOCTALIA_CACHE_DIR" = "/tmp/noctalia-cache/";
       colors = {
         mError = "#f38ba8";
         mHover = "#94e2d5";
@@ -479,7 +478,7 @@
           enabled = true;
           overviewEnabled = true;
           useOriginalImages = true;
-          automationEnabled = true;
+          automationEnabled = false;
           directory = ../../assets/wallpapers;
           fillMode = "crop";
           overviewBlur = 0.4;
@@ -491,6 +490,12 @@
           ];
         };
       };
+    };
+  };
+
+  flake.homeModules.noctalia = {
+    home.file.".cache/noctalia/wallpapers.json".text = builtins.toJSON {
+      defaultWallpaper = toString ./../../assets/wallpapers/tokyo.png;
     };
   };
 }

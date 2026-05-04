@@ -6,6 +6,7 @@
       firefox
       spicetify
       nixcord
+      noctalia
     ];
   };
 }
