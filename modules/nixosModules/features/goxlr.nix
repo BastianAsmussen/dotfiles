@@ -7,6 +7,6 @@
       autoStart.xdg = true;
     };
 
-    preferences.autostart = ["${pkgs.goxlr-utility}/bin/goxlr-launcher &"];
+    preferences.autostart = ["${pkgs.goxlr-utility}/bin/goxlr-daemon"];
   };
 }
