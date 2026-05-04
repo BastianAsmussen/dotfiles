@@ -16,7 +16,11 @@
     ];
   };
 
-  flake.nixosModules.hostEpsilon = {config, ...}: {
+  flake.nixosModules.hostEpsilon = {
+    config,
+    lib,
+    ...
+  }: {
     imports = [
       # Base modules
       self.nixosModules.base
@@ -65,6 +69,7 @@
       self.nixosModules.topology
       self.nixosModules.virtualisation
       self.nixosModules.website
+      self.nixosModules.arcticVault
 
       # Host-specific hardware
       self.diskoConfigurations.hostEpsilon
@@ -298,7 +303,13 @@
     };
 
     primaryBusy.enable = true;
-    btrfs.scrub.fileSystems = ["/persist" "/srv/media"];
+    btrfs.scrub.fileSystems = ["/persist" "/srv/media" "/srv/arctic-vault"];
+
+    arcticVault = {
+      enable = true;
+      sources = ["dotfiles" "nix-secrets" ".password-store"];
+      recipients = map (f: lib.strings.trim (builtins.readFile f)) lib.custom.keys.default.agePaths;
+    };
 
     home-manager.userModules.bastian = self.homeModuleSets.epsilon;
   };

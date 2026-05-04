@@ -134,3 +134,9 @@ topology:
     rm -f docs/topology.svg
     nix build .#topology.x86_64-linux.config.output
     cp result/main.svg docs/topology.svg
+
+# Trigger an arctic vault snapshot now.
+[group("backup")]
+vault:
+    sudo systemctl start arctic-vault.service
+    journalctl -u arctic-vault.service --no-pager -n 20
