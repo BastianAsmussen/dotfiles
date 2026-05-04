@@ -144,7 +144,6 @@
 
           # App state / configs not fully managed by HM.
           ".config"
-          ".gnupg"
           ".mozilla"
           ".local/share"
           ".local/state"
@@ -152,13 +151,25 @@
           ".pki"
           ".ssh"
         ];
+
+        directoriesWithMode.".gnupg" = "0700";
       };
     };
 
-    mtls.signer = {
-      enable = true;
-      caCertPath = ../../../../keys/mtls-ca.crt;
-      authorizedKeyFiles = lib.custom.keys.selectSshPaths ["ssh-delta.pub"] lib.custom.keys.default;
+    mtls = {
+      signer = {
+        enable = true;
+        caCertPath = ../../../../keys/mtls-ca.crt;
+        authorizedKeyFiles = lib.custom.keys.selectSshPaths ["ssh-epsilon.pub" "ssh-mtls-delta.pub"] lib.custom.keys.default;
+      };
+
+      # Epsilon is its own signer; sign certs directly from the CA key.
+      client = {
+        enable = true;
+        localSigner = true;
+        caCertPath = ../../../../keys/mtls-ca.crt;
+        domains = ["qbittorrent.asmussen.tech"];
+      };
     };
 
     wireguard = {
@@ -223,6 +234,31 @@
       nginx = {
         appendHttpConfig = ''
           add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+          # Loopback proxy: browser hits 127.0.0.1:443, this block presents the
+          # ephemeral mTLS client cert to epsilon's own nginx on 10.10.0.2:443.
+          # The more-specific listen address takes precedence over 0.0.0.0:443.
+          server {
+            listen 127.0.0.1:443 ssl;
+            listen [::1]:443 ssl;
+
+            server_name qbittorrent.asmussen.tech;
+
+            ssl_certificate     /run/mtls/local-qbittorrent.asmussen.tech.crt;
+            ssl_certificate_key /run/mtls/local-qbittorrent.asmussen.tech.key;
+
+            location / {
+              proxy_pass https://10.10.0.2;
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection "upgrade";
+              proxy_set_header Host qbittorrent.asmussen.tech;
+              proxy_ssl_certificate     /run/mtls/client.crt;
+              proxy_ssl_certificate_key /run/mtls/client.key;
+              proxy_ssl_server_name on;
+              proxy_ssl_name qbittorrent.asmussen.tech;
+            }
+          }
         '';
 
         virtualHosts = {
@@ -269,11 +305,12 @@
       openssh.openFirewall = false;
     };
 
-    # Resolve qbittorrent via WG IP locally so public DNS (*.asmussen.tech -> eta) is bypassed.
+    # Resolve qbittorrent to loopback so the browser hits the local mTLS proxy
+    # instead of going out through eta (bypasses public DNS and the untrusted hop).
     networking = {
       hosts = {
-        "10.10.0.2" = ["qbittorrent.asmussen.tech"];
-        "fd00:10:10::2" = ["qbittorrent.asmussen.tech"];
+        "127.0.0.1" = ["qbittorrent.asmussen.tech"];
+        "::1" = ["qbittorrent.asmussen.tech"];
       };
 
       # Allow WireGuard peers (eta, delta) to reach proxied services on epsilon.

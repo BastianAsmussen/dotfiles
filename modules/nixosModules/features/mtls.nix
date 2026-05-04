@@ -8,6 +8,45 @@
     inherit (lib) mkOption mkEnableOption mkIf types;
 
     cfg = config.mtls;
+
+    openssl = lib.getExe' pkgs.openssl "openssl";
+
+    # Shared signing logic: reads a CSR from stdin, writes a signed cert to stdout.
+    # Extracted so the local-signer renewal path can call it directly.
+    mkSignScript = caKeyPath: caCertPath: lifetimeHours:
+      pkgs.writeShellScript "mtls-sign" ''
+        set -euo pipefail
+
+        CA_KEY="${caKeyPath}"
+        CA_CERT="${caCertPath}"
+
+        WORK=$(mktemp -d)
+        trap 'rm -rf "$WORK"' EXIT
+
+        # Read CSR from stdin.
+        cat > "$WORK/request.csr"
+
+        if ! ${openssl} req -in "$WORK/request.csr" -noout -verify 2>/dev/null; then
+          echo "error: invalid CSR" >&2
+          exit 1
+        fi
+
+        # Extract the requested CN to build SAN (for server certs).
+        CN=$(${openssl} req -in "$WORK/request.csr" -noout -subject \
+          | sed -n 's/.*CN = \(.*\)/\1/p')
+
+        # Sign it.
+        ${openssl} x509 -req \
+          -in "$WORK/request.csr" \
+          -CA "$CA_CERT" \
+          -CAkey "$CA_KEY" \
+          -CAserial "$WORK/ca.srl" -CAcreateserial \
+          -days ${toString lifetimeHours} \
+          -extfile <(printf "subjectAltName=DNS:%s" "$CN") \
+          2>/dev/null
+
+        # Cert goes to stdout.
+      '';
   in {
     options.mtls = {
       signer = {
@@ -27,6 +66,7 @@
 
         authorizedKeyFiles = mkOption {
           type = types.listOf types.path;
+          default = [];
           description = "SSH public key files allowed to request certificates.";
         };
 
@@ -39,10 +79,20 @@
       client = {
         enable = mkEnableOption "Ephemeral mTLS client certificate renewal";
 
+        localSigner = mkOption {
+          type = types.bool;
+          default = false;
+          description = ''
+            Sign certificates directly using the local CA key instead of SSHing
+            to the signer. Only valid when mtls.signer is also enabled on this
+            host. Removes the dependency on gpg-agent / YubiKey at boot time.
+          '';
+        };
+
         signerHost = mkOption {
           type = types.str;
           default = "10.10.0.2";
-          description = "SSH host of the mTLS signer (epsilon WG IP).";
+          description = "SSH host of the mTLS signer (epsilon WG IP). Ignored when localSigner = true.";
         };
 
         domains = mkOption {
@@ -62,61 +112,30 @@
           description = "Path to the CA certificate (from keys/).";
         };
 
-        sshKeyFile = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = ''
-            Path to an SSH private key file for authenticating to the signer.
-            When null (default), SSH uses gpg-agent (YubiKey).
-          '';
-        };
-
-        user = mkOption {
+        sshKeySecret = mkOption {
           type = types.str;
-          description = ''
-            User to run the renewal service as. Must have access to the SSH
-            authentication method (e.g. gpg-agent for YubiKey).
-          '';
+          default = "hosts/${config.networking.hostName}/mtls-ssh-private-key";
+          description = "Sops secret key containing the SSH private key used to authenticate to the signer.";
         };
       };
     };
 
     config = lib.mkMerge [
+      {
+        assertions = [
+          {
+            assertion = !cfg.client.localSigner || cfg.signer.enable;
+            message = "mtls.client.localSigner requires mtls.signer to also be enabled on this host.";
+          }
+        ];
+      }
+
       (mkIf cfg.signer.enable (let
-        signScript = pkgs.writeShellScript "mtls-sign" ''
-          set -euo pipefail
-
-          CA_KEY="${config.sops.secrets.${cfg.signer.caKeySecret}.path}"
-          CA_CERT="${cfg.signer.caCertPath}"
-          LIFETIME_HOURS="${toString cfg.signer.certLifetimeHours}"
-
-          WORK=$(mktemp -d)
-          trap 'rm -rf "$WORK"' EXIT
-
-          # Read CSR from stdin.
-          cat > "$WORK/request.csr"
-
-          if ! ${lib.getExe' pkgs.openssl "openssl"} req -in "$WORK/request.csr" -noout -verify 2>/dev/null; then
-            echo "error: invalid CSR" >&2
-            exit 1
-          fi
-
-          # Extract the requested CN to build SAN (for server certs).
-          CN=$(${lib.getExe' pkgs.openssl "openssl"} req -in "$WORK/request.csr" -noout -subject \
-            | sed -n 's/.*CN = \(.*\)/\1/p')
-
-          # Sign it.
-          ${lib.getExe' pkgs.openssl "openssl"} x509 -req \
-            -in "$WORK/request.csr" \
-            -CA "$CA_CERT" \
-            -CAkey "$CA_KEY" \
-            -CAcreateserial \
-            -days 1 \
-            -extfile <(printf "subjectAltName=DNS:%s" "$CN") \
-            2>/dev/null
-
-          # Cert goes to stdout.
-        '';
+        signScript =
+          mkSignScript
+          config.sops.secrets.${cfg.signer.caKeySecret}.path
+          cfg.signer.caCertPath
+          cfg.signer.certLifetimeHours;
       in {
         sops.secrets.${cfg.signer.caKeySecret} = {
           owner = "mtls-signer";
@@ -146,39 +165,40 @@
         '';
       }))
 
-      (mkIf cfg.client.enable (let
+      (mkIf (cfg.client.enable && cfg.client.localSigner) (let
+        signScript =
+          mkSignScript
+          config.sops.secrets.${cfg.signer.caKeySecret}.path
+          cfg.client.caCertPath
+          cfg.signer.certLifetimeHours;
+
         renewScript = pkgs.writeShellScript "mtls-renew" ''
           set -euo pipefail
 
-          SIGNER="${cfg.client.signerHost}"
           DIR="/run/mtls"
-          SSH_OPTS="-o StrictHostKeyChecking=accept-new -o BatchMode=yes"
-          ${lib.optionalString (cfg.client.sshKeyFile != null) ''
-            SSH_OPTS="$SSH_OPTS -i ${cfg.client.sshKeyFile}"
-          ''}
 
           # Ensure group (nginx) can read but others cannot.
           umask 027
           mkdir -p "$DIR"
 
-          openssl ecparam -genkey -name prime256v1 \
+          ${openssl} ecparam -genkey -name prime256v1 \
             -out "$DIR/client.key" 2>/dev/null
-          openssl req -new \
+          ${openssl} req -new \
             -key "$DIR/client.key" \
             -subj "/CN=${config.networking.hostName}" \
             -out "$DIR/client.csr" 2>/dev/null
 
-          ssh $SSH_OPTS mtls-signer@"$SIGNER" < "$DIR/client.csr" > "$DIR/client.crt"
+          ${signScript} < "$DIR/client.csr" > "$DIR/client.crt"
 
           ${lib.concatMapStringsSep "\n" (domain: ''
-              openssl ecparam -genkey -name prime256v1 \
+              ${openssl} ecparam -genkey -name prime256v1 \
                 -out "$DIR/local-${domain}.key" 2>/dev/null
-              openssl req -new \
+              ${openssl} req -new \
                 -key "$DIR/local-${domain}.key" \
                 -subj "/CN=${domain}" \
                 -out "$DIR/local-${domain}.csr" 2>/dev/null
 
-              ssh $SSH_OPTS mtls-signer@"$SIGNER" < "$DIR/local-${domain}.csr" > "$DIR/local-${domain}.crt"
+              ${signScript} < "$DIR/local-${domain}.csr" > "$DIR/local-${domain}.crt"
 
               rm -f "$DIR/local-${domain}.csr"
             '')
@@ -195,22 +215,21 @@
 
         systemd = {
           tmpfiles.rules = [
-            "d /run/mtls 0750 ${cfg.client.user} nginx -"
+            "d /run/mtls 0750 mtls-signer nginx -"
           ];
 
           services.mtls-renew = {
             description = "Renew ephemeral mTLS certificates";
-            after = ["network-online.target" "wireguard-wg0.service"];
+            after = ["network-online.target" "wireguard-wg0.service" "sops-nix.service"];
             wants = ["network-online.target"];
             before = ["nginx.service"];
             wantedBy = ["multi-user.target"];
 
-            path = [pkgs.openssh pkgs.openssl];
+            path = [pkgs.openssl];
 
-            # Run as the user who owns the YubiKey / gpg-agent.
             serviceConfig = {
               Type = "oneshot";
-              User = cfg.client.user;
+              User = "mtls-signer";
               Group = "nginx";
               ExecStart = renewScript;
               # '+' prefix: run as root regardless of User=/Group= above.
@@ -218,11 +237,105 @@
               Restart = "on-failure";
               RestartSec = "30s";
             };
+          };
 
-            # Point SSH at gpg-agent's socket for YubiKey auth.
-            environment.SSH_AUTH_SOCK = "/run/user/${
-              toString config.users.users.${cfg.client.user}.uid
-            }/gnupg/S.gpg-agent.ssh";
+          timers.mtls-renew = {
+            description = "Periodic mTLS certificate renewal";
+            wantedBy = ["timers.target"];
+            timerConfig = {
+              OnBootSec = "1min";
+              OnUnitActiveSec = "${toString cfg.client.renewIntervalHours}h";
+              RandomizedDelaySec = "5min";
+            };
+          };
+        };
+      }))
+
+      (mkIf (cfg.client.enable && !cfg.client.localSigner) (let
+        sshKey = config.sops.secrets.${cfg.client.sshKeySecret}.path;
+
+        renewScript = pkgs.writeShellScript "mtls-renew" ''
+          set -euo pipefail
+
+          SIGNER="${cfg.client.signerHost}"
+          DIR="/run/mtls"
+          SSH_OPTS="-o StrictHostKeyChecking=accept-new -o BatchMode=yes -i ${sshKey}"
+
+          # Ensure group (nginx) can read but others cannot.
+          umask 027
+          mkdir -p "$DIR"
+
+          ${openssl} ecparam -genkey -name prime256v1 \
+            -out "$DIR/client.key" 2>/dev/null
+          ${openssl} req -new \
+            -key "$DIR/client.key" \
+            -subj "/CN=${config.networking.hostName}" \
+            -out "$DIR/client.csr" 2>/dev/null
+
+          ssh $SSH_OPTS mtls-signer@"$SIGNER" < "$DIR/client.csr" > "$DIR/client.crt"
+
+          ${lib.concatMapStringsSep "\n" (domain: ''
+              ${openssl} ecparam -genkey -name prime256v1 \
+                -out "$DIR/local-${domain}.key" 2>/dev/null
+              ${openssl} req -new \
+                -key "$DIR/local-${domain}.key" \
+                -subj "/CN=${domain}" \
+                -out "$DIR/local-${domain}.csr" 2>/dev/null
+
+              ssh $SSH_OPTS mtls-signer@"$SIGNER" < "$DIR/local-${domain}.csr" > "$DIR/local-${domain}.crt"
+
+              rm -f "$DIR/local-${domain}.csr"
+            '')
+            cfg.client.domains}
+
+          rm -f "$DIR/client.csr"
+        '';
+      in {
+        sops.secrets.${cfg.client.sshKeySecret} = {
+          owner = "mtls-client";
+          group = "mtls-client";
+        };
+
+        users = {
+          users.mtls-client = {
+            isSystemUser = true;
+            group = "mtls-client";
+            home = "/var/empty";
+            shell = pkgs.shadow;
+          };
+          groups.mtls-client = {};
+        };
+
+        # Trust the CA so browsers accept local nginx certs.
+        security.pki.certificateFiles = [cfg.client.caCertPath];
+
+        # Firefox: honor system trust store.
+        programs.firefox.policies.Certificates.ImportEnterpriseRoots = true;
+
+        systemd = {
+          tmpfiles.rules = [
+            "d /run/mtls 0750 mtls-client nginx -"
+          ];
+
+          services.mtls-renew = {
+            description = "Renew ephemeral mTLS certificates";
+            after = ["network-online.target" "wireguard-wg0.service" "sops-nix.service"];
+            wants = ["network-online.target"];
+            before = ["nginx.service"];
+            wantedBy = ["multi-user.target"];
+
+            path = [pkgs.openssh pkgs.openssl];
+
+            serviceConfig = {
+              Type = "oneshot";
+              User = "mtls-client";
+              Group = "nginx";
+              ExecStart = renewScript;
+              # '+' prefix: run as root regardless of User=/Group= above.
+              ExecStartPost = "+${lib.getExe' pkgs.systemd "systemctl"} reload-or-restart nginx.service";
+              Restart = "on-failure";
+              RestartSec = "30s";
+            };
           };
 
           timers.mtls-renew = {
