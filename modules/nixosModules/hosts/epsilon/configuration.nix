@@ -215,13 +215,6 @@
             localhostBypass = true;
           };
         };
-
-        syncthing = {
-          enable = true;
-          domain = "syncthing.asmussen.tech";
-          location = "/";
-          upstream = "http://localhost:8384";
-        };
       };
     };
 
