@@ -49,6 +49,7 @@
       self.nixosModules.homeManager
       self.nixosModules.remoteBuilder
       self.nixosModules.kanata
+      self.nixosModules.syncthing
       self.nixosModules.networkManager
       self.nixosModules.nginx
       self.nixosModules.topology

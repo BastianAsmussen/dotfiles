@@ -55,6 +55,7 @@
       self.nixosModules.homeManager
       self.nixosModules.jellyfin
       self.nixosModules.qbittorrent
+      self.nixosModules.syncthing
       self.nixosModules.primaryBusy
       self.nixosModules.monero
       self.nixosModules.networkManager
@@ -213,6 +214,13 @@
             caCertificate = ../../../../keys/mtls-ca.crt;
             localhostBypass = true;
           };
+        };
+
+        syncthing = {
+          enable = true;
+          domain = "syncthing.asmussen.tech";
+          location = "/";
+          upstream = "http://localhost:8384";
         };
       };
     };
