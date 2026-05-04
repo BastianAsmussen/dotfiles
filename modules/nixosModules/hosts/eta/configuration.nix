@@ -181,10 +181,7 @@
       healthCheckHost = "cache.asmussen.tech";
       healthCheckPath = "/nix-cache-info";
 
-      sniRoutes = {
-        "jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
-        "syncthing.asmussen.tech".primaryAddress = "10.10.0.2:443";
-      };
+      sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
     };
 
     sops = {
