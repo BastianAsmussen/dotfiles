@@ -72,7 +72,6 @@
 
     mtls.client = {
       enable = true;
-      user = config.preferences.user.name;
       caCertPath = ../../../../keys/mtls-ca.crt;
       domains = ["qbittorrent.asmussen.tech"];
     };
