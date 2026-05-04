@@ -159,18 +159,35 @@
           };
         };
 
-        backup = {
+        vault = {
           device = "/dev/disk/by-id/ata-WDC_WD10EZEX-08WN4A0_WD-WCC6Y5FXA989";
           type = "disk";
           content = {
             type = "gpt";
-            partitions.root = {
+            partitions.luks = {
               size = "100%";
               content = {
-                type = "filesystem";
-                format = "ext4";
-                mountpoint = "/run/media/bastian/Backup";
-                mountOptions = ["nofail"];
+                type = "luks";
+                name = "vault_crypt";
+                settings = {
+                  crypttabExtraOpts = [
+                    "fido2-device=auto"
+                    "token-timeout=10"
+                  ];
+                };
+
+                content = {
+                  type = "btrfs";
+                  extraArgs = ["-f"];
+                  mountpoint = "/srv/arctic-vault";
+                  mountOptions = [
+                    "compress=zstd:3"
+                    "noatime"
+                    "autodefrag"
+                    "space_cache=v2"
+                    "nofail"
+                  ];
+                };
               };
             };
           };
