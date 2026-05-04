@@ -226,7 +226,12 @@
 
       nginx = {
         appendHttpConfig = ''
-          add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+          # Add HSTS header with preloading to HTTPS requests.
+          map $scheme $hsts_header {
+              https   "max-age=63072000; includeSubDomains; preload";
+          }
+
+          add_header Strict-Transport-Security $hsts_header always;
         '';
 
         virtualHosts = let
