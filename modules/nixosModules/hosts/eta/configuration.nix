@@ -42,6 +42,7 @@
 
       # Features
       self.nixosModules.btrfs
+      self.nixosModules.btop
       self.nixosModules.homeManager
       self.nixosModules.remoteBuilder
       self.nixosModules.primaryMirror
