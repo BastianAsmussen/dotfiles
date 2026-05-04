@@ -55,6 +55,11 @@
             path = "${home}/Pictures";
             devices = allDevices;
           };
+
+          "Videos" = {
+            path = "${home}/Videos";
+            devices = allDevices;
+          };
         };
       };
     };
