@@ -43,6 +43,7 @@
       # Features
       self.nixosModules.japanese
       self.nixosModules.bluetooth
+      self.nixosModules.btop
       self.nixosModules.btrfs
       self.nixosModules.ccache
       self.nixosModules.homeManager

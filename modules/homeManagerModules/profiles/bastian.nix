@@ -11,38 +11,44 @@
       };
     };
 
-    home.packages = with pkgs; [
-      man-pages
-      man-pages-posix
-      gitui
-      wget
-      go
-      jq
-      manix
-      tlrc
-      cabal-install
-      mit
-      calculator
-      copy-file
-      repo-cloner
-      todo
-      just
-      bacon
-      cargo-info
-      teams-for-linux
-      rusty-man
-      hyperfine
-      tokei
-      fselect
-      xh
-      libreoffice-fresh
-      mpv
-      # winboat
-      freerdp
-      anki
-      diesel-cli
-      postman
-      just
-    ];
+    home = {
+      # /run/wrappers/bin is appended after user profiles by NixOS; prepend it
+      # so setcap wrappers take precedence.
+      sessionPath = ["/run/wrappers/bin"];
+
+      packages = with pkgs; [
+        man-pages
+        man-pages-posix
+        gitui
+        wget
+        go
+        jq
+        manix
+        tlrc
+        cabal-install
+        mit
+        calculator
+        copy-file
+        repo-cloner
+        todo
+        just
+        bacon
+        cargo-info
+        teams-for-linux
+        rusty-man
+        hyperfine
+        tokei
+        fselect
+        xh
+        libreoffice-fresh
+        mpv
+        # winboat
+        freerdp
+        anki
+        diesel-cli
+        postman
+        just
+      ];
+    };
   };
 }
