@@ -12,6 +12,7 @@
     devices = {
       epsilon.id = hosts.epsilon.syncthing-id;
       delta.id = hosts.delta.syncthing-id;
+      mu.id = hosts.mu.syncthing-id;
     };
 
     # All hosts share the same folder declarations; each host syncs with the
@@ -59,7 +60,7 @@
 
           "Videos" = {
             path = "${home}/Videos";
-            devices = allDevices;
+            devices = ["epsilon" "delta"];
           };
         };
       };
