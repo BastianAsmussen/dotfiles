@@ -12,6 +12,7 @@
     devices = {
       epsilon.id = hosts.epsilon.syncthing-id;
       delta.id = hosts.delta.syncthing-id;
+      mu.id = hosts.mu.syncthing-id;
     };
 
     # Syncthing ignores a host's own ID in the shared device list.
@@ -58,7 +59,7 @@
 
           "Videos" = {
             path = "${home}/Videos";
-            devices = allDevices;
+            devices = ["epsilon" "delta"];
           };
         };
       };
