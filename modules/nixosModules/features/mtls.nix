@@ -32,8 +32,9 @@
         fi
 
         # Extract the requested CN to build SAN (for server certs).
-        CN=$(${openssl} req -in "$WORK/request.csr" -noout -subject \
-          | sed -n 's/.*CN = \(.*\)/\1/p')
+        # -nameopt oneline forces "CN = value" spacing (OpenSSL 3 defaults to RFC2253 "CN=value").
+        CN=$(${openssl} req -in "$WORK/request.csr" -noout -subject -nameopt oneline \
+          | sed -n 's/.*CN = \([^,/]*\).*/\1/p')
 
         # Sign it.
         ${openssl} x509 -req \
@@ -223,6 +224,7 @@
             after = ["network-online.target" "wireguard-wg0.service" "sops-nix.service"];
             wants = ["network-online.target"];
             before = ["nginx.service"];
+            requiredBy = ["nginx.service"];
             wantedBy = ["multi-user.target"];
 
             path = [pkgs.openssl];
@@ -322,6 +324,7 @@
             after = ["network-online.target" "wireguard-wg0.service" "sops-nix.service"];
             wants = ["network-online.target"];
             before = ["nginx.service"];
+            requiredBy = ["nginx.service"];
             wantedBy = ["multi-user.target"];
 
             path = [pkgs.openssh pkgs.openssl];
