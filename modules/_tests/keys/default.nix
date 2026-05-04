@@ -1,12 +1,14 @@
 {lib}: let
   mockDir = ./mock;
   keys = lib.custom.keys.load mockDir;
+
   mapKeys = ks: map (k: mockDir + "/${k}") ks;
 in {
   testAllKeys = {
     expr = keys.fullPaths;
     expected = mapKeys [
       "0xDEADBEEFDEADBEEF-1970-01-01.asc"
+      "age-alice.pub"
       "builder-kappa.pub"
       "builder-sigma.pub"
       "ssh-theta.pub"
@@ -16,6 +18,7 @@ in {
   testPublicKeys = {
     expr = keys.publicPaths;
     expected = mapKeys [
+      "age-alice.pub"
       "builder-kappa.pub"
       "builder-sigma.pub"
       "ssh-theta.pub"
@@ -26,6 +29,13 @@ in {
     expr = keys.gpgPaths;
     expected = mapKeys [
       "0xDEADBEEFDEADBEEF-1970-01-01.asc"
+    ];
+  };
+
+  testAgeKeys = {
+    expr = keys.agePaths;
+    expected = mapKeys [
+      "age-alice.pub"
     ];
   };
 
@@ -76,6 +86,41 @@ in {
 
   testSelectSshContentsEmpty = {
     expr = lib.custom.keys.selectSshContents ["ssh-nonexistent.pub"] keys;
+    expected = [];
+  };
+
+  testFilterAgeKeys = {
+    expr = map (k: k.name) (lib.custom.keys.filterAgeKeys ["age-alice.pub"] keys);
+    expected = ["age-alice.pub"];
+  };
+
+  testFilterAgeKeysExcludesNonAge = {
+    expr = lib.custom.keys.filterAgeKeys ["builder-kappa.pub"] keys;
+    expected = [];
+  };
+
+  testFilterAgeKeysEmpty = {
+    expr = lib.custom.keys.filterAgeKeys [] keys;
+    expected = [];
+  };
+
+  testSelectAgePaths = {
+    expr = lib.custom.keys.selectAgePaths ["age-alice.pub"] keys;
+    expected = mapKeys ["age-alice.pub"];
+  };
+
+  testSelectAgePathsMissingName = {
+    expr = lib.custom.keys.selectAgePaths ["age-alice.pub" "age-nonexistent.pub"] keys;
+    expected = mapKeys ["age-alice.pub"];
+  };
+
+  testSelectAgeContents = {
+    expr = lib.custom.keys.selectAgeContents ["age-alice.pub"] keys;
+    expected = [(builtins.readFile (mockDir + "/age-alice.pub"))];
+  };
+
+  testSelectAgeContentsEmpty = {
+    expr = lib.custom.keys.selectAgeContents ["age-nonexistent.pub"] keys;
     expected = [];
   };
 }
