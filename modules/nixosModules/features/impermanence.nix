@@ -7,6 +7,7 @@
     inherit (lib) mkOption mkEnableOption mkIf types;
 
     cfg = config.persistence;
+    mkDirWithMode = lib.mapAttrsToList (directory: mode: {inherit directory mode;});
     user = config.preferences.user.name;
   in {
     imports = [
@@ -34,6 +35,12 @@
         description = "Extra system directories to persist.";
       };
 
+      directoriesWithMode = mkOption {
+        type = types.attrsOf types.str;
+        default = {};
+        description = "Extra system directories to persist, with explicit permissions. Keys are paths, values are mode strings (e.g. \"0700\").";
+      };
+
       files = mkOption {
         type = types.listOf (types.either types.str types.attrs);
         default = [];
@@ -45,6 +52,12 @@
           type = types.listOf (types.either types.str types.attrs);
           default = [];
           description = "User directories to persist (important data).";
+        };
+
+        directoriesWithMode = mkOption {
+          type = types.attrsOf types.str;
+          default = {};
+          description = "User directories to persist, with explicit permissions. Keys are paths, values are mode strings (e.g. \"0700\").";
         };
 
         files = mkOption {
@@ -95,7 +108,8 @@
               "/var/lib/systemd/timers" # Persistent timer state.
               "/var/lib/sops-nix"
             ]
-            ++ cfg.directories;
+            ++ cfg.directories
+            ++ mkDirWithMode cfg.directoriesWithMode;
 
           files =
             [
@@ -105,7 +119,8 @@
         };
 
         "${cfg.persistPath}/userdata".users.${user} = {
-          inherit (cfg.user) directories files;
+          inherit (cfg.user) files;
+          directories = cfg.user.directories ++ mkDirWithMode cfg.user.directoriesWithMode;
         };
 
         "${cfg.persistPath}/usercache".users.${user} = {
