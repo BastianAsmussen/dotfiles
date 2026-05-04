@@ -109,6 +109,7 @@
         "/var/lib/AccountsService" # GDM user list / icons.
         "/var/lib/bluetooth"
         "/var/lib/fail2ban"
+        "/var/lib/power-profiles-daemon"
         "/var/lib/jellyfin"
         "/var/lib/qBittorrent"
         "/var/lib/systemd/coredump"
