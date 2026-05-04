@@ -509,7 +509,11 @@
 
               extraConfig = lib.optionalString rep.mtls.enable ''
                 ssl_client_certificate ${rep.mtls.caCertificate};
-                ssl_verify_client on;
+                ssl_verify_client ${
+                  if rep.mtls.localhostBypass
+                  then "optional"
+                  else "on"
+                };
               '';
 
               # Merge locations from every proxy on this domain.
