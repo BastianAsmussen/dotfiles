@@ -188,15 +188,29 @@
         harvard-dk = dkRedirect "harvard.dk";
       };
 
-      reverseProxies.jellyfin = {
-        enable = true;
-        domain = "jellyfin.asmussen.tech";
-        location = "/";
-        upstream = "https://localhost:8920";
-        extraConfig = "proxy_ssl_verify off;";
-        ssl = {
-          dnsProvider = "cloudflare";
-          environmentFile = config.sops.templates."cloudflare-acme-env".path;
+      reverseProxies = {
+        jellyfin = {
+          enable = true;
+          domain = "jellyfin.asmussen.tech";
+          location = "/";
+          upstream = "https://localhost:8920";
+          proxySSL.verify = false;
+          ssl = {
+            dnsProvider = "cloudflare";
+            environmentFile = config.sops.templates."cloudflare-acme-env".path;
+          };
+        };
+
+        qbittorrent = {
+          enable = true;
+          domain = "qbittorrent.asmussen.tech";
+          location = "/";
+          upstream = "http://localhost:${toString config.services.qbittorrent.webuiPort}";
+          mtls = {
+            enable = true;
+            caCertificate = ../../../../keys/mtls-ca.crt;
+            localhostBypass = true;
+          };
         };
       };
     };
@@ -220,38 +234,6 @@
 
           # Redirect legacy path to subdomain for existing bookmarks.
           "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
-
-          "qbittorrent.asmussen.tech" = {
-            forceSSL = true;
-            useACMEHost = "asmussen.tech";
-
-            extraConfig = ''
-              ssl_client_certificate ${../../../../keys/mtls-ca.crt};
-              ssl_verify_client on;
-            '';
-
-            locations."/" = {
-              proxyPass = "http://127.0.0.1:${toString config.services.qbittorrent.webuiPort}";
-              proxyWebsockets = true;
-              extraConfig = ''
-                if ($ssl_client_verify != SUCCESS) {
-                  set $reject "no_cert";
-                }
-
-                if ($remote_addr = 127.0.0.1) {
-                  set $reject "";
-                }
-
-                if ($remote_addr = ::1) {
-                  set $reject "";
-                }
-
-                if ($reject) {
-                  return 403;
-                }
-              '';
-            };
-          };
         };
       };
 

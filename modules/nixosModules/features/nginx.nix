@@ -143,7 +143,7 @@
               description = ''
                 URL path prefix at which this service is served.  Defaults to
                 "/<name>" where <name> is the attribute key in reverseProxies
-                (e.g. reverseProxies.foo → "/foo").  Passed directly
+                (e.g. reverseProxies.foo -> "/foo").  Passed directly
                 as an nginx `location` directive, which uses prefix matching by
                 default. "/foo" matches "/foo", "/foo/bar", etc.
                 Multiple services can share the same domain at different paths.
@@ -230,6 +230,72 @@
               default = "";
               description = "Extra configuration to add to the nginx location block.";
             };
+
+            mtls = mkOption {
+              default = {};
+              description = "Mutual TLS (client certificate verification) for this virtual host.";
+              type = types.submodule {
+                options = {
+                  enable = lib.mkEnableOption "mTLS client certificate verification";
+
+                  caCertificate = mkOption {
+                    type = types.nullOr types.path;
+                    default = null;
+                    description = "Path to the CA certificate used to verify client certificates.";
+                  };
+
+                  localhostBypass = mkOption {
+                    type = types.bool;
+                    default = false;
+                    description = ''
+                      Allow requests from localhost (127.0.0.1, ::1) without a
+                      valid client certificate.  Useful when a browser on the
+                      same host should reach the service without importing the
+                      client certificate.
+                    '';
+                  };
+                };
+              };
+            };
+
+            proxySSL = mkOption {
+              default = {};
+              description = "Client certificate to present when connecting to the upstream over TLS.";
+              type = types.submodule {
+                options = {
+                  clientCertificate = mkOption {
+                    type = types.nullOr types.path;
+                    default = null;
+                    description = "Path to the PEM client certificate for upstream mTLS.";
+                  };
+
+                  clientCertificateKey = mkOption {
+                    type = types.nullOr types.path;
+                    default = null;
+                    description = "Path to the PEM private key for upstream mTLS.";
+                  };
+
+                  serverName = mkOption {
+                    type = types.nullOr types.str;
+                    default = null;
+                    description = ''
+                      Override the SNI hostname sent to the upstream during the
+                      TLS handshake (proxy_ssl_name).  Required when the upstream
+                      address differs from the domain the upstream expects (e.g.
+                      when traffic is routed through an SNI-based passthrough
+                      proxy at a different IP).  Enables proxy_ssl_server_name
+                      automatically.
+                    '';
+                  };
+
+                  verify = mkOption {
+                    type = types.bool;
+                    default = true;
+                    description = "Whether to verify the upstream server's TLS certificate.";
+                  };
+                };
+              };
+            };
           };
         }));
       };
@@ -257,6 +323,7 @@
             map $ssl_preread_server_name $tls_backend {
               ${mapEntries}
             }
+
             server {
               listen 443;
               listen [::]:443;
@@ -277,6 +344,7 @@
                 port = 80;
               }
             ];
+
             locations."/".return = "301 https://$host$request_uri";
           };
         };
@@ -335,15 +403,35 @@
                 p.ssl.useACME
                 == first.ssl.useACME
                 && p.ssl.dnsProvider == first.ssl.dnsProvider
-                && p.forceSSL == first.forceSSL;
+                && p.forceSSL == first.forceSSL
+                && p.mtls.enable == first.mtls.enable;
               message = ''
                 nginx: all reverseProxies sharing the domain "${domain}" must
-                have identical ssl.useACME, ssl.dnsProvider, and forceSSL
-                settings.
+                have identical ssl.useACME, ssl.dnsProvider, forceSSL, and
+                mtls.enable settings.
               '';
             })
             rest)
-          proxiesByDomain));
+          proxiesByDomain))
+          ++ (mapAttrsToList (name: proxy: {
+              assertion =
+                !proxy.mtls.enable || proxy.mtls.caCertificate != null;
+              message = ''
+                nginx.reverseProxies.${name}: mtls.enable is set but
+                mtls.caCertificate is not provided.
+              '';
+            })
+            enabledProxies)
+          ++ (mapAttrsToList (name: proxy: {
+              assertion =
+                (proxy.proxySSL.clientCertificate == null)
+                == (proxy.proxySSL.clientCertificateKey == null);
+              message = ''
+                nginx.reverseProxies.${name}: proxySSL.clientCertificate and
+                proxySSL.clientCertificateKey must both be set or both be null.
+              '';
+            })
+            enabledProxies);
 
         sops =
           mkIf (
@@ -417,14 +505,48 @@
               sslCertificate = mkIf (!rep.ssl.useACME && !useShared) rep.ssl.certificate;
               sslCertificateKey = mkIf (!rep.ssl.useACME && !useShared) rep.ssl.certificateKey;
 
+              extraConfig = lib.optionalString rep.mtls.enable ''
+                ssl_client_certificate ${rep.mtls.caCertificate};
+                ssl_verify_client on;
+              '';
+
               # Merge locations from every proxy on this domain.
               locations = let
                 proxyLocations = builtins.listToAttrs (map (proxy: {
                     name = proxy.location;
                     value = {
-                      inherit (proxy) proxyWebsockets extraConfig;
+                      inherit (proxy) proxyWebsockets;
 
                       proxyPass = proxy.upstream;
+                      extraConfig = lib.concatStringsSep "\n" (lib.filter (s: s != "") [
+                        proxy.extraConfig
+                        (lib.optionalString (proxy.proxySSL.clientCertificate != null) ''
+                          proxy_ssl_certificate ${proxy.proxySSL.clientCertificate};
+                          proxy_ssl_certificate_key ${proxy.proxySSL.clientCertificateKey};
+                        '')
+                        (lib.optionalString (proxy.proxySSL.serverName != null) ''
+                          proxy_ssl_server_name on;
+                          proxy_ssl_name ${proxy.proxySSL.serverName};
+                        '')
+                        (lib.optionalString (!proxy.proxySSL.verify) "proxy_ssl_verify off;")
+                        (lib.optionalString (rep.mtls.enable && rep.mtls.localhostBypass) ''
+                          if ($ssl_client_verify != SUCCESS) {
+                            set $reject "no_cert";
+                          }
+
+                          if ($remote_addr = 127.0.0.1) {
+                            set $reject "";
+                          }
+
+                          if ($remote_addr = ::1) {
+                            set $reject "";
+                          }
+
+                          if ($reject) {
+                            return 403;
+                          }
+                        '')
+                      ]);
                     };
                   })
                   proxies);
@@ -487,6 +609,7 @@
                 name = r.domain;
                 value = {
                   inherit (r) forceSSL;
+
                   enableACME = r.ssl.useACME && !useDns01;
                   useACMEHost = mkIf useDns01 r.domain;
                   locations."/".return = "301 ${r.target}$request_uri";
