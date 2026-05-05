@@ -34,6 +34,8 @@
             Session\GlobalUPSpeedLimit=10240
             Session\ProxyPeerConnections=true
             Session\QueueingSystemEnabled=false
+            Session\MaxConnections=-1
+            Session\MaxConnectionsPerTorrent=-1
 
             [LegalNotice]
             Accepted=true
