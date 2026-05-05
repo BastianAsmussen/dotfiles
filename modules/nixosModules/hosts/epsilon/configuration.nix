@@ -112,7 +112,7 @@
       # System state that must survive reboot.
       directories = [
         "/var/lib/acme" # ACME/Let's Encrypt certificates.
-        "/var/lib/AccountsService" # GDM user list / icons.
+        "/var/lib/AccountsService" # User list / icons.
         "/var/lib/bluetooth"
         "/var/lib/fail2ban"
         "/var/lib/power-profiles-daemon"
@@ -264,7 +264,6 @@
         ];
     };
 
-    desktop.greeter.gdm.enable = true;
     preferences.monitors = {
       "DP-1" = {
         width = 1920;

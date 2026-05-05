@@ -96,7 +96,6 @@
       ];
     };
 
-    desktop.greeter.gdm.enable = true;
     nginx = {
       openFirewall = false;
       acme.sharedHost = "asmussen.tech";
