@@ -31,7 +31,6 @@
     ];
 
     networking.hostName = "iso";
-
     nixpkgs = {
       hostPlatform = lib.mkDefault "x86_64-linux";
       config.allowUnfree = true;
@@ -43,9 +42,7 @@
     ];
 
     isoImage.squashfsCompression = "zstd -Xcompression-level 6";
-
     documentation.dev.enable = lib.mkForce false;
-
     environment.etc.isoBuildTime.text = lib.mkDefault (
       lib.readFile "${
         pkgs.runCommand "timestamp" {

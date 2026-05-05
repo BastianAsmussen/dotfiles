@@ -8,7 +8,6 @@
     services = {
       openssh = {
         enable = true;
-
         allowSFTP = false;
         settings = {
           PermitRootLogin = "no";
@@ -55,7 +54,6 @@
 
       fail2ban = {
         enable = true;
-
         extraPackages = with pkgs; [
           nftables
           ipset
@@ -74,7 +72,6 @@
         bantime = "1h";
         bantime-increment = {
           enable = true;
-
           rndtime = "30m";
           overalljails = true;
           multipliers = "4 8 16 32 64 128 256 512 1024 2048";
@@ -92,7 +89,6 @@
 
         jails.sshd.settings = {
           enabled = true;
-
           filter = "sshd[mode=aggressive]";
           port = builtins.concatStringsSep "," (map toString config.services.openssh.ports);
         };

@@ -8,7 +8,6 @@
     inherit (lib) mkOption mkEnableOption mkIf types;
 
     cfg = config.primaryBusy;
-
     notifyScript = pkgs.writeShellScript "primary-notify-mirror" ''
       ${lib.getExe pkgs.openssh} \
         -o StrictHostKeyChecking=accept-new \
@@ -55,9 +54,7 @@
       # The gamemode custom hooks run as the logged-in user, so the SSH key
       # must be readable by that user.  A dedicated key pair would be more
       # restrictive; for now we reuse the builder key.
-      sops.secrets."hosts/${config.networking.hostName}/builder-ssh-private-key" = {
-        owner = config.preferences.user.name;
-      };
+      sops.secrets."hosts/${config.networking.hostName}/builder-ssh-private-key".owner = config.preferences.user.name;
 
       programs.gamemode.settings.custom = {
         start = "${notifyScript} busy";

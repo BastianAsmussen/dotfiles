@@ -17,7 +17,6 @@
       else "${pkgs.writeShellScript "autostart-${toString i}" entry}";
 
     autostartEntries = lib.imap0 toStartupEntry config.preferences.autostart;
-
     monitorsToOutputs = lib.mapAttrs (
       _: m:
         {
@@ -44,7 +43,6 @@
       services.displayManager.defaultSession = lib.mkDefault "niri";
       programs.niri = {
         enable = true;
-
         package = inputs.wrapper-modules.wrappers.niri.wrap {
           inherit pkgs;
 
@@ -91,9 +89,7 @@
         nerd-fonts.jetbrains-mono
       ];
 
-      fonts.fontconfig.defaultFonts = {
-        monospace = ["JetBrainsMono Nerd Font"];
-      };
+      fonts.fontconfig.defaultFonts.monospace = ["JetBrainsMono Nerd Font"];
     };
   };
 }

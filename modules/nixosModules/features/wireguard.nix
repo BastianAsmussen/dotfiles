@@ -9,8 +9,7 @@
     cfg = config.wireguard;
   in {
     options.wireguard = {
-      enable = mkEnableOption "WireGuard VPN interface";
-
+      enable = mkEnableOption "WireGuard VPN interface.";
       interface = mkOption {
         type = types.str;
         default = "wg0";

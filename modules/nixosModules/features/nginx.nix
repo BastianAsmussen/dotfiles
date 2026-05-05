@@ -318,7 +318,6 @@
 
         services.nginx = {
           enable = true;
-
           streamConfig = ''
             map $ssl_preread_server_name $tls_backend {
               ${mapEntries}
@@ -484,12 +483,10 @@
 
         services.nginx = {
           enable = true;
-
           recommendedProxySettings = true;
           recommendedTlsSettings = true;
           recommendedGzipSettings = true;
           recommendedOptimisation = true;
-
           virtualHosts =
             lib.mapAttrs (domain: proxies: let
               # SSL settings come from the first proxy for this domain.
@@ -504,9 +501,9 @@
                 if useShared
                 then cfg.acme.sharedHost
                 else mkIf useDns01 domain;
+
               sslCertificate = mkIf (!rep.ssl.useACME && !useShared) rep.ssl.certificate;
               sslCertificateKey = mkIf (!rep.ssl.useACME && !useShared) rep.ssl.certificateKey;
-
               extraConfig = lib.optionalString rep.mtls.enable ''
                 ssl_client_certificate ${rep.mtls.caCertificate};
                 ssl_verify_client ${
@@ -585,7 +582,6 @@
             security.acme = mkIf (lib.any (r: r.ssl.useACME) redirectList) {
               acceptTerms = true;
               defaults.email = cfg.acme.email;
-
               certs = builtins.listToAttrs (
                 mapAttrsToList (_: r: {
                   name = r.domain;

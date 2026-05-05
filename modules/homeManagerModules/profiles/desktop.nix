@@ -4,9 +4,9 @@
     imports = with self.homeModules; [
       alacritty
       firefox
-      spicetify
       nixcord
       noctalia
+      spicetify
     ];
   };
 }

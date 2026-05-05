@@ -14,7 +14,6 @@
       type = types.submodule {
         options = {
           enable = lib.mkEnableOption "Enables XMRig service.";
-
           pool = mkOption {
             default = "pool.supportxmr.com:443";
             description = "The URL of the Monero pool to use.";
@@ -49,7 +48,6 @@
 
         services.xmrig = {
           enable = true;
-
           settings = {
             autosave = true;
             opencl = false;

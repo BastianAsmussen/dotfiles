@@ -2,7 +2,6 @@
   flake.homeModules.fastfetch = {
     programs.fastfetch = {
       enable = true;
-
       settings = {
         display.separator = " ";
         modules = [

@@ -9,17 +9,14 @@
       command-not-found.enable = false;
       nix-your-shell = {
         enable = true;
-
         enableZshIntegration = true;
       };
 
       zsh = {
         enable = true;
-
         autocd = true;
         autosuggestion.enable = true;
         syntaxHighlighting.enable = true;
-
         history = {
           append = true;
           ignoreAllDups = true;
@@ -28,7 +25,6 @@
         };
 
         historySubstringSearch.enable = true;
-
         defaultKeymap = "emacs";
         initContent =
           # sh
@@ -106,15 +102,20 @@
             bindkey '^xl' clear-screen-and-scrollback
 
             # Just type the filename to open it with the associated program.
+            alias -s json=jless
+            alias -s log=bat
             alias -s md=bat
             alias -s txt=bat
-            alias -s log=bat
-            alias -s json=jless
+            alias -s c='$EDITOR'
+            alias -s cpp='$EDITOR'
             alias -s go='$$EDITOR'
-            alias -s rs='$EDITOR'
-            alias -s py='$EDITOR'
             alias -s js='$EDITOR'
+            alias -s nix='$EDITOR'
+            alias -s py='$EDITOR'
+            alias -s rs='$EDITOR'
+            alias -s sh='$EDITOR'
             alias -s ts='$EDITOR'
+            alias -s zig='$EDITOR'
 
             # Match any case.
             zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
@@ -143,6 +144,7 @@
           # Make sudo use aliases.
           sudo = "sudo ";
 
+          # Nice shorthands.
           c = "clear";
           cp = "cp --recursive";
           rm = "rm --recursive";
@@ -179,15 +181,12 @@
 
         oh-my-zsh = {
           enable = true;
-
           plugins = [
             "archlinux"
             "dotnet"
             "eza"
             "git"
             "golang"
-            "kubectl"
-            "kubectx"
             "pass"
             "rust"
             "sudo"

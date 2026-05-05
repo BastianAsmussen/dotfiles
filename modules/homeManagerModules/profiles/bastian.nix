@@ -4,7 +4,6 @@
   flake.homeModules.bastian = {pkgs, ...}: {
     gpg = {
       enable = true;
-
       keyTrustMap = {
         "0x0FE5A355DBC92568-2024-08-09.asc" = "ultimate";
         "0x3B89704887DFEF65-2024-08-23.asc" = "marginal";
@@ -17,37 +16,36 @@
       sessionPath = ["/run/wrappers/bin"];
 
       packages = with pkgs; [
+        anki
+        bacon
+        cabal-install
+        calculator
+        cargo-info
+        copy-file
+        diesel-cli
+        freerdp
+        fselect
+        gitui
+        go
+        hyperfine
+        jq
+        just
+        just
+        libreoffice-fresh
         man-pages
         man-pages-posix
-        gitui
-        wget
-        go
-        jq
         manix
-        tlrc
-        cabal-install
         mit
-        calculator
-        copy-file
-        repo-cloner
-        todo
-        just
-        bacon
-        cargo-info
-        teams-for-linux
-        rusty-man
-        hyperfine
-        tokei
-        fselect
-        xh
-        libreoffice-fresh
         mpv
-        # winboat
-        freerdp
-        anki
-        diesel-cli
         postman
-        just
+        repo-cloner
+        rusty-man
+        teams-for-linux
+        tlrc
+        todo
+        tokei
+        wget
+        xh
       ];
     };
   };

@@ -22,33 +22,33 @@
     ...
   }: {
     imports = [
-      # Base modules
+      # Base modules.
       self.nixosModules.base
       self.nixosModules.grub
       self.nixosModules.language
       self.nixosModules.misc
       self.nixosModules.stylix
 
-      # Desktop
+      # Desktop.
       self.nixosModules.greeter
       self.nixosModules.niri
       self.nixosModules.pipewire
 
-      # Nix
+      # Nix.
       self.nixosModules.nix
       self.nixosModules.nh
 
-      # Security
+      # Security.
       self.nixosModules.gpg
       self.nixosModules.security
       self.nixosModules.sops
       self.nixosModules.ssh
-      self.nixosModules.wireguard
       self.nixosModules.luksFido2
       self.nixosModules.yubiKey
       self.nixosModules.impermanence
+      self.nixosModules.wireguard
 
-      # Features
+      # Features.
       self.nixosModules.japanese
       self.nixosModules.bluetooth
       self.nixosModules.btop
@@ -71,15 +71,15 @@
       self.nixosModules.website
       self.nixosModules.arcticVault
 
-      # Host-specific hardware
+      # Host-specific hardware.
       self.diskoConfigurations.hostEpsilon
 
-      # External modules
+      # External modules.
       inputs.disko.nixosModules.disko
       inputs.stylix.nixosModules.stylix
       inputs.nix-index-database.nixosModules.nix-index
 
-      # Hardware-specific
+      # Hardware-specific.
       inputs.nixos-hardware.nixosModules.common-cpu-amd
     ];
 
@@ -174,10 +174,8 @@
     };
 
     nix-serve-extras.bindAddress = "10.10.0.2";
-
     nginx = {
       acme.sharedHost = "asmussen.tech";
-
       redirects = let
         dkRedirect = domain: {
           inherit domain;
@@ -232,17 +230,15 @@
     };
 
     services = {
-      nginx = {
-        virtualHosts = {
-          "www.asmussen.tech" = {
-            useACMEHost = "asmussen.tech";
-            forceSSL = true;
-            locations."/".return = "301 https://asmussen.tech$request_uri";
-          };
-
-          # Redirect legacy path to subdomain for existing bookmarks.
-          "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+      nginx.virtualHosts = {
+        "www.asmussen.tech" = {
+          useACMEHost = "asmussen.tech";
+          forceSSL = true;
+          locations."/".return = "301 https://asmussen.tech$request_uri";
         };
+
+        # Redirect legacy path to subdomain for existing bookmarks.
+        "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
       };
 
       openssh.openFirewall = false;
@@ -304,7 +300,6 @@
 
     primaryBusy.enable = true;
     btrfs.scrub.fileSystems = ["/persist" "/srv/media" "/srv/arctic-vault"];
-
     arcticVault = {
       enable = true;
       sources = ["dotfiles" "nix-secrets" ".password-store"];

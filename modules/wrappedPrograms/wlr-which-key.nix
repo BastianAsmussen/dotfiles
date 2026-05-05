@@ -21,7 +21,6 @@
         padding = 15;
         rows_per_column = 5;
         column_padding = 25;
-
         anchor = "bottom-right";
         margin_right = 0;
         margin_bottom = 5;
@@ -48,7 +47,6 @@ in {
 
       config = {
         package = config.pkgs.wlr-which-key;
-
         args = [
           (toString (yamlFormat.generate "config.yaml" config.settings))
         ];

@@ -73,7 +73,6 @@
   in {
     options.arcticVault = {
       enable = mkEnableOption "Monthly encrypted archival snapshots (arctic vault).";
-
       mountpoint = mkOption {
         type = types.str;
         default = "/srv/arctic-vault";

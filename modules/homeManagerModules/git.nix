@@ -7,12 +7,10 @@
   }: {
     programs.git = {
       enable = true;
-
       package = pkgs.gitFull;
       lfs.enable = true;
       maintenance = {
         enable = true;
-
         repositories = let
           makePath = dir: config.home.homeDirectory + dir;
         in [

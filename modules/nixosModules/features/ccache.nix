@@ -2,7 +2,6 @@
   flake.nixosModules.ccache = {config, ...}: {
     programs.ccache.enable = true;
     nix.settings.extra-sandbox-paths = [config.programs.ccache.cacheDir];
-
     nixpkgs.overlays = [
       (_: super: {
         ccacheWrapper = super.ccacheWrapper.override {

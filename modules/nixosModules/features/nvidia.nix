@@ -7,7 +7,6 @@
     hardware = {
       nvidia = {
         package = config.boot.kernelPackages.nvidiaPackages.beta;
-
         modesetting.enable = true;
         powerManagement = {
           enable = false;
@@ -22,7 +21,6 @@
       graphics = {
         enable = true;
         enable32Bit = true;
-
         extraPackages = with pkgs; [
           libva-vdpau-driver
           libvdpau
@@ -40,16 +38,15 @@
 
     # Load NVIDIA drivers for Xorg and Wayland.
     services.xserver.videoDrivers = ["nvidia"];
-
     environment = {
       systemPackages = [pkgs.nvtopPackages.nvidia];
       variables = {
         # Required to run the correct GBM backend for NVIDIA GPUs on Wayland.
         GBM_BACKEND = "nvidia-drm";
+
         # Apparently, without this nouveau may attempt to be used instead.
         # (despite it being blacklisted)
         __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-
         LIBVA_DRIVER_NAME = "nvidia";
         __GL_GSYNC_ALLOWED = "1";
         __GL_VRR_ALLOWED = "0";

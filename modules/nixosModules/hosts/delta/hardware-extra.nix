@@ -12,10 +12,8 @@
     ];
 
     services.thermald.enable = lib.mkDefault true;
-
     hardware.graphics = {
       enable = true;
-
       extraPackages = with pkgs; [
         intel-media-driver
         intel-vaapi-driver
@@ -24,7 +22,6 @@
     };
 
     hardware.acpilight.enable = true;
-
     environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
   };
 }

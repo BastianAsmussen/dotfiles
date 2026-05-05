@@ -6,11 +6,9 @@
   }: {
     # Use the CachyOS gaming-focused kernel.
     boot.kernelPackages = inputs.nix-cachyos-kernel.legacyPackages.${pkgs.stdenv.hostPlatform.system}.linuxPackages-cachyos-latest-lto;
-
     programs = {
       steam = {
         enable = true;
-
         gamescopeSession.enable = true;
       };
 

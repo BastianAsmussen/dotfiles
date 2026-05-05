@@ -12,9 +12,7 @@
     stateDir = "/var/lib/primary-mirror";
     busyFlag = "${stateDir}/busy";
     streamStateFile = "${stateDir}/stream-upstream.conf";
-
     upstream = "${cfg.primaryHost}:${toString cfg.primaryPort}";
-
     sniEntriesUp = lib.mapAttrsToList (sni: route: "${sni} ${route.primaryAddress};") cfg.sniRoutes;
     sniEntriesDown =
       lib.mapAttrsToList (
@@ -25,7 +23,6 @@
         };"
       )
       cfg.sniRoutes;
-
     upStateFile = pkgs.writeText "stream-upstream-up.conf" (
       lib.concatStringsSep "\n" (sniEntriesUp ++ ["default ${upstream};"]) + "\n"
     );

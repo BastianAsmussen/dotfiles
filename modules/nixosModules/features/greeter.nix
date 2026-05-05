@@ -35,7 +35,6 @@
       (mkIf cfg.gdm.enable {
         services.displayManager.gdm = {
           enable = true;
-
           wayland = cfg.useWayland;
           autoSuspend = false;
         };

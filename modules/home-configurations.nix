@@ -37,28 +37,28 @@
 
   bastianModules = {
     epsilon = with self.homeModules; [
-      terminal
+      bastian
+      dconf
       desktop
+      dotnet
       goxlr
+      qemu
+      rust
       sops
       ssh
-      dconf
-      dotnet
-      rust
-      qemu
-      bastian
+      terminal
     ];
 
     delta = with self.homeModules; [
-      terminal
+      bastian
+      dconf
       desktop
+      dotnet
+      qemu
+      rust
       sops
       ssh
-      dconf
-      dotnet
-      rust
-      qemu
-      bastian
+      terminal
 
       ({pkgs, ...}: {
         home.packages = with pkgs; [
@@ -69,8 +69,8 @@
     ];
 
     mu = with self.homeModules; [
-      terminal
       rust
+      terminal
     ];
 
     eta = with self.homeModules; [
@@ -90,27 +90,28 @@
     ];
   };
 in {
-  flake.homeModuleSets = bastianModules;
+  flake = {
+    homeModuleSets = bastianModules;
+    homeConfigurations = {
+      "bastian@epsilon" = mkHome {
+        system = "x86_64-linux";
+        modules = bastianModules.epsilon;
+      };
 
-  flake.homeConfigurations = {
-    "bastian@epsilon" = mkHome {
-      system = "x86_64-linux";
-      modules = bastianModules.epsilon;
-    };
+      "bastian@delta" = mkHome {
+        system = "x86_64-linux";
+        modules = bastianModules.delta;
+      };
 
-    "bastian@delta" = mkHome {
-      system = "x86_64-linux";
-      modules = bastianModules.delta;
-    };
+      "bastian@mu" = mkHome {
+        system = "aarch64-linux";
+        modules = bastianModules.mu;
+      };
 
-    "bastian@mu" = mkHome {
-      system = "aarch64-linux";
-      modules = bastianModules.mu;
-    };
-
-    "bastian@eta" = mkHome {
-      system = "aarch64-linux";
-      modules = bastianModules.eta;
+      "bastian@eta" = mkHome {
+        system = "aarch64-linux";
+        modules = bastianModules.eta;
+      };
     };
   };
 }

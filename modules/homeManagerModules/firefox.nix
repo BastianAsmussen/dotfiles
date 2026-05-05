@@ -11,13 +11,10 @@
     stylix.targets.firefox.enable = false;
     programs.schizofox = {
       enable = true;
-
       extensions = {
         enableDefaultExtensions = true;
         enableExtraExtensions = true;
-
         darkreader.enable = true;
-
         extraExtensions = let
           mkFirefoxURL = name: "https://addons.mozilla.org/firefox/downloads/latest/${name}/latest.xpi";
         in {
@@ -56,11 +53,7 @@
         ];
       };
 
-      search = {
-        defaultSearchEngine = "DuckDuckGo";
-        searxRandomizer.enable = true;
-      };
-
+      search.defaultSearchEngine = "DuckDuckGo";
       settings = {
         "browser.translations.automaticallyPopup" = false;
         "browser.display.use_system_colors" = true;
@@ -69,7 +62,6 @@
       };
 
       security.sandbox.enable = true;
-
       theme = lib.optionalAttrs (osConfig != null) (let
         inherit (osConfig.lib.stylix) colors;
       in {

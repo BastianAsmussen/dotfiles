@@ -8,7 +8,6 @@
     inherit (lib) hasAttr mkEnableOption mkOption types mkIf;
 
     cfg = config.gpg;
-
     keyDir = ../../keys;
 
     getAllKeys = keyDir: builtins.filter (x: lib.strings.hasSuffix ".asc" x) (attrNames (readDir keyDir));
@@ -103,7 +102,6 @@
 
       programs.gpg = {
         enable = true;
-
         mutableKeys = false;
         mutableTrust = false;
 

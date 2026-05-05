@@ -16,7 +16,6 @@
 
     options.persistence = {
       enable = mkEnableOption "Erase root on every boot (impermanence)";
-
       tmpfsSize = mkOption {
         type = types.str;
         default = "4G";
@@ -93,9 +92,7 @@
 
       # Allow bind-mount FUSE access for user home persistence.
       programs.fuse.userAllowOther = true;
-
       boot.tmp.cleanOnBoot = lib.mkDefault true;
-
       environment.persistence = {
         "${cfg.persistPath}/system" = {
           hideMounts = true;
@@ -120,6 +117,7 @@
 
         "${cfg.persistPath}/userdata".users.${user} = {
           inherit (cfg.user) files;
+
           directories = cfg.user.directories ++ mkDirWithMode cfg.user.directoriesWithMode;
         };
 

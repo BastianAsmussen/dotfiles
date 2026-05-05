@@ -10,7 +10,6 @@
     pfxPath = "/var/lib/jellyfin/cert.pfx";
     networkXml = "/var/lib/jellyfin/config/network.xml";
     httpsPort = toString cfg.https.listenPort;
-
     networkXmlTemplate = pkgs.writeText "jellyfin-network.xml" ''
       <?xml version="1.0" encoding="utf-8"?>
       <NetworkConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -66,7 +65,6 @@
   in {
     options.jellyfin.https = {
       enable = lib.mkEnableOption "Jellyfin native HTTPS via PKCS#12 certificate";
-
       acmeHost = lib.mkOption {
         type = lib.types.str;
         default = "";

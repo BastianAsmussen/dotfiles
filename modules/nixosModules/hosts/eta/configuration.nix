@@ -23,41 +23,41 @@
     ...
   }: {
     imports = [
-      # Base modules
+      # External modules.
+      inputs.disko.nixosModules.disko
+      inputs.stylix.nixosModules.stylix
+
+      # Host-specific hardware.
+      self.diskoConfigurations.hostEta
+
+      # Base modules.
       self.nixosModules.base
-      self.nixosModules.systemdBoot
       self.nixosModules.language
       self.nixosModules.stylix
+      self.nixosModules.systemdBoot
 
-      # Nix
+      # Nix.
       self.nixosModules.nix
       self.nixosModules.nh
 
-      # Security
+      # Security.
+      self.nixosModules.gpg
       self.nixosModules.security
       self.nixosModules.sops
-      self.nixosModules.gpg
       self.nixosModules.ssh
       self.nixosModules.wireguard
 
-      # Features
-      self.nixosModules.btrfs
+      # Features.
       self.nixosModules.btop
+      self.nixosModules.btrfs
       self.nixosModules.homeManager
-      self.nixosModules.remoteBuilder
-      self.nixosModules.primaryMirror
       self.nixosModules.networkManager
       self.nixosModules.nginx
       self.nixosModules.nix-serve
+      self.nixosModules.primaryMirror
+      self.nixosModules.remoteBuilder
       self.nixosModules.topology
       self.nixosModules.website
-
-      # Host-specific hardware
-      self.diskoConfigurations.hostEta
-
-      # External modules
-      inputs.disko.nixosModules.disko
-      inputs.stylix.nixosModules.stylix
     ];
 
     # Support building from x86_64.
@@ -67,7 +67,6 @@
     };
 
     environment.memoryAllocator.provider = "graphene-hardened";
-
     boot = {
       kernelParams = [
         "slab_nomerge"
@@ -83,10 +82,8 @@
     };
 
     security.lockKernelModules = true;
-
     networking = {
       hostName = "eta";
-
       interfaces.enp1s0.ipv6.addresses = [
         {
           address = inputs.nix-secrets.hosts.eta.ipv6_address;
@@ -145,9 +142,7 @@
     # Eta is not fit for building, offload everything to Epsilon.
     # If Epsilon is unreachable, builds fail rather than running locally.
     nix.settings.max-jobs = lib.mkForce 0;
-
     btrfs.scrub.fileSystems = ["/"];
-
     nginx = {
       streamProxy = {
         enable = true;
@@ -159,7 +154,6 @@
           inherit domain;
 
           enable = true;
-
           target = "https://asmussen.tech";
           ssl = {
             dnsProvider = "cloudflare";
@@ -176,11 +170,9 @@
 
     primaryMirror = {
       enable = true;
-
       fallbackAddress = "127.0.0.1:8443";
       healthCheckHost = "cache.asmussen.tech";
       healthCheckPath = "/nix-cache-info";
-
       sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
     };
 
@@ -212,10 +204,8 @@
 
     nix-serve-extras.exposePublicly = false;
     website-extras.exposePublicly = false;
-
     services = {
       openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
-
       chrony = {
         enable = true;
         enableNTS = true;

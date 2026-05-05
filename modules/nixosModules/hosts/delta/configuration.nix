@@ -18,57 +18,55 @@
 
   flake.nixosModules.hostDelta = {config, ...}: {
     imports = [
-      # Base modules
+      # External modules.
+      inputs.disko.nixosModules.disko
+      inputs.stylix.nixosModules.stylix
+      inputs.nix-index-database.nixosModules.nix-index
+
+      # Host-specific hardware.
+      self.diskoConfigurations.hostDelta
+
+      # Base modules.
       self.nixosModules.base
+      self.nixosModules.grub
       self.nixosModules.language
       self.nixosModules.misc
-      self.nixosModules.grub
       self.nixosModules.stylix
 
-      # Desktop
+      # Desktop.
       self.nixosModules.greeter
       self.nixosModules.niri
       self.nixosModules.pipewire
 
-      # Nix
-      self.nixosModules.nix
+      # Nix.
       self.nixosModules.nh
+      self.nixosModules.nix
 
-      # Security
+      # Security.
+      self.nixosModules.gpg
       self.nixosModules.security
       self.nixosModules.sops
-      self.nixosModules.gpg
       self.nixosModules.yubiKey
+      self.nixosModules.wireguard
 
-      # Features
-      self.nixosModules.japanese
+      # Features.
       self.nixosModules.bluetooth
       self.nixosModules.btop
       self.nixosModules.btrfs
       self.nixosModules.ccache
       self.nixosModules.homeManager
-      self.nixosModules.remoteBuilder
+      self.nixosModules.japanese
       self.nixosModules.kanata
-      self.nixosModules.syncthing
       self.nixosModules.networkManager
       self.nixosModules.nginx
+      self.nixosModules.remoteBuilder
+      self.nixosModules.syncthing
       self.nixosModules.topology
       self.nixosModules.virtualisation
-      self.nixosModules.wireguard
-
-      # Host-specific hardware
-      self.diskoConfigurations.hostDelta
-
-      # External modules
-      inputs.disko.nixosModules.disko
-      inputs.stylix.nixosModules.stylix
-      inputs.nix-index-database.nixosModules.nix-index
     ];
 
     networking.hostName = "delta";
-
     remoteBuilder.jumpHost = "10.10.0.1";
-
     topology.self = let
       inherit (config.lib.topology) mkConnection;
     in {
@@ -99,11 +97,9 @@
     };
 
     desktop.greeter.gdm.enable = true;
-
     nginx = {
       openFirewall = false;
       acme.sharedHost = "asmussen.tech";
-
       reverseProxies.qbittorrent = {
         enable = true;
         domain = "qbittorrent.asmussen.tech";
@@ -127,7 +123,6 @@
     };
 
     users.users.acme.extraGroups = ["keys"];
-
     sops = {
       secrets = {
         "cloudflare-api-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
