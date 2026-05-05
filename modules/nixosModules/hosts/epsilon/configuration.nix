@@ -59,6 +59,7 @@
       self.nixosModules.homeManager
       self.nixosModules.jellyfin
       self.nixosModules.qbittorrent
+      self.nixosModules.i2p
       self.nixosModules.syncthing
       self.nixosModules.primaryBusy
       self.nixosModules.monero
@@ -117,6 +118,7 @@
         "/var/lib/fail2ban"
         "/var/lib/power-profiles-daemon"
         "/var/lib/jellyfin"
+        "/var/lib/i2pd"
         "/var/lib/qBittorrent"
         "/var/lib/systemd/coredump"
       ];
@@ -284,6 +286,8 @@
         scale = 1.0;
       };
     };
+
+    i2p.enable = true;
 
     monero.mining = {
       enable = false;

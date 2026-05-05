@@ -48,6 +48,7 @@
       self.nixosModules.wireguard
 
       # Features.
+      self.nixosModules.i2p
       self.nixosModules.btop
       self.nixosModules.btrfs
       self.nixosModules.homeManager
@@ -143,6 +144,13 @@
     # If Epsilon is unreachable, builds fail rather than running locally.
     nix.settings.max-jobs = lib.mkForce 0;
     btrfs.scrub.fileSystems = ["/"];
+    i2p = {
+      enable = true;
+      floodfill = true;
+      openFirewall = true;
+      eepsite.enable = true;
+    };
+
     nginx = {
       streamProxy = {
         enable = true;

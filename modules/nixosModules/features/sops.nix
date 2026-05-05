@@ -1,5 +1,9 @@
 {inputs, ...}: {
-  flake.nixosModules.sops = {pkgs, ...}: {
+  flake.nixosModules.sops = {
+    pkgs,
+    config,
+    ...
+  }: {
     imports = [inputs.sops-nix.nixosModules.sops];
 
     environment.systemPackages = with pkgs; [
@@ -8,7 +12,7 @@
     ];
 
     sops = {
-      defaultSopsFile = "${toString inputs.nix-secrets}/secrets.yaml";
+      defaultSopsFile = "${toString inputs.nix-secrets}/hosts/${config.networking.hostName}.yaml";
       age = {
         # Use the host's SSH host ed25519 key as the age identity. sops-nix
         # will derive the age key from it at activation time, so no separate

@@ -59,6 +59,7 @@
       self.nixosModules.kanata
       self.nixosModules.networkManager
       self.nixosModules.nginx
+      self.nixosModules.i2p
       self.nixosModules.remoteBuilder
       self.nixosModules.syncthing
       self.nixosModules.topology
@@ -66,6 +67,7 @@
     ];
 
     networking.hostName = "delta";
+    i2p.enable = true;
     remoteBuilder.jumpHost = "10.10.0.1";
     topology.self = let
       inherit (config.lib.topology) mkConnection;
