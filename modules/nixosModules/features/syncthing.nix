@@ -20,9 +20,13 @@
     allDevices = lib.attrNames devices;
   in {
     sops.secrets = {
+      "services/syncthing/gui-password" = {
+        sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
+        owner = user;
+      };
+
       "hosts/${config.networking.hostName}/syncthing-key".owner = user;
       "hosts/${config.networking.hostName}/syncthing-cert".owner = user;
-      "services/syncthing/gui-password".owner = user;
     };
 
     services.syncthing = {

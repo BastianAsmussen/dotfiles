@@ -130,8 +130,8 @@
 
     sops = {
       secrets = {
+        "cloudflare-api-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
         "wireguard/psk-eta-delta" = {};
-        "cloudflare-api-token" = {};
         "mtls/delta-client-cert".owner = "nginx";
         "mtls/delta-client-key".owner = "nginx";
       };

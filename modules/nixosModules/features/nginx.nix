@@ -1,4 +1,4 @@
-{
+{inputs, ...}: {
   flake.nixosModules.nginx = {
     lib,
     config,
@@ -439,7 +439,7 @@
           mkIf (
             lib.any (proxy: proxy.ssl.dnsProvider == "cloudflare") (lib.attrValues enabledProxies)
           ) {
-            secrets."cloudflare-api-token" = {};
+            secrets."cloudflare-api-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
             templates."cloudflare-acme-env" = {
               owner = "acme";
               content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
@@ -575,7 +575,7 @@
         mkIf (enabledRedirects != {}) (lib.mkMerge [
           {
             sops = mkIf (lib.any (r: r.ssl.dnsProvider == "cloudflare") redirectList) {
-              secrets."cloudflare-api-token" = {};
+              secrets."cloudflare-api-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
               templates."cloudflare-acme-env" = {
                 owner = "acme";
                 content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";

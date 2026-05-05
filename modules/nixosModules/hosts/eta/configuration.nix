@@ -186,7 +186,7 @@
 
     sops = {
       secrets = {
-        "cloudflare-api-token" = {};
+        "cloudflare-api-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
         "wireguard/psk-eta-epsilon" = {};
         "wireguard/psk-eta-delta" = {};
       };

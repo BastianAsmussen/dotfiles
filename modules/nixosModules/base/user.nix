@@ -61,7 +61,10 @@
     };
 
     config = {
-      sops.secrets."user/bastian/password-hash".neededForUsers = true;
+      sops.secrets."user/bastian/password-hash" = {
+        sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
+        neededForUsers = true;
+      };
 
       programs.zsh.enable = true;
       users = {
