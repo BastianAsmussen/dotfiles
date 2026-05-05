@@ -2,7 +2,6 @@
   flake.homeModules.ohMyPosh = {config, ...}: {
     programs.oh-my-posh = {
       enable = true;
-
       enableZshIntegration = config.programs.zsh.enable;
       settings = {
         version = 2;

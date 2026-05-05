@@ -6,7 +6,6 @@
 }: {
   viAlias = true;
   vimAlias = true;
-
   globals = {
     mapleader = " ";
     maplocalleader = " ";
@@ -29,14 +28,12 @@
   performance = {
     byteCompileLua = {
       enable = true;
-
       nvimRuntime = true;
       plugins = true;
     };
 
     combinePlugins = {
       enable = true;
-
       standalonePlugins = ["nvim-treesitter"];
     };
   };
@@ -68,16 +65,13 @@
     number = true;
     relativenumber = true;
     showmode = false;
-
     undofile = true;
     backup = false;
     swapfile = false;
-
     hlsearch = true;
     ignorecase = true;
     smartcase = true;
     inccommand = "split";
-
     tabstop = 4;
     softtabstop = 4;
     shiftwidth = 4;
@@ -86,9 +80,7 @@
     wrap = false;
     breakindent = true;
     scrolloff = 8;
-
     cursorline = true;
-
     signcolumn = "yes";
     list = true;
     listchars = {
@@ -98,18 +90,14 @@
     };
 
     termguicolors = pkgs.stdenv.isLinux;
-
     updatetime = 50;
     timeoutlen = 300;
-
     colorcolumn = "80";
   };
 
   diagnostic.settings.virtual_text = false;
-
   colorschemes.catppuccin = {
     enable = true;
-
     settings = {
       flavour = "mocha";
       styles = {
@@ -341,7 +329,6 @@
   plugins = {
     cmp = {
       enable = true;
-
       settings = {
         mapping = {
           "<C-d>" = "cmp.mapping.scroll_docs(-4)";
@@ -408,16 +395,13 @@
     };
 
     crates.enable = true;
-
     colorizer = {
       enable = true;
-
       settings.user_default_options.names = false;
     };
 
     comment = {
       enable = true;
-
       settings.pre_hook =
         # lua
         ''
@@ -427,7 +411,6 @@
 
     dap = {
       enable = true;
-
       signs = {
         dapBreakpoint = {
           text = "";
@@ -450,7 +433,6 @@
 
     dap-ui = {
       enable = true;
-
       settings = {
         floating.mappings.close = ["<ESC>" "q"];
         icons = {
@@ -477,12 +459,9 @@
 
     dap-virtual-text.enable = true;
     cmp-dap.enable = true;
-
     fidget.enable = true;
-
     gitsigns = {
       enable = true;
-
       settings = {
         current_line_blame = true;
         trouble = config.plugins.trouble.enable;
@@ -495,17 +474,14 @@
     };
 
     indent-blankline.enable = true;
-
     lsp = {
       enable = true;
-
       inlayHints = true;
       servers = {
         clangd.enable = true;
         cssls.enable = true;
         dockerls = {
           enable = true;
-
           settings.docker.languageserver.formatter.ignoreMultilineInstructions = true;
         };
 
@@ -513,7 +489,6 @@
         gopls.enable = true;
         hls = {
           enable = true;
-
           installGhc = true;
         };
 
@@ -521,13 +496,11 @@
         java_language_server.enable = true;
         lua_ls = {
           enable = true;
-
           settings.telemetry.enable = false;
         };
 
         nixd = {
           enable = true;
-
           settings.formatting.command = lib.mkDefault ["${lib.getExe pkgs.alejandra}"];
         };
 
@@ -540,7 +513,6 @@
         ts_ls.enable = true;
         typos_lsp = {
           enable = true;
-
           extraOptions.init_options.diagnosticSeverity = "Hint";
         };
       };
@@ -651,10 +623,8 @@
     };
 
     lsp-format.enable = true;
-
     lspkind = {
       enable = true;
-
       settings = {
         mode = "symbol_text";
         maxwidth = 50;
@@ -663,10 +633,8 @@
     };
 
     lsp-lines.enable = true;
-
     lualine = {
       enable = true;
-
       settings = {
         options = {
           globalstatus = true;
@@ -753,7 +721,6 @@
 
     luasnip = {
       enable = true;
-
       settings = {
         enable_autosnippets = true;
         store_selection_keys = "<Tab>";
@@ -769,15 +736,12 @@
 
     markdown-preview = {
       enable = true;
-
       settings.theme = "dark";
     };
 
     nix.enable = true;
-
     none-ls = {
       enable = true;
-
       sources = {
         code_actions = {
           gitsigns.enable = true;
@@ -799,7 +763,6 @@
           markdownlint.enable = true;
           prettier = {
             enable = false;
-
             disableTsServerFormatter = true;
           };
         };
@@ -809,7 +772,6 @@
     nvim-autopairs.enable = true;
     oil = {
       enable = true;
-
       settings = {
         columns = ["icon"];
         view_options.show_hidden = true;
@@ -823,7 +785,6 @@
 
     rustaceanvim = {
       enable = true;
-
       settings = {
         server = {
           load_vscode_settings = true;
@@ -879,7 +840,6 @@
     sleuth.enable = true;
     telescope = {
       enable = true;
-
       keymaps = {
         "<leader>sh" = {
           mode = "n";
@@ -975,7 +935,6 @@
 
     tmux-navigator = {
       enable = true;
-
       keymaps = [
         {
           action = "up";
@@ -1002,12 +961,10 @@
 
     treesitter = {
       enable = true;
-
       grammarPackages = pkgs.vimPlugins.nvim-treesitter.allGrammars;
       settings = {
         highlight = {
           enable = true;
-
           additional_vim_regex_highlighting = true;
         };
 
@@ -1017,7 +974,6 @@
 
     treesitter-context = {
       enable = true;
-
       settings.max_lines = 3;
     };
 
@@ -1026,10 +982,8 @@
     typescript-tools.enable = true;
     undotree.enable = true;
     web-devicons.enable = true;
-
     which-key = {
       enable = true;
-
       settings = {
         spec = [
           {

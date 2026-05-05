@@ -8,7 +8,6 @@
 
     user = config.preferences.user.name;
     home = "/home/${user}";
-
     devices = {
       epsilon.id = hosts.epsilon.syncthing-id;
       delta.id = hosts.delta.syncthing-id;

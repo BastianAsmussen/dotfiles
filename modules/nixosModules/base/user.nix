@@ -81,7 +81,6 @@
             hashedPasswordFile = config.sops.secrets."user/bastian/password-hash".path;
             extraGroups = ["wheel"];
             shell = pkgs.zsh;
-
             openssh.authorizedKeys.keyFiles = cfg.authorizedKeyFiles;
           };
         };

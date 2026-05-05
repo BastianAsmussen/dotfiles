@@ -6,7 +6,6 @@
 
     programs.nixcord = {
       enable = true;
-
       discord.enable = true;
       vesktop.enable = true;
       config = {
@@ -16,7 +15,6 @@
         };
 
         enabledThemes = ["catppuccin-mocha.css"];
-
         plugins = {
           callTimer.enable = true;
           dontRoundMyTimestamps.enable = true;

@@ -23,11 +23,9 @@
 
       nginx.reverseProxies.website = lib.mkIf config.website-extras.exposePublicly {
         enable = true;
-
         domain = "asmussen.tech";
         location = "/";
         upstream = "http://localhost:${toString config.services.website.port}/";
-
         ssl = {
           dnsProvider = "cloudflare";
           environmentFile = config.sops.templates."cloudflare-acme-env".path;

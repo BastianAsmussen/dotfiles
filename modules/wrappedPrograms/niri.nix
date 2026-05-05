@@ -19,7 +19,6 @@
         noctaliaExe = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-shell;
       in {
         prefer-no-csd = _: {};
-
         input = {
           focus-follows-mouse = _: {};
           keyboard = {

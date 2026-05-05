@@ -19,7 +19,6 @@
 
         # Disable channels.
         channel.enable = false;
-
         nrBuildUsers = 64;
         settings = {
           experimental-features = [
@@ -85,11 +84,9 @@
       systemd = {
         oomd = {
           enable = lib.mkDefault true;
-
           enableRootSlice = true;
           enableSystemSlice = true;
           enableUserSlices = true;
-
           settings.OOM."DefaultMemoryPressureDurationSec" = "20s";
         };
 

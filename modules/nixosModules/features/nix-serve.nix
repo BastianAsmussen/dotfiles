@@ -45,7 +45,6 @@
         inherit (cfg) bindAddress;
 
         enable = true;
-
         package = pkgs.nix-serve-ng;
         secretKeyFile = config.sops.secrets.${cacheKeySecret}.path;
       };
@@ -65,11 +64,9 @@
         serveCfg = config.services.nix-serve;
       in {
         enable = true;
-
         domain = "cache.asmussen.tech";
         location = "/";
         upstream = "http://${serveCfg.bindAddress}:${toString serveCfg.port}";
-
         ssl = {
           dnsProvider = "cloudflare";
           environmentFile = config.sops.templates."cloudflare-acme-env".path;
@@ -85,7 +82,6 @@
           group = "builder";
           useDefaultShell = true;
           hashedPassword = "*";
-
           openssh.authorizedKeys.keys = [
             inputs.nix-secrets.hosts.epsilon.builder-ssh-public-key
             inputs.nix-secrets.hosts.delta.builder-ssh-public-key

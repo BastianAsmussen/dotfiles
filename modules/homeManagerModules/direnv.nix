@@ -8,9 +8,7 @@
 
     programs.direnv = {
       enable = true;
-
       enableZshIntegration = config.programs.zsh.enable;
-
       silent = true;
       nix-direnv.enable = true;
 

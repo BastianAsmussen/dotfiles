@@ -82,29 +82,26 @@
       if ! ${tmux} has-session -t "=$session_name" 2>/dev/null; then
         ${tmux} new-session -d -s "$session_name" -c "$target_dir"
       fi
+
       ${tmux} switch-client -t "$session_name"
     '';
   in {
     stylix.targets.tmux.enable = false;
+
     programs.tmux = {
       enable = true;
-
       shell = getExe pkgs.zsh;
       terminal = "screen-256color"; # Fix terminal colors.
       keyMode = "vi";
-
       newSession = true;
       secureSocket = true;
-
       escapeTime = 0; # Make pressing escape instant.
       prefix = "C-Space";
       mouse = true;
       clock24 = true;
-
       aggressiveResize = true;
       disableConfirmationPrompt = true;
       baseIndex = 1;
-
       plugins = with pkgs.tmuxPlugins; [
         vim-tmux-navigator
         yank

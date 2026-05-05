@@ -8,10 +8,8 @@
       defaultLocale = lib.mkForce "ja_JP.UTF-8";
       extraLocales = ["ja_JP.UTF-8/UTF-8"];
       extraLocaleSettings.LC_ALL = "ja_JP.UTF-8";
-
       inputMethod = {
         enable = true;
-
         type = "fcitx5";
         fcitx5 = {
           waylandFrontend = true;

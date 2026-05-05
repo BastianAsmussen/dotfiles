@@ -41,7 +41,6 @@
       };
 
       kernelModules = ["tcp_bbr"];
-
       blacklistedKernelModules = [
         # Unused network protocols.
         "dccp"
@@ -62,7 +61,6 @@
     security = {
       apparmor = {
         enable = true;
-
         enableCache = true;
         killUnconfinedConfinables = true;
         packages = [pkgs.apparmor-profiles];
@@ -73,7 +71,6 @@
       unprivilegedUsernsClone = false;
       polkit.enable = true;
       rtkit.enable = true;
-
       sudo.enable = false;
       sudo-rs.enable = true;
 

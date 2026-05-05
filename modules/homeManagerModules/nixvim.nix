@@ -18,9 +18,7 @@
 
     programs.nixvim = {
       enable = true;
-
       imports = [./_nixvim-config.nix];
-
       defaultEditor = true;
       plugins = {
         # nixd needs activation-only flake context from NixOS/HM.

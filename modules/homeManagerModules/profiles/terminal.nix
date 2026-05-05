@@ -2,15 +2,6 @@
 {self, ...}: {
   flake.homeModules.terminal = {
     imports = with self.homeModules; [
-      nixvim
-      git
-      zsh
-      zoxide
-      nixIndex
-      tmux
-      tmuxSessionizer
-      gpg
-      ohMyPosh
       bat
       btop
       direnv
@@ -18,8 +9,17 @@
       eza
       fastfetch
       fzf
-      ripgrep
+      git
+      gpg
+      nixIndex
+      nixvim
+      ohMyPosh
       passwordStore
+      ripgrep
+      tmux
+      tmuxSessionizer
+      zoxide
+      zsh
     ];
   };
 }

@@ -12,11 +12,9 @@
       initrd = {
         availableKernelModules = ["xhci_pci" "virtio_pci" "virtio_scsi" "virtio_net" "usbhid" "sr_mod"];
         kernelModules = [];
-
         luks.forceLuksSupportInInitrd = true;
         systemd.network = {
           enable = true;
-
           networks."10-eth" = {
             matchConfig.Type = "ether";
             networkConfig = {
@@ -28,11 +26,9 @@
 
         network = {
           enable = true;
-
           flushBeforeStage2 = true;
           ssh = {
             enable = true;
-
             port = 2222;
             hostKeys = ["/boot/initrd-host-key"];
             authorizedKeys =

@@ -22,7 +22,6 @@
     config = {
       nix = {
         distributedBuilds = true;
-
         buildMachines = [
           {
             hostName = "10.10.0.2";

@@ -6,9 +6,7 @@
   }: {
     programs.nh = {
       enable = true;
-
       flake = "/home/${config.preferences.user.name}/dotfiles";
-
       clean = {
         enable = true;
         extraArgs = "--keep 3 --keep-since 7d";
