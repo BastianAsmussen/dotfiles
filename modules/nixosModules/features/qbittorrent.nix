@@ -55,6 +55,7 @@
             [Preferences]
             Downloads\SavePath=/srv/media/torrents/
             General\Locale=en
+            General\StatusbarExternalIPDisplayed=true
             WebUI\Address=${config.qbittorrent.webuiAddress}
             WebUI\Username=admin
             WebUI\Password_PBKDF2=${config.sops.placeholder."services/qbittorrent/webui/password-hash"}
