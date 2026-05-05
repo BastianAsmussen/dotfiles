@@ -18,6 +18,7 @@
       settings = let
         noctaliaExe = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-shell;
       in {
+        hotkey-overlay.skip-at-startup = _: {};
         prefer-no-csd = _: {};
         input = {
           focus-follows-mouse = _: {};
