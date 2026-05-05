@@ -19,6 +19,7 @@
   flake.nixosModules.hostEpsilon = {
     config,
     lib,
+    pkgs,
     ...
   }: {
     imports = [
@@ -59,7 +60,6 @@
       self.nixosModules.homeManager
       self.nixosModules.jellyfin
       self.nixosModules.qbittorrent
-      self.nixosModules.i2p
       self.nixosModules.syncthing
       self.nixosModules.primaryBusy
       self.nixosModules.monero
@@ -105,6 +105,11 @@
       };
     };
 
+    services.ollama = {
+      enable = true;
+      package = pkgs.ollama-cuda;
+    };
+
     sops.secrets."wireguard/psk-eta-epsilon" = {};
 
     persistence = {
@@ -118,9 +123,9 @@
         "/var/lib/fail2ban"
         "/var/lib/power-profiles-daemon"
         "/var/lib/jellyfin"
-        "/var/lib/i2pd"
         "/var/lib/qBittorrent"
         "/var/lib/systemd/coredump"
+        "/var/lib/private/ollama"
       ];
 
       files = [
@@ -286,8 +291,6 @@
         scale = 1.0;
       };
     };
-
-    i2p.enable = true;
 
     monero.mining = {
       enable = false;

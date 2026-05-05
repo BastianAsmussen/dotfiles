@@ -18,17 +18,6 @@
     # other devices in the list (Syncthing silently ignores its own ID).
     allDevices = lib.attrNames devices;
   in {
-    # Expose Syncthing as an I2P hidden service when i2pd is running.
-    # The key determines the stable B32 address.
-    services.i2pd.inTunnels = lib.mkIf config.services.i2pd.enable {
-      syncthing = {
-        enable = true;
-        address = "127.0.0.1";
-        port = 22000;
-        keys = "syncthing-i2p.dat";
-      };
-    };
-
     sops.secrets = {
       "services/syncthing/gui-password" = {
         sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
@@ -37,11 +26,6 @@
 
       "hosts/${config.networking.hostName}/syncthing-key".owner = user;
       "hosts/${config.networking.hostName}/syncthing-cert".owner = user;
-      "hosts/${config.networking.hostName}/i2p-syncthing-key" = {
-        owner = "i2pd";
-        mode = "0600";
-        path = "/var/lib/i2pd/syncthing-i2p.dat";
-      };
     };
 
     services.syncthing = {

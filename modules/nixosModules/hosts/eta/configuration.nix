@@ -48,7 +48,6 @@
       self.nixosModules.wireguard
 
       # Features.
-      self.nixosModules.i2p
       self.nixosModules.btop
       self.nixosModules.btrfs
       self.nixosModules.homeManager
@@ -85,12 +84,26 @@
     security.lockKernelModules = true;
     networking = {
       hostName = "eta";
-      interfaces.enp1s0.ipv6.addresses = [
-        {
-          address = inputs.nix-secrets.hosts.eta.ipv6_address;
-          prefixLength = 64;
-        }
-      ];
+      interfaces.enp1s0 = {
+        ipv4.addresses = [
+          {
+            address = inputs.nix-secrets.hosts.eta.ipv4_address;
+            prefixLength = 32;
+          }
+        ];
+
+        ipv6.addresses = [
+          {
+            address = inputs.nix-secrets.hosts.eta.ipv6_address;
+            prefixLength = 64;
+          }
+        ];
+      };
+
+      defaultGateway = {
+        address = "172.31.1.1";
+        interface = "enp1s0";
+      };
 
       defaultGateway6 = {
         address = "fe80::1";
@@ -144,13 +157,6 @@
     # If Epsilon is unreachable, builds fail rather than running locally.
     nix.settings.max-jobs = lib.mkForce 0;
     btrfs.scrub.fileSystems = ["/"];
-    i2p = {
-      enable = true;
-      floodfill = true;
-      openFirewall = true;
-      eepsite.enable = true;
-    };
-
     nginx = {
       streamProxy = {
         enable = true;
