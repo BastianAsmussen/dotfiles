@@ -113,7 +113,6 @@
             alias -s nix='$EDITOR'
             alias -s py='$EDITOR'
             alias -s rs='$EDITOR'
-            alias -s sh='$EDITOR'
             alias -s ts='$EDITOR'
             alias -s zig='$EDITOR'
 
