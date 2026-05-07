@@ -1,5 +1,6 @@
 # GUI application set shared across desktop/laptop hosts.
-{self, ...}: {
+{ self, ... }:
+{
   flake.homeModules.desktop = {
     imports = with self.homeModules; [
       alacritty

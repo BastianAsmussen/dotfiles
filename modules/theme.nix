@@ -18,13 +18,16 @@ let
     base0F = "#f2cdcd"; # flamingo
   };
 
-  stripHash = str:
-    if builtins.substring 0 1 str == "#"
-    then builtins.substring 1 (builtins.stringLength str - 1) str
-    else str;
+  stripHash =
+    str:
+    if builtins.substring 0 1 str == "#" then
+      builtins.substring 1 (builtins.stringLength str - 1) str
+    else
+      str;
 
   themeNoHash = builtins.mapAttrs (_: stripHash) theme;
-in {
+in
+{
   flake = {
     inherit theme themeNoHash;
   };

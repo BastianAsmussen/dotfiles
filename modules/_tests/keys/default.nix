@@ -1,9 +1,11 @@
-{lib}: let
+{ lib }:
+let
   mockDir = ./mock;
   keys = lib.custom.keys.load mockDir;
 
   mapKeys = ks: map (k: mockDir + "/${k}") ks;
-in {
+in
+{
   testAllKeys = {
     expr = keys.fullPaths;
     expected = mapKeys [
@@ -55,72 +57,72 @@ in {
   };
 
   testFilterSshKeys = {
-    expr = map (k: k.name) (lib.custom.keys.filterSshKeys ["ssh-theta.pub"] keys);
-    expected = ["ssh-theta.pub"];
+    expr = map (k: k.name) (lib.custom.keys.filterSshKeys [ "ssh-theta.pub" ] keys);
+    expected = [ "ssh-theta.pub" ];
   };
 
   testFilterSshKeysExcludesNonSsh = {
-    expr = lib.custom.keys.filterSshKeys ["builder-kappa.pub"] keys;
-    expected = [];
+    expr = lib.custom.keys.filterSshKeys [ "builder-kappa.pub" ] keys;
+    expected = [ ];
   };
 
   testFilterSshKeysEmpty = {
-    expr = lib.custom.keys.filterSshKeys [] keys;
-    expected = [];
+    expr = lib.custom.keys.filterSshKeys [ ] keys;
+    expected = [ ];
   };
 
   testSelectSshPaths = {
-    expr = lib.custom.keys.selectSshPaths ["ssh-theta.pub"] keys;
-    expected = mapKeys ["ssh-theta.pub"];
+    expr = lib.custom.keys.selectSshPaths [ "ssh-theta.pub" ] keys;
+    expected = mapKeys [ "ssh-theta.pub" ];
   };
 
   testSelectSshPathsMissingName = {
-    expr = lib.custom.keys.selectSshPaths ["ssh-theta.pub" "ssh-nonexistent.pub"] keys;
-    expected = mapKeys ["ssh-theta.pub"];
+    expr = lib.custom.keys.selectSshPaths [ "ssh-theta.pub" "ssh-nonexistent.pub" ] keys;
+    expected = mapKeys [ "ssh-theta.pub" ];
   };
 
   testSelectSshContents = {
-    expr = lib.custom.keys.selectSshContents ["ssh-theta.pub"] keys;
-    expected = [(builtins.readFile (mockDir + "/ssh-theta.pub"))];
+    expr = lib.custom.keys.selectSshContents [ "ssh-theta.pub" ] keys;
+    expected = [ (builtins.readFile (mockDir + "/ssh-theta.pub")) ];
   };
 
   testSelectSshContentsEmpty = {
-    expr = lib.custom.keys.selectSshContents ["ssh-nonexistent.pub"] keys;
-    expected = [];
+    expr = lib.custom.keys.selectSshContents [ "ssh-nonexistent.pub" ] keys;
+    expected = [ ];
   };
 
   testFilterAgeKeys = {
-    expr = map (k: k.name) (lib.custom.keys.filterAgeKeys ["age-alice.pub"] keys);
-    expected = ["age-alice.pub"];
+    expr = map (k: k.name) (lib.custom.keys.filterAgeKeys [ "age-alice.pub" ] keys);
+    expected = [ "age-alice.pub" ];
   };
 
   testFilterAgeKeysExcludesNonAge = {
-    expr = lib.custom.keys.filterAgeKeys ["builder-kappa.pub"] keys;
-    expected = [];
+    expr = lib.custom.keys.filterAgeKeys [ "builder-kappa.pub" ] keys;
+    expected = [ ];
   };
 
   testFilterAgeKeysEmpty = {
-    expr = lib.custom.keys.filterAgeKeys [] keys;
-    expected = [];
+    expr = lib.custom.keys.filterAgeKeys [ ] keys;
+    expected = [ ];
   };
 
   testSelectAgePaths = {
-    expr = lib.custom.keys.selectAgePaths ["age-alice.pub"] keys;
-    expected = mapKeys ["age-alice.pub"];
+    expr = lib.custom.keys.selectAgePaths [ "age-alice.pub" ] keys;
+    expected = mapKeys [ "age-alice.pub" ];
   };
 
   testSelectAgePathsMissingName = {
-    expr = lib.custom.keys.selectAgePaths ["age-alice.pub" "age-nonexistent.pub"] keys;
-    expected = mapKeys ["age-alice.pub"];
+    expr = lib.custom.keys.selectAgePaths [ "age-alice.pub" "age-nonexistent.pub" ] keys;
+    expected = mapKeys [ "age-alice.pub" ];
   };
 
   testSelectAgeContents = {
-    expr = lib.custom.keys.selectAgeContents ["age-alice.pub"] keys;
-    expected = [(builtins.readFile (mockDir + "/age-alice.pub"))];
+    expr = lib.custom.keys.selectAgeContents [ "age-alice.pub" ] keys;
+    expected = [ (builtins.readFile (mockDir + "/age-alice.pub")) ];
   };
 
   testSelectAgeContentsEmpty = {
-    expr = lib.custom.keys.selectAgeContents ["age-nonexistent.pub"] keys;
-    expected = [];
+    expr = lib.custom.keys.selectAgeContents [ "age-nonexistent.pub" ] keys;
+    expected = [ ];
   };
 }

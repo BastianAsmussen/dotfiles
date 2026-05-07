@@ -3,8 +3,10 @@
   self,
   lib,
   ...
-}: let
-  mkWhichKey = pkgs: menu:
+}:
+let
+  mkWhichKey =
+    pkgs: menu:
     (self.wrapperModules.which-key.apply {
       inherit pkgs;
 
@@ -28,7 +30,8 @@
         margin_top = 0;
       };
     }).wrapper;
-in {
+in
+{
   flake.mkWhichKeyExe = pkgs: menu: lib.getExe (mkWhichKey pkgs menu);
 
   flake.wrapperModules.which-key = inputs.wrappers.lib.wrapModule (
@@ -36,9 +39,11 @@ in {
       config,
       lib,
       ...
-    }: let
-      yamlFormat = config.pkgs.formats.yaml {};
-    in {
+    }:
+    let
+      yamlFormat = config.pkgs.formats.yaml { };
+    in
+    {
       options = {
         settings = lib.mkOption {
           inherit (yamlFormat) type;

@@ -2,37 +2,41 @@
   inputs,
   self,
   ...
-}: let
-  mkHome = {
-    system,
-    modules,
-  }:
+}:
+let
+  mkHome =
+    {
+      system,
+      modules,
+    }:
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = import inputs.nixpkgs {
         inherit system;
 
         config.allowUnfree = true;
-        overlays = [self.overlays.additions self.overlays.modifications];
+        overlays = [
+          self.overlays.additions
+          self.overlays.modifications
+        ];
       };
 
-      extraSpecialArgs = {inherit inputs self;};
+      extraSpecialArgs = { inherit inputs self; };
 
-      modules =
-        [
-          inputs.stylix.homeModules.stylix
+      modules = [
+        inputs.stylix.homeModules.stylix
 
-          # Baseline required by standalone home-manager.
-          {
-            home = {
-              username = "bastian";
-              homeDirectory = "/home/bastian";
-              stateVersion = "26.05";
-            };
+        # Baseline required by standalone home-manager.
+        {
+          home = {
+            username = "bastian";
+            homeDirectory = "/home/bastian";
+            stateVersion = "26.05";
+          };
 
-            programs.home-manager.enable = true;
-          }
-        ]
-        ++ modules;
+          programs.home-manager.enable = true;
+        }
+      ]
+      ++ modules;
     };
 
   bastianModules = {
@@ -60,12 +64,15 @@
       ssh
       terminal
 
-      ({pkgs, ...}: {
-        home.packages = with pkgs; [
-          airtame
-          freecad-wayland
-        ];
-      })
+      (
+        { pkgs, ... }:
+        {
+          home.packages = with pkgs; [
+            airtame
+            freecad-wayland
+          ];
+        }
+      )
     ];
 
     mu = with self.homeModules; [
@@ -89,7 +96,8 @@
       sops
     ];
   };
-in {
+in
+{
   flake = {
     homeModuleSets = bastianModules;
     homeConfigurations = {

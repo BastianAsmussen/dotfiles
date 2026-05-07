@@ -1,18 +1,21 @@
-{inputs, ...}: {
-  perSystem = {
-    pkgs,
-    config,
-    ...
-  }: {
-    devShells.default = pkgs.mkShell {
-      inherit (config.pre-commit) shellHook;
+{ inputs, ... }:
+{
+  perSystem =
+    {
+      pkgs,
+      config,
+      ...
+    }:
+    {
+      devShells.default = pkgs.mkShell {
+        inherit (config.pre-commit) shellHook;
 
-      inputsFrom = [
-        (import ../shell.nix {
-          inherit pkgs;
-          inherit (inputs) nixvim;
-        })
-      ];
+        inputsFrom = [
+          (import ../shell.nix {
+            inherit pkgs;
+            inherit (inputs) nixvim;
+          })
+        ];
+      };
     };
-  };
 }

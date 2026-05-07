@@ -1,4 +1,5 @@
-{inputs, ...}: {
+{ inputs, ... }:
+{
   flake.homeModules.nixIndex = {
     imports = [
       inputs.nix-index-database.homeModules.nix-index

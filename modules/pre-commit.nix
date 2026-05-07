@@ -1,4 +1,5 @@
-{inputs, ...}: {
+{ inputs, ... }:
+{
   imports = [
     inputs.pre-commit-hooks.flakeModule
   ];
@@ -14,7 +15,7 @@
       nixfmt.enable = true;
       flake-checker = {
         enable = true;
-        args = ["--no-telemetry"];
+        args = [ "--no-telemetry" ];
       };
     };
   };

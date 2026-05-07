@@ -1,4 +1,5 @@
-{lib}: let
+{ lib }:
+let
   inherit (builtins) attrNames readDir filter;
   inherit (lib.strings) hasSuffix hasPrefix;
 
@@ -37,37 +38,36 @@
   };
 
   defaultDir = ../../keys;
-in rec {
+in
+rec {
   # Main entry points.
-  load = dir: let
-    keyNames = attrNames (readDir dir);
-    keySets = map (name: makeKey dir name) keyNames;
-  in
+  load =
+    dir:
+    let
+      keyNames = attrNames (readDir dir);
+      keySets = map (name: makeKey dir name) keyNames;
+    in
     makeKeyCollection dir keySets;
 
   default = load defaultDir;
 
   # Filter SSH keys from a collection by filename.
-  filterSshKeys = names: collection:
-    filter (k: builtins.elem k.name names) collection.sshKeys;
+  filterSshKeys = names: collection: filter (k: builtins.elem k.name names) collection.sshKeys;
 
   # Filter SSH keys from a collection by filename.
-  filterAgeKeys = names: collection:
-    filter (k: builtins.elem k.name names) collection.ageKeys;
+  filterAgeKeys = names: collection: filter (k: builtins.elem k.name names) collection.ageKeys;
 
   # Full paths of SSH keys filtered by filename.
-  selectSshPaths = names: collection:
-    map (k: k.fullPath) (filterSshKeys names collection);
+  selectSshPaths = names: collection: map (k: k.fullPath) (filterSshKeys names collection);
 
   # File contents of SSH keys filtered by filename.
-  selectSshContents = names: collection:
-    map (k: builtins.readFile k.fullPath) (filterSshKeys names collection);
+  selectSshContents =
+    names: collection: map (k: builtins.readFile k.fullPath) (filterSshKeys names collection);
 
   # Full paths of Age keys filtered by filename.
-  selectAgePaths = names: collection:
-    map (k: k.fullPath) (filterAgeKeys names collection);
+  selectAgePaths = names: collection: map (k: k.fullPath) (filterAgeKeys names collection);
 
   # File contents of Age keys filtered by filename.
-  selectAgeContents = names: collection:
-    map (k: builtins.readFile k.fullPath) (filterAgeKeys names collection);
+  selectAgeContents =
+    names: collection: map (k: builtins.readFile k.fullPath) (filterAgeKeys names collection);
 }

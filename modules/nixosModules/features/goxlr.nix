@@ -1,12 +1,14 @@
 {
-  flake.nixosModules.goxlr = {pkgs, ...}: {
-    environment.systemPackages = [pkgs.goxlr-utility];
+  flake.nixosModules.goxlr =
+    { pkgs, ... }:
+    {
+      environment.systemPackages = [ pkgs.goxlr-utility ];
 
-    services.goxlr-utility = {
-      enable = true;
-      autoStart.xdg = true;
+      services.goxlr-utility = {
+        enable = true;
+        autoStart.xdg = true;
+      };
+
+      preferences.autostart = [ "${pkgs.goxlr-utility}/bin/goxlr-daemon" ];
     };
-
-    preferences.autostart = ["${pkgs.goxlr-utility}/bin/goxlr-daemon"];
-  };
 }
