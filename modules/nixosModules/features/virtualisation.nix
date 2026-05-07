@@ -1,15 +1,18 @@
-{self, ...}: {
-  flake.nixosModules.virtualisation = {pkgs, ...}: {
-    imports = [
-      self.nixosModules.android
-      self.nixosModules.podman
-      # self.nixosModules.qemuVirtualisation
-    ];
+{ self, ... }:
+{
+  flake.nixosModules.virtualisation =
+    { pkgs, ... }:
+    {
+      imports = [
+        self.nixosModules.android
+        self.nixosModules.podman
+        # self.nixosModules.qemuVirtualisation
+      ];
 
-    # Emulate ARM CPU.
-    boot.binfmt.emulatedSystems = ["aarch64-linux"];
+      # Emulate ARM CPU.
+      boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
-    # Bottles.
-    environment.systemPackages = [pkgs.bottles];
-  };
+      # Bottles.
+      environment.systemPackages = [ pkgs.bottles ];
+    };
 }

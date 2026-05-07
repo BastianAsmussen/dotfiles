@@ -1,18 +1,27 @@
 {
   lib,
   helpers,
-}: let
-  inherit (lib.custom.math) sqrt pow sin cos tan TAU PI HALF_PI;
+}:
+let
+  inherit (lib.custom.math)
+    sqrt
+    pow
+    sin
+    cos
+    tan
+    TAU
+    PI
+    HALF_PI
+    ;
 
-  isClose = a: b:
+  isClose =
+    a: b:
     helpers.isClose {
       margins = {
         abs = 1.0e-6;
         rel = 1.0e-6;
       };
-    }
-    a
-    b;
+    } a b;
 
   tanIsClose = helpers.isClose {
     margins = {
@@ -32,7 +41,8 @@
 
   sqrt2 = sqrt 2;
   sqrt3 = sqrt 3;
-in {
+in
+{
   # Critical angles.
   testSinZero = {
     expr = isClose (sin 0) 0.0;

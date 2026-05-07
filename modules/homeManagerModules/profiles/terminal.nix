@@ -1,5 +1,6 @@
 # Terminal profile for desktop, laptop and phone hosts.
-{self, ...}: {
+{ self, ... }:
+{
   flake.homeModules.terminal = {
     imports = with self.homeModules; [
       bat

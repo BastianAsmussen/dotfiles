@@ -13,29 +13,32 @@
     };
   };
 
-  outputs = {
-    # deadnix: skip
-    self,
-    nixpkgs,
-    flake-utils,
-    gomod2nix,
-  }: (
-    flake-utils.lib.eachDefaultSystem
-    (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+  outputs =
+    {
+      # deadnix: skip
+      self,
+      nixpkgs,
+      flake-utils,
+      gomod2nix,
+    }:
+    (flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
 
-      # Use a newer macOS SDK; the default fails to compile Go projects.
-      callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
+        # Use a newer macOS SDK; the default fails to compile Go projects.
+        callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
 
-      application = callPackage ./. {
-        inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
-      };
-    in {
-      checks.build = application;
-      packages.default = application;
-      devShells.default = callPackage ./shell.nix {
-        inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
-      };
-    })
-  );
+        application = callPackage ./. {
+          inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
+        };
+      in
+      {
+        checks.build = application;
+        packages.default = application;
+        devShells.default = callPackage ./shell.nix {
+          inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
+        };
+      }
+    ));
 }

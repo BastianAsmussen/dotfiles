@@ -1,205 +1,208 @@
 {
-  flake.homeModules.zsh = {
-    config,
-    lib,
-    pkgs,
-    ...
-  }: {
-    programs = {
-      command-not-found.enable = false;
-      nix-your-shell = {
-        enable = true;
-        enableZshIntegration = true;
-      };
-
-      zsh = {
-        enable = true;
-        autocd = true;
-        autosuggestion.enable = true;
-        syntaxHighlighting.enable = true;
-        history = {
-          append = true;
-          ignoreAllDups = true;
-          path = "${config.xdg.dataHome}/zsh/history";
-          size = 16 * 1024;
+  flake.homeModules.zsh =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      programs = {
+        command-not-found.enable = false;
+        nix-your-shell = {
+          enable = true;
+          enableZshIntegration = true;
         };
 
-        historySubstringSearch.enable = true;
-        defaultKeymap = "emacs";
-        initContent =
-          # sh
-          ''
-            # Keybindings.
-            bindkey '^f' autosuggest-accept
+        zsh = {
+          enable = true;
+          autocd = true;
+          autosuggestion.enable = true;
+          syntaxHighlighting.enable = true;
+          history = {
+            append = true;
+            ignoreAllDups = true;
+            path = "${config.xdg.dataHome}/zsh/history";
+            size = 16 * 1024;
+          };
 
-            bindkey '^[[1;5C' emacs-forward-word
-            bindkey '^[[1;5D' emacs-backward-word
-            bindkey '^[[3~' delete-char
+          historySubstringSearch.enable = true;
+          defaultKeymap = "emacs";
+          initContent =
+            # sh
+            ''
+              # Keybindings.
+              bindkey '^f' autosuggest-accept
 
-            bindkey '^p' history-search-backward
-            bindkey '^n' history-search-forward
+              bindkey '^[[1;5C' emacs-forward-word
+              bindkey '^[[1;5D' emacs-backward-word
+              bindkey '^[[3~' delete-char
 
-            # Open buffer line in editor.
-            autoload -Uz edit-command-line
-            zle -N edit-command-line
-            bindkey '^x^e' edit-command-line
+              bindkey '^p' history-search-backward
+              bindkey '^n' history-search-forward
 
-            # Expands history expressions like !! or !$ when you press space.
-            bindkey ' ' magic-space
+              # Open buffer line in editor.
+              autoload -Uz edit-command-line
+              zle -N edit-command-line
+              bindkey '^x^e' edit-command-line
 
-            # Project environment loader hooks.
-            autoload -Uz add-zsh-hook
+              # Expands history expressions like !! or !$ when you press space.
+              bindkey ' ' magic-space
 
-            function auto_venv() {
-              # If already in a virtualenv, do nothing.
-              if [[ -n "$VIRTUAL_ENV" && "$PWD" != *"''${VIRTUAL_ENV:h}"* ]]; then
-                deactivate
+              # Project environment loader hooks.
+              autoload -Uz add-zsh-hook
 
-                return
-              fi
+              function auto_venv() {
+                # If already in a virtualenv, do nothing.
+                if [[ -n "$VIRTUAL_ENV" && "$PWD" != *"''${VIRTUAL_ENV:h}"* ]]; then
+                  deactivate
 
-              [[ -n "$VIRTUAL_ENV" ]] && return
-
-              local dir="$PWD"
-              while [[ "$dir" != "/" ]]; do
-                if [[ -f "$dir/.venv/bin/activate" ]]; then
-                  source "$dir/.venv/bin/activate"
                   return
                 fi
 
-                dir="''${dir:h}"
-              done
-            }
+                [[ -n "$VIRTUAL_ENV" ]] && return
 
-            function auto_nvm() {
-              [[ -f .nvmrc ]] && nvm use
-            }
+                local dir="$PWD"
+                while [[ "$dir" != "/" ]]; do
+                  if [[ -f "$dir/.venv/bin/activate" ]]; then
+                    source "$dir/.venv/bin/activate"
+                    return
+                  fi
 
-            add-zsh-hook chpwd auto_venv
-            add-zsh-hook chpwd auto_nvm
+                  dir="''${dir:h}"
+                done
+              }
 
-            # Enable zmv module.
-            autoload -Uz zmv
+              function auto_nvm() {
+                [[ -f .nvmrc ]] && nvm use
+              }
 
-            # Bookmarked directories.
-            hash -d personal=~/Projects/Personal
-            hash -d work=~/Projects/Work
-            hash -d school=~/Projects/School
-            hash -d cfg=~/dotfiles
-            hash -d sec=~/nix-secrets
-            hash -d dl=~/Downloads
+              add-zsh-hook chpwd auto_venv
+              add-zsh-hook chpwd auto_nvm
 
-            # Clear screen but keep current command buffer.
-            function clear-screen-and-scrollback() {
-              echoti civis >"$TTY"
-              printf '%b' '\e[H\e[2J\e[3J' >"$TTY"
+              # Enable zmv module.
+              autoload -Uz zmv
 
-              echoti cnorm >"$TTY"
-              zle redisplay
-            }
+              # Bookmarked directories.
+              hash -d personal=~/Projects/Personal
+              hash -d work=~/Projects/Work
+              hash -d school=~/Projects/School
+              hash -d cfg=~/dotfiles
+              hash -d sec=~/nix-secrets
+              hash -d dl=~/Downloads
 
-            zle -N clear-screen-and-scrollback
-            bindkey '^xl' clear-screen-and-scrollback
+              # Clear screen but keep current command buffer.
+              function clear-screen-and-scrollback() {
+                echoti civis >"$TTY"
+                printf '%b' '\e[H\e[2J\e[3J' >"$TTY"
 
-            # Just type the filename to open it with the associated program.
-            alias -s json=jless
-            alias -s log=bat
-            alias -s md=bat
-            alias -s txt=bat
-            alias -s c='$EDITOR'
-            alias -s cpp='$EDITOR'
-            alias -s go='$$EDITOR'
-            alias -s js='$EDITOR'
-            alias -s nix='$EDITOR'
-            alias -s py='$EDITOR'
-            alias -s rs='$EDITOR'
-            alias -s ts='$EDITOR'
-            alias -s zig='$EDITOR'
+                echoti cnorm >"$TTY"
+                zle redisplay
+              }
 
-            # Match any case.
-            zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+              zle -N clear-screen-and-scrollback
+              bindkey '^xl' clear-screen-and-scrollback
 
-            ${lib.optionalString config.programs.nix-index.enable
-              # sh
-              ''
-                # `command-not-found` replacement.
-                source ${pkgs.nix-index}/etc/profile.d/command-not-found.sh
-              ''}
+              # Just type the filename to open it with the associated program.
+              alias -s json=jless
+              alias -s log=bat
+              alias -s md=bat
+              alias -s txt=bat
+              alias -s c='$EDITOR'
+              alias -s cpp='$EDITOR'
+              alias -s go='$$EDITOR'
+              alias -s js='$EDITOR'
+              alias -s nix='$EDITOR'
+              alias -s py='$EDITOR'
+              alias -s rs='$EDITOR'
+              alias -s ts='$EDITOR'
+              alias -s zig='$EDITOR'
 
-            # Previews.
-            zstyle ':completion:*:git-checkout:*' sort false
-            zstyle ':completion:*:descriptions' format '[%d]'
-            zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
-            zstyle ':completion:*' menu no
+              # Match any case.
+              zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-            zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-            zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+              ${lib.optionalString config.programs.nix-index.enable
+                # sh
+                ''
+                  # `command-not-found` replacement.
+                  source ${pkgs.nix-index}/etc/profile.d/command-not-found.sh
+                ''
+              }
 
-            # Extra completions.
-            source <(${lib.getExe pkgs.todo} completion zsh)
-          '';
+              # Previews.
+              zstyle ':completion:*:git-checkout:*' sort false
+              zstyle ':completion:*:descriptions' format '[%d]'
+              zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+              zstyle ':completion:*' menu no
 
-        shellAliases = {
-          # Make sudo use aliases.
-          sudo = "sudo ";
+              zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
+              zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 
-          # Nice shorthands.
-          c = "clear";
-          cp = "cp --recursive";
-          rm = "rm --recursive";
-          mkdir = "mkdir --parents";
+              # Extra completions.
+              source <(${lib.getExe pkgs.todo} completion zsh)
+            '';
 
-          # Copy and link with patterns.
-          zcp = "zmv -C";
-          zln = "zmv -L";
+          shellAliases = {
+            # Make sudo use aliases.
+            sudo = "sudo ";
 
-          myip = "curl --silent --write-out '\n' https://ifconfig.me/";
-          system-size = "nix path-info -Sh /run/current-system | awk '{ print $2, $3 }'";
-        };
+            # Nice shorthands.
+            c = "clear";
+            cp = "cp --recursive";
+            rm = "rm --recursive";
+            mkdir = "mkdir --parents";
 
-        shellGlobalAliases = {
-          # Pipe to (rip)grep.
-          G = "| grep";
-          RG = "| rg";
+            # Copy and link with patterns.
+            zcp = "zmv -C";
+            zln = "zmv -L";
 
-          # Pipe to jq.
-          J = "| jq";
+            myip = "curl --silent --write-out '\n' https://ifconfig.me/";
+            system-size = "nix path-info -Sh /run/current-system | awk '{ print $2, $3 }'";
+          };
 
-          # Redirect stdout to /dev/null.
-          NO = ">/dev/null";
+          shellGlobalAliases = {
+            # Pipe to (rip)grep.
+            G = "| grep";
+            RG = "| rg";
 
-          # Redirect stderr to /dev/null.
-          NE = "2>/dev/null";
+            # Pipe to jq.
+            J = "| jq";
 
-          # Redirect both stdout and stderr to /dev/null.
-          NUL = ">/dev/null 2>&1";
+            # Redirect stdout to /dev/null.
+            NO = ">/dev/null";
 
-          # Copy output to clipboard.
-          C = "| wl-copy";
-        };
+            # Redirect stderr to /dev/null.
+            NE = "2>/dev/null";
 
-        oh-my-zsh = {
-          enable = true;
+            # Redirect both stdout and stderr to /dev/null.
+            NUL = ">/dev/null 2>&1";
+
+            # Copy output to clipboard.
+            C = "| wl-copy";
+          };
+
+          oh-my-zsh = {
+            enable = true;
+            plugins = [
+              "archlinux"
+              "dotnet"
+              "eza"
+              "git"
+              "golang"
+              "pass"
+              "rust"
+              "sudo"
+            ];
+          };
+
           plugins = [
-            "archlinux"
-            "dotnet"
-            "eza"
-            "git"
-            "golang"
-            "pass"
-            "rust"
-            "sudo"
+            {
+              name = "fzf-tab";
+              src = pkgs.zsh-fzf-tab;
+              file = "share/fzf-tab/fzf-tab.plugin.zsh";
+            }
           ];
         };
-
-        plugins = [
-          {
-            name = "fzf-tab";
-            src = pkgs.zsh-fzf-tab;
-            file = "share/fzf-tab/fzf-tab.plugin.zsh";
-          }
-        ];
       };
     };
-  };
 }
