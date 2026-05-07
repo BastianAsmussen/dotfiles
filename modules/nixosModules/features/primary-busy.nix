@@ -9,21 +9,24 @@
     }:
     let
       inherit (lib)
-        mkOption
         mkEnableOption
         mkIf
+        mkOption
         types
         ;
 
       cfg = config.primaryBusy;
+
+      inherit (config.networking) hostName;
+
       notifyScript = pkgs.writeShellScript "primary-notify-mirror" ''
         ${lib.getExe pkgs.openssh} \
           -o StrictHostKeyChecking=accept-new \
           -o ConnectTimeout=5 \
           -o BatchMode=yes \
-          -i "${config.sops.secrets."hosts/${config.networking.hostName}/builder-ssh-private-key".path}" \
-          "builder@${cfg.mirrorHost}" \
-          "/run/current-system/sw/bin/primary-mirror-ctl $1"
+          -i "${config.sops.secrets.${cfg.sshKeySecret}.path}" \
+          "${cfg.sshUser}@${cfg.mirrorHost}" \
+          "$1"
       '';
 
       syncScript = pkgs.writeShellScript "primary-busy-sync" ''
@@ -47,10 +50,22 @@
           description = "WireGuard IP address of the mirror host.";
         };
 
+        sshUser = mkOption {
+          type = types.str;
+          default = "primary-busy";
+          description = "Remote SSH user used to update primary mirror state.";
+        };
+
+        sshKeySecret = mkOption {
+          type = types.str;
+          default = "hosts/${hostName}/primary-busy-ssh-private-key";
+          description = "SOPS secret containing the SSH key used for busy-state updates.";
+        };
+
         syncInterval = mkOption {
           type = types.ints.positive;
           default = 60;
-          description = "How often (in seconds) to sync gamemode state to the mirror host.";
+          description = "How often, in seconds, to sync gamemode state to the mirror host.";
         };
       };
 
@@ -60,11 +75,10 @@
           publicKey = inputs.nix-secrets.hosts.eta.ssh-public-key;
         };
 
-        # The gamemode custom hooks run as the logged-in user, so the SSH key
-        # must be readable by that user.  A dedicated key pair would be more
-        # restrictive; for now we reuse the builder key.
-        sops.secrets."hosts/${config.networking.hostName}/builder-ssh-private-key".owner =
-          config.preferences.user.name;
+        sops.secrets.${cfg.sshKeySecret} = {
+          owner = config.preferences.user.name;
+          mode = "0400";
+        };
 
         programs.gamemode.settings.custom = {
           start = "${notifyScript} busy";
