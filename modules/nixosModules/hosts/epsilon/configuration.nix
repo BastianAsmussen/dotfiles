@@ -133,6 +133,7 @@
           "/var/lib/private/ollama"
         ];
 
+        directoriesWithMode."/var/cache/jellyfin" = "0755";
         files = [
           "/var/lib/systemd/random-seed" # Better entropy at boot.
         ];
