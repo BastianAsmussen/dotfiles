@@ -501,7 +501,7 @@
 
         nixd = {
           enable = true;
-          settings.formatting.command = lib.mkDefault ["${lib.getExe pkgs.alejandra}"];
+          settings.formatting.command = lib.mkDefault ["${lib.getExe pkgs.nixfmt}"];
         };
 
         omnisharp.enable = true;
@@ -761,7 +761,7 @@
         };
 
         formatting = {
-          alejandra.enable = true;
+          nixfmt.enable = true;
           stylua.enable = true;
           shfmt.enable = true;
           google_java_format.enable = false;
