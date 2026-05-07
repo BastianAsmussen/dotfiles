@@ -8,9 +8,11 @@
     }:
     let
       inherit (lib)
-        mkOption
+        concatStringsSep
+        mapAttrsToList
         mkEnableOption
         mkIf
+        mkOption
         types
         ;
 
@@ -19,17 +21,21 @@
       stateDir = "/var/lib/primary-mirror";
       busyFlag = "${stateDir}/busy";
       streamStateFile = "${stateDir}/stream-upstream.conf";
+
       upstream = "${cfg.primaryHost}:${toString cfg.primaryPort}";
-      sniEntriesUp = lib.mapAttrsToList (sni: route: "${sni} ${route.primaryAddress};") cfg.sniRoutes;
-      sniEntriesDown = lib.mapAttrsToList (
+
+      sniEntriesUp = mapAttrsToList (sni: route: "${sni} ${route.primaryAddress};") cfg.sniRoutes;
+      sniEntriesDown = mapAttrsToList (
         sni: route:
         "${sni} ${if route.fallbackAddress != null then route.fallbackAddress else cfg.fallbackAddress};"
       ) cfg.sniRoutes;
+
       upStateFile = pkgs.writeText "stream-upstream-up.conf" (
-        lib.concatStringsSep "\n" (sniEntriesUp ++ [ "default ${upstream};" ]) + "\n"
+        concatStringsSep "\n" (sniEntriesUp ++ [ "default ${upstream};" ]) + "\n"
       );
+
       downStateFile = pkgs.writeText "stream-upstream-down.conf" (
-        lib.concatStringsSep "\n" (sniEntriesDown ++ [ "default ${cfg.fallbackAddress};" ]) + "\n"
+        concatStringsSep "\n" (sniEntriesDown ++ [ "default ${cfg.fallbackAddress};" ]) + "\n"
       );
 
       healthCheckScript = pkgs.writeShellScript "primary-mirror-health-check" ''
@@ -52,15 +58,24 @@
 
       ctlScript = pkgs.writeShellScriptBin "primary-mirror-ctl" ''
         set -euo pipefail
+
         case "''${1:-}" in
           busy)
-            touch "${busyFlag}" || { echo "error: permission denied, run with sudo" >&2; exit 1; }
+            touch "${busyFlag}" || {
+              echo "error: permission denied, run with sudo or as ${cfg.busyUser}" >&2
+              exit 1
+            }
             echo "Primary marked as busy"
             ;;
+
           available)
-            rm -f "${busyFlag}" || { echo "error: permission denied, run with sudo" >&2; exit 1; }
+            rm -f "${busyFlag}" || {
+              echo "error: permission denied, run with sudo or as ${cfg.busyUser}" >&2
+              exit 1
+            }
             echo "Primary marked as available"
             ;;
+
           status)
             if [ -f "${busyFlag}" ]; then
               echo "BUSY"
@@ -68,8 +83,24 @@
               echo "AVAILABLE"
             fi
             ;;
+
           *)
             echo "Usage: primary-mirror-ctl {busy|available|status}" >&2
+            exit 1
+            ;;
+        esac
+      '';
+
+      busyRemoteScript = pkgs.writeShellScript "primary-mirror-remote" ''
+        set -euo pipefail
+
+        case "''${SSH_ORIGINAL_COMMAND:-}" in
+          busy|available|status)
+            exec ${ctlScript}/bin/primary-mirror-ctl "$SSH_ORIGINAL_COMMAND"
+            ;;
+
+          *)
+            echo "error: unsupported primary-mirror command" >&2
             exit 1
             ;;
         esac
@@ -114,7 +145,25 @@
         checkInterval = mkOption {
           type = types.ints.positive;
           default = 30;
-          description = "How often (in seconds) to check primary host availability.";
+          description = "How often, in seconds, to check primary host availability.";
+        };
+
+        busyUser = mkOption {
+          type = types.str;
+          default = "primary-busy";
+          description = "SSH user allowed to update primary mirror busy state.";
+        };
+
+        busyGroup = mkOption {
+          type = types.str;
+          default = "primary-busy";
+          description = "Group allowed to update primary mirror busy state.";
+        };
+
+        busyAuthorizedKeys = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "SSH public keys allowed to update primary mirror busy state.";
         };
 
         sniRoutes = mkOption {
@@ -134,7 +183,9 @@
               };
             }
           );
+
           default = { };
+
           description = ''
             Per-SNI routes whose upstreams the health check controls. Each entry
             is written into the stream state file pointing to primaryAddress when
@@ -145,11 +196,27 @@
       };
 
       config = mkIf cfg.enable {
+        users = {
+          groups.${cfg.busyGroup} = { };
+
+          users.${cfg.busyUser} = {
+            description = "Primary mirror busy-state controller";
+            isSystemUser = true;
+            createHome = false;
+            group = cfg.busyGroup;
+            useDefaultShell = true;
+            hashedPassword = "*";
+
+            openssh.authorizedKeys.keys = map (
+              key: ''restrict,from="${cfg.primaryHost}",command="${busyRemoteScript}" ${key}''
+            ) cfg.busyAuthorizedKeys;
+          };
+        };
+
         systemd = {
           tmpfiles.rules = [
-            "d ${stateDir}        0775 root builder -"
-            "C ${streamStateFile} 0644 root root    - ${downStateFile}"
-            "f ${busyFlag}        0644 root builder -"
+            "d ${stateDir}        2775 root ${cfg.busyGroup} -"
+            "C ${streamStateFile} 0644 root root             - ${downStateFile}"
           ];
 
           services.primary-mirror-health = {
@@ -159,6 +226,7 @@
               "wireguard-wg0.service"
             ];
             wants = [ "network-online.target" ];
+
             serviceConfig = {
               Type = "oneshot";
               ExecStart = healthCheckScript;
@@ -168,6 +236,7 @@
           timers.primary-mirror-health = {
             description = "Periodic primary host availability check";
             wantedBy = [ "timers.target" ];
+
             timerConfig = {
               OnBootSec = "15s";
               OnUnitActiveSec = "${toString cfg.checkInterval}s";
