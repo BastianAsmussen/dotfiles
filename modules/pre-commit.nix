@@ -11,7 +11,7 @@
       };
 
       statix.enable = true;
-      alejandra.enable = true;
+      nixfmt.enable = true;
       flake-checker = {
         enable = true;
         args = ["--no-telemetry"];
