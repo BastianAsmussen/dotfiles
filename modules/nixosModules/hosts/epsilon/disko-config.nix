@@ -4,7 +4,10 @@
       # tmpfs root, wiped every reboot. All state lives under /persist.
       nodev."/" = {
         fsType = "tmpfs";
-        mountOptions = ["size=4G" "mode=755"];
+        mountOptions = [
+          "size=4G"
+          "mode=755"
+        ];
       };
 
       disk = {
@@ -143,12 +146,10 @@
 
                   content = {
                     type = "btrfs";
-                    extraArgs = ["-f"];
+                    extraArgs = [ "-f" ];
                     mountpoint = "/srv/media";
                     mountOptions = [
-                      "compress=zstd:3"
                       "noatime"
-                      "autodefrag"
                       "space_cache=v2"
                       "nofail"
                     ];
@@ -178,7 +179,7 @@
 
                 content = {
                   type = "btrfs";
-                  extraArgs = ["-f"];
+                  extraArgs = [ "-f" ];
                   mountpoint = "/srv/arctic-vault";
                   mountOptions = [
                     "compress=zstd:3"
