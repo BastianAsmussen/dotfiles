@@ -133,7 +133,11 @@
           "/var/lib/private/ollama"
         ];
 
-        directoriesWithMode."/var/cache/jellyfin" = "0755";
+        directoriesWithMode = {
+          "/var/lib/private" = "0700";
+          "/var/cache/jellyfin" = "0755";
+        };
+
         files = [
           "/var/lib/systemd/random-seed" # Better entropy at boot.
         ];
@@ -225,6 +229,17 @@
             };
           };
 
+          shoko = {
+            enable = true;
+            domain = "shoko.asmussen.tech";
+            location = "/";
+            upstream = "http://localhost:8111";
+            ssl = {
+              dnsProvider = "cloudflare";
+              environmentFile = config.sops.templates."cloudflare-acme-env".path;
+            };
+          };
+
           qbittorrent = {
             enable = true;
             domain = "qbittorrent.asmussen.tech";
@@ -262,6 +277,12 @@
         openssh.openFirewall = false;
       };
 
+      qbittorrent.categories = {
+        anime = { };
+        shows = { };
+        movies = { };
+      };
+
       # Use the local mTLS proxy instead of routing qBittorrent through eta.
       networking = {
         hosts = {
@@ -274,8 +295,8 @@
           config.services.nix-serve.port
           config.services.website.port
           443 # nginx, WG peers reach epsilon directly
-          8096 # Jellyfin HTTP
           8920 # Jellyfin HTTPS
+          8111 # Shoko HTTP
         ];
       };
 
@@ -318,6 +339,7 @@
         "/srv/media"
         "/srv/arctic-vault"
       ];
+
       arcticVault = {
         enable = true;
         sources = [
@@ -325,6 +347,7 @@
           "nix-secrets"
           ".password-store"
         ];
+
         recipients = map (f: lib.strings.trim (builtins.readFile f)) lib.custom.keys.default.agePaths;
       };
 

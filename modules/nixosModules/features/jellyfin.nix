@@ -7,6 +7,8 @@
       ...
     }:
     let
+      inherit (lib) mkOption types;
+
       user = config.preferences.user.name;
       cfg = config.jellyfin;
       jellyfinUser = config.services.jellyfin.user;
@@ -18,6 +20,7 @@
       networkXmlTemplate = pkgs.writeText "jellyfin-network.xml" ''
         <?xml version="1.0" encoding="utf-8"?>
         <NetworkConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <RequireHttps>true</RequireHttps>
           <EnableHttps>true</EnableHttps>
           <HttpsPort>${httpsPort}</HttpsPort>
           <CertificatePath>${pfxPath}</CertificatePath>
@@ -52,6 +55,8 @@
           chmod 644 "${networkXml}"
         else
           ${pkgs.xmlstarlet}/bin/xmlstarlet ed -L \
+            -s '/NetworkConfiguration[not(RequireHttps)]' -t elem -n RequireHttps -v 'true' \
+            -u '/NetworkConfiguration/RequireHttps' -v 'true' \
             -s '/NetworkConfiguration[not(EnableHttps)]' -t elem -n EnableHttps -v 'true' \
             -u '/NetworkConfiguration/EnableHttps' -v 'true' \
             -s '/NetworkConfiguration[not(HttpsPort)]' -t elem -n HttpsPort -v '${httpsPort}' \
@@ -70,16 +75,15 @@
     in
     {
       options.jellyfin.https = {
-        enable = lib.mkEnableOption "Jellyfin native HTTPS via PKCS#12 certificate";
-
-        acmeHost = lib.mkOption {
-          type = lib.types.str;
+        enable = lib.mkEnableOption "Jellyfin native HTTPS via PKCS#12 certificate.";
+        acmeHost = mkOption {
+          type = types.str;
           default = "";
           description = "Name of the security.acme.certs entry to convert to PFX for Jellyfin.";
         };
 
-        listenPort = lib.mkOption {
-          type = lib.types.port;
+        listenPort = mkOption {
+          type = types.port;
           default = 8920;
           description = "Port Jellyfin listens on for native HTTPS.";
         };
@@ -92,6 +96,7 @@
             extraGroups.media.members = [
               user
               jellyfinUser
+              "shoko"
             ];
           };
 
@@ -111,15 +116,20 @@
             };
           };
 
-          services.jellyfin = {
-            enable = true;
-            openFirewall = false;
+          services = {
+            jellyfin = {
+              enable = true;
+              openFirewall = false;
+            };
+
+            shoko.enable = true;
           };
 
           environment.systemPackages = with pkgs; [
             jellyfin
             jellyfin-web
             jellyfin-ffmpeg
+            shoko
           ];
         }
 

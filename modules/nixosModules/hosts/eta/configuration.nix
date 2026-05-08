@@ -252,13 +252,11 @@
           virtualHosts =
             let
               acmeDir = "/var/lib/acme/asmussen.tech";
-              fallbackListen = [
-                {
-                  addr = "127.0.0.1";
-                  port = 8443;
-                  ssl = true;
-                }
-              ];
+              fallbackListen = {
+                addr = "127.0.0.1";
+                port = 8443;
+                ssl = true;
+              };
 
               sslConfig = ''
                 ssl_certificate ${acmeDir}/fullchain.pem;
@@ -266,8 +264,22 @@
               '';
             in
             {
+              "_" = {
+                listen = [
+                  (
+                    fallbackListen
+                    // {
+                      extraParameters = [ "default_server" ];
+                    }
+                  )
+                ];
+
+                extraConfig = sslConfig;
+                locations."/".return = "421";
+              };
+
               "asmussen.tech" = {
-                listen = fallbackListen;
+                listen = [ fallbackListen ];
                 extraConfig = sslConfig;
                 locations."/" = {
                   proxyPass = "http://localhost:${toString config.services.website.port}";
@@ -276,13 +288,19 @@
               };
 
               "jellyfin.asmussen.tech" = {
-                listen = fallbackListen;
+                listen = [ fallbackListen ];
+                extraConfig = sslConfig;
+                locations."/".return = "503";
+              };
+
+              "shoko.asmussen.tech" = {
+                listen = [ fallbackListen ];
                 extraConfig = sslConfig;
                 locations."/".return = "503";
               };
 
               "cache.asmussen.tech" = {
-                listen = fallbackListen;
+                listen = [ fallbackListen ];
                 extraConfig = sslConfig;
                 locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
               };
