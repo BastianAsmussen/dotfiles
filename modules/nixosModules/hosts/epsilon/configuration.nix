@@ -297,7 +297,6 @@
           config.services.website.port
           443 # nginx, WG peers reach epsilon directly
           8920 # Jellyfin HTTPS
-          8111 # Shoko HTTP
         ];
       };
 
