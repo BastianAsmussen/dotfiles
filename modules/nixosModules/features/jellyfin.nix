@@ -107,12 +107,18 @@
               "d /srv/media/jellyfin 2770 ${jellyfinUser} media - -"
             ];
 
-            services.jellyfin = {
-              unitConfig.RequiresMountsFor = [
-                "/srv/media/jellyfin"
-              ];
+            services = {
+              jellyfin = {
+                unitConfig.RequiresMountsFor = [
+                  "/srv/media"
+                ];
 
-              serviceConfig.UMask = lib.mkForce "0002";
+                serviceConfig.UMask = lib.mkForce "0002";
+              };
+
+              shoko.unitConfig.RequiresMountsFor = [
+                "/srv/media"
+              ];
             };
           };
 
