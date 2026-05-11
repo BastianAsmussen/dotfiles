@@ -261,6 +261,16 @@
           description = "Path where qBittorrent stores completed downloads.";
         };
 
+        autoTorrentManagement = mkOption {
+          type = types.bool;
+          default = true;
+          description = ''
+            Whether new torrents default to automatic torrent management (ATM)
+            mode. When enabled, qBittorrent automatically sets the save path
+            based on the selected category, including in the Add Torrent dialog.
+          '';
+        };
+
         useCategoryPathsInManualMode = mkOption {
           type = types.bool;
           default = true;
@@ -439,6 +449,7 @@
               Session\QueueingSystemEnabled=${boolToString cfg.queueing.enable}
               Session\TempPath=${incompletePath}/
               Session\TempPathEnabled=true
+              Session\AutoTMMDisabledByDefault=${boolToString (!cfg.autoTorrentManagement)}
               Session\UseCategoryPathsInManualMode=${boolToString cfg.useCategoryPathsInManualMode}
               ${optionalString cfg.queueing.enable ''
                 Session\IgnoreSlowTorrentsForQueueing=${boolToString cfg.queueing.ignoreSlowTorrents}
