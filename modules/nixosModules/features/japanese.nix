@@ -3,32 +3,34 @@
     {
       lib,
       pkgs,
+      config,
       ...
     }:
+    let
+      cfg = config.japanese;
+    in
     {
-      i18n = {
-        defaultLocale = lib.mkForce "ja_JP.UTF-8";
-        extraLocales = [ "ja_JP.UTF-8/UTF-8" ];
-        extraLocaleSettings.LC_ALL = "ja_JP.UTF-8";
-        inputMethod = {
-          enable = true;
-          type = "fcitx5";
-          fcitx5 = {
-            waylandFrontend = true;
-            addons = with pkgs; [
-              fcitx5-mozc
-              fcitx5-gtk
-            ];
+      options.japanese.enable = lib.mkEnableOption "Japanese locale and fcitx5 input method";
 
-            ignoreUserConfig = true;
-            settings.globalOptions."Hotkey/TriggerKeys"."0" = "Control+Shift+space";
+      config = lib.mkIf cfg.enable {
+        i18n = {
+          defaultLocale = lib.mkForce "ja_JP.UTF-8";
+          extraLocales = [ "ja_JP.UTF-8/UTF-8" ];
+          inputMethod = {
+            enable = true;
+            type = "fcitx5";
+            fcitx5 = {
+              waylandFrontend = true;
+              addons = with pkgs; [
+                fcitx5-mozc
+                fcitx5-gtk
+              ];
+
+              ignoreUserConfig = true;
+              settings.globalOptions."Hotkey/TriggerKeys"."0" = "Control+Shift+space";
+            };
           };
         };
       };
-
-      # environment.variables = {
-      #   GTK_IM_MODULE = lib.mkForce "";
-      #   QT_IM_MODULE = lib.mkForce "";
-      # };
     };
 }

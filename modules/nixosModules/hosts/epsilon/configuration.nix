@@ -182,6 +182,7 @@
           "10.10.0.2/24"
           "fd00:10:10::2/64"
         ];
+
         peers = [
           {
             publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
@@ -333,6 +334,7 @@
         acmeHost = "asmussen.tech";
       };
 
+      japanese.enable = true;
       primaryBusy.enable = true;
       btrfs.scrub.fileSystems = [
         "/persist"
