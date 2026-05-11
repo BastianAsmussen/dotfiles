@@ -535,6 +535,7 @@
               "sops-install-secrets.service"
             ];
 
+            restartTriggers = [ config.sops.templates."qbittorrent.conf".content ];
             serviceConfig.ExecStartPre = [
               "+${prepareScript}"
             ];
