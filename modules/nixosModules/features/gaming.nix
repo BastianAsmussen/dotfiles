@@ -3,6 +3,7 @@
   flake.nixosModules.gaming =
     {
       pkgs,
+      lib,
       config,
       ...
     }:
@@ -14,6 +15,20 @@
         steam = {
           enable = true;
           gamescopeSession.enable = true;
+
+          # Bypass fcitx5 in Proton; its IME mangles non-Japanese layouts.
+          package = lib.mkIf config.japanese.enable (
+            pkgs.steam.overrideAttrs (old: {
+              nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+              postFixup = (old.postFixup or "") + ''
+                wrapProgram $out/bin/steam \
+                  --unset XMODIFIERS \
+                  --unset GTK_IM_MODULE \
+                  --unset QT_IM_MODULE \
+                  --unset SDL_IM_MODULE
+              '';
+            })
+          );
         };
 
         gamemode.enable = true;
