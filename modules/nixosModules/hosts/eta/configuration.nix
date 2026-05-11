@@ -294,12 +294,6 @@
                 locations."/".return = "503";
               };
 
-              "shoko.asmussen.tech" = {
-                listen = [ fallbackListen ];
-                extraConfig = sslConfig;
-                locations."/".return = "503";
-              };
-
               "cache.asmussen.tech" = {
                 listen = [ fallbackListen ];
                 extraConfig = sslConfig;

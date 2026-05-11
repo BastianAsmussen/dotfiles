@@ -93,6 +93,7 @@
           "10.10.0.3/24"
           "fd00:10:10::3/64"
         ];
+
         peers = [
           {
             publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
@@ -107,16 +108,31 @@
       nginx = {
         openFirewall = false;
         acme.sharedHost = "asmussen.tech";
-        reverseProxies.qbittorrent = {
-          enable = true;
-          domain = "qbittorrent.asmussen.tech";
-          location = "/";
-          upstream = "https://10.10.0.1";
-          proxySSL = {
-            clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-            clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-            serverName = "qbittorrent.asmussen.tech";
-            verify = false;
+        reverseProxies = {
+          qbittorrent = {
+            enable = true;
+            domain = "qbittorrent.asmussen.tech";
+            location = "/";
+            upstream = "https://10.10.0.1";
+            proxySSL = {
+              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
+              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
+              serverName = "qbittorrent.asmussen.tech";
+              verify = false;
+            };
+          };
+
+          shoko = {
+            enable = true;
+            domain = "shoko.asmussen.tech";
+            location = "/";
+            upstream = "https://10.10.0.1";
+            proxySSL = {
+              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
+              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
+              serverName = "shoko.asmussen.tech";
+              verify = false;
+            };
           };
         };
       };
@@ -144,11 +160,18 @@
         };
       };
 
-      # Resolve qbittorrent to loopback so the browser hits the local mTLS proxy
-      # instead of going out through eta.
+      # Resolve mTLS-protected services to loopback so the browser hits the local
+      # mTLS proxy instead of going out through eta.
       networking.hosts = {
-        "127.0.0.1" = [ "qbittorrent.asmussen.tech" ];
-        "::1" = [ "qbittorrent.asmussen.tech" ];
+        "127.0.0.1" = [
+          "qbittorrent.asmussen.tech"
+          "shoko.asmussen.tech"
+        ];
+
+        "::1" = [
+          "qbittorrent.asmussen.tech"
+          "shoko.asmussen.tech"
+        ];
       };
 
       home-manager.userModules.bastian = self.homeModuleSets.delta;

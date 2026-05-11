@@ -235,9 +235,10 @@
             domain = "shoko.asmussen.tech";
             location = "/";
             upstream = "http://localhost:8111";
-            ssl = {
-              dnsProvider = "cloudflare";
-              environmentFile = config.sops.templates."cloudflare-acme-env".path;
+            mtls = {
+              enable = true;
+              caCertificate = ../../../../keys/mtls-ca.crt;
+              localhostBypass = true;
             };
           };
 
@@ -288,8 +289,15 @@
       # instead of going out through eta (bypasses public DNS and the untrusted hop).
       networking = {
         hosts = {
-          "127.0.0.1" = [ "qbittorrent.asmussen.tech" ];
-          "::1" = [ "qbittorrent.asmussen.tech" ];
+          "127.0.0.1" = [
+            "qbittorrent.asmussen.tech"
+            "shoko.asmussen.tech"
+          ];
+
+          "::1" = [
+            "qbittorrent.asmussen.tech"
+            "shoko.asmussen.tech"
+          ];
         };
 
         # Allow WireGuard peers (eta, delta) to reach proxied services on epsilon.
