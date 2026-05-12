@@ -126,6 +126,7 @@
           "/var/lib/AccountsService" # User list / icons.
           "/var/lib/bluetooth"
           "/var/lib/fail2ban"
+          "/var/lib/ccache"
           "/var/lib/power-profiles-daemon"
           "/var/lib/jellyfin"
           "/var/lib/qBittorrent"
