@@ -449,7 +449,7 @@
               Session\QueueingSystemEnabled=${boolToString cfg.queueing.enable}
               Session\TempPath=${incompletePath}/
               Session\TempPathEnabled=true
-              Session\AutoTMMDisabledByDefault=${boolToString (!cfg.autoTorrentManagement)}
+              Session\DisableAutoTMMByDefault=${boolToString (!cfg.autoTorrentManagement)}
               Session\UseCategoryPathsInManualMode=${boolToString cfg.useCategoryPathsInManualMode}
               ${optionalString cfg.queueing.enable ''
                 Session\IgnoreSlowTorrentsForQueueing=${boolToString cfg.queueing.ignoreSlowTorrents}
