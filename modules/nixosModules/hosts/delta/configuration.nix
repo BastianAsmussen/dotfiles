@@ -68,6 +68,7 @@
         self.nixosModules.virtualisation
       ];
 
+      japanese.enable = true;
       networking.hostName = "delta";
       remoteBuilder.jumpHost = "10.10.0.1";
       topology.self =
