@@ -132,6 +132,7 @@
           "/var/lib/qBittorrent"
           "/var/lib/systemd/coredump"
           "/var/lib/private/ollama"
+          "/var/cache/ccache"
         ];
 
         directoriesWithMode = {
