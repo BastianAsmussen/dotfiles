@@ -28,6 +28,11 @@
       bottles = prev.bottles.override {
         removeWarningPopup = true;
       };
+
+      # TODO: Skip tests on x86 architecture until upstream sorts it out.
+      openldap = prev.openldap.overrideAttrs {
+        doCheck = !prev.stdenv.hostPlatform.isi686;
+      };
     };
 
     # Convenient access to the nixpkgs stable branch.

@@ -1037,7 +1037,6 @@
 
   extraPlugins = with pkgs.vimPlugins; [
     cellular-automaton-nvim
-    vim-be-good
   ];
 
   extraConfigLua = ''
