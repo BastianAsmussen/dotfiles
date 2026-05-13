@@ -128,7 +128,11 @@
           "/var/lib/fail2ban"
           "/var/lib/ccache"
           "/var/lib/power-profiles-daemon"
-          "/var/lib/jellyfin"
+          {
+            directory = "/var/lib/jellyfin";
+            user = "jellyfin";
+            group = "jellyfin";
+          }
           "/var/lib/qBittorrent"
           "/var/lib/systemd/coredump"
           "/var/lib/private/ollama"
