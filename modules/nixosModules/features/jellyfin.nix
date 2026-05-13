@@ -116,16 +116,9 @@
                 serviceConfig.UMask = lib.mkForce "0002";
               };
 
-              shoko = {
-                unitConfig.RequiresMountsFor = [
-                  "/srv/media"
-                ];
-
-                environment.QUARTZ_CONCURRENCY_LIMITS = builtins.toJSON {
-                  HashFileJob = 2;
-                  MediaInfoJob = 28;
-                };
-              };
+              shoko.unitConfig.RequiresMountsFor = [
+                "/srv/media"
+              ];
             };
           };
 
