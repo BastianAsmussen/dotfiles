@@ -29,7 +29,6 @@
           hyperfine
           jq
           just
-          just
           libreoffice-fresh
           man-pages
           man-pages-posix
