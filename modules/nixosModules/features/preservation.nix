@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.nixosModules.impermanence =
+  flake.nixosModules.preservation =
     {
       config,
       lib,
@@ -11,6 +11,7 @@
         mkOption
         mkEnableOption
         mkIf
+        mkDefault
         types
         ;
 
@@ -20,11 +21,11 @@
     in
     {
       imports = [
-        inputs.impermanence.nixosModules.impermanence
+        inputs.preservation.nixosModules.preservation
       ];
 
       options.persistence = {
-        enable = mkEnableOption "Erase root on every boot (impermanence)";
+        enable = mkEnableOption "Erase root on every boot (preservation)";
         tmpfsSize = mkOption {
           type = types.str;
           default = "4G";
@@ -91,45 +92,53 @@
       };
 
       config = mkIf cfg.enable {
-        # Persist subvolume must be available before anything else.
         fileSystems."${cfg.persistPath}".neededForBoot = true;
 
-        # Point sops at the persist source directly, since /persist is mounted early.
         sops.age.sshKeyPaths = [
           "${cfg.persistPath}/system/etc/ssh/ssh_host_ed25519_key"
         ];
 
-        # Allow bind-mount FUSE access for user home persistence.
-        programs.fuse.userAllowOther = true;
-        boot.tmp.cleanOnBoot = lib.mkDefault true;
-        environment.persistence = {
-          "${cfg.persistPath}/system" = {
-            hideMounts = true;
-
-            directories = [
-              "/etc/ssh" # Host keys, sops-nix derives age identity from these.
-              "/var/log"
-              "/var/lib/nixos" # UID/GID map state.
-              "/var/lib/systemd/timers" # Persistent timer state.
-              "/var/lib/sops-nix"
-            ]
-            ++ cfg.directories
-            ++ mkDirWithMode cfg.directoriesWithMode;
-
-            files = [
-              "/etc/machine-id"
-            ]
-            ++ cfg.files;
+        boot = {
+          initrd.systemd.enable = mkDefault true;
+          tmp = {
+            useTmpfs = false;
+            cleanOnBoot = mkDefault true;
           };
+        };
 
-          "${cfg.persistPath}/userdata".users.${user} = {
-            inherit (cfg.user) files;
+        preservation = {
+          enable = true;
 
-            directories = cfg.user.directories ++ mkDirWithMode cfg.user.directoriesWithMode;
-          };
+          preserveAt = {
+            "${cfg.persistPath}/system" = {
+              directories = [
+                "/etc/ssh"
+                "/var/log"
+                "/var/lib/nixos"
+                "/var/lib/systemd/timers"
+                "/var/lib/sops-nix"
+              ]
+              ++ cfg.directories
+              ++ mkDirWithMode cfg.directoriesWithMode;
 
-          "${cfg.persistPath}/usercache".users.${user} = {
-            inherit (cfg.user.cache) directories files;
+              files = [
+                {
+                  file = "/etc/machine-id";
+                  inInitrd = true;
+                }
+              ]
+              ++ cfg.files;
+            };
+
+            "${cfg.persistPath}/userdata".users.${user} = {
+              inherit (cfg.user) files;
+
+              directories = cfg.user.directories ++ mkDirWithMode cfg.user.directoriesWithMode;
+            };
+
+            "${cfg.persistPath}/usercache".users.${user} = {
+              inherit (cfg.user.cache) directories files;
+            };
           };
         };
       };

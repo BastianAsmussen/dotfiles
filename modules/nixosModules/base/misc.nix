@@ -1,8 +1,8 @@
 {
   flake.nixosModules.misc =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     {
-      boot.tmp.useTmpfs = true;
+      boot.tmp.useTmpfs = lib.mkDefault true;
 
       environment.wordlist = {
         enable = true;
