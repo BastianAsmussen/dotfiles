@@ -10,7 +10,11 @@
     {
       # Use the CachyOS gaming-focused kernel.
       nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
-      boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
+      boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto.extend (
+        _: prev: {
+          kernel = prev.kernel.override { stdenv = pkgs.ccacheStdenv; };
+        }
+      );
 
       programs = {
         steam = {
