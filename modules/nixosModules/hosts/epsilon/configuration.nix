@@ -49,7 +49,7 @@
         self.nixosModules.ssh
         self.nixosModules.luksFido2
         self.nixosModules.yubiKey
-        self.nixosModules.impermanence
+        self.nixosModules.preservation
         self.nixosModules.wireguard
 
         # Features.
@@ -141,7 +141,11 @@
         };
 
         files = [
-          "/var/lib/systemd/random-seed" # Better entropy at boot.
+          # Better entropy at boot.
+          {
+            file = "/var/lib/systemd/random-seed";
+            how = "symlink";
+          }
         ];
 
         user = {
@@ -165,16 +169,28 @@
             "Postman"
 
             # App state / configs not fully managed by HM.
-            ".config"
+            ".config/libreoffice"
+            ".config/vesktop"
+            ".config/teams-for-linux"
             ".mozilla"
-            ".local/share"
-            ".local/state"
             ".password-store"
             ".pki"
             ".ssh"
+
+            ".local/share"
+
+            ".local/state/home-manager"
+            ".local/state/nix"
+            ".local/state/nvim"
+            ".local/state/wireplumber"
+            ".local/state/mpv"
           ];
 
           directoriesWithMode.".gnupg" = "0700";
+
+          cache.directories = [
+            ".cache/direnv"
+          ];
         };
       };
 
