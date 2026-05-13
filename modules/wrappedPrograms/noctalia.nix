@@ -498,7 +498,7 @@
 
   flake.homeModules.noctalia = {
     home.file.".cache/noctalia/wallpapers.json".text = builtins.toJSON {
-      defaultWallpaper = toString ./../../assets/wallpapers/tokyo.png;
+      defaultWallpaper = "${./../../assets/wallpapers/tokyo.png}";
     };
   };
 }
