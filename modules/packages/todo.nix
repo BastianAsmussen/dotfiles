@@ -1,6 +1,10 @@
 {
   perSystem =
-    { pkgs, ... }:
+    {
+      pkgs,
+      lib,
+      ...
+    }:
     {
       packages.todo = pkgs.buildGoModule rec {
         pname = "todo";
@@ -18,6 +22,9 @@
         meta = {
           description = "A simple ToDo program.";
           homepage = "https://github.com/BastianAsmussen/todo";
+          license = lib.licenses.mit;
+          maintainers = [ lib.maintainers.BastianAsmussen ];
+          platforms = lib.platforms.unix;
           mainProgram = "todo";
         };
       };
