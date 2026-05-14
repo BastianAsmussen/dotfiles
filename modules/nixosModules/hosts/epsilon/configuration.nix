@@ -117,6 +117,10 @@
 
       sops.secrets."wireguard/psk-eta-epsilon" = { };
 
+      # /etc/machine-id is persisted by the preservation module in initrd.
+      # The commit unit only applies to transient machine-id on tmpfs.
+      systemd.services.systemd-machine-id-commit.enable = false;
+
       persistence = {
         enable = true;
 
