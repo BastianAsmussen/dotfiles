@@ -1,7 +1,6 @@
-{ lib }:
-let
-  base = rec {
-    inherit (builtins) floor ciel;
+{
+  customLib.math = rec {
+    inherit (builtins) floor;
 
     HALF_PI = 1.5707963267948965579989817342720925807952880859375;
     PI = 3.141592653589793115997963468544185161590576171875;
@@ -54,9 +53,4 @@ let
 
     fact = n: if n <= 1.0 then 1.0 else n * fact (n - 1.0);
   };
-
-  crypto = import ./crypto.nix { inherit base lib; };
-  random = import ./random.nix { inherit base lib; };
-  trigenometry = import ./trigenometry.nix { inherit base; };
-in
-base // crypto // random // trigenometry
+}
