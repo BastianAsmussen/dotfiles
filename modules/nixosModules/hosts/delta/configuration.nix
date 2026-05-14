@@ -46,6 +46,7 @@
         self.nixosModules.nix
 
         # Security.
+        self.nixosModules.acmeShared
         self.nixosModules.gpg
         self.nixosModules.security
         self.nixosModules.sops
@@ -71,6 +72,9 @@
       japanese.enable = true;
       networking.hostName = "delta";
       remoteBuilder.jumpHost = "10.10.0.1";
+      acmeShared.enable = true;
+
+      environment.memoryAllocator.provider = "graphene-hardened";
       topology.self =
         let
           inherit (config.lib.topology) mkConnection;
@@ -138,27 +142,10 @@
         };
       };
 
-      security.acme.certs."asmussen.tech" = {
-        extraDomainNames = [ "*.asmussen.tech" ];
-        dnsProvider = "cloudflare";
-        environmentFile = config.sops.templates."cloudflare-acme-env".path;
-
-        inherit (config.services.nginx) group;
-      };
-
-      users.users.acme.extraGroups = [ "keys" ];
-      sops = {
-        secrets = {
-          "cloudflare-api-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
-          "wireguard/psk-eta-delta" = { };
-          "mtls/delta-client-cert".owner = "nginx";
-          "mtls/delta-client-key".owner = "nginx";
-        };
-
-        templates."cloudflare-acme-env" = {
-          owner = "acme";
-          content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
-        };
+      sops.secrets = {
+        "wireguard/psk-eta-delta" = { };
+        "mtls/delta-client-cert".owner = "nginx";
+        "mtls/delta-client-key".owner = "nginx";
       };
 
       # Resolve mTLS-protected services to loopback so the browser hits the local

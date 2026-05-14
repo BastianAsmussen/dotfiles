@@ -44,6 +44,7 @@
         self.nixosModules.nh
 
         # Security.
+        self.nixosModules.acmeShared
         self.nixosModules.gpg
         self.nixosModules.security
         self.nixosModules.sops
@@ -165,31 +166,15 @@
       # If Epsilon is unreachable, builds fail rather than running locally.
       nix.settings.max-jobs = lib.mkForce 0;
       btrfs.scrub.fileSystems = [ "/" ];
-      nginx = {
-        streamProxy = {
-          enable = true;
-          stateFile = "/var/lib/primary-mirror/stream-upstream.conf";
-        };
 
-        redirects =
-          let
-            dkRedirect = domain: {
-              inherit domain;
+      acmeShared = {
+        enable = true;
+        dkRedirects.enable = true;
+      };
 
-              enable = true;
-              target = "https://asmussen.tech";
-              ssl = {
-                dnsProvider = "cloudflare";
-                environmentFile = config.sops.templates."cloudflare-acme-env".path;
-              };
-            };
-          in
-          {
-            dotfiles-dk = dkRedirect "dotfiles.dk";
-            fansly-dk = dkRedirect "fansly.dk";
-            tech-college-dk = dkRedirect "tech-college.dk";
-            harvard-dk = dkRedirect "harvard.dk";
-          };
+      nginx.streamProxy = {
+        enable = true;
+        stateFile = "/var/lib/primary-mirror/stream-upstream.conf";
       };
 
       primaryMirror = {
@@ -201,30 +186,9 @@
         busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
       };
 
-      sops = {
-        secrets = {
-          "cloudflare-api-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
-          "wireguard/psk-eta-epsilon" = { };
-          "wireguard/psk-eta-delta" = { };
-        };
-
-        templates."cloudflare-acme-env" = {
-          owner = "acme";
-          content = "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
-        };
-      };
-
-      users.users.acme.extraGroups = [ "keys" ];
-      security.acme = {
-        acceptTerms = true;
-        defaults.email = config.preferences.user.email;
-        certs."asmussen.tech" = {
-          inherit (config.services.nginx) group;
-
-          extraDomainNames = [ "*.asmussen.tech" ];
-          dnsProvider = "cloudflare";
-          environmentFile = config.sops.templates."cloudflare-acme-env".path;
-        };
+      sops.secrets = {
+        "wireguard/psk-eta-epsilon" = { };
+        "wireguard/psk-eta-delta" = { };
       };
 
       nix-serve-extras.exposePublicly = false;
