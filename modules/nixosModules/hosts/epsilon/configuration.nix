@@ -43,6 +43,7 @@
         self.nixosModules.nh
 
         # Security.
+        self.nixosModules.acmeShared
         self.nixosModules.gpg
         self.nixosModules.security
         self.nixosModules.sops
@@ -219,28 +220,14 @@
         ];
       };
 
+      acmeShared = {
+        enable = true;
+        dkRedirects.enable = true;
+      };
+
       nix-serve-extras.bindAddress = "10.10.0.2";
       nginx = {
         acme.sharedHost = "asmussen.tech";
-        redirects =
-          let
-            dkRedirect = domain: {
-              inherit domain;
-
-              enable = true;
-              target = "https://asmussen.tech";
-              ssl = {
-                dnsProvider = "cloudflare";
-                environmentFile = config.sops.templates."cloudflare-acme-env".path;
-              };
-            };
-          in
-          {
-            dotfiles-dk = dkRedirect "dotfiles.dk";
-            fansly-dk = dkRedirect "fansly.dk";
-            tech-college-dk = dkRedirect "tech-college.dk";
-            harvard-dk = dkRedirect "harvard.dk";
-          };
 
         reverseProxies = {
           jellyfin = {
@@ -279,14 +266,6 @@
             };
           };
         };
-      };
-
-      security.acme.certs."asmussen.tech" = {
-        extraDomainNames = [ "*.asmussen.tech" ];
-        dnsProvider = "cloudflare";
-        environmentFile = config.sops.templates."cloudflare-acme-env".path;
-
-        inherit (config.services.nginx) group;
       };
 
       services = {
