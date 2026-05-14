@@ -1,11 +1,20 @@
-{ inputs, ... }:
+{ inputs, self, ... }:
 {
-  perSystem =
-    { pkgs, ... }:
+  flake.wrapperModules.noctalia-shell =
     {
-      packages.noctalia-shell = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
-        inherit pkgs;
+      lib,
+      pkgs,
+      config,
+      ...
+    }:
+    {
+      options.videoDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/home/${inputs.nix-secrets.user.name}/Videos";
+        description = "Directory noctalia's screen recorder writes to.";
+      };
 
+      config = {
         package = pkgs.noctalia-shell.overrideAttrs {
           name = "noctalia";
         };
@@ -356,7 +365,7 @@
             audioCodec = "opus";
             audioSource = "default_output";
             colorRange = "limited";
-            directory = "/home/bastian/Videos";
+            directory = config.videoDir;
             frameRate = 60;
             quality = "very_high";
             showCursor = true;
@@ -493,6 +502,15 @@
             ];
           };
         };
+      };
+    };
+
+  perSystem =
+    { pkgs, ... }:
+    {
+      packages.noctalia-shell = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
+        inherit pkgs;
+        imports = [ self.wrapperModules.noctalia-shell ];
       };
     };
 
