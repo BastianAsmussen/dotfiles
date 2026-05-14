@@ -1,14 +1,9 @@
-{ self, ... }:
 {
   perSystem =
     { pkgs, ... }:
     {
+      # Library tests are registered by modules/tests/**.nix.
       checks = {
-        library = pkgs.callPackage ./_tests {
-          inherit pkgs;
-          inherit (self) lib;
-        };
-
         # Check for dead Nix code.
         deadnix =
           pkgs.runCommandLocal "deadnix"
