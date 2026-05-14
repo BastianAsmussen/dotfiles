@@ -18,8 +18,6 @@
         args = [ "--no-telemetry" ];
       };
 
-      trim-trailing-whitespace.enable = true;
-      end-of-file-fixer.enable = true;
       check-yaml.enable = true;
     };
   };
