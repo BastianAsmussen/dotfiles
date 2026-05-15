@@ -143,6 +143,7 @@
 
       wireguard = {
         enable = true;
+        forwardPeers = true;
         ips = [
           "10.10.0.1/24"
           "fd00:10:10::1/64"
@@ -158,6 +159,15 @@
             publicKey = inputs.nix-secrets.hosts.delta.wg-public-key;
             peerIps = self.nixosConfigurations.delta.config.wireguard.ips;
             presharedKeyFile = config.sops.secrets."wireguard/psk-eta-delta".path;
+          }
+          {
+            publicKey = inputs.nix-secrets.hosts.mu.wg-public-key;
+            allowedIPs = [
+              "10.10.0.4/32"
+              "fd00:10:10::4/128"
+            ];
+
+            presharedKeyFile = config.sops.secrets."wireguard/psk-eta-mu".path;
           }
         ];
       };
@@ -189,6 +199,7 @@
       sops.secrets = {
         "wireguard/psk-eta-epsilon" = { };
         "wireguard/psk-eta-delta" = { };
+        "wireguard/psk-eta-mu" = { };
       };
 
       nix-serve-extras.exposePublicly = false;
