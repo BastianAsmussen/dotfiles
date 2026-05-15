@@ -82,6 +82,14 @@
           "lockdown=confidentiality"
         ];
 
+        # Declare nftables modules because lockKernelModules prevents runtime
+        # loading.
+        kernelModules = [
+          "nf_conntrack"
+          "nft_ct"
+          "nf_nat"
+        ];
+
         kernel.sysctl."vm.mmap_rnd_bits" = 32;
       };
 
