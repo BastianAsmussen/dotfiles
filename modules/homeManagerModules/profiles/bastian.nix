@@ -25,7 +25,6 @@
           cargo-info
           copy-file
           diesel-cli
-          freerdp
           fselect
           gitui
           go

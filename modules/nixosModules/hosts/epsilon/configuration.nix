@@ -74,6 +74,7 @@
         self.nixosModules.topology
         self.nixosModules.virtualisation
         self.nixosModules.website
+        self.nixosModules.winapps
         self.nixosModules.arcticVault
 
         # Host-specific hardware.
@@ -170,6 +171,7 @@
             "Videos"
 
             # Personal.
+            "Windows"
             "Projects"
             "dotfiles"
             "nix-secrets"
@@ -351,6 +353,8 @@
         enable = true;
         acmeHost = "asmussen.tech";
       };
+
+      winapps.enable = true;
 
       japanese.enable = true;
       primaryBusy.enable = true;
