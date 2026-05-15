@@ -82,6 +82,14 @@
           "lockdown=confidentiality"
         ];
 
+        # Required by the nftables firewall (ct state / ct status dnat rules).
+        # Must be declared here because lockKernelModules prevents runtime loading.
+        kernelModules = [
+          "nf_conntrack"
+          "nft_ct"
+          "nf_nat"
+        ];
+
         kernel.sysctl."vm.mmap_rnd_bits" = 32;
       };
 
