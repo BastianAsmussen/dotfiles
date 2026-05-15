@@ -66,6 +66,7 @@
     wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
 
     website.url = "github:BastianAsmussen/website";
+    winapps.url = "github:winapps-org/winapps";
   };
 
   # Import every Nix file under `./modules` as a flake-parts module.

@@ -67,7 +67,10 @@
         self.nixosModules.syncthing
         self.nixosModules.topology
         self.nixosModules.virtualisation
+        self.nixosModules.winapps
       ];
+
+      winapps.enable = true;
 
       japanese.enable = true;
       networking.hostName = "delta";
