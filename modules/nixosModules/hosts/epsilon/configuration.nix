@@ -178,6 +178,7 @@
             "Postman"
 
             # App state / configs not fully managed by HM.
+            ".config/sops" # VERY important!
             ".config/libreoffice"
             ".config/vesktop"
             ".config/teams-for-linux"
@@ -213,7 +214,11 @@
         peers = [
           {
             publicKey = inputs.nix-secrets.hosts.eta.wg-public-key;
-            peerIps = self.nixosConfigurations.eta.config.wireguard.ips;
+            allowedIPs = [
+              "10.10.0.0/24"
+              "fd00:10:10::/64"
+            ];
+
             endpoint = "${inputs.nix-secrets.hosts.eta.ipv4_address}:51820";
             persistentKeepalive = 25;
             presharedKeyFile = config.sops.secrets."wireguard/psk-eta-epsilon".path;

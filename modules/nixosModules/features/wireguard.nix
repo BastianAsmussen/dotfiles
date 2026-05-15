@@ -18,6 +18,8 @@
     {
       options.wireguard = {
         enable = mkEnableOption "WireGuard VPN interface.";
+
+        forwardPeers = mkEnableOption "IP forwarding between WireGuard peers (hub/router mode). Restricts forwarding to wg0-to-wg0 traffic only.";
         interface = mkOption {
           type = types.str;
           default = "wg0";
@@ -117,7 +119,20 @@
               }) cfg.peers;
             };
 
-            firewall.allowedUDPPorts = mkIf (cfg.listenPort != null) [ cfg.listenPort ];
+            nftables.enable = mkIf cfg.forwardPeers true;
+
+            firewall = {
+              allowedUDPPorts = mkIf (cfg.listenPort != null) [ cfg.listenPort ];
+              filterForward = mkIf cfg.forwardPeers true;
+              extraForwardRules = mkIf cfg.forwardPeers ''
+                iifname "${cfg.interface}" oifname "${cfg.interface}" accept
+              '';
+            };
+          };
+
+          boot.kernel.sysctl = mkIf cfg.forwardPeers {
+            "net.ipv4.conf.all.forwarding" = 1;
+            "net.ipv6.conf.all.forwarding" = 1;
           };
         }
       );
