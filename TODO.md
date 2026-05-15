@@ -6,14 +6,13 @@ around problems.
 
 ## Table of Contents
 
-- [Neovim Plugins](#neovim-plugins)
+- [Noctalia Idle](#noctalia-idle)
 - [Development Environments](#development-environments)
-- [Impermanence Setup](#impermanence-setup)
 
-## Neovim Plugins
+## Noctalia Idle
 
-- [x] Resolved `harpoon` / `tmux-navigator` keybind overlap (`<C-j>`, `<C-k>`,
-  `<C-l>`). Harpoon slots moved to `<C-S-j/k/l/m>`.
+Add a toggle for enabling idle. Right now on `epsilon`, it will turn off the
+monitors, but them back on will make Noctalia bug out.
 
 ## Development Environments
 
@@ -27,21 +26,3 @@ to implement a template for each language I use, which, as of now consists of:
 - [ ] Haskell
 - [ ] C
 - [x] Python
-
-## Impermanence Setup
-
-### Current Issues
-
-- **Desyncs**:
-  Fresh installs don't always match long-running ones.
-  - **Example**: If I change something in my
-    [Firefox setup](./modules/homeManagerModules/firefox.nix), like tweaking
-    uBlock Origin settings, those changes don't carry over to new installs
-    because they're done imperatively.
-- **Installation Problems**:
-  When booting a fresh install, LUKS can't find the disk and just hangs.
-
-### Goal
-
-- Get rid of desyncs so fresh installs work the same as a system I've been
-  using for a long time.
