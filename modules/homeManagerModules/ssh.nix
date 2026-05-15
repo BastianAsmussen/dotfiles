@@ -23,6 +23,7 @@
           "eta" = {
             hostname = "10.10.0.1";
             port = 22;
+            forwardAgent = false;
             remoteForwards = [
               {
                 bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
@@ -38,7 +39,7 @@
 
             hostname = "10.10.0.2";
             port = 22;
-            proxyJump = "eta";
+            forwardAgent = false;
             remoteForwards = [
               {
                 bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
