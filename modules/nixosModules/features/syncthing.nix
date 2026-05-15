@@ -12,9 +12,20 @@
       user = config.preferences.user.name;
       home = "/home/${user}";
       devices = {
-        epsilon.id = hosts.epsilon.syncthing-id;
-        delta.id = hosts.delta.syncthing-id;
-        mu.id = hosts.mu.syncthing-id;
+        epsilon = {
+          id = hosts.epsilon.syncthing-id;
+          addresses = [ "tcp://10.10.0.2:22000" ];
+        };
+
+        delta = {
+          id = hosts.delta.syncthing-id;
+          addresses = [ "tcp://10.10.0.3:22000" ];
+        };
+
+        mu = {
+          id = hosts.mu.syncthing-id;
+          addresses = [ "dynamic" ];
+        };
       };
 
       # Syncthing ignores a host's own ID in the shared device list.
@@ -31,6 +42,11 @@
         "hosts/${config.networking.hostName}/syncthing-cert".owner = user;
       };
 
+      networking.firewall.interfaces.wg0 = {
+        allowedTCPPorts = [ 22000 ];
+        allowedUDPPorts = [ 22000 ];
+      };
+
       services.syncthing = {
         inherit user;
 
@@ -45,7 +61,17 @@
         settings = {
           inherit devices;
 
-          options.urAccepted = -1;
+          options = {
+            urAccepted = -1;
+            globalAnnounceEnabled = false;
+            localAnnounceEnabled = false;
+            relaysEnabled = false;
+            listenAddresses = [
+              "tcp://0.0.0.0:22000"
+              "quic://0.0.0.0:22000"
+            ];
+          };
+
           gui = {
             inherit user;
 
