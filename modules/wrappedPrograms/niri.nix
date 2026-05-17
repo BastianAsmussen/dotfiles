@@ -91,6 +91,11 @@
               "Mod+Shift+9".move-column-to-workspace = "w8";
               "Mod+Shift+0".move-column-to-workspace = "w9";
 
+              "Mod+Comma".focus-monitor-previous = _: { };
+              "Mod+Period".focus-monitor-next = _: { };
+              "Mod+Shift+Comma".move-column-to-monitor-previous = _: { };
+              "Mod+Shift+Period".move-column-to-monitor-next = _: { };
+
               "Mod+S".spawn-sh = "${noctaliaExe} ipc call launcher toggle";
               "Mod+V".spawn-sh = "${pkgs.alsa-utils}/bin/amixer sset Capture toggle";
 
