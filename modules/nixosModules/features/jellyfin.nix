@@ -151,6 +151,8 @@
             serviceConfig.ExecStartPre = [ "+${configureHttpsScript}" ];
             wants = [ "acme-finished-${cfg.https.acmeHost}.target" ];
             after = [ "acme-finished-${cfg.https.acmeHost}.target" ];
+
+            environment.LC_ALL = config.i18n.defaultLocale;
           };
 
           security.acme.certs.${cfg.https.acmeHost}.postRun = ''
