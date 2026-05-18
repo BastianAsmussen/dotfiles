@@ -51,9 +51,16 @@
               Folder = "Proton";
             }
             {
+              Title = "Codeberg.org";
+              URL = "https://codeberg.org";
+              Placement = "toolbar";
+              Folder = "VSC";
+            }
+            {
               Title = "GitHub";
               URL = "https://github.com";
               Placement = "toolbar";
+              Folder = "VSC";
             }
           ];
         };
