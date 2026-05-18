@@ -17,6 +17,15 @@
         zsh = {
           enable = true;
           autocd = true;
+
+          # Distrobox maps the read-only Nix store to `nobody`, which trips
+          # oh-my-zsh's compaudit. Suppress only inside containers.
+          envExtra = ''
+            if [[ -n "$CONTAINER_ID" ]]; then
+              export ZSH_DISABLE_COMPFIX=true
+            fi
+          '';
+
           autosuggestion.enable = true;
           syntaxHighlighting.enable = true;
           history = {
