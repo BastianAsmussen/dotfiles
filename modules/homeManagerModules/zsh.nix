@@ -17,6 +17,15 @@
         zsh = {
           enable = true;
           autocd = true;
+
+          # Distrobox maps the store to nobody, so disable oh-my-zsh compaudit
+          # there.
+          envExtra = ''
+            if [[ -n "$CONTAINER_ID" ]]; then
+              export ZSH_DISABLE_COMPFIX=true
+            fi
+          '';
+
           autosuggestion.enable = true;
           syntaxHighlighting.enable = true;
           history = {
