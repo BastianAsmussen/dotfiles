@@ -132,7 +132,6 @@
           "/var/lib/AccountsService" # User list / icons.
           "/var/lib/bluetooth"
           "/var/lib/fail2ban"
-          "/var/lib/ccache"
           "/var/lib/power-profiles-daemon"
           {
             directory = "/var/lib/jellyfin";
@@ -142,7 +141,12 @@
           "/var/lib/qBittorrent"
           "/var/lib/systemd/coredump"
           "/var/lib/private/ollama"
-          "/var/cache/ccache"
+          {
+            directory = "/var/cache/ccache";
+            user = "root";
+            group = "nixbld";
+            mode = "0770";
+          }
         ];
 
         directoriesWithMode = {
