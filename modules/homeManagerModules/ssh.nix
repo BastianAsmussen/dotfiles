@@ -12,42 +12,35 @@
       programs.ssh = {
         enable = true;
         enableDefaultConfig = false;
-        matchBlocks = {
+        settings = {
           "eta-initrd" = {
-            user = "root";
-            hostname = inputs.nix-secrets.hosts.eta.ipv4_address;
-            port = 2222;
-            extraOptions.UserKnownHostsFile = "~/.ssh/known_hosts ~/.ssh/known_hosts_static";
+            User = "root";
+            HostName = inputs.nix-secrets.hosts.eta.ipv4_address;
+            Port = 2222;
+            UserKnownHostsFile = "~/.ssh/known_hosts ~/.ssh/known_hosts_static";
           };
 
           "eta" = {
-            hostname = "10.10.0.1";
-            port = 22;
-            forwardAgent = false;
-            remoteForwards = [
-              {
-                bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
-                host.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
-              }
+            HostName = "10.10.0.1";
+            Port = 22;
+            ForwardAgent = "no";
+            RemoteForward = [
+              "/home/${user}/.gnupg/S.gpg-agent.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
             ];
 
-            extraOptions.StreamLocalBindUnlink = "yes";
+            StreamLocalBindUnlink = "yes";
           };
 
           "epsilon" = {
-            inherit user;
-
-            hostname = "10.10.0.2";
-            port = 22;
-            forwardAgent = false;
-            remoteForwards = [
-              {
-                bind.address = "/home/${user}/.gnupg/S.gpg-agent.ssh";
-                host.address = "/run/user/1000/gnupg/S.gpg-agent.ssh";
-              }
+            User = user;
+            HostName = "10.10.0.2";
+            Port = 22;
+            ForwardAgent = "no";
+            RemoteForward = [
+              "/home/${user}/.gnupg/S.gpg-agent.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
             ];
 
-            extraOptions.StreamLocalBindUnlink = "yes";
+            StreamLocalBindUnlink = "yes";
           };
         };
       };
