@@ -25,6 +25,8 @@
 
           if [ -z "$SSH_CONNECTION" ]; then
             export GPG_TTY=$(tty)
+
+            gpgconf --launch gpg-agent >/dev/null 2>&1 || true
           fi
         '';
 
