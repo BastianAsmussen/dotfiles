@@ -29,7 +29,7 @@
       snapshotScript = pkgs.writeShellScript "arctic-vault-snapshot" ''
         set -euo pipefail
 
-        timestamp="$(date +%Y-%m)"
+        timestamp="$(date +${cfg.timestampFormat})"
         dest="${cfg.mountpoint}/vault-''${timestamp}.tar.zst.age"
 
         if [ -f "$dest" ]; then
@@ -112,6 +112,12 @@
           type = types.str;
           default = "monthly";
           description = "systemd OnCalendar expression for snapshot frequency.";
+        };
+
+        timestampFormat = mkOption {
+          type = types.str;
+          default = "%Y-%m";
+          description = "date(1) format string used in snapshot filenames. Must be fine-grained enough to avoid collisions at the chosen calendar frequency.";
         };
 
         retention = mkOption {

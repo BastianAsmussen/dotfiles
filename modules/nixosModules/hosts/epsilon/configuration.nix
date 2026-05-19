@@ -370,6 +370,8 @@
 
       arcticVault = {
         enable = true;
+        calendar = "weekly";
+        timestampFormat = "%Y-W%V";
         sources = [
           "dotfiles"
           "nix-secrets"
