@@ -93,6 +93,11 @@
               (mkConnection "eta" "wg0")
             ];
           };
+
+          services.syncthing = {
+            name = "Syncthing";
+            icon = "services.syncthing";
+          };
         };
 
       wireguard = {

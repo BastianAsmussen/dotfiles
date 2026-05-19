@@ -46,10 +46,9 @@
 
       networking.hostName = "mu";
       topology.self = {
-        hardware.info = "Android Phone";
-        interfaces.wifi.physicalConnections = [
-          (config.lib.topology.mkConnection "homeRouter" "wifi")
-        ];
+        hardware.info = "NixOS via AVF";
+        guestType = "avf";
+        parent = "muPhone";
       };
 
       avf.defaultUser = config.preferences.user.name;
