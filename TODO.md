@@ -7,12 +7,18 @@ around problems.
 ## Table of Contents
 
 - [Noctalia Idle](#noctalia-idle)
+- [Neovim Undotree](#neovim-undotree)
 - [Development Environments](#development-environments)
 
 ## Noctalia Idle
 
 Add a toggle for enabling idle. Right now on `epsilon`, it will turn off the
 monitors, but them back on will make Noctalia bug out.
+
+## Neovim Undotree
+
+It currently doesn't save correctly aside from per-session. Might be due to
+preservation, or not saving to disk correctly.
 
 ## Development Environments
 
