@@ -176,6 +176,32 @@
               }
             ];
 
+            window-rules = [
+              {
+                matches = [ { app-id = "steam"; } ];
+                excludes = [ { title = "^[Ss]team$"; } ];
+                open-floating = true;
+              }
+              {
+                matches = [
+                  {
+                    app-id = "steam";
+                    title = "^notificationtoasts_\\d+_desktop$";
+                  }
+                ];
+
+                default-floating-position = _: {
+                  props = {
+                    x = 10;
+                    y = 10;
+                    relative-to = "bottom-right";
+                  };
+                };
+
+                open-focused = false;
+              }
+            ];
+
             workspaces =
               let
                 settings = {
