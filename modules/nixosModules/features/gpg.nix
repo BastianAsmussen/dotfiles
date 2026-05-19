@@ -6,6 +6,7 @@
         gnupg.agent = {
           enable = true;
           enableSSHSupport = true;
+          enableExtraSocket = true;
           pinentryPackage = pkgs.pinentry-gnome3;
           settings = {
             default-cache-ttl = 60;
@@ -24,9 +25,6 @@
 
           if [ -z "$SSH_CONNECTION" ]; then
             export GPG_TTY=$(tty)
-
-            gpgconf --launch gpg-agent
-            gpg-connect-agent updatestartuptty /bye > /dev/null
           fi
         '';
 
