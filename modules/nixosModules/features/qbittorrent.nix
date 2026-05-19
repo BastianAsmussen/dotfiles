@@ -155,7 +155,7 @@
         trap '${rm} -f "$cookie_jar"' EXIT
 
         login() {
-          ${curl} -fsS \
+          ${curl} -sS -o /dev/null -w "%{http_code}" \
             -c "$cookie_jar" \
             -H "Referer: $base_url" \
             --data-urlencode ${escapeShellArg "username=${cfg.webuiUsername}"} \
@@ -164,14 +164,14 @@
         }
 
         for attempt in {1..60}; do
-          response="$(login 2>/dev/null || true)"
+          status="$(login 2>/dev/null || true)"
 
-          if [ "$response" = "Ok." ]; then
-            break
-          fi
+          case "$status" in
+            200|204) break;;
+          esac
 
           if [ "$attempt" -eq 60 ]; then
-            echo "qBittorrent WebUI authentication did not succeed at $base_url!" >&2
+            echo "qBittorrent WebUI authentication did not succeed at $base_url (last HTTP $status)!" >&2
             exit 1
           fi
 
