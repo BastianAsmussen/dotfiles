@@ -251,8 +251,7 @@
             enable = true;
             domain = "jellyfin.asmussen.tech";
             location = "/";
-            upstream = "https://localhost:8920";
-            proxySSL.verify = false;
+            upstream = "http://localhost:8096";
             ssl = {
               dnsProvider = "cloudflare";
               environmentFile = config.sops.templates."cloudflare-acme-env".path;
@@ -326,7 +325,6 @@
           config.services.nix-serve.port
           config.services.website.port
           443 # nginx, WG peers reach epsilon directly
-          8920 # Jellyfin HTTPS
         ];
       };
 
@@ -356,11 +354,6 @@
         pool = "pool.hashvault.pro:80";
         wallet = self.preferences.monero-wallet;
         maxUsagePercentage = 25;
-      };
-
-      jellyfin.https = {
-        enable = true;
-        acmeHost = "asmussen.tech";
       };
 
       winapps.enable = true;
