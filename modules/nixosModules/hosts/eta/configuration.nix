@@ -200,7 +200,7 @@
         fallbackAddress = "127.0.0.1:8443";
         healthCheckHost = "cache.asmussen.tech";
         healthCheckPath = "/nix-cache-info";
-        sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:8920";
+        sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:443";
         busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
       };
 
