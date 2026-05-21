@@ -76,6 +76,7 @@
         self.nixosModules.website
         self.nixosModules.winapps
         self.nixosModules.arcticVault
+        self.nixosModules.pia
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -265,7 +266,7 @@
             upstream = "http://localhost:8111";
             mtls = {
               enable = true;
-              caCertificate = ../../../../keys/mtls-ca.crt;
+              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
               localhostBypass = true;
             };
           };
@@ -277,7 +278,7 @@
             upstream = "http://localhost:${toString config.services.qbittorrent.webuiPort}";
             mtls = {
               enable = true;
-              caCertificate = ../../../../keys/mtls-ca.crt;
+              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
               localhostBypass = true;
             };
           };
@@ -299,10 +300,20 @@
         openssh.openFirewall = false;
       };
 
-      qbittorrent.categories = {
-        anime = { };
-        shows = { };
-        movies = { };
+      qbittorrent = {
+        networkInterface = config.pia.interface;
+        categories = {
+          anime = { };
+          shows = { };
+          movies = { };
+        };
+      };
+
+      pia = {
+        enable = true;
+        region = "nl_amsterdam";
+        boundServices = [ "qbittorrent" ];
+        portSync.passwordFile = config.qbittorrent.webuiPasswordFile;
       };
 
       # Resolve qbittorrent to loopback so the browser hits the local mTLS proxy
