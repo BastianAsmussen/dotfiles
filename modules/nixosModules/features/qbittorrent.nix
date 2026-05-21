@@ -311,6 +311,17 @@
           '';
         };
 
+        networkInterface = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = ''
+            Network interface to bind all BitTorrent traffic to (e.g. "pia0").
+            Sets Session\NetworkInterface in qBittorrent.conf so libtorrent binds
+            both its listen socket and outgoing connections to this interface,
+            ensuring the correct source IP is used.
+          '';
+        };
+
         preallocate = mkOption {
           type = types.bool;
           default = true;
@@ -421,9 +432,6 @@
               (
                 [
                   "services/qbittorrent/webui/password-hash"
-                  "services/qbittorrent/proxy/address"
-                  "services/qbittorrent/proxy/username"
-                  "services/qbittorrent/proxy/password"
                 ]
                 ++ optionals (categories != [ ]) [
                   "services/qbittorrent/webui/password"
@@ -438,19 +446,21 @@
 
             content = ''
               [BitTorrent]
-              Session\AnonymousModeEnabled=true
               Session\DefaultSavePath=${completePath}/
-              Session\Encryption=1
+              Session\Encryption=0
               Session\GlobalUPSpeedLimit=10240
               Session\MaxConnections=-1
               Session\MaxConnectionsPerTorrent=-1
               Session\Preallocation=${boolToString cfg.preallocate}
-              Session\ProxyPeerConnections=true
               Session\QueueingSystemEnabled=${boolToString cfg.queueing.enable}
               Session\TempPath=${incompletePath}/
               Session\TempPathEnabled=true
               Session\DisableAutoTMMByDefault=${boolToString (!cfg.autoTorrentManagement)}
               Session\UseCategoryPathsInManualMode=${boolToString cfg.useCategoryPathsInManualMode}
+              ${optionalString (cfg.networkInterface != null) ''
+                Session\Interface=${cfg.networkInterface}
+                Session\InterfaceName=${cfg.networkInterface}
+              ''}
               ${optionalString cfg.queueing.enable ''
                 Session\IgnoreSlowTorrentsForQueueing=${boolToString cfg.queueing.ignoreSlowTorrents}
                 Session\MaxActiveDownloads=${toString cfg.queueing.maxActiveDownloads}
@@ -470,19 +480,9 @@
               [LegalNotice]
               Accepted=true
 
-              [Network]
-              Proxy\AuthEnabled=true
-              Proxy\HostnameLookupEnabled=false
-              Proxy\IP=${config.sops.placeholder."services/qbittorrent/proxy/address"}
-              Proxy\Password=${config.sops.placeholder."services/qbittorrent/proxy/password"}
-              Proxy\Port=1080
-              Proxy\Profiles\BitTorrent=true
-              Proxy\Profiles\Misc=true
-              Proxy\Profiles\RSS=true
-              Proxy\Type=SOCKS5
-              Proxy\Username=${config.sops.placeholder."services/qbittorrent/proxy/username"}
-
               [Preferences]
+              Connection\UPnP=false
+              Connection\NATPMP=false
               Downloads\PreAllocation=${boolToString cfg.preallocate}
               Downloads\SavePath=${completePath}/
               Downloads\TempPath=${incompletePath}/
@@ -536,9 +536,14 @@
             ];
 
             restartTriggers = [ config.sops.templates."qbittorrent.conf".content ];
-            serviceConfig.ExecStartPre = [
-              "+${prepareScript}"
-            ];
+            serviceConfig = {
+              ExecStartPre = [ "+${prepareScript}" ];
+              NoNewPrivileges = true;
+              CapabilityBoundingSet = "";
+              LockPersonality = true;
+              RestrictRealtime = true;
+              RestrictSUIDSGID = true;
+            };
           };
 
           services.qbittorrent-sync-categories = mkIf (categories != [ ]) {
