@@ -141,7 +141,7 @@
                 {
                   key = "f";
                   desc = "Firefox";
-                  cmd = "firefox";
+                  cmd = "schizofox";
                 }
                 {
                   key = "d";
