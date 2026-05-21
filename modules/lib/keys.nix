@@ -13,6 +13,7 @@
 
         isPublic = hasSuffix ".pub" name;
         isGpg = hasSuffix ".asc" name;
+        isCert = hasSuffix ".crt" name;
         isSsh = (hasPrefix "ssh-" name) && isPublic;
         isAge = (hasPrefix "age-" name) && isPublic;
         isBuilder = (hasPrefix "builder-" name) && isPublic;
@@ -27,6 +28,7 @@
         # Type-based collections.
         publicKeys = filter (k: k.isPublic) keys;
         gpgKeys = filter (k: k.isGpg) keys;
+        certKeys = filter (k: k.isCert) keys;
         sshKeys = filter (k: k.isSsh) keys;
         ageKeys = filter (k: k.isAge) keys;
         builderKeys = filter (k: k.isBuilder) keys;
@@ -34,6 +36,7 @@
         # Direct property access for paths.
         publicPaths = map (k: k.fullPath) publicKeys;
         gpgPaths = map (k: k.fullPath) gpgKeys;
+        certPaths = map (k: k.fullPath) certKeys;
         sshPaths = map (k: k.fullPath) sshKeys;
         agePaths = map (k: k.fullPath) ageKeys;
         builderPaths = map (k: k.fullPath) builderKeys;
@@ -72,5 +75,14 @@
       # File contents of Age keys filtered by filename.
       selectAgeContents =
         names: collection: map (k: builtins.readFile k.fullPath) (filterAgeKeys names collection);
+
+      # Filter certificates from a collection by filename.
+      filterCertKeys = names: collection: filter (k: builtins.elem k.name names) collection.certKeys;
+
+      # Full paths of certificates filtered by filename.
+      selectCertPaths = names: collection: map (k: k.fullPath) (filterCertKeys names collection);
+
+      # Full path of a single certificate by filename (throws if not found).
+      selectCertPath = name: collection: builtins.head (selectCertPaths [ name ] collection);
     };
 }

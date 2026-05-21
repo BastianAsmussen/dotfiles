@@ -17,6 +17,7 @@
             "age-alice.pub"
             "builder-kappa.pub"
             "builder-sigma.pub"
+            "ca.crt"
             "ssh-theta.pub"
           ];
         };
@@ -134,6 +135,44 @@
         testSelectAgeContentsEmpty = {
           expr = keysLib.selectAgeContents [ "age-nonexistent.pub" ] keys;
           expected = [ ];
+        };
+
+        testCertKeys = {
+          expr = keys.certPaths;
+          expected = mapKeys [ "ca.crt" ];
+        };
+
+        testFilterCertKeys = {
+          expr = map (k: k.name) (keysLib.filterCertKeys [ "ca.crt" ] keys);
+          expected = [ "ca.crt" ];
+        };
+
+        testFilterCertKeysExcludesNonCert = {
+          expr = keysLib.filterCertKeys [ "age-alice.pub" ] keys;
+          expected = [ ];
+        };
+
+        testFilterCertKeysEmpty = {
+          expr = keysLib.filterCertKeys [ ] keys;
+          expected = [ ];
+        };
+
+        testSelectCertPaths = {
+          expr = keysLib.selectCertPaths [ "ca.crt" ] keys;
+          expected = mapKeys [ "ca.crt" ];
+        };
+
+        testSelectCertPathsMissingName = {
+          expr = keysLib.selectCertPaths [
+            "ca.crt"
+            "nonexistent.crt"
+          ] keys;
+          expected = mapKeys [ "ca.crt" ];
+        };
+
+        testSelectCertPath = {
+          expr = keysLib.selectCertPath "ca.crt" keys;
+          expected = mockDir + "/ca.crt";
         };
       };
 
