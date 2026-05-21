@@ -54,7 +54,7 @@
         INTERFACE=${escapeShellArg cfg.interface}
         REGION=${escapeShellArg cfg.region}
         TABLE=${toString cfg.routeTable}
-        CA_CERT=${escapeShellArg (toString piaCaCert)}
+        CA_CERT=${piaCaCert}
         STATE_DIR=/run/pia
         QBT_UID="$(id -u ${escapeShellArg qbtUser})"
 
