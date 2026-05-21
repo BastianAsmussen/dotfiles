@@ -54,13 +54,13 @@
               Title = "Codeberg.org";
               URL = "https://codeberg.org";
               Placement = "toolbar";
-              Folder = "VSC";
+              Folder = "VCS";
             }
             {
               Title = "GitHub";
               URL = "https://github.com";
               Placement = "toolbar";
-              Folder = "VSC";
+              Folder = "VCS";
             }
           ];
         };
