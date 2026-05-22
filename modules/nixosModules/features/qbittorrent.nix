@@ -220,6 +220,10 @@
     in
     {
       options.qbittorrent = {
+        enable = mkEnableOption "qBittorrent torrent client." // {
+          default = true;
+        };
+
         webuiAddress = mkOption {
           type = types.str;
           default = "127.0.0.1";
@@ -425,7 +429,7 @@
         };
       };
 
-      config = {
+      config = mkIf cfg.enable {
         sops = {
           secrets =
             lib.genAttrs
