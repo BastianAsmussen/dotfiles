@@ -34,6 +34,9 @@
             ];
 
             serviceConfig.UMask = lib.mkForce "0002";
+
+            # Override service locale.
+            environment.LC_ALL = config.i18n.defaultLocale;
           };
 
           shoko.unitConfig.RequiresMountsFor = [
