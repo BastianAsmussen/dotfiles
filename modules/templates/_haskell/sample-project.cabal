@@ -1,0 +1,13 @@
+cabal-version: 2.4
+name:          sample-project
+version:       0.1.0.0
+synopsis:      Sample Haskell project.
+license:       MIT
+build-type:    Simple
+
+executable sample-project
+  main-is:          Main.hs
+  hs-source-dirs:   app
+  build-depends:    base >=4.14 && <5
+  default-language: Haskell2010
+  ghc-options:      -Wall

@@ -29,6 +29,6 @@ to implement a template for each language I use, which, as of now consists of:
 - [x] Rust
 - [x] Go
 - [ ] C#
-- [ ] Haskell
-- [ ] C
+- [x] Haskell
+- [x] C
 - [x] Python
