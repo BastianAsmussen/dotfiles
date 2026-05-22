@@ -24,6 +24,9 @@
       pkgs,
       ...
     }:
+    let
+      inherit (lib) mkForce;
+    in
     {
       imports = [
         # Base modules.
@@ -391,5 +394,29 @@
       };
 
       home-manager.userModules.bastian = self.homeModuleSets.epsilon;
+
+      specialisation.safeMode.configuration = {
+        system.nixos.tags = [ "safe-mode" ];
+
+        wireguard.enable = mkForce false;
+        pia.enable = mkForce false;
+        acmeShared.enable = mkForce false;
+        winapps.enable = mkForce false;
+
+        virtualisation.podman.enable = mkForce false;
+
+        qbittorrent.enable = mkForce false;
+
+        nginx.enable = mkForce false;
+
+        services = {
+          jellyfin.enable = mkForce false;
+          shoko.enable = mkForce false;
+          syncthing.enable = mkForce false;
+          nix-serve.enable = mkForce false;
+          website.enable = mkForce false;
+          ollama.enable = mkForce false;
+        };
+      };
     };
 }
