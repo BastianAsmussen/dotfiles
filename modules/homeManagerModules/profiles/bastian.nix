@@ -30,6 +30,7 @@
           go
           hyperfine
           jq
+          jless
           just
           libreoffice-fresh
           man-pages
