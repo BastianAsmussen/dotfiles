@@ -447,6 +447,7 @@
             content = ''
               [BitTorrent]
               Session\DefaultSavePath=${completePath}/
+              Session\AnonymousModeEnabled=true
               Session\Encryption=0
               Session\GlobalUPSpeedLimit=10240
               Session\MaxConnections=-1
