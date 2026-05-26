@@ -332,6 +332,24 @@
           description = "Whether qBittorrent preallocates disk space for torrent payloads.";
         };
 
+        altSpeed = {
+          download = mkOption {
+            type = rateType;
+            default = {
+              value = 10;
+              unit = "MiB/s";
+            };
+            apply = rateToKiBps;
+            description = "Alternate download speed limit.";
+          };
+
+          upload = mkOption {
+            type = types.int;
+            default = 0;
+            description = "Alternate upload speed limit in KiB/s. 0 = unlimited.";
+          };
+        };
+
         queueing = {
           enable = mkEnableOption "qBittorrent torrent queueing";
 
@@ -454,6 +472,8 @@
               Session\AnonymousModeEnabled=true
               Session\Encryption=0
               Session\GlobalUPSpeedLimit=10240
+              Session\AlternativeGlobalDLSpeedLimit=${toString cfg.altSpeed.download}
+              Session\AlternativeGlobalUPSpeedLimit=${toString cfg.altSpeed.upload}
               Session\MaxConnections=-1
               Session\MaxConnectionsPerTorrent=-1
               Session\Preallocation=${boolToString cfg.preallocate}
