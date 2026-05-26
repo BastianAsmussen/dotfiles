@@ -66,10 +66,13 @@
         self.nixosModules.goxlr
         self.nixosModules.homeManager
         self.nixosModules.jellyfin
+        self.nixosModules.seerr
         self.nixosModules.qbittorrent
+        self.nixosModules.servarr
         self.nixosModules.syncthing
         self.nixosModules.primaryBusy
         self.nixosModules.monero
+        self.nixosModules.dns
         self.nixosModules.networkManager
         self.nixosModules.nginx
         self.nixosModules.nix-serve
@@ -148,7 +151,19 @@
             group = "jellyfin";
           }
           "/var/lib/qBittorrent"
+          {
+            directory = "/var/lib/sonarr";
+            user = "sonarr";
+            group = "sonarr";
+          }
+          {
+            directory = "/var/lib/radarr";
+            user = "radarr";
+            group = "radarr";
+          }
           "/var/lib/systemd/coredump"
+          "/var/lib/private/prowlarr"
+          "/var/lib/private/seerr"
           "/var/lib/private/ollama"
           {
             directory = "/var/cache/ccache";
@@ -196,6 +211,7 @@
             ".config/sops" # VERY important!
             ".config/libreoffice"
             ".config/vesktop"
+            ".config/spotify"
             ".config/teams-for-linux"
             ".mozilla"
             ".password-store"
@@ -215,6 +231,7 @@
 
           cache.directories = [
             ".cache/direnv"
+            ".cache/spotify/Storage"
           ];
         };
       };
@@ -285,6 +302,53 @@
               localhostBypass = true;
             };
           };
+
+          radarr = {
+            enable = true;
+            domain = "radarr.asmussen.tech";
+            location = "/";
+            upstream = "http://localhost:${toString config.services.radarr.settings.server.port}";
+            mtls = {
+              enable = true;
+              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
+              localhostBypass = true;
+            };
+          };
+
+          sonarr = {
+            enable = true;
+            domain = "sonarr.asmussen.tech";
+            location = "/";
+            upstream = "http://localhost:${toString config.services.sonarr.settings.server.port}";
+            mtls = {
+              enable = true;
+              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
+              localhostBypass = true;
+            };
+          };
+
+          seerr = {
+            enable = true;
+            domain = "requests.asmussen.tech";
+            location = "/";
+            upstream = "http://localhost:${toString config.services.seerr.port}";
+            ssl = {
+              dnsProvider = "cloudflare";
+              environmentFile = config.sops.templates."cloudflare-acme-env".path;
+            };
+          };
+
+          prowlarr = {
+            enable = true;
+            domain = "prowlarr.asmussen.tech";
+            location = "/";
+            upstream = "http://localhost:${toString config.services.prowlarr.settings.server.port}";
+            mtls = {
+              enable = true;
+              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
+              localhostBypass = true;
+            };
+          };
         };
       };
 
@@ -319,18 +383,33 @@
         portSync.passwordFile = config.qbittorrent.webuiPasswordFile;
       };
 
+      servarr.enable = true;
+      seerr.enable = true;
+
       # Resolve qbittorrent to loopback so the browser hits the local mTLS proxy
       # instead of going out through eta (bypasses public DNS and the untrusted hop).
       networking = {
+        # Never roams, don't let DHCP DNS shadow the global DoT config.
+        networkmanager.settings.connection = {
+          "ipv4.ignore-auto-dns" = true;
+          "ipv6.ignore-auto-dns" = true;
+        };
+
         hosts = {
           "127.0.0.1" = [
             "qbittorrent.asmussen.tech"
+            "radarr.asmussen.tech"
             "shoko.asmussen.tech"
+            "sonarr.asmussen.tech"
+            "prowlarr.asmussen.tech"
           ];
 
           "::1" = [
             "qbittorrent.asmussen.tech"
+            "radarr.asmussen.tech"
             "shoko.asmussen.tech"
+            "sonarr.asmussen.tech"
+            "prowlarr.asmussen.tech"
           ];
         };
 
@@ -406,8 +485,11 @@
         virtualisation.podman.enable = mkForce false;
 
         qbittorrent.enable = mkForce false;
+        servarr.enable = mkForce false;
 
         nginx.enable = mkForce false;
+
+        seerr.enable = mkForce false;
 
         services = {
           jellyfin.enable = mkForce false;
