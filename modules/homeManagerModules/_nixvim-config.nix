@@ -34,7 +34,7 @@
     };
 
     combinePlugins = {
-      enable = true;
+      enable = !pkgs.stdenv.hostPlatform.isAarch64;
       standalonePlugins = [ "nvim-treesitter" ];
     };
   };
