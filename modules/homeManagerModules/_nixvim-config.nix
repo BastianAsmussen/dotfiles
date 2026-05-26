@@ -26,17 +26,10 @@
     }
   ];
 
-  performance = {
-    byteCompileLua = {
-      enable = true;
-      nvimRuntime = true;
-      plugins = true;
-    };
-
-    combinePlugins = {
-      enable = !pkgs.stdenv.hostPlatform.isAarch64;
-      standalonePlugins = [ "nvim-treesitter" ];
-    };
+  performance.byteCompileLua = {
+    enable = true;
+    nvimRuntime = true;
+    plugins = true;
   };
 
   extraConfigLuaPre = ''
