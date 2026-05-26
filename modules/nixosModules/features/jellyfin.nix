@@ -22,9 +22,11 @@
 
       systemd = {
         tmpfiles.rules = [
-          "d /srv/media          0755 root            media - -"
-          "d /srv/media/shared   3770 root            media - -"
-          "d /srv/media/jellyfin 2770 ${jellyfinUser} media - -"
+          "d /srv/media                 0755 root            media - -"
+          "d /srv/media/jellyfin        2770 ${jellyfinUser} media - -"
+          "d /srv/media/jellyfin/Anime  2770 ${jellyfinUser} media - -"
+          "d /srv/media/jellyfin/Shows  2770 ${jellyfinUser} media - -"
+          "d /srv/media/jellyfin/Movies 2770 ${jellyfinUser} media - -"
         ];
 
         services = {
