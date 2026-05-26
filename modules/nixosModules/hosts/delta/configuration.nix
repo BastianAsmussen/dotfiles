@@ -166,6 +166,19 @@
             };
           };
 
+          radarr = {
+            enable = true;
+            domain = "radarr.asmussen.tech";
+            location = "/";
+            upstream = "https://10.10.0.1";
+            proxySSL = {
+              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
+              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
+              serverName = "radarr.asmussen.tech";
+              verify = false;
+            };
+          };
+
           prowlarr = {
             enable = true;
             domain = "prowlarr.asmussen.tech";
@@ -194,6 +207,7 @@
           "qbittorrent.asmussen.tech"
           "shoko.asmussen.tech"
           "sonarr.asmussen.tech"
+          "radarr.asmussen.tech"
           "prowlarr.asmussen.tech"
         ];
 
@@ -201,6 +215,7 @@
           "qbittorrent.asmussen.tech"
           "shoko.asmussen.tech"
           "sonarr.asmussen.tech"
+          "radarr.asmussen.tech"
           "prowlarr.asmussen.tech"
         ];
       };
