@@ -7,7 +7,11 @@
       ...
     }:
     {
-      services = {
+      options.ssh.fail2ban.enable = lib.mkEnableOption "Fail2ban SSH jail." // {
+        default = true;
+      };
+
+      config.services = {
         openssh = {
           enable = true;
           allowSFTP = false;
@@ -54,7 +58,7 @@
           };
         };
 
-        fail2ban = {
+        fail2ban = lib.mkIf config.ssh.fail2ban.enable {
           enable = true;
           extraPackages = with pkgs; [
             nftables

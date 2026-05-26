@@ -142,7 +142,6 @@
           "/var/lib/acme" # ACME/Let's Encrypt certificates.
           "/var/lib/AccountsService" # User list / icons.
           "/var/lib/bluetooth"
-          "/var/lib/fail2ban"
           "/var/lib/power-profiles-daemon"
           {
             directory = "/var/lib/jellyfin";
@@ -262,6 +261,8 @@
         dkRedirects.enable = true;
       };
 
+      ssh.fail2ban.enable = false;
+
       nix-serve-extras.bindAddress = "10.10.0.2";
       nginx = {
         acme.sharedHost = "asmussen.tech";
@@ -352,15 +353,34 @@
       };
 
       services = {
-        nginx.virtualHosts = {
-          "www.asmussen.tech" = {
-            useACMEHost = "asmussen.tech";
-            forceSSL = true;
-            locations."/".return = "301 https://asmussen.tech$request_uri";
-          };
+        nginx = {
+          # Allow 5 login attempts per minute per IP; reject bursts with
+          # nodelay.
+          appendHttpConfig = ''
+            limit_req_zone $binary_remote_addr zone=jellyfin_auth:10m rate=5r/m;
+            limit_req_zone $binary_remote_addr zone=seerr_auth:10m rate=5r/m;
+          '';
 
-          # Redirect legacy path to subdomain for existing bookmarks.
-          "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+          virtualHosts = {
+            "www.asmussen.tech" = {
+              useACMEHost = "asmussen.tech";
+              forceSSL = true;
+              locations."/".return = "301 https://asmussen.tech$request_uri";
+            };
+
+            # Redirect legacy path to subdomain for existing bookmarks.
+            "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+
+            "jellyfin.asmussen.tech".locations."/Users/AuthenticateByName" = {
+              proxyPass = "http://localhost:8096";
+              extraConfig = "limit_req zone=jellyfin_auth burst=3 nodelay;";
+            };
+
+            "requests.asmussen.tech".locations."/api/v1/auth/local" = {
+              proxyPass = "http://localhost:${toString config.services.seerr.port}";
+              extraConfig = "limit_req zone=seerr_auth burst=3 nodelay;";
+            };
+          };
         };
 
         openssh.openFirewall = false;
