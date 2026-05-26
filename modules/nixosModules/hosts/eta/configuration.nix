@@ -201,6 +201,7 @@
         healthCheckHost = "cache.asmussen.tech";
         healthCheckPath = "/nix-cache-info";
         sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:443";
+        sniRoutes."requests.asmussen.tech".primaryAddress = "10.10.0.2:443";
         busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
       };
 
@@ -272,6 +273,12 @@
               };
 
               "jellyfin.asmussen.tech" = {
+                listen = [ fallbackListen ];
+                extraConfig = sslConfig;
+                locations."/".return = "503";
+              };
+
+              "requests.asmussen.tech" = {
                 listen = [ fallbackListen ];
                 extraConfig = sslConfig;
                 locations."/".return = "503";
