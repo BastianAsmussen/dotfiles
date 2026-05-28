@@ -26,9 +26,9 @@
               "{74145f27-f039-47ce-a470-a662b129930a}".install_url = mkFirefoxURL "clearurls";
               "sponsorBlocker@ajay.app".install_url = mkFirefoxURL "sponsorblock";
               "{762f9885-5a13-4abd-9c77-433dcd38b8fd}".install_url = mkFirefoxURL "return-youtube-dislikes";
-              "{34daeb50-c2d2-4f14-886a-7160b24d66a4}".install_url = mkFirefoxURL "youtube-shorts-block";
               "moz-addon-prod@7tv.app".install_url = mkFirefoxURL "7tv-extension";
               "control-panel-for-youtube@jbscript.dev".install_url = mkFirefoxURL "control_panel_for_youtube";
+              "control-panel-for-twitter@jbscript.dev".install_url = mkFirefoxURL "control_panel_for_twitter";
             };
         };
 
