@@ -92,10 +92,7 @@
 
             "Videos" = {
               path = "${home}/Videos";
-              devices = [
-                "epsilon"
-                "delta"
-              ];
+              devices = allDevices;
             };
           };
         };
