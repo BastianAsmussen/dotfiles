@@ -498,6 +498,8 @@
       specialisation.safeMode.configuration = {
         system.nixos.tags = [ "safe-mode" ];
 
+        boot.kernelPackages = mkForce pkgs.linuxPackages_latest;
+
         wireguard.enable = mkForce false;
         pia.enable = mkForce false;
         acmeShared.enable = mkForce false;
