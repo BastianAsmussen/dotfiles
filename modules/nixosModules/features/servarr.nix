@@ -10,6 +10,17 @@
           config.services.radarr.user
         ];
 
+        # Acquisition-only roots for anime, kept out of the Jellyfin media tree:
+        # Shoko is the librarian for anime, so these hold nothing Jellyfin
+        # reads. Sonarr/Radarr hardlink-import here purely to track what they
+        # already have.
+        systemd.tmpfiles.rules = [
+          "d /srv/media/sonarr        2775 root                           media - -"
+          "d /srv/media/sonarr/anime  2770 ${config.services.sonarr.user} media - -"
+          "d /srv/media/radarr        2775 root                           media - -"
+          "d /srv/media/radarr/anime  2770 ${config.services.radarr.user} media - -"
+        ];
+
         systemd.services =
           let
             serviceConfig = {

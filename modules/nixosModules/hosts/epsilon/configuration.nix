@@ -389,12 +389,24 @@
 
       qbittorrent = {
         networkInterface = config.pia.interface;
-        categories = {
-          anime = { };
-          shows = { };
-          movies = { };
-          linux-isos = { };
-        };
+        categories =
+          let
+            animePath = "/srv/media/torrents/complete/anime";
+          in
+          {
+            linux-isos = { };
+
+            # Manual / Shoko-managed anime library. Monitored by no *arr client.
+            anime.path = animePath;
+            shows = { };
+            movies = { };
+
+            # Sonarr/Radarr anime grabs land here but share the anime save path,
+            # so Shoko still catalogs them while the *arr clients only ever
+            # enumerate their own downloads instead of the whole seeding library.
+            sonarr-anime.path = animePath;
+            radarr-anime.path = animePath;
+          };
       };
 
       pia = {
