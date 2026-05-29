@@ -392,6 +392,7 @@
           anime = { };
           shows = { };
           movies = { };
+          linux-isos = { };
         };
       };
 
