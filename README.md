@@ -23,7 +23,7 @@ You can boot from the custom ISO which comes with Git, my custom Neovim build,
 and flakes pre-enabled.
 
 Download the latest pre-built ISO from the
-[Releases](https://github.com/BastianAsmussen/dotfiles/releases/latest) page,
+[Releases](https://codeberg.org/BastianA/dotfiles/releases/latest) page,
 or build it locally:
 
 ```sh
@@ -49,7 +49,7 @@ just iso-install /dev/sdX
 1. Clone the Git repository.
 
    ```sh
-   git clone https://github.com/BastianAsmussen/dotfiles.git ~/dotfiles
+   git clone https://codeberg.org/BastianA/dotfiles.git ~/dotfiles
    cd ~/dotfiles
    ```
 

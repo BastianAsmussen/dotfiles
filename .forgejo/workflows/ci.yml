@@ -1,0 +1,157 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: nix
+    steps:
+      - uses: https://code.forgejo.org/actions/checkout@v6.0.2
+      - name: Setup SSH Key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          echo "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB" >> ~/.ssh/known_hosts
+
+      - name: Nix Flake Check
+        run: nix flake check --all-systems --keep-going --show-trace
+
+  iso:
+    needs: check
+    runs-on: nix
+    permissions:
+      contents: write
+
+    steps:
+      - uses: https://code.forgejo.org/actions/checkout@v6.0.2
+      - name: Setup SSH Key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          echo "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB" >> ~/.ssh/known_hosts
+
+      # Compute a deterministic derivation path for the ISO image. The ISO
+      # config embeds `builtins.currentTime` (impure) and
+      # `system.configurationRevision` (depends on `self.shortRev`, which
+      # changes every commit). `mkForce` (priority 50) beats `mkDefault`
+      # (priority 1000), so these impure/volatile values are replaced with
+      # static strings and the derivation path only changes when the real
+      # config changes.
+      - name: Compute deterministic ISO derivation path
+        id: drv
+        run: |
+          STORE_PATH=$(nix eval --raw \
+            '.#nixosConfigurations.iso' \
+            --apply '
+              iso: (iso.extendModules {
+                modules = [
+                  ({ lib, ... }: {
+                    environment.etc.isoBuildTime.text = lib.mkForce "deterministic";
+                    system.configurationRevision = lib.mkForce "deterministic";
+                  })
+                ];
+              }).config.system.build.isoImage.drvPath
+            ')
+
+          echo "store_path=$STORE_PATH" >> "$GITHUB_OUTPUT"
+          echo "Deterministic ISO derivation path: $STORE_PATH"
+
+      - name: Check if ISO changed since last release
+        id: check
+        run: |
+          CURRENT="${{ steps.drv.outputs.store_path }}"
+          LATEST=$(curl -sf \
+            "${{ github.server_url }}/api/v1/repos/${{ github.repository }}/releases/latest" \
+            2>/dev/null \
+            | jq -r '.body // empty' \
+            | grep -oP '(?<=Derivation Path:\*\* `)[^`]+' || true)
+
+          if [ "$CURRENT" = "$LATEST" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "ISO unchanged, skipping release..."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "ISO changed ($LATEST → $CURRENT), building release..."
+          fi
+
+      - name: Build ISO image
+        if: steps.check.outputs.changed == 'true'
+        id: build
+        run: |
+          nix build .#nixosConfigurations.iso.config.system.build.isoImage --impure
+          mkdir -p dist
+          cp result/iso/*.iso dist/
+
+          SHORT=$(git rev-parse --short HEAD)
+          LONG=$(git rev-parse HEAD)
+          URL="${{ github.server_url }}/${{ github.repository }}/commit/$LONG"
+          {
+            echo "Automated ISO build from [\`$SHORT\`]($URL)."
+            echo
+            echo "**SHA-256:** \`$(sha256sum dist/*.iso | cut -d' ' -f1)\`"
+            echo "**Derivation Path:** \`${{ steps.drv.outputs.store_path }}\`"
+          } > release-notes.md
+
+          echo "tag=iso-$(date -u +%Y%m%d-%H%M%S)" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        if: steps.check.outputs.changed == 'true'
+        env:
+          API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+          TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          ISO=$(ls dist/*.iso)
+          BODY=$(jq -n \
+            --arg tag "${{ steps.build.outputs.tag }}" \
+            --arg commitish "${{ github.sha }}" \
+            --arg name "NixOS Installer ISO - $(date -u +%Y-%m-%d)" \
+            --rawfile body release-notes.md \
+            '{tag_name: $tag, target_commitish: $commitish, name: $name, body: $body}')
+
+          ID=$(curl -fsS -X POST "$API/releases" \
+            -H "Authorization: token $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" | jq -r '.id')
+
+          curl -fsS -X POST "$API/releases/$ID/assets?name=$(basename "$ISO")" \
+            -H "Authorization: token $TOKEN" \
+            -F "attachment=@$ISO;type=application/octet-stream"
+
+  topology:
+    needs: check
+    runs-on: nix
+    permissions:
+      contents: write
+
+    steps:
+      - uses: https://code.forgejo.org/actions/checkout@v6.0.2
+      - name: Setup SSH Key
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          echo "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBah1KJOMzBouggJ29iNdLddtrvwjYF9/Kh0xut9F2MR" >> ~/.ssh/known_hosts
+
+      - name: Build Topology
+        run: nix build .#topology.x86_64-linux.config.output
+
+      - name: Copy Topology Image
+        run: |
+          mkdir -p docs
+          cp result/main.svg docs/topology.svg
+
+      - name: Commit & Push
+        run: |
+          git config user.name "forgejo-actions[bot]"
+          git config user.email "forgejo-actions[bot]@noreply.codeberg.org"
+          git add docs/topology.svg
+          git diff --cached --quiet || git commit -m "docs: update topology diagram [skip ci]"
+          git push
