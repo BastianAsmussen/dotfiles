@@ -1,6 +1,25 @@
 {
   flake.templates = rec {
     default = rust;
+
+    c = {
+      path = ./_c;
+      description = "C development environment.";
+      welcomeText = ''
+        # C Project Template
+
+        ## Intended Usage
+
+        Development of C programs and libraries.
+
+        ## Getting Started
+
+        - Enter the development shell with `nix develop`.
+        - Build with `make` or `nix build`.
+        - Rename `sample-project` in `Makefile` and `flake.nix` to your project name.
+      '';
+    };
+
     go = {
       path = ./_go;
       description = "Go development environment.";
@@ -18,6 +37,24 @@
         I highly recommend giving Adam Hoese's
         [gomod2nix blog post](https://www.tweag.io/blog/2021-03-04-gomod2nix) a
         read before continuing.
+      '';
+    };
+
+    haskell = {
+      path = ./_haskell;
+      description = "Haskell development environment.";
+      welcomeText = ''
+        # Haskell Project Template
+
+        ## Intended Usage
+
+        Development of Haskell programs and libraries.
+
+        ## Getting Started
+
+        - Enter the development shell with `nix develop`.
+        - Build with `cabal build` or `nix build`.
+        - Rename `sample-project` in `sample-project.cabal` and `flake.nix` to your project name.
       '';
     };
 

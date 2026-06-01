@@ -8,10 +8,18 @@
       ...
     }:
     {
-      options.videoDir = lib.mkOption {
-        type = lib.types.str;
-        default = "/home/${inputs.nix-secrets.user.name}/Videos";
-        description = "Directory noctalia's screen recorder writes to.";
+      options = {
+        videoDir = lib.mkOption {
+          type = lib.types.str;
+          default = "/home/${inputs.nix-secrets.user.name}/Videos";
+          description = "Directory noctalia's screen recorder writes to.";
+        };
+
+        idleEnabled = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Whether the idle service turns off displays and locks the session after the configured timeouts.";
+        };
       };
 
       config = {
@@ -293,7 +301,7 @@
           };
 
           idle = {
-            enabled = true;
+            enabled = config.idleEnabled;
             screenOffTimeout = 300;
             lockTimeout = 330;
             suspendTimeout = 0;
