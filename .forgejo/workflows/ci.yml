@@ -10,14 +10,6 @@ jobs:
     runs-on: nix
     steps:
       - uses: https://code.forgejo.org/actions/checkout@v6.0.2
-      - name: Setup SSH Key
-        run: |
-          install -m 700 -d ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          echo "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB" >> ~/.ssh/known_hosts
-
       - name: Nix Flake Check
         run: nix flake check --all-systems --keep-going --show-trace
 
@@ -29,14 +21,6 @@ jobs:
 
     steps:
       - uses: https://code.forgejo.org/actions/checkout@v6.0.2
-      - name: Setup SSH Key
-        run: |
-          install -m 700 -d ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          echo "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB" >> ~/.ssh/known_hosts
-
       # Compute a deterministic derivation path for the ISO image. The ISO
       # config embeds `builtins.currentTime` (impure) and
       # `system.configurationRevision` (depends on `self.shortRev`, which
@@ -132,14 +116,6 @@ jobs:
 
     steps:
       - uses: https://code.forgejo.org/actions/checkout@v6.0.2
-      - name: Setup SSH Key
-        run: |
-          install -m 700 -d ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          echo "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBah1KJOMzBouggJ29iNdLddtrvwjYF9/Kh0xut9F2MR" >> ~/.ssh/known_hosts
-
       - name: Build Topology
         run: nix build .#topology.x86_64-linux.config.output
 
@@ -150,8 +126,10 @@ jobs:
 
       - name: Commit & Push
         run: |
+          git add docs/topology.svg
+          git diff --cached --quiet && exit 0
+
           git config user.name "forgejo-actions[bot]"
           git config user.email "forgejo-actions[bot]@noreply.codeberg.org"
-          git add docs/topology.svg
-          git diff --cached --quiet || git commit -m "docs: update topology diagram [skip ci]"
-          git push
+          git commit -m "docs: update topology diagram [skip ci]"
+          git push "git@codeberg.org:${{ github.repository }}.git" HEAD:master

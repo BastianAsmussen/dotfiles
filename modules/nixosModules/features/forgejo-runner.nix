@@ -9,9 +9,13 @@
     }:
     let
       hostname = config.networking.hostName;
+      codebergHostKey = "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB";
     in
     {
-      sops.secrets."forgejo/runner-token" = { };
+      sops.secrets = {
+        "forgejo/runner-token" = { };
+        "forgejo/deploy-key" = { };
+      };
 
       services.gitea-actions-runner = {
         package = pkgs.forgejo-runner;
@@ -63,10 +67,17 @@
         ExecStartPre = lib.mkForce [
           (pkgs.writeShellScript "forgejo-runner-${hostname}-pre" ''
             mkdir -p "$STATE_DIRECTORY/${hostname}"
+
+            install -d -m 700 "$HOME/.ssh"
+            install -m 600 "$CREDENTIALS_DIRECTORY/deploy-key" "$HOME/.ssh/id_ed25519"
+            printf '%s\n' ${lib.escapeShellArg codebergHostKey} > "$HOME/.ssh/known_hosts"
           '')
         ];
 
-        LoadCredential = [ "token.txt:${config.sops.secrets."forgejo/runner-token".path}" ];
+        LoadCredential = [
+          "token.txt:${config.sops.secrets."forgejo/runner-token".path}"
+          "deploy-key:${config.sops.secrets."forgejo/deploy-key".path}"
+        ];
       };
     };
 }
