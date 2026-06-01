@@ -124,12 +124,19 @@
           };
         };
 
-      services.ollama = {
-        enable = true;
-        package = pkgs.ollama-cuda;
+      services = {
+        ollama = {
+          enable = true;
+          package = pkgs.ollama-cuda;
+        };
+
+        meilisearch.masterKeyFile = config.sops.secrets."meilisearch/master-key".path;
       };
 
-      sops.secrets."wireguard/psk-eta-epsilon" = { };
+      sops.secrets = {
+        "wireguard/psk-eta-epsilon" = { };
+        "meilisearch/master-key" = { };
+      };
 
       # /etc/machine-id is persisted by the preservation module in initrd.
       # The commit unit only applies to transient machine-id on tmpfs.
@@ -149,6 +156,7 @@
             user = "jellyfin";
             group = "jellyfin";
           }
+          "/var/lib/private/meilisearch"
           "/var/lib/qBittorrent"
           {
             directory = "/var/lib/sonarr";
@@ -528,6 +536,7 @@
 
         services = {
           jellyfin.enable = mkForce false;
+          meilisearch.enable = mkForce false;
           shoko.enable = mkForce false;
           syncthing.enable = mkForce false;
           nix-serve.enable = mkForce false;
