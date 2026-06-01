@@ -29,7 +29,7 @@
             let
               inherit (osConfig.networking) hostName;
 
-              system = builtins.toJSON pkgs.system;
+              system = builtins.toJSON pkgs.stdenv.hostPlatform.system;
               flake = ''(builtins.getFlake "${self}")'';
 
               flakeParts = {
