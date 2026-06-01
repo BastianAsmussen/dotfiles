@@ -59,7 +59,6 @@
         self.nixosModules.btrfs
         self.nixosModules.ccache
         self.nixosModules.homeManager
-        self.nixosModules.japanese
         self.nixosModules.kanata
         self.nixosModules.dns
         self.nixosModules.networkManager
@@ -73,7 +72,6 @@
 
       winapps.enable = true;
 
-      japanese.enable = true;
       networking.hostName = "delta";
       remoteBuilder.jumpHost = "10.10.0.1";
       acmeShared.enable = true;
