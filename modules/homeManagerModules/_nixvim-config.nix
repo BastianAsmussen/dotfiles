@@ -40,7 +40,7 @@
   '';
 
   extraConfigLuaPost = ''
-    if os.getenv("SSH_TTY") then
+    if os.getenv("SSH_TTY") or os.getenv("SSH_CONNECTION") then
       vim.g.clipboard = {
         name = "OSC 52",
         copy = {
