@@ -83,6 +83,7 @@
         self.nixosModules.winapps
         self.nixosModules.arcticVault
         self.nixosModules.pia
+        self.nixosModules.forgejoRunner
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -168,6 +169,7 @@
             group = "radarr";
           }
           "/var/lib/systemd/coredump"
+          "/var/lib/private/gitea-runner" # Forgejo runner state.
           "/var/lib/private/prowlarr"
           "/var/lib/private/seerr"
           "/var/lib/private/ollama"

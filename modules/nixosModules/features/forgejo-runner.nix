@@ -1,0 +1,69 @@
+{ inputs, ... }:
+{
+  flake.nixosModules.forgejoRunner =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      hostname = config.networking.hostName;
+    in
+    {
+      sops.secrets."forgejo/runner-token" = { };
+
+      services.gitea-actions-runner = {
+        package = pkgs.forgejo-runner;
+        instances.${hostname} = {
+          enable = true;
+          name = hostname;
+          url = "https://codeberg.org";
+
+          # Satisfy the module's token assertion while legacy registration is
+          # disabled.
+          token = "unused";
+
+          # CI jobs use the host Nix store and warm cache.asmussen.tech.
+          labels = [ "nix:host" ];
+          hostPackages = with pkgs; [
+            config.nix.package
+            bash
+            coreutils
+            curl
+            gawk
+            git
+            gnugrep
+            gnused
+            gnutar
+            gzip
+            jq
+            nodejs
+            openssh
+          ];
+
+          settings = {
+            runner.labels = [ "nix:host" ];
+            server.connections.codeberg = {
+              url = "https://codeberg.org/";
+              uuid = inputs.nix-secrets.hosts.${hostname}.forgejo-runner-uuid;
+              token_url = "file:$CREDENTIALS_DIRECTORY/token.txt";
+              labels = [ "nix:host" ];
+            };
+          };
+        };
+      };
+
+      # Pass token_url through a systemd credential and replace deprecated
+      # registration.
+      systemd.services."gitea-runner-${hostname}".serviceConfig = {
+        ExecStartPre = lib.mkForce [
+          (pkgs.writeShellScript "forgejo-runner-${hostname}-pre" ''
+            mkdir -p "$STATE_DIRECTORY/${hostname}"
+          '')
+        ];
+
+        LoadCredential = [ "token.txt:${config.sops.secrets."forgejo/runner-token".path}" ];
+      };
+    };
+}
