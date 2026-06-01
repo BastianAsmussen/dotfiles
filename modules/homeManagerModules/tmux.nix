@@ -94,7 +94,7 @@
       programs.tmux = {
         enable = true;
         shell = getExe pkgs.zsh;
-        terminal = "screen-256color"; # Fix terminal colors.
+        terminal = "tmux-256color";
         keyMode = "vi";
         newSession = true;
         secureSocket = true;
@@ -124,8 +124,8 @@
         ];
 
         extraConfig = ''
-          # Fix terminal colors.
           set -as terminal-features ",xterm-256color:RGB"
+          set -g set-clipboard external
 
           # Automatically renumber windows.
           set -g renumber-windows on
