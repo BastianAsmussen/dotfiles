@@ -494,7 +494,6 @@
 
       winapps.enable = true;
 
-      japanese.enable = true;
       primaryBusy.enable = true;
       btrfs.scrub.fileSystems = [
         "/persist"
