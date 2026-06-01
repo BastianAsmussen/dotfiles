@@ -124,12 +124,19 @@
           };
         };
 
-      services.ollama = {
-        enable = true;
-        package = pkgs.ollama-cuda;
+      services = {
+        ollama = {
+          enable = true;
+          package = pkgs.ollama-cuda;
+        };
+
+        meilisearch.masterKeyFile = config.sops.secrets."meilisearch/master-key".path;
       };
 
-      sops.secrets."wireguard/psk-eta-epsilon" = { };
+      sops.secrets = {
+        "wireguard/psk-eta-epsilon" = { };
+        "meilisearch/master-key" = { };
+      };
 
       # machine-id is persisted in initrd, so disable the transient commit unit.
       systemd.services.systemd-machine-id-commit.enable = false;
@@ -148,6 +155,7 @@
             user = "jellyfin";
             group = "jellyfin";
           }
+          "/var/lib/private/meilisearch"
           "/var/lib/qBittorrent"
           {
             directory = "/var/lib/sonarr";
@@ -524,6 +532,7 @@
 
         services = {
           jellyfin.enable = mkForce false;
+          meilisearch.enable = mkForce false;
           shoko.enable = mkForce false;
           syncthing.enable = mkForce false;
           nix-serve.enable = mkForce false;

@@ -52,6 +52,8 @@
           openFirewall = false;
         };
 
+        meilisearch.enable = true;
+
         shoko.enable = true;
       };
 
