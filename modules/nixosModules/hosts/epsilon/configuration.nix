@@ -44,6 +44,7 @@
         # Nix.
         self.nixosModules.nix
         self.nixosModules.nh
+        self.nixosModules.eh
 
         # Security.
         self.nixosModules.acmeShared

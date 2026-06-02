@@ -42,8 +42,9 @@
         self.nixosModules.pipewire
 
         # Nix.
-        self.nixosModules.nh
         self.nixosModules.nix
+        self.nixosModules.nh
+        self.nixosModules.eh
 
         # Security.
         self.nixosModules.acmeShared

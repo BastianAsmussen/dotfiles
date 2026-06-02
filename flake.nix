@@ -52,6 +52,7 @@
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     schizofox.url = "github:schizofox/schizofox";
     nixcord.url = "github:FlameFlag/nixcord";
+    eh.url = "github:NotAShelf/eh";
 
     pre-commit-hooks = {
       url = "github:cachix/git-hooks.nix";
