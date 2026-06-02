@@ -1,0 +1,4 @@
+(A) Fix @delta +kanata keyboard Unicode bug.
+(A) 2026-06-02 Fix @epsilon +noctalia idle multi-monitor wake bug.
+(B) Fix +undotree state persistence.
+(C) Add development environments for Zig, C#, Haskell and C.
