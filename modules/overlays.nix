@@ -19,6 +19,7 @@
             neovim-minimal
             repo-cloner
             todo
+            tuxedo
             ;
         }
       );
