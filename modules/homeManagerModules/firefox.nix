@@ -65,7 +65,30 @@
           ];
         };
 
-        search.defaultSearchEngine = "DuckDuckGo";
+        search = {
+          defaultSearchEngine = "Kagi";
+          addEngines = [
+            {
+              Name = "Kagi";
+              Description = "Kagi Search";
+              Alias = "!k";
+              Method = "GET";
+              URLTemplate = "https://kagi.com/search?q={searchTerms}";
+            }
+          ];
+
+          removeEngines = [
+            "Google"
+            "Bing"
+            "Brave"
+            "Perplexity"
+            "Amazon.com"
+            "eBay"
+            "Twitter"
+            "Wikipedia"
+          ];
+        };
+
         settings = {
           "browser.translations.automaticallyPopup" = false;
           "browser.display.use_system_colors" = true;
