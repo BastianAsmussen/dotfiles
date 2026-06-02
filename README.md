@@ -293,10 +293,9 @@ sops updatekeys secrets.yaml
 ## To-Do Tracking
 
 I track stuff I need to get done and stuff that annoys me about my current
-setup in a file called [TODO.md](./TODO.md).  
-If you have suggestions or notice something that could be improved, feel free
-to open a pull request. I'll review and consider integrating your
-contributions.
+setup with [Tuxedo](https://github.com/webstonehq/tuxedo). If you have
+suggestions or notice something that could be improved, feel free to open a
+pull request. I'll review and consider integrating your contributions.
 
 ## Development Templates
 
