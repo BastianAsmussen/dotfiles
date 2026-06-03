@@ -227,7 +227,19 @@
             ".pki"
             ".ssh"
 
-            ".local/share"
+            ".local/share/bottles"
+            ".local/share/containers"
+            ".local/share/direnv"
+            ".local/share/flatpak"
+            ".local/share/gopass"
+            ".local/share/goxlr-utility"
+            ".local/share/lutris"
+            ".local/share/nvim"
+            ".local/share/opencode"
+            ".local/share/Steam"
+            ".local/share/umu"
+            ".local/share/zoxide"
+            ".local/share/zsh"
 
             ".local/state/home-manager"
             ".local/state/nix"
@@ -236,7 +248,10 @@
             ".local/state/mpv"
           ];
 
-          directoriesWithMode.".gnupg" = "0700";
+          directoriesWithMode = {
+            ".gnupg" = "0700";
+            ".local/share/keyrings" = "0700";
+          };
 
           cache.directories = [
             ".cache/direnv"
