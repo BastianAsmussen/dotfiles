@@ -1,0 +1,6 @@
+# Ignore results from `nix build`.
+result*
+
+# Compiled artifacts.
+sample-project
+*.o

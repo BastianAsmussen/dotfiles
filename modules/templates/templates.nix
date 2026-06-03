@@ -1,6 +1,76 @@
 {
   flake.templates = rec {
     default = rust;
+    c = {
+      path = ./_c;
+      description = "C development environment.";
+      welcomeText = ''
+        # C Project Template
+
+        ## Intended Usage
+
+        Development of C programs and libraries.
+
+        ## Notes
+
+        Run `chmod +x init.sh && ./init.sh` to rename the project files automatically.
+      '';
+    };
+
+    csharp = {
+      path = ./_csharp;
+      description = "C# development environment.";
+      welcomeText = ''
+        # C# Project Template
+
+        ## Intended Usage
+
+        Development of .NET console applications and libraries.
+
+        ## Notes
+
+        Run `chmod +x init.sh && ./init.sh` to rename the project files automatically.
+
+        After adding NuGet packages, regenerate the lockfile. See `README.md` for
+        the `fetch-deps` step.
+      '';
+    };
+
+    haskell = {
+      path = ./_haskell;
+      description = "Haskell development environment.";
+      welcomeText = ''
+        # Haskell Project Template
+
+        ## Intended Usage
+
+        Development of Haskell programs and libraries with Cabal.
+
+        ## Notes
+
+        Run `chmod +x init.sh && ./init.sh` to rename the project files automatically.
+      '';
+    };
+
+    zig = {
+      path = ./_zig;
+      description = "Zig development environment.";
+      welcomeText = ''
+        # Zig Project Template
+
+        ## Intended Usage
+
+        Development of Zig programs and libraries.
+
+        ## Notes
+
+        Run `chmod +x init.sh && ./init.sh` to rename the project files automatically.
+
+        The toolchain is provided by [zig2nix](https://github.com/Cloudef/zig2nix),
+        which keeps `zig` and `zls` in lock-step.
+      '';
+    };
+
     go = {
       path = ./_go;
       description = "Go development environment.";

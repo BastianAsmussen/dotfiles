@@ -1,0 +1,5 @@
+# Ignore results from `nix build`.
+result*
+
+bin/
+obj/
