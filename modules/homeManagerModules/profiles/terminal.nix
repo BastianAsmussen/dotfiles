@@ -16,7 +16,7 @@
       nixIndex
       nixvim
       ohMyPosh
-      passwordStore
+      gopass
       ripgrep
       tmux
       tmuxSessionizer
