@@ -6,7 +6,7 @@
       imports = [
         self.nixosModules.android
         self.nixosModules.podman
-        # self.nixosModules.qemuVirtualisation
+        self.nixosModules.qemu
       ];
 
       # Emulate ARM CPU.
