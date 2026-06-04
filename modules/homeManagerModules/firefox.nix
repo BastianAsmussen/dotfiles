@@ -2,6 +2,7 @@
 {
   flake.homeModules.firefox =
     {
+      config,
       osConfig,
       lib,
       ...
@@ -23,6 +24,7 @@
               mkFirefoxURL = name: "https://addons.mozilla.org/firefox/downloads/latest/${name}/latest.xpi";
             in
             {
+              "{eec37db0-22ad-4bf1-9068-5ae08df8c7e9}".install_url = mkFirefoxURL "gopass-bridge";
               "{74145f27-f039-47ce-a470-a662b129930a}".install_url = mkFirefoxURL "clearurls";
               "sponsorBlocker@ajay.app".install_url = mkFirefoxURL "sponsorblock";
               "{762f9885-5a13-4abd-9c77-433dcd38b8fd}".install_url = mkFirefoxURL "return-youtube-dislikes";
@@ -96,7 +98,20 @@
           "general.autoScroll" = true;
         };
 
-        security.sandbox.enable = true;
+        security.sandbox = {
+          enable = true;
+
+          # gopassbridge's native host (gopass-jsonapi) runs *inside* this
+          # sandbox, so it needs the gopass/gpg runtime paths bound in
+          # or it can't decrypt and corrupts the native-messaging stream.
+          extraBinds = [
+            "${config.home.homeDirectory}/.gnupg" # keyring + trustdb
+            "${config.home.homeDirectory}/.password-store" # the secrets
+            "${config.home.homeDirectory}/.config/gopass" # gopass config
+            "/run/user/1000/gnupg" # gpg-agent socket
+          ];
+        };
+
         theme = lib.optionalAttrs (osConfig != null) (
           let
             inherit (osConfig.lib.stylix) colors;
