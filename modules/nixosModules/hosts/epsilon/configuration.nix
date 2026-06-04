@@ -397,12 +397,21 @@
             # Redirect legacy path to subdomain for existing bookmarks.
             "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
 
-            "jellyfin.asmussen.tech".locations."/Users/AuthenticateByName" = {
-              proxyPass = "http://localhost:8096";
-              extraConfig = "limit_req zone=jellyfin_auth burst=3 nodelay;";
+            "jellyfin.asmussen.tech".locations = {
+              # Block pre-auth endpoints exposed by eta's TLS passthrough.
+              "~* ^/Users/ForgotPassword".return = "403";
+              "~* ^/Users/Public".return = "403";
+              "~* ^/QuickConnect".return = "403";
+              "~* ^/Startup".return = "403";
+              "~* ^/ClientLog".return = "403";
+
+              "~* ^/Users/AuthenticateByName" = {
+                proxyPass = "http://localhost:8096";
+                extraConfig = "limit_req zone=jellyfin_auth burst=3 nodelay;";
+              };
             };
 
-            "requests.asmussen.tech".locations."/api/v1/auth/local" = {
+            "requests.asmussen.tech".locations."~* ^/api/v1/auth/(local|jellyfin)" = {
               proxyPass = "http://localhost:${toString config.services.seerr.port}";
               extraConfig = "limit_req zone=seerr_auth burst=3 nodelay;";
             };
