@@ -3,3 +3,4 @@
 (B) Fix +undotree state persistence.
 x 2026-06-03 2026-06-03 Add development environments for Zig, C#, Haskell and C.
 (B) Add +gamemode daemon hooks for new @epsilon services.
+(C) Make +schizofox sandbox able to open YubiKey initially.
