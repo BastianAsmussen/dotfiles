@@ -101,13 +101,13 @@
                 rsquare (macro RA-9)    ;; ]  (AltGr+9)
                 bsl     (macro RA-lsgt) ;; \  (AltGr+lsgt)
 
-                at    (unicode @)
-                hash  (unicode #)
-                dol   (unicode $)
-                caret (unicode ^)
-                tilde (unicode ~)
-                pipe  (unicode |)
-                unds  (unicode _)
+                at    (macro RA-2)     ;; @  (AltGr+2)
+                hash  (macro S-3)      ;; #  (Shift+3)
+                dol   (macro RA-4)     ;; $  (AltGr+4)
+                caret (macro S-] spc)  ;; ^  (dead circumflex + space)
+                tilde (macro RA-] spc) ;; ~  (dead tilde + space)
+                pipe  (macro RA-=)     ;; |  (AltGr+=)
+                unds  (macro S-/)      ;; _  (Shift+/)
               )
 
               (deflayer base
