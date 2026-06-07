@@ -206,6 +206,11 @@
                 open-floating = true;
                 open-focused = false;
 
+                min-width = 480;
+                max-width = 480;
+                min-height = 270;
+                max-height = 270;
+
                 default-floating-position = _: {
                   props = {
                     x = 10;
