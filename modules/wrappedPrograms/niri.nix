@@ -200,6 +200,20 @@
 
                 open-focused = false;
               }
+              {
+                matches = [ { title = "^Picture-in-Picture$"; } ];
+
+                open-floating = true;
+                open-focused = false;
+
+                default-floating-position = _: {
+                  props = {
+                    x = 10;
+                    y = 10;
+                    relative-to = "bottom-right";
+                  };
+                };
+              }
             ];
 
             workspaces =
