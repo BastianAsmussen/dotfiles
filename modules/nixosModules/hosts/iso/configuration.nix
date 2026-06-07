@@ -33,6 +33,7 @@
         self.nixosModules.language
       ];
 
+      system.stateVersion = lib.mkForce lib.trivial.release;
       networking.hostName = "iso";
       nixpkgs = {
         hostPlatform = lib.mkDefault "x86_64-linux";
