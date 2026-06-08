@@ -17,6 +17,7 @@
             copy-file
             neovim
             neovim-minimal
+            qbittorrent-webui-catppuccin
             repo-cloner
             todo
             tuxedo

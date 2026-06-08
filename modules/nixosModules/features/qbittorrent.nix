@@ -247,6 +247,27 @@
           '';
         };
 
+        webuiTheme = {
+          enable = mkEnableOption "the Catppuccin Mocha alternative WebUI" // {
+            default = true;
+          };
+
+          package = mkOption {
+            type = types.package;
+            default = pkgs.qbittorrent-webui-catppuccin;
+            defaultText = lib.literalExpression "pkgs.qbittorrent-webui-catppuccin";
+            description = ''
+              WebUI bundle served as qBittorrent's alternative WebUI root folder.
+              Defaults to a Catppuccin Mocha overlay built from the same
+              qbittorrent-nox source the service runs, so the WebUI always
+              matches the served API.
+
+              Set the WebUI color scheme to Dark for correct toolbar icon
+              contrast (Catppuccin Mocha is a dark flavor).
+            '';
+          };
+        };
+
         torrentsPath = mkOption {
           type = types.str;
           default = "/srv/media/torrents";
@@ -519,6 +540,10 @@
               WebUI\Username=${cfg.webuiUsername}
               WebUI\Password_PBKDF2=${config.sops.placeholder."services/qbittorrent/webui/password-hash"}
               WebUI\LocalHostAuth=true
+              ${optionalString cfg.webuiTheme.enable ''
+                WebUI\AlternativeUIEnabled=true
+                WebUI\RootFolder=${cfg.webuiTheme.package}
+              ''}
               ${optionalString cfg.queueing.enable ''
                 Queueing\IgnoreSlowTorrents=${boolToString cfg.queueing.ignoreSlowTorrents}
                 Queueing\MaxActiveDownloads=${toString cfg.queueing.maxActiveDownloads}
