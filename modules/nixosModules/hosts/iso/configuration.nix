@@ -92,8 +92,7 @@
       ];
 
       users.users.root.openssh.authorizedKeys.keyFiles = lib.custom.keys.selectSshPaths [
-        "ssh-delta.pub"
-        "ssh-epsilon.pub"
+        "ssh-yubikey.pub"
       ] lib.custom.keys.default;
     };
 }

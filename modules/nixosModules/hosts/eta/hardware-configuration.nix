@@ -43,7 +43,7 @@
               authorizedKeys =
                 # Prompt to unlock encrypted partitions.
                 map (k: "command=\"systemd-tty-ask-password-agent\" ${k}") (
-                  lib.custom.keys.selectSshContents [ "ssh-delta.pub" "ssh-epsilon.pub" ] lib.custom.keys.default
+                  lib.custom.keys.selectSshContents [ "ssh-yubikey.pub" ] lib.custom.keys.default
                 );
             };
           };

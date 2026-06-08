@@ -54,6 +54,7 @@
         # Features.
         self.nixosModules.btop
         self.nixosModules.btrfs
+        self.nixosModules.preservation
         self.nixosModules.homeManager
         self.nixosModules.networkManager
         self.nixosModules.nginx
@@ -183,7 +184,24 @@
       # Eta is not fit for building, offload everything to Epsilon.
       # If Epsilon is unreachable, builds fail rather than running locally.
       nix.settings.max-jobs = lib.mkForce 0;
-      btrfs.scrub.fileSystems = [ "/" ];
+      btrfs.scrub.fileSystems = [
+        "/persist"
+        "/nix"
+        "/home"
+      ];
+
+      persistence = {
+        enable = true;
+        directories = [
+          "/var/lib/acme"
+          {
+            directory = "/var/lib/primary-mirror";
+            user = "root";
+            group = "builder";
+            mode = "0775";
+          }
+        ];
+      };
 
       acmeShared = {
         enable = true;
@@ -294,8 +312,7 @@
       };
 
       users.users.root.openssh.authorizedKeys.keyFiles = lib.custom.keys.selectSshPaths [
-        "ssh-epsilon.pub"
-        "ssh-delta.pub"
+        "ssh-yubikey.pub"
       ] lib.custom.keys.default;
 
       environment.systemPackages = [

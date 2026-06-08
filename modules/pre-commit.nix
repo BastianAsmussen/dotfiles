@@ -11,7 +11,11 @@
         settings.edit = true;
       };
 
-      statix.enable = true;
+      statix = {
+        enable = true;
+        excludes = [ "tofu/.terraform" ];
+      };
+
       nixfmt.enable = true;
       flake-checker = {
         enable = true;
