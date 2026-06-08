@@ -1631,11 +1631,11 @@
         "nixpkgs": "nixpkgs_12"
       },
       "locked": {
-        "lastModified": 1780921173,
-        "narHash": "sha256-rKUucC6w6K80uR3cu4CcmranQVeXkQ3cAOaPpDp3bM0=",
+        "lastModified": 1780950994,
+        "narHash": "sha256-T1Xt5zuikB7Lnwde3CVpkjh39ZB/vIqwSo0jw4d4NUM=",
         "owner": "BastianAsmussen",
         "repo": "website",
-        "rev": "1d2a15dbd4549d99b46aca6ee4f4725e990f88a1",
+        "rev": "1dff78e5e4d97ee5418fadf278b0bc9060449646",
         "type": "github"
       },
       "original": {
