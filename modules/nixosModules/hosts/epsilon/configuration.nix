@@ -140,9 +140,6 @@
         "meilisearch/master-key" = { };
       };
 
-      # machine-id is persisted in initrd, so disable the transient commit unit.
-      systemd.services.systemd-machine-id-commit.enable = false;
-
       persistence = {
         enable = true;
 

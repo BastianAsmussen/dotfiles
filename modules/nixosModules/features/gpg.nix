@@ -1,6 +1,6 @@
 {
   flake.nixosModules.gpg =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     {
       programs = {
         gnupg.agent = {
@@ -30,7 +30,14 @@
           fi
         '';
 
-      # Create root's .gnupg to avoid gpg-agent profile errors on login.
-      systemd.tmpfiles.rules = [ "d /root/.gnupg 0700 root root -" ];
+      # Create gpg-agent and RemoteForward socket directories.
+      systemd.tmpfiles.rules =
+        let
+          inherit (config.preferences.user) name;
+        in
+        [
+          "d /root/.gnupg 0700 root root -"
+          "d /home/${name}/.gnupg 0700 ${name} ${name} -"
+        ];
     };
 }

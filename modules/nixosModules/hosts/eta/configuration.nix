@@ -54,6 +54,7 @@
         # Features.
         self.nixosModules.btop
         self.nixosModules.btrfs
+        self.nixosModules.preservation
         self.nixosModules.homeManager
         self.nixosModules.networkManager
         self.nixosModules.nginx
@@ -183,7 +184,24 @@
       # Offload all builds to epsilon; do not build locally when it is
       # unavailable.
       nix.settings.max-jobs = lib.mkForce 0;
-      btrfs.scrub.fileSystems = [ "/" ];
+      btrfs.scrub.fileSystems = [
+        "/persist"
+        "/nix"
+        "/home"
+      ];
+
+      persistence = {
+        enable = true;
+        directories = [
+          "/var/lib/acme"
+          {
+            directory = "/var/lib/primary-mirror";
+            user = "root";
+            group = "builder";
+            mode = "0775";
+          }
+        ];
+      };
 
       acmeShared = {
         enable = true;

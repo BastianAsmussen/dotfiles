@@ -98,6 +98,7 @@
           "${cfg.persistPath}/system/etc/ssh/ssh_host_ed25519_key"
         ];
 
+        systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
         boot = {
           initrd.systemd.enable = mkDefault true;
           tmp = {
@@ -112,7 +113,12 @@
           preserveAt = {
             "${cfg.persistPath}/system" = {
               directories = [
-                "/etc/ssh"
+                # Mount /etc/ssh in initrd before setup-etc installs its config
+                # symlinks.
+                {
+                  directory = "/etc/ssh";
+                  inInitrd = true;
+                }
                 "/var/log"
                 "/var/lib/nixos"
                 "/var/lib/systemd/timers"

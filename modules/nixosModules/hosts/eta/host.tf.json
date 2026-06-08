@@ -1,0 +1,7 @@
+{
+  "hostname": "eta",
+  "provider": "hcloud",
+  "copy_host_keys": false,
+  "luks": true,
+  "extra_files_script": "./scripts/extra-files-eta.sh"
+}

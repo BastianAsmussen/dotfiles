@@ -1,6 +1,15 @@
 {
   flake.diskoConfigurations.hostEta = {
     disko.devices = {
+      # tmpfs root, wiped every reboot. All state lives under /persist.
+      nodev."/" = {
+        fsType = "tmpfs";
+        mountOptions = [
+          "size=2G"
+          "mode=755"
+        ];
+      };
+
       disk = {
         main = {
           type = "disk";
@@ -24,6 +33,8 @@
                 content = {
                   type = "luks";
                   name = "cryptroot";
+                  # This key is only for disko; boot unlocks over initrd SSH.
+                  passwordFile = "/tmp/disk-1.key";
                   settings.allowDiscards = true;
                   content = {
                     type = "lvm_pv";
@@ -53,8 +64,8 @@
               type = "btrfs";
               extraArgs = [ "-f" ];
               subvolumes = {
-                "/root" = {
-                  mountpoint = "/";
+                "/persist" = {
+                  mountpoint = "/persist";
                   mountOptions = [
                     "compress=zstd"
                     "noatime"
