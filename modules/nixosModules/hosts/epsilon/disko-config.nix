@@ -179,7 +179,16 @@
 
                 content = {
                   type = "btrfs";
-                  extraArgs = [ "-f" ];
+                  extraArgs = [
+                    "-f"
+
+                    "-d"
+                    "dup"
+
+                    "-m"
+                    "dup"
+                  ];
+
                   mountpoint = "/srv/arctic-vault";
                   mountOptions = [
                     "compress=zstd:3"
