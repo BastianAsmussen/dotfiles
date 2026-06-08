@@ -140,3 +140,10 @@ topology:
 vault:
     sudo systemctl start arctic-vault.service
     journalctl -u arctic-vault.service --no-pager -n 20
+
+# Run an OpenTofu command for the Hetzner IaC.
+[group("infra")]
+infra *args:
+    nix develop .#infra -c \
+        sops exec-env ~/nix-secrets/infra/hetzner.yaml \
+        'tofu -chdir=tofu {{ args }}'

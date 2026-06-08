@@ -98,6 +98,7 @@
           "${cfg.persistPath}/system/etc/ssh/ssh_host_ed25519_key"
         ];
 
+        systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
         boot = {
           initrd.systemd.enable = mkDefault true;
           tmp = {
@@ -112,7 +113,17 @@
           preserveAt = {
             "${cfg.persistPath}/system" = {
               directories = [
-                "/etc/ssh"
+                # Mount in initrd so the bind-mount is active before stage-2
+                # `setup-etc` runs. Otherwise setup-etc writes the sshd_config /
+                # ssh_config / moduli symlinks onto the tmpfs /etc/ssh and the
+                # later bind-mount shadows them, leaving sshd with no config on a
+                # freshly-installed host (it works on long-lived hosts only
+                # because repeated switches eventually populate /persist).
+                # /persist is neededForBoot, so it is available in initrd.
+                {
+                  directory = "/etc/ssh";
+                  inInitrd = true;
+                }
                 "/var/log"
                 "/var/lib/nixos"
                 "/var/lib/systemd/timers"

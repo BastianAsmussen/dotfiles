@@ -1,6 +1,6 @@
 {
   flake.nixosModules.gpg =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     {
       programs = {
         gnupg.agent = {
@@ -31,7 +31,15 @@
         '';
 
       # gpg-agent's profile.d script runs for all users including root.
-      # Without a .gnupg dir, root's shell spews gpg-connect-agent errors on login.
-      systemd.tmpfiles.rules = [ "d /root/.gnupg 0700 root root -" ];
+      # Without a .gnupg dir, the shell spews gpg-connect-agent errors on login
+      # and ssh gpg-agent socket forwarding (RemoteForward) fails to bind.
+      systemd.tmpfiles.rules =
+        let
+          inherit (config.preferences.user) name;
+        in
+        [
+          "d /root/.gnupg 0700 root root -"
+          "d /home/${name}/.gnupg 0700 ${name} ${name} -"
+        ];
     };
 }
