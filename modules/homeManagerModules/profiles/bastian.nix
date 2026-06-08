@@ -7,6 +7,7 @@
       gpg = {
         enable = true;
         keyTrustMap = {
+          "0xD92D668B77A29897-2026-06-08.asc" = "ultimate";
           "0x0FE5A355DBC92568-2024-08-09.asc" = "ultimate";
           "0x3B89704887DFEF65-2024-08-23.asc" = "marginal";
         };
