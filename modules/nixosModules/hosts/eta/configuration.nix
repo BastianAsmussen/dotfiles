@@ -55,6 +55,7 @@
         self.nixosModules.btop
         self.nixosModules.btrfs
         self.nixosModules.preservation
+        self.nixosModules.dns
         self.nixosModules.homeManager
         self.nixosModules.networkManager
         self.nixosModules.nginx
