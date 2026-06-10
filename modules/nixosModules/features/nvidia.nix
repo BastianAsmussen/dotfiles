@@ -15,8 +15,14 @@
             finegrained = false;
           };
 
-          open = false;
+          # Turing+ GPUs are supported and NVIDIA recommends the open kernel
+          # module for them; userspace stays proprietary either way.
+          open = true;
           nvidiaSettings = true;
+
+          # Keeps driver state initialized on a headless-capable desktop;
+          # nvidia-mps below depends on the persistenced unit.
+          nvidiaPersistenced = true;
         };
 
         # Enable graphics driver.
