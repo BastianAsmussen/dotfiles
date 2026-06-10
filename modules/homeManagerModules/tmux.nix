@@ -113,12 +113,15 @@
             extraConfig = ''
               set -g @catppuccin_flavor 'mocha'
               set -g @catppuccin_window_status_style 'basic'
+              set -g @catppuccin_window_current_number_color '#{@thm_peach}'
+              set -g @catppuccin_status_background 'none'
+              set -g @catppuccin_application_color '#{@thm_pink}'
 
               set -g status-left-length 100
               set -g status-right-length 100
               set -g status-left ""
-              set -g status-right "#{E:@catppuccin_status_session}"
-              set -ag status-right "#{E:@catppuccin_status_application}"
+              set -g status-right "#{E:@catppuccin_status_application}"
+              set -ag status-right "#{E:@catppuccin_status_session}"
             '';
           }
         ];
