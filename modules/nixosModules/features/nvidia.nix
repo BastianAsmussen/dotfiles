@@ -15,8 +15,12 @@
             finegrained = false;
           };
 
-          open = false;
+          # Turing+ GPUs use NVIDIA's recommended open kernel module.
+          open = true;
           nvidiaSettings = true;
+
+          # nvidia-mps depends on persistenced keeping driver state initialized.
+          nvidiaPersistenced = true;
         };
 
         # Enable graphics driver.
