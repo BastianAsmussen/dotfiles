@@ -31,8 +31,8 @@
 
         # Base modules.
         self.nixosModules.base
-        self.nixosModules.grub
         self.nixosModules.language
+        self.nixosModules.limine
         self.nixosModules.misc
         self.nixosModules.stylix
 
