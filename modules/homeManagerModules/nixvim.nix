@@ -19,6 +19,9 @@
 
       stylix.targets.nixvim.enable = false;
 
+      # Needed for TypeScript.
+      home.packages = [ pkgs.typescript-language-server ];
+
       programs.nixvim = {
         enable = true;
         imports = [ ./_nixvim-config.nix ];
