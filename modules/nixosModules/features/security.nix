@@ -74,7 +74,10 @@
         polkit.enable = true;
         rtkit.enable = true;
         sudo.enable = false;
-        sudo-rs.enable = true;
+        sudo-rs = {
+          enable = true;
+          extraConfig = "Defaults !pwfeedback"; # Restore expected behavior.
+        };
 
         # Always flush L1 cache before entering a guest.
         virtualisation.flushL1DataCache = "always";
