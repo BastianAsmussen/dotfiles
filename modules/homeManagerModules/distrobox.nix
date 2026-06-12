@@ -7,7 +7,7 @@
       xdg.configFile."distrobox/distrobox.conf".text = ''
         container_additional_volumes="/nix/store:/nix/store:ro /etc/profiles/per-user:/etc/profiles/per-user:ro /etc/static/profiles/per-user:/etc/static/profiles/per-user:ro"
         container_always_pull="0"
-        container_image_default="archlinux/archlinux:latest"
+        container_image_default="docker.io/library/archlinux:latest"
         container_name_default="archlinux"
         non_interactive="1"
       '';
