@@ -103,13 +103,7 @@
         }
       ];
 
-      systemd = {
-        settings.Manager.DefaultLimitNOFILE = 524288;
-
-        user.extraConfig = ''
-          DefaultLimitNOFILE=524288
-        '';
-      };
+      systemd.settings.Manager.DefaultLimitNOFILE = 524288;
 
       # Wine runs unprivileged and needs direct access to the ntsync device.
       services.udev.extraRules = ''
