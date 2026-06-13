@@ -21,6 +21,24 @@
         settings =
           let
             noctaliaExe = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-shell;
+
+            # Capture with grim into ~/Pictures/Screenshots/<host> and also copy to the clipboard.
+            mkScreenshot =
+              name: grimArgs:
+              lib.getExe (
+                pkgs.writeShellApplication {
+                  inherit name;
+
+                  text = ''
+                    dir="$HOME/Pictures/Screenshots/$(hostname)"
+                    mkdir -p "$dir"
+
+                    file="$dir/screenshot-$(date +%Y%m%d-%H%M%S).png"
+                    ${lib.getExe pkgs.grim} ${grimArgs} "$file"
+                    ${pkgs.wl-clipboard}/bin/wl-copy < "$file"
+                  '';
+                }
+              );
           in
           {
             hotkey-overlay.skip-at-startup = _: { };
@@ -115,17 +133,9 @@
               "Mod+Ctrl+WheelScrollDown".focus-workspace-down = _: { };
               "Mod+Ctrl+WheelScrollUp".focus-workspace-up = _: { };
 
-              "Mod+Ctrl+S".spawn-sh = "${lib.getExe pkgs.grim} -l 0 - | ${pkgs.wl-clipboard}/bin/wl-copy";
+              "Mod+Ctrl+S".spawn-sh = mkScreenshot "screenshot-full" "-l 0";
               "Mod+Shift+E".spawn-sh = "${pkgs.wl-clipboard}/bin/wl-paste | ${lib.getExe pkgs.swappy} -f -";
-              "Mod+Shift+S".spawn-sh = lib.getExe (
-                pkgs.writeShellApplication {
-                  name = "screenshot";
-                  text = ''
-                    ${lib.getExe pkgs.grim} -g "$(${lib.getExe pkgs.slurp} -w 0)" - \
-                    | ${pkgs.wl-clipboard}/bin/wl-copy
-                  '';
-                }
-              );
+              "Mod+Shift+S".spawn-sh = mkScreenshot "screenshot-region" ''-g "$(${lib.getExe pkgs.slurp} -w 0)"'';
 
               "Mod+d".spawn-sh = self.mkWhichKeyExe pkgs [
                 {
@@ -177,6 +187,11 @@
             ];
 
             window-rules = [
+              {
+                excludes = [ { is-floating = true; } ];
+                clip-to-geometry = true;
+                geometry-corner-radius = 10.0;
+              }
               {
                 matches = [ { app-id = "steam"; } ];
                 excludes = [ { title = "^[Ss]team$"; } ];
