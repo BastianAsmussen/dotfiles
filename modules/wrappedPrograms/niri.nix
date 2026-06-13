@@ -234,6 +234,11 @@
                   };
                 };
               }
+              {
+                # Enable VRR for games.
+                matches = [ { app-id = "^steam_app_"; } ];
+                variable-refresh-rate = true;
+              }
             ];
 
             workspaces =
