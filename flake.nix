@@ -51,6 +51,12 @@
     nixvim.url = "github:nix-community/nixvim";
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     schizofox.url = "github:schizofox/schizofox";
+
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixcord.url = "github:FlameFlag/nixcord";
     eh.url = "github:NotAShelf/eh";
 

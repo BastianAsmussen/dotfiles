@@ -5,8 +5,27 @@
       config,
       osConfig,
       lib,
+      pkgs,
       ...
     }:
+    let
+      # Version-pinned, hash-locked xpis from the rycee firefox-addons set
+      # (overlay registered in overlays.nix). Bump them all declaratively with
+      # `nix flake update firefox-addons`.
+      addons = pkgs.firefox-addons;
+
+      # Firefox installs system extensions under its application id; each addon
+      # package drops its signed xpi there named by its own addon id.
+      firefoxAppId = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
+      mkExtensions =
+        pkgList:
+        lib.listToAttrs (
+          map (pkg: {
+            name = pkg.addonId;
+            value.install_url = "file://${pkg}/share/mozilla/extensions/${firefoxAppId}/${pkg.addonId}.xpi";
+          }) pkgList
+        );
+    in
     {
       imports = [
         inputs.schizofox.homeManagerModule
@@ -19,19 +38,15 @@
           enableDefaultExtensions = true;
           enableExtraExtensions = true;
           darkreader.enable = true;
-          extraExtensions =
-            let
-              mkFirefoxURL = name: "https://addons.mozilla.org/firefox/downloads/latest/${name}/latest.xpi";
-            in
-            {
-              "{eec37db0-22ad-4bf1-9068-5ae08df8c7e9}".install_url = mkFirefoxURL "gopass-bridge";
-              "{74145f27-f039-47ce-a470-a662b129930a}".install_url = mkFirefoxURL "clearurls";
-              "sponsorBlocker@ajay.app".install_url = mkFirefoxURL "sponsorblock";
-              "{762f9885-5a13-4abd-9c77-433dcd38b8fd}".install_url = mkFirefoxURL "return-youtube-dislikes";
-              "moz-addon-prod@7tv.app".install_url = mkFirefoxURL "7tv-extension";
-              "control-panel-for-youtube@jbscript.dev".install_url = mkFirefoxURL "control_panel_for_youtube";
-              "control-panel-for-twitter@jbscript.dev".install_url = mkFirefoxURL "control_panel_for_twitter";
-            };
+          extraExtensions = mkExtensions [
+            addons.gopass-bridge
+            addons.clearurls
+            addons.sponsorblock
+            addons.return-youtube-dislikes
+            addons."7tv"
+            addons.control-panel-for-youtube
+            addons.control-panel-for-twitter
+          ];
         };
 
         misc = {

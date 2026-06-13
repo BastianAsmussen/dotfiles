@@ -17,6 +17,7 @@ let
         overlays = [
           self.overlays.additions
           self.overlays.modifications
+          self.overlays.firefox-addons
         ];
       };
 

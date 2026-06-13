@@ -25,6 +25,9 @@
         }
       );
 
+    # Version-pinned, hash-locked Firefox addons (`pkgs.firefox-addons.*`).
+    firefox-addons = inputs.firefox-addons.overlays.default;
+
     # User-defined overlays.
     modifications = _: prev: {
       bottles = prev.bottles.override {
