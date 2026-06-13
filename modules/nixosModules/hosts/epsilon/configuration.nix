@@ -90,6 +90,7 @@
         self.diskoConfigurations.hostEpsilon
 
         # External modules.
+        inputs.egg-mouse-config.nixosModules.default
         inputs.disko.nixosModules.disko
         inputs.stylix.nixosModules.stylix
         inputs.nix-index-database.nixosModules.nix-index
@@ -516,6 +517,8 @@
       };
 
       winapps.enable = true;
+
+      programs.egg-mouse-config.enable = true;
 
       primaryBusy.enable = true;
       btrfs.scrub.fileSystems = [

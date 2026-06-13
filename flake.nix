@@ -70,6 +70,11 @@
 
     website.url = "github:BastianAsmussen/website";
     winapps.url = "github:winapps-org/winapps";
+
+    egg-mouse-config = {
+      url = "github:BastianAsmussen/UnofficialEGGMouseConfig";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # Every Nix file under `./modules` is a flake-parts module,
