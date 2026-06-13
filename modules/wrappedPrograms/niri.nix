@@ -239,6 +239,10 @@
                 matches = [ { app-id = "^steam_app_"; } ];
                 variable-refresh-rate = true;
               }
+              {
+                matches = [ { app-id = "^gamescope$"; } ];
+                variable-refresh-rate = true;
+              }
             ];
 
             workspaces =
