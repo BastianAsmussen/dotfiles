@@ -25,7 +25,7 @@
             Port = 22;
             ForwardAgent = "no";
             RemoteForward = [
-              "/home/${user}/.gnupg/S.gpg-agent.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
+              "/home/${user}/.ssh/gpg-agent-forward.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
               "/home/${user}/.gnupg/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra"
             ];
 
@@ -38,7 +38,7 @@
             Port = 22;
             ForwardAgent = "no";
             RemoteForward = [
-              "/home/${user}/.gnupg/S.gpg-agent.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
+              "/home/${user}/.ssh/gpg-agent-forward.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
               "/home/${user}/.gnupg/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra"
             ];
 
