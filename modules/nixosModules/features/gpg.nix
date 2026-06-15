@@ -21,7 +21,12 @@
       environment.shellInit =
         # sh
         ''
-          export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+          # Set SSH_AUTH_SOCK to non-conflicting path over SSH.
+          if [ -n "$SSH_CONNECTION" ] && [ -S "$HOME/.ssh/gpg-agent-forward.ssh" ]; then
+            export SSH_AUTH_SOCK="$HOME/.ssh/gpg-agent-forward.ssh"
+          else
+            export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+          fi
 
           if [ -z "$SSH_CONNECTION" ]; then
             export GPG_TTY=$(tty)
