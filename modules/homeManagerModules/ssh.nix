@@ -26,7 +26,7 @@
             ForwardAgent = "no";
             RemoteForward = [
               "/home/${user}/.ssh/gpg-agent-forward.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
-              "/home/${user}/.gnupg/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra"
+              "/home/${user}/.gnupg-fwd/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra"
             ];
 
             StreamLocalBindUnlink = "yes";
@@ -39,7 +39,7 @@
             ForwardAgent = "no";
             RemoteForward = [
               "/home/${user}/.ssh/gpg-agent-forward.ssh /run/user/1000/gnupg/S.gpg-agent.ssh"
-              "/home/${user}/.gnupg/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra"
+              "/home/${user}/.gnupg-fwd/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra"
             ];
 
             StreamLocalBindUnlink = "yes";

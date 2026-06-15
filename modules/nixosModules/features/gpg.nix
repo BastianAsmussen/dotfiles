@@ -28,6 +28,11 @@
             export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
           fi
 
+          # Route gpg to the forwarded signing socket over SSH.
+          if [ -n "$SSH_CONNECTION" ] && [ -S "$HOME/.gnupg-fwd/S.gpg-agent" ]; then
+            export GNUPGHOME="$HOME/.gnupg-fwd"
+          fi
+
           if [ -z "$SSH_CONNECTION" ]; then
             export GPG_TTY=$(tty)
 
@@ -45,6 +50,10 @@
         [
           "d /root/.gnupg 0700 root root -"
           "d /home/${name}/.gnupg 0700 ${name} ${name} -"
+          "d /home/${name}/.gnupg-fwd 0700 ${name} ${name} -"
+          "f /home/${name}/.gnupg-fwd/gpg.conf 0600 ${name} ${name} - no-autostart"
+          "L+ /home/${name}/.gnupg-fwd/pubring.kbx - - - - /home/${name}/.gnupg/pubring.kbx"
+          "L+ /home/${name}/.gnupg-fwd/trustdb.gpg - - - - /home/${name}/.gnupg/trustdb.gpg"
         ];
     };
 }
