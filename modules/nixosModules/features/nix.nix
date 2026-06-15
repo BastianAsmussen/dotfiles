@@ -9,8 +9,6 @@
       ...
     }:
     {
-      imports = [ inputs.determinate.nixosModules.default ];
-
       config = {
         nix =
           let
@@ -47,7 +45,6 @@
               stalled-download-timeout = 30;
               max-jobs = "auto";
               cores = 0;
-              eval-cores = 0;
               auto-optimise-store = true;
               builders-use-substitutes = true;
               fallback = true;
@@ -91,15 +88,6 @@
             allowUnfree = true;
             android_sdk.accept_license = true;
           };
-        };
-
-        environment = {
-          etc."determinate/config.json".text = builtins.toJSON {
-            garbageCollector.strategy = "disabled";
-          };
-
-          # Disable telemetry.
-          variables.DETSYS_IDS_TELEMETRY = "disabled";
         };
 
         systemd = {
