@@ -4,6 +4,7 @@
     {
       lib,
       pkgs,
+      config,
       outputs,
       ...
     }:
@@ -67,7 +68,22 @@
               # Disable the global registry.
               flake-registry = "";
             };
+
+            extraOptions = ''
+              !include ${config.sops.templates."access-tokens.conf".path}
+            '';
           };
+
+        sops = {
+          secrets."github-access-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
+          templates."access-tokens.conf" = {
+            mode = "0440";
+            group = config.users.groups.nixbld.name;
+            content = ''
+              access-tokens = github.com=${config.sops.placeholder."github-access-token"}
+            '';
+          };
+        };
 
         nixpkgs = {
           overlays = builtins.attrValues outputs.overlays;
