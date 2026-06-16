@@ -24,6 +24,7 @@
 
       programs.nixvim = {
         enable = true;
+        nixpkgs.source = inputs.nixpkgs;
         imports = [ ./_nixvim-config.nix ];
         defaultEditor = true;
         plugins = {

@@ -47,8 +47,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixvim.url = "github:nix-community/nixvim";
-    spicetify-nix.url = "github:Gerg-L/spicetify-nix";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     schizofox.url = "github:schizofox/schizofox";
 
     firefox-addons = {
@@ -56,7 +64,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixcord.url = "github:FlameFlag/nixcord";
+    nixcord = {
+      url = "github:FlameFlag/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     eh.url = "github:NotAShelf/eh";
 
     pre-commit-hooks = {
@@ -64,11 +76,25 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    wrappers.url = "github:Lassulus/wrappers";
-    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
+    wrappers = {
+      url = "github:Lassulus/wrappers";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    website.url = "github:BastianAsmussen/website";
-    winapps.url = "github:winapps-org/winapps";
+    wrapper-modules = {
+      url = "github:BirdeeHub/nix-wrapper-modules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    website = {
+      url = "github:BastianAsmussen/website";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    winapps = {
+      url = "github:winapps-org/winapps";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     egg-mouse-config = {
       url = "github:BastianAsmussen/UnofficialEGGMouseConfig";
