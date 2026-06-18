@@ -22,9 +22,11 @@
       # Needed for TypeScript.
       home.packages = [ pkgs.typescript-language-server ];
 
-      programs.nixvim = {
+      programs.nixvim = _: {
+        imports = [ self.nixvimModules.default ];
+        nixpkgs.pkgs = pkgs;
+
         enable = true;
-        imports = [ ./_nixvim-config.nix ];
         defaultEditor = true;
         plugins = {
           # `nixd` needs flake context that is only available inside a NixOS/HM

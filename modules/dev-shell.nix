@@ -1,4 +1,3 @@
-{ inputs, ... }:
 {
   perSystem =
     {
@@ -11,10 +10,7 @@
         inherit (config.pre-commit) shellHook;
 
         inputsFrom = [
-          (import ../shell.nix {
-            inherit pkgs;
-            inherit (inputs) nixvim;
-          })
+          (import ../shell.nix { inherit pkgs; })
         ];
       };
     };
