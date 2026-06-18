@@ -304,7 +304,7 @@ You can use this flake for development environment templates.
 ### List Templates
 
 ```sh
-nix flake show self --json 2>/dev/null | jq '.inventory.templates.output.children | map_values(.shortDescription) | del(.default)'
+just show-templates
 ```
 
 ### Use Template
