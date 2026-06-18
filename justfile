@@ -12,6 +12,10 @@ check args="":
         --show-trace \
         {{ args }}
 
+# See development environment templates.
+show-templates:
+    nix flake show self --json 2>/dev/null | jq '.templates | map_values(.description) | del(.default)'
+
 # Rebuild and switch to the specified host (defaults to current hostname).
 [group("building")]
 rebuild *args:
