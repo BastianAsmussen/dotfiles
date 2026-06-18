@@ -1,4 +1,4 @@
-(A) Fix @delta +kanata keyboard Unicode bug.
+x 2026-06-18 2026-06-18 Fix @delta +kanata keyboard Unicode bug.
 (A) 2026-06-02 Fix @epsilon +noctalia idle multi-monitor wake bug.
 (B) Fix +undotree state persistence.
 x 2026-06-03 2026-06-03 Add development environments for Zig, C#, Haskell and C.
@@ -7,3 +7,4 @@ x 2026-06-03 2026-06-03 Add development environments for Zig, C#, Haskell and C.
 (C) Make +schizofox able to use +gopass clipboard.
 x 2026-06-18 2026-06-18 Refactor +nixvim module system to use +flake-parts like here: https://github.com/traxys/Nixfiles
 (B) Modularize +nixvim module.
+(A) Switch to Lanzaboote and enroll Secrue Boot keys on @epsilon and @delta devices.
