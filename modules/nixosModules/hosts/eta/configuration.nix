@@ -24,6 +24,17 @@
       pkgs,
       ...
     }:
+    let
+      # Derive Ente domains from epsilon so eta's routes stay synchronized.
+      epsilonEnte = self.nixosConfigurations.epsilon.config.services.ente;
+      enteDomains = [
+        epsilonEnte.api.domain
+        epsilonEnte.web.domains.accounts
+        epsilonEnte.web.domains.albums
+        epsilonEnte.web.domains.cast
+        epsilonEnte.web.domains.photos
+      ];
+    in
     {
       imports = [
         # External modules.
@@ -219,8 +230,14 @@
         fallbackAddress = "127.0.0.1:8443";
         healthCheckHost = "cache.asmussen.tech";
         healthCheckPath = "/nix-cache-info";
-        sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:443";
-        sniRoutes."requests.asmussen.tech".primaryAddress = "10.10.0.2:443";
+        sniRoutes = {
+          "jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:443";
+          "requests.asmussen.tech".primaryAddress = "10.10.0.2:443";
+        }
+        # List Ente routes explicitly to pair them with local fallback vhosts.
+        // lib.genAttrs enteDomains (_: {
+          primaryAddress = "10.10.0.2:443";
+        });
         busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
       };
 
@@ -308,7 +325,13 @@
                 extraConfig = sslConfig;
                 locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
               };
-            };
+            }
+            # Return a local 503 for Ente when epsilon is unavailable.
+            // lib.genAttrs enteDomains (_: {
+              listen = [ fallbackListen ];
+              extraConfig = sslConfig;
+              locations."/".return = "503";
+            });
         };
       };
 
