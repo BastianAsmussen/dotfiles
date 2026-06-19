@@ -129,7 +129,7 @@
 
             ente = {
               name = "Ente Photos";
-              icon = "services.photos";
+              icon = "services.ente";
               details.listen.text = "photos.asmussen.tech";
             };
           };
@@ -176,6 +176,7 @@
                 encryption._secret = config.sops.secrets."services/ente/encryption-key".path;
                 hash._secret = config.sops.secrets."services/ente/hash-key".path;
               };
+
               jwt.secret._secret = config.sops.secrets."services/ente/jwt-secret".path;
 
               s3 = {

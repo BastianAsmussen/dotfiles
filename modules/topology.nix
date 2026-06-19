@@ -14,7 +14,18 @@
           { config, ... }:
           {
             icons = {
-              services.syncthing.file = "${pkgs.syncthing}/share/icons/hicolor/scalable/apps/syncthing.svg";
+              services = {
+                syncthing.file = "${pkgs.syncthing}/share/icons/hicolor/scalable/apps/syncthing.svg";
+                ente.file = pkgs.runCommand "ente.svg" { } ''
+                  sed 's|<title>[^<]*</title>||; s|<path |<path fill="#00BC45" |' ${
+                    builtins.fetchurl {
+                      url = "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ente.svg";
+                      sha256 = "18z5kjrxc51qwm4p7k03z0w8n04qc2dyf29d5w8z2ncnmfxq67n4";
+                    }
+                  } > $out
+                '';
+              };
+
               devices.android.file = pkgs.runCommand "android.svg" { } ''
                 sed 's|<title>[^<]*</title>||; s|<path |<path fill="#3DDC84" |' ${
                   builtins.fetchurl {
