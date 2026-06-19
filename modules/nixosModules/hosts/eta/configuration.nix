@@ -24,6 +24,19 @@
       pkgs,
       ...
     }:
+    let
+      # The public Ente subdomains are served from epsilon. Derive them from
+      # epsilon's own config so eta can never drift out of sync, mirroring the
+      # `peerIps = ...epsilon.config.wireguard.ips` reference further down.
+      epsilonEnte = self.nixosConfigurations.epsilon.config.services.ente;
+      enteDomains = [
+        epsilonEnte.api.domain
+        epsilonEnte.web.domains.accounts
+        epsilonEnte.web.domains.albums
+        epsilonEnte.web.domains.cast
+        epsilonEnte.web.domains.photos
+      ];
+    in
     {
       imports = [
         # External modules.
@@ -219,8 +232,16 @@
         fallbackAddress = "127.0.0.1:8443";
         healthCheckHost = "cache.asmussen.tech";
         healthCheckPath = "/nix-cache-info";
-        sniRoutes."jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:443";
-        sniRoutes."requests.asmussen.tech".primaryAddress = "10.10.0.2:443";
+        sniRoutes = {
+          "jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:443";
+          "requests.asmussen.tech".primaryAddress = "10.10.0.2:443";
+        }
+        # The `default` upstream already forwards unlisted SNIs to epsilon, but
+        # listing the Ente domains keeps eta self-documenting and pairs with the
+        # 503 fallback vhosts below.
+        // lib.genAttrs enteDomains (_: {
+          primaryAddress = "10.10.0.2:443";
+        });
         busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
       };
 
@@ -308,7 +329,16 @@
                 extraConfig = sslConfig;
                 locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
               };
-            };
+            }
+            # Local 503 fallback for each Ente subdomain when epsilon is down,
+            # so clients see a clean "service unavailable" rather than the
+            # default_server 421. When epsilon is up the stream proxy passes
+            # straight through and these are never hit.
+            // lib.genAttrs enteDomains (_: {
+              listen = [ fallbackListen ];
+              extraConfig = sslConfig;
+              locations."/".return = "503";
+            });
         };
       };
 
