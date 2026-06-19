@@ -21,7 +21,7 @@
       config = {
         services.website = {
           enable = true;
-          port = 8080;
+          port = lib.mkDefault 8080;
         };
 
         nginx.reverseProxies.website = lib.mkIf config.website-extras.exposePublicly {
