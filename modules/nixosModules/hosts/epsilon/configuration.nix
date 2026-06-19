@@ -142,6 +142,8 @@
         };
 
         meilisearch.masterKeyFile = config.sops.secrets."meilisearch/master-key".path;
+
+        website.port = 8083;
         garage = {
           enable = true;
           package = pkgs.garage;
