@@ -629,7 +629,15 @@
         };
 
         users = {
-          groups.media = { };
+          # Pin IDs so they stay stable across rebuilds. The /srv/media/torrents
+          # payloads are owned by these numeric IDs; an unpinned service can
+          # drift on rebuild and orphan every download it owns.
+          users.${svc.user}.uid = 992;
+
+          groups = {
+            ${svc.group}.gid = 989;
+            media.gid = 994;
+          };
 
           extraGroups.media.members = [
             svc.user
