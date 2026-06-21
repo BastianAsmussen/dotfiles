@@ -9,9 +9,17 @@
     }:
     let
       hostname = config.networking.hostName;
-      codebergHostKey = "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB";
+      # Codeberg host key (docs.codeberg.org/security/ssh-fingerprint).
+      codebergPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB";
+      codebergHostKey = "codeberg.org ${codebergPublicKey}";
     in
     {
+      # Host jobs need global known_hosts; they do not share the runner's home.
+      programs.ssh.knownHosts.codeberg = {
+        hostNames = [ "codeberg.org" ];
+        publicKey = codebergPublicKey;
+      };
+
       sops.secrets = {
         "forgejo/runner-token" = { };
         "forgejo/deploy-key" = { };
