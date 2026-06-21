@@ -629,7 +629,13 @@
         };
 
         users = {
-          groups.media = { };
+          # Pin numeric IDs that own persistent torrent payloads.
+          users.${svc.user}.uid = 992;
+
+          groups = {
+            ${svc.group}.gid = 989;
+            media.gid = 994;
+          };
 
           extraGroups.media.members = [
             svc.user
