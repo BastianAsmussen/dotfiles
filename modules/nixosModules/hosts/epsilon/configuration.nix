@@ -203,6 +203,13 @@
         };
       };
 
+      # Pin Ente's numeric ids for persistent state, only when its API is
+      # enabled.
+      users = lib.mkIf config.services.ente.api.enable {
+        users.${config.services.ente.api.user}.uid = 998;
+        groups.${config.services.ente.api.group}.gid = 998;
+      };
+
       # Bootstrap Garage's single-node layout, bucket and access key.
       systemd.services = lib.mkIf config.services.ente.api.enable {
         garage-bootstrap = {
