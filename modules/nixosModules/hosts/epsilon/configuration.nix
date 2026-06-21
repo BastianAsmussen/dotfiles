@@ -207,6 +207,16 @@
         };
       };
 
+      # Pin ente's IDs so they stay stable across rebuilds. /var/lib/ente state
+      # is owned by these numeric IDs; an unpinned service drifts on rebuild and
+      # locks itself out of its own StateDirectory (which is exactly what hit the
+      # configurations/ subdir). Guarded on api.enable so the safeMode
+      # specialisation doesn't end up with a groupless ente user.
+      users = lib.mkIf config.services.ente.api.enable {
+        users.${config.services.ente.api.user}.uid = 998;
+        groups.${config.services.ente.api.group}.gid = 998;
+      };
+
       # Garage has no declarative bucket/key provisioning, so initialize the
       # single-node layout, the "ente" bucket and its access key once garage is
       # up. Every step is idempotent, so re-running it on each boot is harmless.
