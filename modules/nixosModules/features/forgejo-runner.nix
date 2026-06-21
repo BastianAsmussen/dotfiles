@@ -9,9 +9,21 @@
     }:
     let
       hostname = config.networking.hostName;
-      codebergHostKey = "codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB";
+      # Codeberg's published ED25519 host key (docs.codeberg.org/security/ssh-fingerprint,
+      # SHA256:mIlxA9k46MmM6qdJOdMnAQpzGxF4WIVVL+fj+wZbw0g).
+      codebergPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB";
+      codebergHostKey = "codeberg.org ${codebergPublicKey}";
     in
     {
+      # Trust Codeberg system-wide via /etc/ssh/ssh_known_hosts. CI jobs run on
+      # the host executor and don't share the runner service's $HOME, so the
+      # per-home known_hosts below isn't visible to them; the global file is the
+      # only one their `git push` over SSH will consult without prompting.
+      programs.ssh.knownHosts.codeberg = {
+        hostNames = [ "codeberg.org" ];
+        publicKey = codebergPublicKey;
+      };
+
       sops.secrets = {
         "forgejo/runner-token" = { };
         "forgejo/deploy-key" = { };
