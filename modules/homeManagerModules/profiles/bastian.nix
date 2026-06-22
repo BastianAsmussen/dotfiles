@@ -42,6 +42,7 @@
           postman
           repo-cloner
           rusty-man
+          sl
           teams-for-linux
           tlrc
           todo
