@@ -32,7 +32,7 @@
         # Base modules.
         self.nixosModules.base
         self.nixosModules.language
-        self.nixosModules.limine
+        self.nixosModules.lanzaboote
         self.nixosModules.misc
         self.nixosModules.stylix
 
@@ -369,6 +369,11 @@
         directoriesWithMode = {
           "/var/lib/private" = "0700";
           "/var/cache/jellyfin" = "0755";
+
+          # Secure Boot keys (lanzaboote pkiBundle). Root tmpfs is wiped every
+          # boot, so this must persist or the next rebuild can't sign the boot
+          # chain and the machine becomes unbootable.
+          "/var/lib/sbctl" = "0700";
         };
 
         files = [
