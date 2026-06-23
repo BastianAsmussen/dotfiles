@@ -32,7 +32,7 @@
         # Base modules.
         self.nixosModules.base
         self.nixosModules.language
-        self.nixosModules.limine
+        self.nixosModules.lanzaboote
         self.nixosModules.misc
         self.nixosModules.stylix
 
@@ -352,6 +352,9 @@
         directoriesWithMode = {
           "/var/lib/private" = "0700";
           "/var/cache/jellyfin" = "0755";
+
+          # Persist the signing keys; without them the next rebuild cannot sign.
+          "/var/lib/sbctl" = "0700";
         };
 
         files = [
