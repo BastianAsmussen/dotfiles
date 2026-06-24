@@ -9,3 +9,4 @@ x 2026-06-18 2026-06-18 Refactor +nixvim module system to use +flake-parts like 
 (B) Modularize +nixvim module.
 (A) Switch to Lanzaboote and enroll Secrue Boot keys on @epsilon and @delta devices.
 (A) Add specific post-install instructions for +lanzaboote setups.
+(C) Add +tuxedo Catppuccin theme.
