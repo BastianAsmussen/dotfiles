@@ -20,7 +20,10 @@
         {
           neovim =
             (inputs'.nixvim.legacyPackages.makeNixvimWithModule {
-              module = import ../homeManagerModules/_nixvim-config.nix;
+              module = {
+                imports = [ (import ../homeManagerModules/_nixvim-config.nix) ];
+                nixpkgs.pkgs = pkgs;
+              };
             })
             // {
               meta = baseMeta // {
@@ -34,6 +37,7 @@
                 { lib, ... }:
                 {
                   imports = [ (import ../homeManagerModules/_nixvim-config.nix) ];
+                  nixpkgs.pkgs = pkgs;
                   plugins = {
                     # LSP.
                     lsp.enable = lib.mkForce false;
@@ -81,6 +85,7 @@
       apps.neovim = {
         type = "app";
         program = "${config.packages.neovim}/bin/nvim";
+        meta.description = "Bastian's full nixvim configuration (LSP, DAP, all language tooling).";
       };
     };
 }
