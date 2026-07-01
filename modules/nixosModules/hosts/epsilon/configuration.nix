@@ -76,6 +76,7 @@
         self.nixosModules.dns
         self.nixosModules.networkManager
         self.nixosModules.nginx
+        self.nixosModules.router
         self.nixosModules.nix-serve
         self.nixosModules.nvidia
         self.nixosModules.topology
@@ -278,6 +279,11 @@
           {
             "wireguard/psk-eta-epsilon" = { };
             "meilisearch/master-key" = { };
+
+            # Router admin and WiFi secrets used to render and push
+            # configuration.
+            "router/admin-password" = { };
+            "router/wifi-passphrase" = { };
 
             # Museum and Garage's bootstrap service share these credentials.
             "services/ente/garage-access-key" = enteOwned;
@@ -722,6 +728,49 @@
         ];
 
         recipients = map (f: lib.strings.trim (builtins.readFile f)) lib.custom.keys.default.agePaths;
+      };
+
+      # Manage the router declaratively; apply changes with `just
+      # router-restore`.
+      router = {
+        enable = true;
+        adminPasswordFile = config.sops.secrets."router/admin-password".path;
+        dns = [ "192.168.1.254" ];
+
+        wifi = {
+          ssid = "GangnamStyle";
+          passphraseFile = config.sops.secrets."router/wifi-passphrase".path;
+        };
+
+        dhcp.staticLeases = [
+          {
+            hostname = "epsilon";
+            mac = "c8:7f:54:66:ff:72";
+            ip = "192.168.1.64";
+          }
+        ];
+
+        # Retain disabled port forwards for declarative round-trips.
+        portForwards = [
+          {
+            name = "SSH";
+            internalClient = "192.168.1.64";
+            externalPort = 22;
+            enable = false;
+          }
+          {
+            name = "HTTPS";
+            internalClient = "192.168.1.64";
+            externalPort = 443;
+            enable = false;
+          }
+          {
+            name = "HTTP";
+            internalClient = "192.168.1.64";
+            externalPort = 80;
+            enable = false;
+          }
+        ];
       };
 
       home-manager.userModules.bastian = self.homeModuleSets.epsilon;
