@@ -1,0 +1,354 @@
+{
+ "_comment": "Extracted firmware schema for Icotera i4850-20 (GETOUI CUSTDB_VER001/DB_VER003). DO NOT EDIT. Values marked secret are injected at runtime from sops; all other defaults are firmware/config constants. header/checksum are opaque fixed descriptors reproduced verbatim.",
+ "model": "i4850-20",
+ "header_b64": "SUNUAAFpNDg1MC0yMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAENVU1REQl9WRVIwMDEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAREJfVkVSMDAzAAAAAAAAAA==",
+ "checksum_b64": "MDUxMjAwMDEwMTAxMDMwMDA3MDAwMTAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+ "records": [
+  {
+   "key": "UserInterface.X_GETOUI_WEB.CustomerPassword?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "secret": true
+  },
+  {
+   "key": "UserInterface.X_GETOUI_Leds.AutoOffState?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 3
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.DnsServers?",
+   "len": 8,
+   "type": 7,
+   "kind": "ipv4pair",
+   "default": [
+    "192.168.1.254",
+    "0.0.0.0"
+   ]
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.1.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 1
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.1.Chaddr?",
+   "len": 18,
+   "type": 7,
+   "kind": "str",
+   "default": "c8:7f:54:66:ff:72"
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.1.YiAddr?",
+   "len": 4,
+   "type": 7,
+   "kind": "ipv4",
+   "default": "192.168.1.64"
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.1.Hostname?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": "epsilon"
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.2.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.2.Chaddr?",
+   "len": 18,
+   "type": 7,
+   "kind": "str",
+   "default": ""
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.2.YiAddr?",
+   "len": 4,
+   "type": 7,
+   "kind": "ipv4",
+   "default": "0.0.0.0"
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.2.Hostname?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": ""
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.3.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.3.Chaddr?",
+   "len": 18,
+   "type": 7,
+   "kind": "str",
+   "default": ""
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.3.YiAddr?",
+   "len": 4,
+   "type": 7,
+   "kind": "ipv4",
+   "default": "0.0.0.0"
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.3.Hostname?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": ""
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.4.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.4.Chaddr?",
+   "len": 18,
+   "type": 7,
+   "kind": "str",
+   "default": ""
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.4.YiAddr?",
+   "len": 4,
+   "type": 7,
+   "kind": "ipv4",
+   "default": "0.0.0.0"
+  },
+  {
+   "key": "DHCPv4.Server.Pool.1.StaticAddress.4.Hostname?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": ""
+  },
+  {
+   "key": "NAT.PortMapping.1.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "NAT.PortMapping.1.Alias?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": "SSH"
+  },
+  {
+   "key": "NAT.PortMapping.1.InternalClient?",
+   "len": 4,
+   "type": 7,
+   "kind": "ipv4",
+   "default": "192.168.1.64"
+  },
+  {
+   "key": "NAT.PortMapping.1.ExternalPort?",
+   "len": 2,
+   "type": 7,
+   "kind": "u16be",
+   "default": 22
+  },
+  {
+   "key": "NAT.PortMapping.1.InternalPort?",
+   "len": 2,
+   "type": 7,
+   "kind": "u16be",
+   "default": 22
+  },
+  {
+   "key": "NAT.PortMapping.1.Protocol?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 1
+  },
+  {
+   "key": "NAT.PortMapping.2.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "NAT.PortMapping.2.Alias?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": "HTTPS"
+  },
+  {
+   "key": "NAT.PortMapping.2.InternalClient?",
+   "len": 4,
+   "type": 7,
+   "kind": "ipv4",
+   "default": "192.168.1.64"
+  },
+  {
+   "key": "NAT.PortMapping.2.ExternalPort?",
+   "len": 2,
+   "type": 7,
+   "kind": "u16be",
+   "default": 443
+  },
+  {
+   "key": "NAT.PortMapping.2.InternalPort?",
+   "len": 2,
+   "type": 7,
+   "kind": "u16be",
+   "default": 443
+  },
+  {
+   "key": "NAT.PortMapping.2.Protocol?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 1
+  },
+  {
+   "key": "NAT.PortMapping.3.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "NAT.PortMapping.3.Alias?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": "HTTP"
+  },
+  {
+   "key": "NAT.PortMapping.3.InternalClient?",
+   "len": 4,
+   "type": 7,
+   "kind": "ipv4",
+   "default": "192.168.1.64"
+  },
+  {
+   "key": "NAT.PortMapping.3.ExternalPort?",
+   "len": 2,
+   "type": 7,
+   "kind": "u16be",
+   "default": 80
+  },
+  {
+   "key": "NAT.PortMapping.3.InternalPort?",
+   "len": 2,
+   "type": 7,
+   "kind": "u16be",
+   "default": 80
+  },
+  {
+   "key": "NAT.PortMapping.3.Protocol?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 1
+  },
+  {
+   "key": "X_GETOUI_UPnP.Enable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "WiFi.Radio.1.AutoChannelEnable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 0
+  },
+  {
+   "key": "WiFi.Radio.1.X_GETOUI_OptimalChannelEnable?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 1
+  },
+  {
+   "key": "WiFi.Radio.1.OperatingChannelBandwidth?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 40
+  },
+  {
+   "key": "WiFi.Radio.1.OperatingStandards?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": "n"
+  },
+  {
+   "key": "WiFi.Radio.2.X_GETOUI_DFSMode?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 2
+  },
+  {
+   "key": "WiFi.Radio.2.X_GETOUI_AutoCleanChannelMode?",
+   "len": 1,
+   "type": 7,
+   "kind": "u8",
+   "default": 1
+  },
+  {
+   "key": "WiFi.Radio.2.OperatingStandards?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "default": "ac"
+  },
+  {
+   "key": "WiFi.AccessPoint.1.Security.KeyPassphrase?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "secret": true
+  },
+  {
+   "key": "WiFi.AccessPoint.5.Security.KeyPassphrase?",
+   "len": 65,
+   "type": 7,
+   "kind": "str",
+   "secret": true
+  },
+  {
+   "key": "WiFi.SSID.1.SSID?",
+   "len": 33,
+   "type": 7,
+   "kind": "str",
+   "default": "GangnamStyle"
+  },
+  {
+   "key": "WiFi.SSID.5.SSID?",
+   "len": 33,
+   "type": 7,
+   "kind": "str",
+   "default": "GangnamStyle"
+  }
+ ]
+}

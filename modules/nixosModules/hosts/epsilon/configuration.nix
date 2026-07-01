@@ -76,6 +76,7 @@
         self.nixosModules.dns
         self.nixosModules.networkManager
         self.nixosModules.nginx
+        self.nixosModules.router
         self.nixosModules.nix-serve
         self.nixosModules.nvidia
         self.nixosModules.topology
@@ -290,6 +291,11 @@
           {
             "wireguard/psk-eta-epsilon" = { };
             "meilisearch/master-key" = { };
+
+            # Icotera router: web/admin password and WiFi WPA passphrase,
+            # consumed by the `router` module when rendering/pushing config.
+            "router/admin-password" = { };
+            "router/wifi-passphrase" = { };
 
             # S3 credentials: consumed by museum (`_secret`) and imported into
             # garage by the bootstrap service (which reads them as root).
@@ -746,6 +752,52 @@
         ];
 
         recipients = map (f: lib.strings.trim (builtins.readFile f)) lib.custom.keys.default.agePaths;
+      };
+
+      # Declarative Icotera i4850-20 router config. Mirrors the device's
+      # current state, so a push regenerates its backup faithfully; edit these
+      # options (not the web panel) and run `just router-restore` to apply.
+      # Secrets live in sops (router/admin-password, router/wifi-passphrase).
+      router = {
+        enable = true;
+        adminPasswordFile = config.sops.secrets."router/admin-password".path;
+        dns = [ "192.168.1.254" ];
+
+        wifi = {
+          ssid = "GangnamStyle";
+          passphraseFile = config.sops.secrets."router/wifi-passphrase".path;
+        };
+
+        dhcp.staticLeases = [
+          {
+            hostname = "epsilon";
+            mac = "c8:7f:54:66:ff:72";
+            ip = "192.168.1.64";
+          }
+        ];
+
+        # Present on the device but disabled; kept here so they round-trip and
+        # can be flipped on declaratively when needed.
+        portForwards = [
+          {
+            name = "SSH";
+            internalClient = "192.168.1.64";
+            externalPort = 22;
+            enable = false;
+          }
+          {
+            name = "HTTPS";
+            internalClient = "192.168.1.64";
+            externalPort = 443;
+            enable = false;
+          }
+          {
+            name = "HTTP";
+            internalClient = "192.168.1.64";
+            externalPort = 80;
+            enable = false;
+          }
+        ];
       };
 
       home-manager.userModules.bastian = self.homeModuleSets.epsilon;

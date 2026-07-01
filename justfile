@@ -145,6 +145,24 @@ vault:
     sudo systemctl start arctic-vault.service
     journalctl -u arctic-vault.service --no-pager -n 20
 
+# Render the declarative router backup locally without uploading it.
+[group("router")]
+router-generate:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    sudo systemctl start router-config-generate.service; rc=$?
+    journalctl -u router-config-generate.service --no-pager -n 20 || true
+    exit $rc
+
+# Push the declarative config to the live Icotera router (a restore/upload).
+[group("router")]
+router-restore:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    sudo systemctl start router-config-push.service; rc=$?
+    journalctl -u router-config-push.service --no-pager -n 30 || true
+    exit $rc
+
 # Run an OpenTofu command for the Hetzner IaC.
 [group("infra")]
 infra *args:
