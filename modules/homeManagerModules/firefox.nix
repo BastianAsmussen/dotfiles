@@ -43,7 +43,7 @@
             addons.clearurls
             addons.sponsorblock
             addons.return-youtube-dislikes
-            addons."7tv"
+            # addons."7tv"
             addons.control-panel-for-youtube
             addons.control-panel-for-twitter
           ];
