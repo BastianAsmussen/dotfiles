@@ -67,7 +67,7 @@ just iso-install /dev/sdX
 > nix-shell --experimental-features 'nix-command flakes'
 > ```
 
-1. Choose a host.
+3. Choose a host.
    1. View available host options.
 
       ```sh
@@ -80,13 +80,13 @@ just iso-install /dev/sdX
       HOSTNAME=delta
       ```
 
-2. Set up the disk configuration.
+4. Set up the disk configuration.
 
    ```sh
    just disko $HOSTNAME
    ```
 
-3. Finally, install NixOS with the given configuration.
+5. Finally, install NixOS with the given configuration.
 
    ```sh
    just install $HOSTNAME
@@ -230,6 +230,39 @@ access it:
 sops updatekeys secrets.yaml
 ```
 
+### Lanzaboote / Secure Boot (UEFI)
+
+Hosts that import `self.nixosModules.lanzaboote` (e.g. `epsilon`) use
+[Lanzaboote](https://github.com/nix-community/lanzaboote) to sign the UEFI boot
+chain with [sbctl](https://github.com/Foxboron/sbctl), protecting against
+evil-maid attacks. The module automatically disables the stock systemd-boot
+installer — do not enable both.
+
+Secure Boot keys are **not** created automatically. You must set them up
+manually after the first rebuild:
+
+```sh
+# Generate PK, KEK, and db certificates at /var/lib/sbctl.
+sudo sbctl create-keys
+
+# Write the keys into the UEFI firmware (requires Setup Mode, or enroll
+# via your firmware's custom-key menu). The --microsoft flag keeps
+# Microsoft-signed option ROMs (GPU, SSD) working.
+sudo sbctl enroll-keys --microsoft
+```
+
+After every rebuild, verify the boot chain is signed:
+
+```sh
+sbctl verify
+```
+
+> [!WARNING]
+> If the host uses impermanence (tmpfs on `/`), the directory
+> `/var/lib/sbctl` **must** be persisted across reboots. Otherwise the keys
+> vanish and the next rebuild cannot sign the boot chain, leaving the machine
+> unbootable. See `epsilon`'s `directoriesWithMode` for a working example.
+
 ## Maintenance Guide
 
 1. I recommend updating the [flake.lock](./flake.lock) file about once per week.
@@ -253,6 +286,23 @@ sops updatekeys secrets.yaml
 > ```sh
 > just rebuild kappa --show-trace
 > ```
+
+### Recipe Reference
+
+| Recipe | Purpose |
+|---|---|
+| `just rebuild` | Rebuild and switch the current host |
+| `just upgrade` | Update flake.lock + rebuild |
+| `just update [input]` | Update flake.lock without rebuilding |
+| `just build <host>` | Build a host without switching |
+| `just deploy <host> <target>` | Remote deploy via SSH with password auth |
+| `just clean` | Remove old generations (keeps 3, plus 7 days) |
+| `just rollback` | Restore flake.lock and rebuild |
+| `just check` | Full flake check (statix, deadnix, eval tests, VM tests) |
+| `just fmt` | Format all Nix files |
+| `just topology` | Regenerate the network diagram (`docs/topology.svg`) |
+| `just vault` | Trigger an arctic vault backup snapshot |
+| `just infra <args>` | OpenTofu IaC commands (Hetzner Cloud) |
 
 ### Rename Host
 
@@ -311,7 +361,7 @@ just show-templates
 
 > [!NOTE]
 > Because we override the [Nix registry](https://nix.dev/manual/nix/2.18/command-ref/new-cli/nix3-registry#description)  
-> [here](./modules/nixos/nix/default.nix), we can simply use the `self` registry
+> [here](./modules/nixosModules/features/nix.nix), we can simply use the `self` registry
 > entry which references this flake.
 
 ### Rust Example
