@@ -6,6 +6,7 @@
 let
   mkHome =
     {
+      hostName,
       system,
       modules,
     }:
@@ -21,7 +22,7 @@ let
         ];
       };
 
-      extraSpecialArgs = { inherit inputs self; };
+      extraSpecialArgs = { inherit inputs self hostName; };
 
       modules = [
         inputs.stylix.homeModules.stylix
@@ -76,11 +77,6 @@ let
       )
     ];
 
-    mu = with self.homeModules; [
-      rust
-      terminal
-    ];
-
     eta = with self.homeModules; [
       git
       gpg
@@ -104,21 +100,19 @@ in
     homeModuleSets = bastianModules;
     homeConfigurations = {
       "bastian@epsilon" = mkHome {
+        hostName = "epsilon";
         system = "x86_64-linux";
         modules = bastianModules.epsilon;
       };
 
       "bastian@delta" = mkHome {
+        hostName = "delta";
         system = "x86_64-linux";
         modules = bastianModules.delta;
       };
 
-      "bastian@mu" = mkHome {
-        system = "aarch64-linux";
-        modules = bastianModules.mu;
-      };
-
       "bastian@eta" = mkHome {
+        hostName = "eta";
         system = "aarch64-linux";
         modules = bastianModules.eta;
       };
