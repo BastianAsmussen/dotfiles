@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Modules go under `modules/homeManagerModules/` — not `modules/nixosModules/`. Placing a home-manager module in the NixOS path will fail silently or produce confusing eval errors.
 - Profile membership is not automatic. Adding a new module file does nothing until you import it in a profile or host module set.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#homeConfigurations.\"bastian@epsilon\".activation-script --raw 2>/dev/null | head -c 80`

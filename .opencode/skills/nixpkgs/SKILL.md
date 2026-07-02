@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - Updating nixpkgs updates it for 17 dependent inputs that follow it. Most flake inputs don't have independent nixpkgs versions — they inherit from the root nixpkgs via `inputs.<input>.nixpkgs.follows = "nixpkgs"`.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval --raw .#nixosConfigurations.epsilon.pkgs.stdenv.hostPlatform.system`

@@ -22,9 +22,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - Stylix must be explicitly disabled for nixcord at `nixcord.nix:33`. If you see double-themed Discord or CSS conflicts, check that `stylix.targets.nixcord.enable = false` is present.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#homeConfigurations.\"bastian@epsilon\".programs.nixcord.discord.enable`

@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The CI auto-commits topology changes as `docs: update topology diagram [skip ci]`. If you manually edit `docs/topology.svg`, it will be overwritten on the next CI run. Always regenerate with `just topology` instead.
 - External nodes (muPhone, internet, cloudRouter, homeRouter) are defined in `modules/topology.nix`, not in individual host configs.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `just topology && test -s docs/topology.svg && echo "SVG generated successfully"`

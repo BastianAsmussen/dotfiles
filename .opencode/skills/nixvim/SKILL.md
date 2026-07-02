@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - `_nixvim-config.nix` is excluded from import-tree's auto-import at `flake.nix:111` because it's not a flake-parts module. It's a raw nixvim config imported by `modules/nixvim.nix`.
 - Nixd LSP is wired to the host's flake (`self.outPath` as the flake root). If nixd shows stale completions, the flake path may need updating.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix build .#neovim 2>&1 | tail -3`

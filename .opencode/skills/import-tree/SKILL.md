@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The `except` parameter takes absolute paths relative to the workspace root. Use `./modules/homeManagerModules/_nixvim-config.nix`, not a bare filename.
 - Creating a `.nix` file with a stray syntax error anywhere under `modules/` breaks the entire flake evaluation, not just the module you're working on.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -c "import-tree" flake.nix && nix eval .#nixosConfigurations.epsilon.config.system.stateVersion --raw 2>/dev/null`

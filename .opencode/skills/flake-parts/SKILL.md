@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Every `.nix` file under `modules/` is auto-imported by `import-tree` and fed to `mkFlake`. A raw Nix expression (not a flake-parts module function) will break the entire flake.
 - `perSystem` config is scoped to the `systems` list — if a host uses `aarch64-linux` but `systems` omits it, that host's packages won't build.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix flake show --json 2>/dev/null | jq '.nixosConfigurations | keys'`

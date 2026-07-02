@@ -22,9 +22,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - Only epsilon uses it. Delta has no EGG mouse and eta/mu are headless/AVF — importing the module elsewhere will fail or be irrelevant.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -n egg-mouse-config modules/nixosModules/hosts/epsilon/configuration.nix`

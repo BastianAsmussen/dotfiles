@@ -22,9 +22,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - The auto-retry only covers `--impure`, `--allow-unfree`, and broken/insecure flags. It does not retry on download failures or eval errors.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -rn '"eh"' modules/nixosModules/hosts/epsilon/configuration.nix modules/nixosModules/hosts/delta/configuration.nix`

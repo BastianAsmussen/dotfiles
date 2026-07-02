@@ -22,9 +22,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - Spicetify is explicitly disabled in the noctalia shell (`modules/wrappedPrograms/noctalia.nix:466` sets `spicetify = false`). If you enable it globally and it conflicts with noctalia, check this override.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#homeConfigurations.\"bastian@epsilon\".programs.spicetify.enable`

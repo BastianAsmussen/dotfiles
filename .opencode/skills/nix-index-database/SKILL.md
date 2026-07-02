@@ -22,9 +22,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - Both the NixOS module AND the home-manager module are required. The NixOS module provides the database; the home-manager module wires it into your shell. Having only one gives silent no-ops.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -rn nix-index-database modules/nixosModules/hosts/*/configuration.nix | head -5`

@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - Btop, firefox, nixcord, nixvim, and tmux all have `stylix.targets.<name>.enable = false`. If a program looks wrong (double-themed or unstyled), check this list — you may need to add or remove a disable line.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#nixosConfigurations.epsilon.config.stylix.base16Scheme --raw`

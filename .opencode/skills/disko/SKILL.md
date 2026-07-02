@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Disko configs live in host directories (`modules/nixosModules/hosts/<host>/disko-config.nix`), referenced as `self.diskoConfigurations.host<Name>` — not `self.diskoConfigurations.<name>`.
 - The `just install HOST` command never runs disko. You must run `just disko HOST` first as a separate, destructive step.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#diskoConfigurations.hostEpsilon.config.disko.devices.disk | jq 'keys'`

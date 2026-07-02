@@ -1,123 +1,74 @@
 ---
 name: nix
-description: Use this skill when the user needs to understand the dotfiles architecture or make structural changes — adding hosts, features, modules, or understanding how the module system, import-tree, flake-parts, and secrets wiring fit together. Trigger: "dotfiles", "NixOS config", "module system", "architecture".
+description: Understand dotfiles architecture or make structural changes — adding hosts, features, modules, module system wiring, import-tree, flake-parts, secrets.
 metadata:
   when_to_use: dotfiles, NixOS configuration, host config, module system, dotfiles architecture
 ---
 
 # Nix — Dotfiles Architecture
 
-When invoked about a specific flake input, also load that input's dedicated skill for detailed pin-aware guidance.
+When invoked about a specific flake input, also load that input's dedicated skill.
 
-## Architecture overview
+## Architecture
 
 ```
 flake.nix → flake-parts.lib.mkFlake → inputs.import-tree ./modules
 ```
 
-Every `.nix` file under `modules/` is auto-discovered by `import-tree` and treated as a flake-parts module. `flake.nix` is only ~112 lines — it declares all inputs and the single `outputs` call. All logic lives in `modules/`.
+Every `.nix` file under `modules/` auto-discovered by `import-tree`. All logic lives in `modules/`.
 
-## Module system layers
+## Module layers
 
-### `modules/flake-parts.nix` — root setup
-- Imports `disko`, `home-manager`, and `flake-parts` flakeModules
-- Sets `systems = ["aarch64-linux" "x86_64-linux"]`, `debug = true`
-- Declares `wrapperModules` option for the wrapping system
-
-### `modules/nixosModules/base/` — shared foundation
-`base.nix`, `grub.nix`, `language.nix`, `lanzaboote.nix`, `limine.nix`, `misc.nix`, `monitors.nix`, `start.nix`, `systemd-boot.nix`, `user.nix`. Every host imports a subset.
-
-### `modules/nixosModules/features/` — feature modules
-Self-contained NixOS modules (ssh, wireguard, niri, jellyfin, etc.). Pattern:
-```nix
-{ flake.nixosModules.<name> = { config, lib, ... }: {
-  options.<name>.enable = lib.mkEnableOption "...";
-  config = lib.mkIf config.<name>.enable { ... };
-}; }
-```
-
-### `modules/nixosModules/hosts/` — host configs
-`epsilon`, `delta`, `eta`, `mu`, `iso` (+ `_example/` template). Each has `configuration.nix` and `disko-config.nix`.
-
-### `modules/homeManagerModules/` — user programs + profiles
-Modules for git, zsh, tmux, firefox, etc. Grouped into profiles (`bastian`, `desktop`, `terminal`) assembled per-host in `modules/home-configurations.nix`.
-
-### `modules/packages/` — custom derivations
-Custom packages exposed via overlays in `modules/overlays.nix`.
-
-### `modules/wrappedPrograms/` — wrapped programs
-`niri.nix`, `noctalia.nix`, `wlr-which-key.nix`.
+- `modules/flake-parts.nix` — root: systems, debug, disko/home-manager/flake-parts imports
+- `modules/nixosModules/base/` — shared foundation: boot, user, monitors, language
+- `modules/nixosModules/features/` — feature modules. Pattern: `{ flake.nixosModules.<name> = { config, lib, ... }: { options.<name>.enable = lib.mkEnableOption "..."; config = lib.mkIf config.<name>.enable { ... }; }; }`
+- `modules/nixosModules/hosts/` — epsilon, delta, eta, mu, iso + `_example/` template
+- `modules/homeManagerModules/` — user programs, grouped into profiles per-host
+- `modules/packages/` — custom derivations, exposed via `modules/overlays.nix`
+- `modules/wrappedPrograms/` — niri, noctalia, wlr-which-key
 
 ## Data flow
 
-Each module file sets options on:
-- `flake.nixosConfigurations.<host>` — Host NixOS configs
-- `flake.nixosModules.<name>` — Reusable NixOS modules
-- `flake.homeConfigurations` — Standalone home-manager configs
-- `flake.homeModules.<name>` — Reusable home-manager modules
-- `perSystem.packages.<name>` — Per-system packages
-- `flake.overlays.<name>` — Package overlays
+Each module sets: `flake.nixosConfigurations.<host>`, `flake.nixosModules.<name>`, `flake.homeConfigurations`, `flake.homeModules.<name>`, `perSystem.packages.<name>`, `flake.overlays.<name>`.
 
-## Adding a host
+## Adding things
 
 ```
-just add-host NAME
+just add-host NAME   # Scaffolds from _example/
 ```
 
-1. Edit `modules/nixosModules/hosts/<name>/configuration.nix` — add feature imports
-2. Edit `modules/nixosModules/hosts/<name>/disko-config.nix` — disk layout
-3. Edit `modules/nixosModules/hosts/<name>/hardware-configuration.nix` — hardware specifics
-4. Add to `modules/home-configurations.nix` — home-manager modules
+- **Feature:** `modules/nixosModules/features/<name>.nix`, import as `self.nixosModules.<name>`
+- **HM module:** `modules/homeManagerModules/<name>.nix`, add to profile in `modules/home-configurations.nix`
+- **Package:** `modules/packages/<name>.nix`, add to `additions` overlay in `modules/overlays.nix`
 
-## Adding a feature
+## Theme
 
-Create `modules/nixosModules/features/<name>.nix`:
-```nix
-{ flake.nixosModules.<name> = { config, lib, ... }: {
-  options.<name>.enable = lib.mkEnableOption "...";
-  config = lib.mkIf config.<name>.enable { ... };
-}; }
-```
-Import in host config: `self.nixosModules.<name>`
-
-## Adding a home-manager module
-
-Create `modules/homeManagerModules/<name>.nix`:
-```nix
-{ flake.homeModules.<name> = { ... }: { ... }; }
-```
-Add to the appropriate profile or host module list in `modules/home-configurations.nix`.
-
-## Adding a package
-
-Create `modules/packages/<name>.nix`:
-```nix
-{ perSystem = { pkgs, ... }: { packages.<name> = ...; }; }
-```
-Add to the `additions` overlay in `modules/overlays.nix`.
-
-## Theme system
-
-Catppuccin Mocha, defined in `modules/theme.nix`:
-- `self.theme` — with `#` prefix (e.g. `"#89b4fa"`)
-- `self.themeNoHash` — hash stripped (e.g. `"89b4fa"`)
-Use `self.themeNoHash.baseXX` in wrapped programs. Stylix applies theming system-wide.
+Catppuccin Mocha in `modules/theme.nix`: `self.theme` (with `#`), `self.themeNoHash` (stripped). Use `self.themeNoHash.baseXX`.
 
 ## Secrets
 
-- Public values: `inputs.nix-secrets.*`
-- Encrypted file paths: `config.sops.secrets."<path>".path`
-- Templated configs: `config.sops.templates."<name>".path`
-- **Never hardcode secrets.** The secrets repo is private — use `mkForce`/`mkDefault` for test bypasses.
+- Public: `inputs.nix-secrets.*`
+- Encrypted file: `config.sops.secrets."<path>".path`
+- Template: `config.sops.templates."<name>".path`
+- **Never hardcode.** Use `mkForce`/`mkDefault` for test bypasses.
 
 ## Conventions
 
-- **Formatting:** `nixfmt-tree` via `just fmt`
-- **Commits:** Conventional Commits (`feat(scope):`, `fix(scope):`, `docs:`, `chore:`, `refactor:`)
-- **Never delete `flake.lock`** — use `just update` or `nix flake update <input>`
-- **Never hardcode `/home/bastian`** — use `config.preferences.user.name`
-- **Imports order:** External → hardware/disko → base → Nix → security → features → host-specific
-- **Module naming:** camelCase for features, `hostCapitalized` for host modules
+- Format: `nixfmt-tree` via `just fmt`
+- Commits: Conventional Commits (`feat(scope):`, `fix(scope):`)
+- Never delete `flake.lock`
+- Never hardcode `/home/bastian` — use `config.preferences.user.name`
+- Import order: External → hardware/disko → base → Nix → security → features → host-specific
+- Module naming: camelCase features, `hostCapitalized` for host modules
+
+## Missing commands
+
+When command not found, use nix-shell:
+```sh
+nix shell nixpkgs#<pkg> -c <command> [args...]
+```
+
+Common: `nix shell nixpkgs#python3 -c python3`, `nix shell nixpkgs#nodejs -c node`, etc.
 
 ## Key commands
 
@@ -125,19 +76,19 @@ Use `self.themeNoHash.baseXX` in wrapped programs. Stylix applies theming system
 |---|---|
 | `just fmt` | Format all Nix files |
 | `just check` | Full flake check |
-| `just build HOST=epsilon` | Build a host without switching |
-| `just rebuild` | Rebuild and switch current host |
+| `just build HOST=epsilon` | Build a host |
+| `just rebuild` | Rebuild and switch |
 | `just iso` | Build custom ISO |
-| `just disko HOST` | Set up disks (destructive) |
+| `just disko HOST` | Set up disks |
 | `just install HOST` | Install NixOS |
-| `just add-host NAME` | Scaffold a new host |
+| `just add-host NAME` | Scaffold new host |
 | `just update [input]` | Update flake inputs |
 | `nix develop` | Enter dev shell |
 
 ## Gotchas
 
-- `import-tree` auto-imports every `.nix` file under `modules/` — don't create non-module `.nix` files there
-- Disko configs live in host directories, referenced as `self.diskoConfigurations.host<Name>`
-- Some hosts cross-reference each other's configs (e.g., eta reads epsilon's WireGuard IPs)
-- `nix flake check` is slow on first run; use `just check --keep-going`
-- The secrets repo is private — you cannot access values from `inputs.nix-secrets`
+- `import-tree` auto-imports every `.nix` under `modules/` — no non-module `.nix` files there
+- Disko configs in host dirs, referenced as `self.diskoConfigurations.host<Name>`
+- Hosts cross-reference (e.g. eta reads epsilon's WireGuard IPs)
+- `nix flake check` slow first run; use `just check --keep-going`
+- Secrets repo is private — can't access `inputs.nix-secrets` values

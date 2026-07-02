@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Per-host extensions use `.extendModules`, not a separate `.wrap` call. Adding a second `.wrap` creates a completely independent derivation unrelated to the host config.
 - Wrapped derivations must be rebuilt when their config changes. A `nixos-rebuild switch` will NOT rebuild wrapper packages unless the flake inputs changed. Use `nix build .#niri` to force a rebuild.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -rn wrapper-modules modules/nixosModules/features/niri.nix modules/wrappedPrograms/niri.nix modules/wrappedPrograms/noctalia.nix | head -5`
