@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The overlay at `modules/overlays.nix:28-29` applies system-wide, but extensions only take effect when referenced in schizofox's `extraExtensions` list. Just adding the overlay does nothing visible.
 - Standalone home-manager configs need the overlay separately at `modules/home-configurations.nix:20`.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#legacyPackages.x86_64-linux.firefox-addons.gopass-bridge.name`

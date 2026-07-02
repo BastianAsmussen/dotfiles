@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Only epsilon uses the CachyOS kernel. Delta and eta use the stock kernel. The overlay is only applied in the gaming feature module, not globally.
 - The `overlays.pinned` overlay pins kernel versions to the nix-cachyos-kernel flake input. Updating that input updates the kernel — kernel ABI changes may require rebuilding out-of-tree modules.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#nixosConfigurations.epsilon.config.boot.kernelPackages.kernel.version`

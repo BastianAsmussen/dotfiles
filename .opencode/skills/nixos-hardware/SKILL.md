@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Delta's hardware modules are in `hardware-extra.nix`, not `configuration.nix`. This is a separate file imported by delta's `configuration.nix` — check both files when auditing hardware config.
 - The modules are cumulative. Importing both `common-cpu-amd` and `common-cpu-intel` on the same host would set conflicting CPU microcode parameters.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#nixosConfigurations.epsilon.config.boot.kernelModules --json | jq '.[] | select(.=="kvm-amd")'`

@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Mu is `aarch64-linux`, not `x86_64-linux`. Any package that isn't available on aarch64 (or doesn't cross-compile) will fail. This is the only aarch64 host.
 - nixos-avf does not replace Android — the host OS remains Android. The NixOS config runs as a VM guest. Bootloader, kernel, and hardware modules (disko, lanzaboote) do not apply.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#nixosConfigurations.mu.config.nixpkgs.hostPlatform.system`

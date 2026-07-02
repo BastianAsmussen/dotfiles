@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The flake input is named `pre-commit-hooks` (not `git-hooks.nix`). All Nix references must use `inputs.pre-commit-hooks`, but the skill directory is `.opencode/skills/git-hooks.nix/`.
 - Hooks only fire in the dev shell. If you commit outside `nix develop`, no hooks run.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix develop --command pre-commit run --all-files 2>&1 | tail -5`

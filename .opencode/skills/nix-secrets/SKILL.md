@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The secrets repo is private and you cannot read `inputs.nix-secrets` without the decryption key. In CI and tests, those paths will fail to evaluate. Use `lib.mkForce` or `lib.mkDefault` to provide test-safe defaults.
 - `inputs.nix-secrets` is a flake, not a flat file list. Access values via `inputs.nix-secrets.hosts.<hostname>` and `inputs.nix-secrets.shared`, not by guessing path structures.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -c 'nix-secrets' flake.nix`

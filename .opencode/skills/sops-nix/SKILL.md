@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The age identity is derived from the host's SSH host key (`/etc/ssh/ssh_host_ed25519_key`). If the host key is not persisted (tmpfs root hosts without `inInitrd = true`), sops decryption fails on reboot because the identity changes.
 - sops-nix decrypts at activation time, not eval time. Secret values are available via `.path` (a file path), not as Nix string values. Never try to embed a secret directly in a Nix string.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#nixosConfigurations.epsilon.config.sops.defaultSopsFile --raw`

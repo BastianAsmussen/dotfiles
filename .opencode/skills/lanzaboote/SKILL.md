@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Only epsilon uses lanzaboote. Delta uses Limine, eta uses systemd-boot without Secure Boot, and mu has no bootloader. Importing lanzaboote on other hosts will fail.
 - `/var/lib/sbctl` must be persisted (line 369-376 in epsilon config). If you forget this, the signing keys are lost on reboot and the boot chain breaks.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#nixosConfigurations.epsilon.config.boot.lanzaboote.enable`

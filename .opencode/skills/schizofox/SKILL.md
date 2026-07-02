@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The sandbox binds for GPG keyring and gopass store are read-write inside Firefox. If these bind paths are wrong, GPG operations inside Firefox (like gopass-bridge auto-fill) will silently fail rather than show an error.
 - Search engines are configured at `firefox.nix:85-107` and explicitly remove Google, Bing, Brave, DuckDuckGo, and others. Adding a search engine in Firefox preferences will be wiped on rebuild.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#homeConfigurations.\"bastian@epsilon\".programs.schizofox.enable`

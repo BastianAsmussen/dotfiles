@@ -22,9 +22,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - Eta runs the website with `exposePublicly = false`, meaning no local TLS. The stream passthrough in eta's nginx forwards raw TCP to epsilon through the WireGuard tunnel. If the WireGuard link is down, the website is unreachable even though eta is up.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -rn website modules/nixosModules/hosts/*/configuration.nix | grep -i website`

@@ -23,9 +23,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - nixpkgs-stable is a completely independent nixpkgs instance. Mixing stable and unstable packages can cause ABI mismatches if a library comes from one and its consumer from the other.
 - The stable overlay is unconditional — `pkgs.stable` is always available, not just when you declare a fallback. Don't accidentally use it for everything.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#legacyPackages.x86_64-linux.stable.hello.version`

@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - The `sharedDir` option maps a host directory (`~/Windows`) into the Windows VM. Any files created there are owned by the Windows user inside the VM, not by the Linux user. File ownership outside the VM may be confusing.
 - The RDP credentials must be declared as sops secrets. Without `winapps/rdp-user` and `winapps/rdp-pass` in the secrets repo, winapps cannot authenticate and will silently fail to connect.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -n winapps modules/nixosModules/features/winapps.nix | head -5`

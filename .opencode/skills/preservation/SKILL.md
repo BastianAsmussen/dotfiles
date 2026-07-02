@@ -24,9 +24,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 
 - Only epsilon and eta use tmpfs root. Delta has a persistent root and does not import preservation. Asking for preservation config on delta is meaningless.
 - `inInitrd = true` is not optional for `/etc/ssh` and `/etc/machine-id`. Without it, SSH host keys vanish at boot and the machine gets a new identity every reboot.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `nix eval .#nixosConfigurations.epsilon.config.preservation.preserveAt | jq 'keys'`

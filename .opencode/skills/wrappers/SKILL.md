@@ -22,9 +22,6 @@ If different, update `metadata.input_hash` and `metadata.input_rev`.
 ## Gotchas
 
 - `wrappers` and `wrapper-modules` are two separate inputs. `wrappers` provides `wrapModule` (single binary); `wrapper-modules` provides `.wrap` and `.extendModules` (composable modules). Don't confuse them.
-
-See [references/dotfiles.md](references/dotfiles.md) for wiring details.
-
 ## Verification
 
 `grep -n "inputs.wrappers" modules/wrappedPrograms/wlr-which-key.nix`
