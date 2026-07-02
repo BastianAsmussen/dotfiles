@@ -15,6 +15,7 @@
       nixIndex
       nixvim
       ohMyPosh
+      opencode
       gopass
       ripgrep
       tmux
