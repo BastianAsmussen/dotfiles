@@ -2,6 +2,11 @@
 
 This project is built using [Nix](https://nixos.org).
 
+## Getting Started
+
+- Enter the development shell with `nix develop`.
+- Update the module path in `go.mod` to match your project name.
+
 ## Usage
 
 ### Building
