@@ -8,6 +8,7 @@
         rsaKeypair
         rsaEncrypt
         rsaDecrypt
+        modInv
         mod
         ;
 
@@ -70,6 +71,16 @@
 
         testRSANonPrime = {
           expr = (builtins.tryEval (builtins.deepSeq (rsaKeypair 4 53) null)).success;
+          expected = false;
+        };
+
+        testModInvBasic = {
+          expr = modInv 7 26;
+          expected = 15;
+        };
+
+        testModInvNotCoprime = {
+          expr = (builtins.tryEval (builtins.deepSeq (modInv 7 14) null)).success;
           expected = false;
         };
       };

@@ -109,7 +109,23 @@
             }
           ];
 
-      cases = mkCases (modCases ++ evenOddCases ++ powCases);
+      cases = mkCases (
+        modCases
+        ++ evenOddCases
+        ++ powCases
+        ++ [
+          {
+            name = "testPowNegExpThrows";
+            expr = (builtins.tryEval (builtins.deepSeq (pow 2.0 (-1.0)) null)).success;
+            expected = false;
+          }
+          {
+            name = "testPowFractionalExpThrows";
+            expr = (builtins.tryEval (builtins.deepSeq (pow 2.0 0.5) null)).success;
+            expected = false;
+          }
+        ]
+      );
       results = lib.runTests cases;
     in
     {

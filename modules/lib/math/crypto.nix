@@ -9,6 +9,7 @@
         floor
         isEven
         square
+        gcd
         ;
       inherit (builtins) foldl';
 
@@ -87,30 +88,40 @@
         modExp cipher d n;
 
       # Modular multiplicative inverse using extended Euclidean algorithm.
+      # Modular inverse only exists when inputs are coprime.
       modInv =
         a: m:
-        let
-          # Extended Euclidean algorithm.
-          extGcd =
-            a: b:
+        builtins.seq
+          (
+            if gcd a m == 1 then
+              true
+            else
+              throw "modInv: ${toString a} and ${toString m} are not coprime (gcd=${toString (gcd a m)})!"
+          )
+          (
             let
-              step =
-                s: t: r: s': t': r':
-                if r' == 0 then
-                  s
-                else
-                  let
-                    q = r / r';
-                    nextS = s - (q * s');
-                    nextT = t - (q * t');
-                    nextR = mod r r';
-                  in
-                  step s' t' r' nextS nextT nextR;
-            in
-            step 1 0 a 0 1 b;
+              # Extended Euclidean algorithm.
+              extGcd =
+                a: b:
+                let
+                  step =
+                    s: t: r: s': t': r':
+                    if r' == 0 then
+                      s
+                    else
+                      let
+                        q = r / r';
+                        nextS = s - (q * s');
+                        nextT = t - (q * t');
+                        nextR = mod r r';
+                      in
+                      step s' t' r' nextS nextT nextR;
+                in
+                step 1 0 a 0 1 b;
 
-          result = extGcd a m;
-        in
-        if result < 0 then result + m else result;
+              result = extGcd a m;
+            in
+            if result < 0 then result + m else result
+          );
     };
 }
