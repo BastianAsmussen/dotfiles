@@ -132,4 +132,4 @@ jobs:
           git config user.name "forgejo-actions[bot]"
           git config user.email "forgejo-actions[bot]@noreply.codeberg.org"
           git commit -m "docs: update topology diagram [skip ci]"
-          git push "git@codeberg.org:${{ github.repository }}.git" HEAD:master
+          git push origin HEAD:master
