@@ -16,6 +16,9 @@
       in
       a - (n * quotient);
 
+    # Greatest common divisor.
+    gcd = a: b: if b == 0 then a else gcd b (mod a b);
+
     isEven = n: mod n 2 == 0;
     isOdd = n: !isEven n;
 
@@ -24,7 +27,16 @@
 
     abs = x: if x < 0.0 then (-x) else x;
 
-    pow = base: exp: if exp == 0.0 then 1.0 else base * pow base (exp - 1.0);
+    pow =
+      base: exp:
+      builtins.seq (
+        if exp < 0.0 then
+          throw "pow: negative exponent ${toString exp} not supported"
+        else if floor exp != exp then
+          throw "pow: non-integer exponent ${toString exp} (use exp/ln instead)"
+        else
+          true
+      ) (if exp == 0.0 then 1.0 else base * pow base (exp - 1.0));
 
     sqrt' =
       n: x: precision: iteration: maxIterations:
