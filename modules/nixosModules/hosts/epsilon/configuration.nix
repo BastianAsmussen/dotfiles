@@ -413,6 +413,7 @@
 
             # App state / configs not fully managed by HM.
             ".config/sops" # VERY important!
+            ".config/sops-nix"
             ".config/libreoffice"
             ".config/vesktop"
             ".config/spotify"
