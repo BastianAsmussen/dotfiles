@@ -30,7 +30,6 @@ First-level inputs in `flake.lock` root node map directly:
 | `nix-index-database` | `.opencode/skills/nix-index-database/` |
 | `nix-topology` | `.opencode/skills/nix-topology/` |
 | `nixcord` | `.opencode/skills/nixcord/` |
-| `nixos-avf` | `.opencode/skills/nixos-avf/` |
 | `nixos-hardware` | `.opencode/skills/nixos-hardware/` |
 | `nixpkgs` | `.opencode/skills/nixpkgs/` |
 | `nixpkgs-stable` | `.opencode/skills/nixpkgs-stable/` |

@@ -12,7 +12,6 @@
 
     import-tree.url = "github:vic/import-tree";
 
-    nixos-avf.url = "github:nix-community/nixos-avf";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-topology = {
