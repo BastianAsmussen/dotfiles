@@ -24,7 +24,6 @@
           copy-file
           diesel-cli
           fselect
-          gitui
           go
           hyperfine
           jq
