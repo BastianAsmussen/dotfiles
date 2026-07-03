@@ -12,6 +12,7 @@
       fzf
       git
       gpg
+      jujutsu
       nixIndex
       nixvim
       ohMyPosh
