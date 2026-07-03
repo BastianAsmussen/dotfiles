@@ -100,6 +100,7 @@
             delta = {
               navigate = true;
               dark = true;
+              syntax-theme = "catppuccin-mocha";
             };
 
             sendemail = {
