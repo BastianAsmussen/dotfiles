@@ -28,6 +28,7 @@
             default-command = "log";
             pager = lib.getExe pkgs.delta;
             diff-formatter = ":git";
+            diff-editor = ":builtin";
           };
 
           git = {
