@@ -33,7 +33,16 @@
                     branch_icon = "";
                     commit_icon = "@";
                     fetch_status = true;
+                    disable_with_jj = true;
                   };
+                }
+                {
+                  type = "jujutsu";
+                  style = "plain";
+                  foreground = "p:grey";
+                  background = "transparent";
+                  template = " {{ if .ClosestBookmarks }}{{ .ClosestBookmarks }}{{ else }}@{{ .ChangeID }}{{ end }}{{ if .Working.Changed }}*{{ end }}";
+                  properties.fetch_status = true;
                 }
                 {
                   type = "text";
