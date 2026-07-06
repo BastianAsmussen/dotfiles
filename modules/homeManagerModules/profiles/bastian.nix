@@ -35,6 +35,7 @@
           manix
           mit
           mpv
+          obsidian
           postman
           repo-cloner
           rusty-man
