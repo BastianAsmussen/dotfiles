@@ -9,7 +9,7 @@
 
       programs.nixcord = {
         enable = true;
-        discord.enable = true;
+        discord.enable = false;
         vesktop.enable = true;
         config = {
           themes."catppuccin-mocha" = pkgs.fetchurl {
@@ -21,7 +21,6 @@
           plugins = {
             callTimer.enable = true;
             dontRoundMyTimestamps.enable = true;
-            friendsSince.enable = true;
             noOnboardingDelay.enable = true;
             relationshipNotifier.enable = true;
           };
