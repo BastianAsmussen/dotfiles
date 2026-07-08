@@ -44,6 +44,7 @@
 
               homeDirectory = "/home/${username}";
               stateVersion = "26.05";
+              pointerCursor.enable = config.stylix.cursor != null;
             };
 
             programs.home-manager.enable = true;
