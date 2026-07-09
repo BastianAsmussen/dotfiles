@@ -703,24 +703,27 @@
         ];
       };
 
-      preferences.monitors = {
-        "DP-1" = {
-          width = 1920;
-          height = 1080;
-          refreshRate = 239.76;
-          x = 1920;
-          y = 0;
-          scale = 1.0;
-          vrr = "on-demand";
-        };
+      preferences = {
+        noctalia.idleEnabled = false;
+        monitors = {
+          "DP-1" = {
+            width = 1920;
+            height = 1080;
+            refreshRate = 239.76;
+            x = 1920;
+            y = 0;
+            scale = 1.0;
+            vrr = "on-demand";
+          };
 
-        "HDMI-A-1" = {
-          width = 1920;
-          height = 1080;
-          refreshRate = 60.0;
-          x = 0;
-          y = 0;
-          scale = 1.0;
+          "HDMI-A-1" = {
+            width = 1920;
+            height = 1080;
+            refreshRate = 60.0;
+            x = 0;
+            y = 0;
+            scale = 1.0;
+          };
         };
       };
 

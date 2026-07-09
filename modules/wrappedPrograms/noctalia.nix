@@ -8,10 +8,24 @@
       ...
     }:
     {
-      options.videoDir = lib.mkOption {
-        type = lib.types.str;
-        default = "/home/${inputs.nix-secrets.user.name}/Videos";
-        description = "Directory noctalia's screen recorder writes to.";
+      options = {
+        videoDir = lib.mkOption {
+          type = lib.types.str;
+          default = "/home/${inputs.nix-secrets.user.name}/Videos";
+          description = "Directory noctalia's screen recorder writes to.";
+        };
+
+        useIpLocation = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Use IP-based geolocation for weather instead of the static city name.";
+        };
+
+        idleEnabled = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Whether to enable idle screen-off and lock timeouts.";
+        };
       };
 
       config = {
@@ -293,14 +307,14 @@
           };
 
           idle = {
-            enabled = true;
+            enabled = config.idleEnabled;
             screenOffTimeout = 300;
             lockTimeout = 330;
             suspendTimeout = 0;
           };
 
           location = {
-            name = inputs.nix-secrets.user.city;
+            name = if config.useIpLocation then "" else inputs.nix-secrets.user.city;
             analogClockInCalendar = false;
             firstDayOfWeek = -1;
             showCalendarEvents = true;

@@ -12,14 +12,23 @@
       ...
     }:
     let
-      inherit (pkgs.stdenv.hostPlatform) system;
-
       toStartupEntry =
         i: entry:
         if lib.isDerivation entry then
           lib.getExe entry
         else
           "${pkgs.writeShellScript "autostart-${toString i}" entry}";
+
+      noctaliaPackage = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
+        inherit pkgs;
+        imports = [
+          self.wrapperModules.noctalia-shell
+          {
+            useIpLocation = config.preferences.noctalia.useIpLocation;
+            idleEnabled = config.preferences.noctalia.idleEnabled;
+          }
+        ];
+      };
 
       autostartEntries = lib.imap0 toStartupEntry config.preferences.autostart;
       monitorsToOutputs = lib.mapAttrs (
@@ -49,7 +58,7 @@
     in
     {
       config = {
-        preferences.autostart = [ self.packages.${system}.noctalia-shell ];
+        preferences.autostart = [ noctaliaPackage ];
 
         services.displayManager.defaultSession = lib.mkDefault "niri";
         programs.niri = {
@@ -70,7 +79,7 @@
         };
 
         environment.systemPackages = [
-          self.packages.${system}.noctalia-shell
+          noctaliaPackage
           pkgs.xwayland-satellite
           pkgs.awww
           pkgs.grim
