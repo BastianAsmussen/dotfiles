@@ -74,6 +74,7 @@
       winapps.enable = true;
 
       networking.hostName = "delta";
+      preferences.noctalia.useIpLocation = true;
       remoteBuilder.jumpHost = "10.10.0.1";
       acmeShared.enable = true;
 
