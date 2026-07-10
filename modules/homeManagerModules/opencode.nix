@@ -28,7 +28,7 @@
             deepseek-v4-pro = { };
           };
 
-          options.apiKey = "{file:${config.sops.secrets."deepseek-api-key".path}}";
+          options.apiKey = "{env:DEEPSEEK_API_KEY}";
         };
 
         model = "deepseek/deepseek-v4-pro";
@@ -77,6 +77,10 @@
     {
       imports = [ inputs.sops-nix.homeManagerModules.sops ];
       sops.secrets."deepseek-api-key".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
+
+      programs.zsh.envExtra = ''
+        export DEEPSEEK_API_KEY="$(cat ${config.sops.secrets."deepseek-api-key".path})"
+      '';
 
       home.packages = [ pkgs.opencode ];
       xdg.configFile =
