@@ -7,6 +7,9 @@
       config,
       ...
     }:
+    let
+      inherit (self) theme;
+    in
     {
       options = {
         videoDir = lib.mkOption {
@@ -33,23 +36,25 @@
           name = "noctalia";
         };
 
+        # Derived from the stylix base16 palette (self.theme) so noctalia tracks
+        # the active scheme instead of pinning Catppuccin Mocha hexes.
         colors = {
-          mError = "#f38ba8";
-          mHover = "#94e2d5";
-          mOnError = "#1e1e2e";
-          mOnHover = "#1e1e2e";
-          mOnPrimary = "#1e1e2e";
-          mOnSecondary = "#1e1e2e";
-          mOnSurface = "#cdd6f4";
-          mOnSurfaceVariant = "#a6adc8";
-          mOnTertiary = "#1e1e2e";
-          mOutline = "#6c7086";
-          mPrimary = "#89b4fa";
-          mSecondary = "#cdd6f4";
-          mShadow = "#1e1e2e";
-          mSurface = "#1e1e2e";
-          mSurfaceVariant = "#313244";
-          mTertiary = "#94e2d5";
+          mError = theme.base08; # red
+          mHover = theme.base0C; # teal
+          mOnError = theme.base00; # base
+          mOnHover = theme.base00; # base
+          mOnPrimary = theme.base00; # base
+          mOnSecondary = theme.base00; # base
+          mOnSurface = theme.base05; # text
+          mOnSurfaceVariant = theme.base04; # subtext0
+          mOnTertiary = theme.base00; # base
+          mOutline = theme.base03; # overlay0
+          mPrimary = theme.base0D; # blue
+          mSecondary = theme.base05; # text
+          mShadow = theme.base00; # base
+          mSurface = theme.base00; # base
+          mSurfaceVariant = theme.base01; # surface0
+          mTertiary = theme.base0C; # teal
         };
 
         settings = {
