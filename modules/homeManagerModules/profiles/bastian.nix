@@ -47,7 +47,6 @@
           tlrc
           todo
           tokei
-          tuxedo
           wget
           xh
         ];
