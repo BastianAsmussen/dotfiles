@@ -22,6 +22,7 @@
       ripgrep
       tmux
       tmuxSessionizer
+      tuxedo
       zoxide
       zsh
     ];
