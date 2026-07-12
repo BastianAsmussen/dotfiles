@@ -86,10 +86,9 @@
       # Substitute base16 tokens at eval time without extra build tools.
       template = builtins.readFile ./theme.css.template;
 
-      themeCss =
-        builtins.replaceStrings (map (name: "%${name}%") (builtins.attrNames colors))
-          (builtins.attrValues colors)
-          template;
+      themeCss = builtins.replaceStrings (map (name: "%${name}%") (
+        builtins.attrNames colors
+      )) (builtins.attrValues colors) template;
 
       themeCssFile = pkgs.writeText "qbittorrent-webui-theme.css" themeCss;
 
