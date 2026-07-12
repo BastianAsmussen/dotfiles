@@ -89,7 +89,6 @@ let
       eza
       fastfetch
       fzf
-      opencode
       ripgrep
       sops
     ];

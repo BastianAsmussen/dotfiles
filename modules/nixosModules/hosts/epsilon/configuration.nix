@@ -431,7 +431,6 @@
             ".local/share/goxlr-utility"
             ".local/share/lutris"
             ".local/share/nvim"
-            ".local/share/opencode"
             ".local/share/Steam"
             ".local/share/umu"
             ".local/share/zoxide"
