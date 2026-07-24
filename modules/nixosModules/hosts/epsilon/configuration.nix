@@ -731,11 +731,14 @@
         };
       };
 
-      monero.mining = {
-        enable = false;
-        pool = "pool.hashvault.pro:80";
-        wallet = self.preferences.monero-wallet;
-        maxUsagePercentage = 25;
+      monero = {
+        node.enable = true;
+        mining = {
+          enable = false;
+          pool = "pool.hashvault.pro:80";
+          wallet = self.preferences.monero-wallet;
+          maxUsagePercentage = 25;
+        };
       };
 
       winapps.enable = true;
