@@ -56,6 +56,7 @@
 
         # Features.
         self.nixosModules.bluetooth
+        self.nixosModules.monero
         self.nixosModules.btop
         self.nixosModules.btrfs
         self.nixosModules.ccache
@@ -72,6 +73,11 @@
       ];
 
       winapps.enable = true;
+
+      monero = {
+        node.enable = true;
+        mining.enable = false;
+      };
 
       networking.hostName = "delta";
       preferences.noctalia.useIpLocation = true;

@@ -348,6 +348,11 @@
           "/var/lib/private/seerr"
           "/var/lib/private/ollama"
           {
+            directory = "/var/lib/monero";
+            user = "monero";
+            group = "monero";
+          }
+          {
             directory = "/var/cache/ccache";
             user = "root";
             group = "nixbld";
