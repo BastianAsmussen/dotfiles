@@ -55,6 +55,18 @@
             description = "Port for the monerod ZMQ pub-sub.";
           };
 
+          p2pAddress = mkOption {
+            type = types.str;
+            default = "0.0.0.0";
+            description = "Address the monerod P2P server binds to.";
+          };
+
+          p2pPort = mkOption {
+            type = types.port;
+            default = 18080;
+            description = "Port for the monerod P2P server.";
+          };
+
           limitRateUp = mkOption {
             type = types.nullOr types.int;
             default = null;
@@ -153,7 +165,10 @@
                   --data-dir ${cfg.node.dataDir} \
                   --rpc-bind-ip ${cfg.node.rpcAddress} \
                   --rpc-bind-port ${toString cfg.node.rpcPort} \
-                  --zmq-rpc-bind-ip ${cfg.node.rpcAddress}:${toString cfg.node.zmqPort} \
+                  --p2p-bind-ip ${cfg.node.p2pAddress} \
+                  --p2p-bind-port ${toString cfg.node.p2pPort} \
+                  --zmq-rpc-bind-ip ${cfg.node.rpcAddress} \
+                  --zmq-rpc-bind-port ${toString cfg.node.zmqPort} \
                   ${optionalString cfg.node.prune "--prune-blockchain"} \
                   ${
                     optionalString (cfg.node.limitRateUp != null) "--limit-rate-up ${toString cfg.node.limitRateUp}"
