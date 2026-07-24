@@ -178,6 +178,7 @@
                       cfg.node.limitRateDown != null
                     ) "--limit-rate-down ${toString cfg.node.limitRateDown}"
                   } \
+                  --non-interactive \
                   ${toString cfg.node.extraArgs}
               '';
               Restart = "on-failure";
