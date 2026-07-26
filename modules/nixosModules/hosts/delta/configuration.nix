@@ -76,7 +76,7 @@
       winapps.enable = true;
 
       monero = {
-        node.enable = true;
+        node.enable = false;
         mining.enable = false;
       };
 
