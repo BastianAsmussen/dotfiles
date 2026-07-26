@@ -160,8 +160,8 @@
                 }
                 {
                   key = "s";
-                  desc = "Pavucontrol";
-                  cmd = "${lib.getExe pkgs.pavucontrol}";
+                  desc = "Signal";
+                  cmd = "signal-desktop";
                 }
                 {
                   key = "l";
