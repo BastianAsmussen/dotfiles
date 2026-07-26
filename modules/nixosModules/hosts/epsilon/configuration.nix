@@ -420,6 +420,7 @@
             ".config/sops" # VERY important!
             ".config/sops-nix"
             ".config/libreoffice"
+            ".config/Signal"
             ".config/vesktop"
             ".config/spotify"
             ".config/teams-for-linux"
