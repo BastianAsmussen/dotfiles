@@ -51,6 +51,7 @@
         self.nixosModules.gpg
         self.nixosModules.security
         self.nixosModules.sops
+        self.nixosModules.tor
         self.nixosModules.yubiKey
         self.nixosModules.wireguard
 
