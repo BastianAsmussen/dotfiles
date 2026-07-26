@@ -52,6 +52,7 @@
         self.nixosModules.security
         self.nixosModules.sops
         self.nixosModules.ssh
+        self.nixosModules.tor
         self.nixosModules.luksFido2
         self.nixosModules.yubiKey
         self.nixosModules.preservation
@@ -365,6 +366,14 @@
           "/var/lib/private/seerr"
           "/var/lib/private/ollama"
           {
+            # Keep a stable entry-guard set instead of selecting new guards on
+            # every reboot.
+            directory = "/var/lib/tor";
+            user = "tor";
+            group = "tor";
+            mode = "0700";
+          }
+          {
             directory = "/var/lib/monero";
             user = "monero";
             group = "monero";
@@ -452,6 +461,7 @@
           directoriesWithMode = {
             ".gnupg" = "0700";
             ".local/share/keyrings" = "0700";
+            ".tor project" = "0700";
           };
 
           cache.directories = [

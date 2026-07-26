@@ -8,6 +8,9 @@
       nixcord
       noctalia
       spicetify
+      torBrowser
     ];
+
+    programs.tor-browser.enable = true;
   };
 }

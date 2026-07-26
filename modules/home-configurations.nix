@@ -69,6 +69,8 @@ let
       (
         { pkgs, ... }:
         {
+          programs.tor-browser.forceLibcAllocator = true;
+
           home.packages = with pkgs; [
             airtame
             freecad-wayland
