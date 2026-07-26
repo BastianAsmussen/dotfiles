@@ -39,6 +39,7 @@
           postman
           repo-cloner
           rusty-man
+          signal-desktop
           sl
           teams-for-linux
           tlrc
