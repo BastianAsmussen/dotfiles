@@ -70,6 +70,7 @@
               "Mod+F".maximize-window-to-edges = _: { };
               "Mod+G".fullscreen-window = _: { };
               "Mod+Shift+F".toggle-window-floating = _: { };
+              "Mod+Shift+V".switch-focus-between-floating-and-tiling = _: { };
               "Mod+C".center-column = _: { };
 
               "Mod+H".focus-column-left = _: { };
@@ -221,10 +222,8 @@
                 open-floating = true;
                 open-focused = false;
 
-                min-width = 480;
-                max-width = 480;
-                min-height = 270;
-                max-height = 270;
+                default-column-width = _: { };
+                default-window-height.fixed = 270;
 
                 default-floating-position = _: {
                   props = {
