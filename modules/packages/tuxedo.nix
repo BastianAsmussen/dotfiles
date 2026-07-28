@@ -8,17 +8,17 @@
     {
       packages.tuxedo = pkgs.rustPlatform.buildRustPackage (finalAttrs: {
         pname = "tuxedo";
-        version = "2026.5.12";
+        version = "2026.7.1";
         __structuredAttrs = true;
 
         src = pkgs.fetchFromGitHub {
           owner = "webstonehq";
           repo = "tuxedo";
           tag = "v${finalAttrs.version}";
-          hash = "sha256-s4GIHq4kjj+FiNBJJjWeXmg4f40ARUILzwsEl0CDV1o=";
+          hash = "sha256-4tkKjFQN6giCBVOs8K/EjGFAG73CWtPGC4e8YPpxFEs=";
         };
 
-        cargoHash = "sha256-rIdjrwNuY0DySdk4jc880JrFgoIuKTYEcx6XoSfllp4=";
+        cargoHash = "sha256-jkrxG7KyAUStyZonAZbgRPkEnElpzYrCDdvCkb2cW2A=";
 
         preCheck = ''
           export HOME="$TMPDIR/home"
@@ -35,7 +35,11 @@
           homepage = "https://github.com/webstonehq/tuxedo";
           changelog = "https://github.com/webstonehq/tuxedo/releases/tag/${finalAttrs.src.tag}";
           license = lib.licenses.mit;
-          maintainers = with lib.maintainers; [ iogamaster ];
+          maintainers = with lib.maintainers; [
+            iogamaster
+            BastianAsmussen
+          ];
+
           mainProgram = "tuxedo";
         };
       });
