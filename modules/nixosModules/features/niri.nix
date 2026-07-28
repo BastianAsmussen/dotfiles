@@ -21,6 +21,7 @@
 
       noctaliaPackage = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
         inherit pkgs;
+
         imports = [
           self.wrapperModules.noctalia-shell
           {
@@ -58,9 +59,12 @@
     in
     {
       config = {
+        nixpkgs.overlays = [
+          self.overlays.niri-libdisplay-info-compat
+        ];
+
         preferences.autostart = [ noctaliaPackage ];
 
-        services.displayManager.defaultSession = lib.mkDefault "niri";
         programs.niri = {
           enable = true;
           package = inputs.wrapper-modules.wrappers.niri.wrap {
@@ -91,6 +95,7 @@
 
         security.polkit.enable = true;
         services = {
+          displayManager.defaultSession = lib.mkDefault "niri";
           power-profiles-daemon.enable = true;
           upower.enable = true;
         };
