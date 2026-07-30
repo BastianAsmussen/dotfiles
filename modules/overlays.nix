@@ -35,31 +35,6 @@
       };
     };
 
-    # TODO: Remove once nixpkgs pins niri to libdisplay-info_0_3.
-    niri-libdisplay-info-compat =
-      _final: prev:
-      let
-        libdisplay-info_0_3 =
-          prev.libdisplay-info_0_3 or (prev.libdisplay-info.overrideAttrs (_oldAttrs: rec {
-            version = "0.3.0";
-
-            src = prev.fetchFromGitLab {
-              domain = "gitlab.freedesktop.org";
-              owner = "emersion";
-              repo = "libdisplay-info";
-              rev = version;
-              hash = "sha256-nXf2KGovNKvcchlHlzKBkAOeySMJXgxMpbi5z9gLrdc=";
-            };
-          }));
-      in
-      {
-        inherit libdisplay-info_0_3;
-
-        niri = prev.niri.override {
-          libdisplay-info = libdisplay-info_0_3;
-        };
-      };
-
     # Convenient access to the nixpkgs stable branch.
     stable-packages = _: prev: {
       stable = withSystem prev.stdenv.hostPlatform.system (
