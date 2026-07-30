@@ -51,7 +51,7 @@
             inherit (cfg) bindAddress;
 
             enable = true;
-            package = pkgs.nix-serve-ng;
+            package = pkgs.haskell.lib.addPkgconfigDepend pkgs.nix-serve-ng pkgs.libcpuid;
             secretKeyFile = config.sops.secrets.${cacheKeySecret}.path;
           };
 
