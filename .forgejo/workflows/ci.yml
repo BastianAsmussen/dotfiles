@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - docs/topology.svg
   workflow_dispatch:
 
 jobs:
@@ -123,7 +125,7 @@ jobs:
       - name: Update Topology
         env:
           API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
-          TOKEN: ${{ forgejo.token }}
+          TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           git diff --quiet -- docs/topology.svg && exit 0
 
