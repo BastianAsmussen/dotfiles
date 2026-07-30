@@ -16,8 +16,6 @@ jobs:
   iso:
     needs: check
     runs-on: nix
-    permissions:
-      contents: write
 
     steps:
       - uses: https://code.forgejo.org/actions/checkout@v6.0.2
@@ -111,8 +109,6 @@ jobs:
   topology:
     needs: check
     runs-on: nix
-    permissions:
-      contents: write
 
     steps:
       - uses: https://code.forgejo.org/actions/checkout@v6.0.2
