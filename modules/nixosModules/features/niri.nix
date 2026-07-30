@@ -59,10 +59,6 @@
     in
     {
       config = {
-        nixpkgs.overlays = [
-          self.overlays.niri-libdisplay-info-compat
-        ];
-
         preferences.autostart = [ noctaliaPackage ];
 
         programs.niri = {
