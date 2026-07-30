@@ -120,12 +120,35 @@ jobs:
           mkdir -p docs
           cp result/main.svg docs/topology.svg
 
-      - name: Commit & Push
+      - name: Update Topology
+        env:
+          API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+          TOKEN: ${{ forgejo.token }}
         run: |
-          git add docs/topology.svg
-          git diff --cached --quiet && exit 0
+          git diff --quiet -- docs/topology.svg && exit 0
 
-          git config user.name "forgejo-actions[bot]"
-          git config user.email "forgejo-actions[bot]@noreply.codeberg.org"
-          git commit -m "docs: update topology diagram [skip ci]"
-          git push origin HEAD:master
+          SHA=$(git rev-parse HEAD:docs/topology.svg)
+          CONTENT="$RUNNER_TEMP/topology.b64"
+          BODY="$RUNNER_TEMP/topology.json"
+
+          base64 -w0 docs/topology.svg > "$CONTENT"
+          jq -n \
+            --arg sha "$SHA" \
+            --rawfile content "$CONTENT" \
+            '{
+              branch: "master",
+              message: "docs: update topology diagram",
+              sha: $sha,
+              content: $content,
+              author: {
+                name: "forgejo-actions[bot]",
+                email: "forgejo-actions[bot]@noreply.codeberg.org"
+              }
+            }' > "$BODY"
+
+          curl -fsS --connect-timeout 10 --max-time 60 \
+            -X PUT "$API/contents/docs/topology.svg" \
+            -H "Authorization: token $TOKEN" \
+            -H "Content-Type: application/json" \
+            --data-binary "@$BODY" \
+            | jq -er '"Updated topology: \(.commit.html_url)"'
