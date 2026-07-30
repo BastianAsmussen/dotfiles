@@ -844,6 +844,7 @@
         seerr.enable = mkForce false;
 
         services = {
+          gitea-actions-runner.instances.epsilon.enable = mkForce false;
           jellyfin.enable = mkForce false;
           meilisearch.enable = mkForce false;
           shoko.enable = mkForce false;
