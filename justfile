@@ -3,6 +3,7 @@ default:
     @just --list
 
 HOST := `hostname`
+SYSTEM := `nix eval --impure --raw --expr builtins.currentSystem`
 
 # Run a flake check on the config.
 [group("checks")]
@@ -11,6 +12,12 @@ check args="":
         --keep-going \
         --show-trace \
         {{ args }}
+
+# Run the pre-commit hooks.
+[group("checks")]
+pre-commit:
+    nix build ".#checks.{{ SYSTEM }}.pre-commit" --no-link
+    @echo "Pre-commit hooks passed for {{ SYSTEM }}."
 
 # See development environment templates.
 show-templates:
