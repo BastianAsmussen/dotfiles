@@ -19,6 +19,7 @@
 
   flake.nixosModules.hostIso =
     {
+      config,
       modulesPath,
       pkgs,
       lib,
@@ -35,6 +36,12 @@
 
       system.stateVersion = lib.mkForce lib.trivial.release;
       networking.hostName = "iso";
+      assertions = [
+        {
+          assertion = !(config ? sops);
+          message = "The public ISO must not import SOPS.";
+        }
+      ];
       nixpkgs = {
         hostPlatform = lib.mkDefault "x86_64-linux";
         config.allowUnfree = true;

@@ -1,9 +1,4 @@
 {
-  inputs,
-  self,
-  ...
-}:
-{
   flake.nixosModules.base =
     {
       lib,
@@ -17,26 +12,22 @@
       cfg = config.preferences.user;
     in
     {
-      imports = [
-        self.nixosModules.sops
-      ];
-
       options.preferences.user = {
         name = mkOption {
           type = types.str;
-          default = inputs.nix-secrets.user.name;
+          default = "nixos";
           description = "The user's login name.";
         };
 
         fullName = mkOption {
           type = types.str;
-          default = inputs.nix-secrets.user.full-name;
+          default = "NixOS User";
           description = "The user's full display name.";
         };
 
         email = mkOption {
           type = types.str;
-          default = inputs.nix-secrets.user.email;
+          default = "root@localhost";
           description = "The user's email address.";
         };
 
@@ -66,11 +57,6 @@
       };
 
       config = {
-        sops.secrets."user/bastian/password-hash" = {
-          sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
-          neededForUsers = true;
-        };
-
         programs.zsh.enable = true;
         users = {
           mutableUsers = false;
@@ -83,7 +69,6 @@
               isNormalUser = true;
               group = cfg.name;
               description = cfg.fullName;
-              hashedPasswordFile = config.sops.secrets."user/bastian/password-hash".path;
               extraGroups = [ "wheel" ];
               shell = pkgs.zsh;
               openssh.authorizedKeys.keyFiles = cfg.authorizedKeyFiles;
