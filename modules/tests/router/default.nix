@@ -2,9 +2,8 @@
   perSystem =
     { pkgs, ... }:
     let
-      features = ../../nixosModules/features;
-      template = builtins.fromJSON (builtins.readFile "${features}/router.template.json");
-      generator = "${features}/router.generate.py";
+      template = builtins.fromJSON (builtins.readFile ../../nixosModules/features/router.template.json);
+      generator = ../../nixosModules/features/router.generate.py;
 
       # Empty secrets produce NUL fields matching the redacted reference backup.
       emptySecret = pkgs.writeText "router-test-empty-secret" "";
