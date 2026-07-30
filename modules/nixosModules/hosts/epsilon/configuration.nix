@@ -214,10 +214,17 @@
       # locks itself out of its own StateDirectory (which is exactly what hit the
       # configurations/ subdir). Guarded on api.enable so the safeMode
       # specialisation doesn't end up with a groupless ente user.
-      users = lib.mkIf config.services.ente.api.enable {
-        users.${config.services.ente.api.user}.uid = 998;
-        groups.${config.services.ente.api.group}.gid = 998;
-      };
+      users = lib.mkMerge [
+        (lib.mkIf config.services.ente.api.enable {
+          users.${config.services.ente.api.user}.uid = 998;
+          groups.${config.services.ente.api.group}.gid = 998;
+        })
+        {
+          # Keep ownership of the persisted blockchain stable across rebuilds.
+          users.monero.uid = 986;
+          groups.monero.gid = 983;
+        }
+      ];
 
       # Garage has no declarative bucket/key provisioning, so initialize the
       # single-node layout, the "ente" bucket and its access key once garage is
