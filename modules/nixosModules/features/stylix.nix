@@ -46,7 +46,10 @@
           };
         };
 
-        targets.qt.platform = lib.mkForce "qtct";
+        targets = {
+          qt.platform = lib.mkForce "qtct";
+          regreet.enable = false;
+        };
       };
     };
 }
