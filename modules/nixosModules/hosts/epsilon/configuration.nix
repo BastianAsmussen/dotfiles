@@ -137,6 +137,7 @@
           };
         };
 
+      jellyfin.enable = true;
       services = {
         ollama = {
           enable = true;
@@ -315,11 +316,6 @@
           "/var/lib/AccountsService" # User list / icons.
           "/var/lib/bluetooth"
           "/var/lib/power-profiles-daemon"
-          {
-            directory = "/var/lib/jellyfin";
-            user = "jellyfin";
-            group = "jellyfin";
-          }
           "/var/lib/private/meilisearch"
           {
             directory = "/var/lib/ente";
@@ -367,7 +363,6 @@
 
         directoriesWithMode = {
           "/var/lib/private" = "0700";
-          "/var/cache/jellyfin" = "0755";
 
           # Persist the signing keys; without them the next rebuild cannot sign.
           "/var/lib/sbctl" = "0700";
@@ -809,20 +804,19 @@
         winapps.enable = mkForce false;
 
         virtualisation.podman.enable = mkForce false;
+        jellyfin.enable = mkForce false;
 
         qbittorrent.enable = mkForce false;
         servarr.enable = mkForce false;
+        seerr.enable = mkForce false;
 
         nginx.enable = mkForce false;
 
-        seerr.enable = mkForce false;
         monero.node.enable = mkForce false;
 
         services = {
           gitea-actions-runner.instances.epsilon.enable = mkForce false;
-          jellyfin.enable = mkForce false;
-          meilisearch.enable = mkForce false;
-          shoko.enable = mkForce false;
+
           syncthing.enable = mkForce false;
           nix-serve.enable = mkForce false;
           website.enable = mkForce false;
