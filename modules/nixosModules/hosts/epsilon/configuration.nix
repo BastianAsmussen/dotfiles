@@ -820,7 +820,10 @@
 
         nginx.enable = mkForce false;
 
+        primaryBusy.enable = mkForce false;
         monero.node.enable = mkForce false;
+        arcticVault.enable = mkForce false;
+
         virtualisation = {
           podman.enable = mkForce false;
           libvirtd.enable = mkForce false;
@@ -834,6 +837,8 @@
           website.enable = mkForce false;
           ollama.enable = mkForce false;
           garage.enable = mkForce false;
+          tor.enable = mkForce false;
+
           ente.api.enable = mkForce false;
           ente.web.enable = mkForce false;
         };
