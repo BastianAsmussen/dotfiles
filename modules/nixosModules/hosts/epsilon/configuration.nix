@@ -212,11 +212,6 @@
           users.${config.services.ente.api.user}.uid = 998;
           groups.${config.services.ente.api.group}.gid = 998;
         })
-        {
-          # Keep ownership of the persisted blockchain stable across rebuilds.
-          users.monero.uid = 986;
-          groups.monero.gid = 983;
-        }
       ];
 
       # Bootstrap Garage's single-node layout, bucket and access key.
@@ -361,11 +356,6 @@
             user = "tor";
             group = "tor";
             mode = "0700";
-          }
-          {
-            directory = "/var/lib/monero";
-            user = "monero";
-            group = "monero";
           }
           {
             directory = "/var/cache/ccache";
@@ -725,7 +715,12 @@
       };
 
       monero = {
-        node.enable = true;
+        node = {
+          enable = true;
+          uid = 986;
+          gid = 983;
+        };
+
         mining = {
           enable = false;
           pool = "pool.hashvault.pro:80";
@@ -821,6 +816,7 @@
         nginx.enable = mkForce false;
 
         seerr.enable = mkForce false;
+        monero.node.enable = mkForce false;
 
         services = {
           gitea-actions-runner.instances.epsilon.enable = mkForce false;
