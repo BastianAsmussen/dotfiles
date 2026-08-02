@@ -68,6 +68,7 @@
         self.nixosModules.goxlr
         self.nixosModules.homeManager
         self.nixosModules.jellyfin
+        self.nixosModules.youtubeArchive
         self.nixosModules.seerr
         self.nixosModules.qbittorrent
         self.nixosModules.servarr
@@ -138,6 +139,13 @@
         };
 
       jellyfin.enable = true;
+      youtubeArchive = {
+        enable = true;
+        uid = 984;
+        schedule = null;
+        channels.Veritasium = "https://www.youtube.com/@veritasium";
+      };
+
       services = {
         ollama = {
           enable = true;
@@ -831,8 +839,8 @@
         acmeShared.enable = mkForce false;
         winapps.enable = mkForce false;
 
-        virtualisation.podman.enable = mkForce false;
         jellyfin.enable = mkForce false;
+        youtubeArchive.enable = mkForce false;
 
         qbittorrent.enable = mkForce false;
         servarr.enable = mkForce false;
@@ -841,6 +849,10 @@
         nginx.enable = mkForce false;
 
         monero.node.enable = mkForce false;
+        virtualisation = {
+          podman.enable = mkForce false;
+          libvirtd.enable = mkForce false;
+        };
 
         services = {
           gitea-actions-runner.instances.epsilon.enable = mkForce false;
