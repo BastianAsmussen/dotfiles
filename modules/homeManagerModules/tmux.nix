@@ -128,7 +128,7 @@
 
         extraConfig = ''
           set -as terminal-features ",xterm-256color:RGB"
-          set -g set-clipboard external
+          set -s set-clipboard on
 
           # Automatically renumber windows.
           set -g renumber-windows on

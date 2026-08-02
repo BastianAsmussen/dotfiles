@@ -33,10 +33,14 @@
   };
 
   extraConfigLuaPre = ''
-    vim.fn.sign_define("diagnosticsignerror", { text = " ", texthl = "diagnosticerror", linehl = "", numhl = "" })
-    vim.fn.sign_define("diagnosticsignwarn", { text = " ", texthl = "diagnosticwarn", linehl = "", numhl = "" })
-    vim.fn.sign_define("diagnosticsignhint", { text = "󰝶 ", texthl = "diagnostichint", linehl = "", numhl = "" })
-    vim.fn.sign_define("diagnosticsigninfo", { text = " ", texthl = "diagnosticinfo", linehl = "", numhl = "" })
+      vim.fn.sign_define("diagnosticsignerror", { text = " ", texthl = "diagnosticerror", linehl = "", numhl = "" })
+      vim.fn.sign_define("diagnosticsignwarn", { text = " ", texthl = "diagnosticwarn", linehl = "", numhl = "" })
+      vim.fn.sign_define("diagnosticsignhint", { text = "󰝶 ", texthl = "diagnostichint", linehl = "", numhl = "" })
+      vim.fn.sign_define("diagnosticsigninfo", { text = " ", texthl = "diagnosticinfo", linehl = "", numhl = "" })
+
+      if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+      vim.g.clipboard = "osc52"
+    end
   '';
 
   extraConfigLuaPost = ''
