@@ -142,7 +142,9 @@
       youtubeArchive = {
         enable = true;
         uid = 984;
-        schedule = null;
+
+        # Run once per day at 04:00.
+        schedule = "04:00";
         channels.Veritasium = "https://www.youtube.com/@veritasium";
       };
 
