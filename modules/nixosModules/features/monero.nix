@@ -276,7 +276,7 @@
 
           # The state belongs to this feature. When the persistence module is
           # absent, this branch contributes no unknown options.
-          (mkIf (options ? persistence) {
+          (lib.optionalAttrs (options ? persistence) {
             persistence.directories = [
               {
                 inherit (node) user group;

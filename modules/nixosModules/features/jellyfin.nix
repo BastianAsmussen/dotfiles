@@ -11,7 +11,6 @@
       inherit (lib)
         mkOption
         types
-        mkIf
         ;
 
       cfg = config.jellyfin;
@@ -41,7 +40,7 @@
         };
       };
 
-      config = mkIf cfg.enable (
+      config = lib.mkIf cfg.enable (
         lib.mkMerge [
           {
             users = {
@@ -98,7 +97,7 @@
             ];
           }
 
-          (mkIf (options ? persistence) {
+          (lib.optionalAttrs (options ? persistence) {
             persistence = {
               directories = [
                 {
