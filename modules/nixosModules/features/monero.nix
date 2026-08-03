@@ -274,7 +274,7 @@
             };
           }
 
-          (mkIf (options ? persistence) {
+          (lib.optionalAttrs (options ? persistence) {
             persistence.directories = [
               {
                 inherit (node) user group;
