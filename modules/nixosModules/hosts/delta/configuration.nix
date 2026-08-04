@@ -34,6 +34,7 @@
         self.nixosModules.language
         self.nixosModules.limine
         self.nixosModules.misc
+        self.nixosModules.time
         self.nixosModules.stylix
 
         # Desktop.

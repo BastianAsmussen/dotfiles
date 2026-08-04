@@ -47,6 +47,7 @@
         # Base modules.
         self.nixosModules.base
         self.nixosModules.language
+        self.nixosModules.time
         self.nixosModules.stylix
         self.nixosModules.systemdBoot
 
@@ -206,6 +207,11 @@
         enable = true;
         directories = [
           "/var/lib/acme"
+          {
+            directory = "/var/lib/chrony";
+            user = "chrony";
+            group = "chrony";
+          }
           {
             directory = "/var/lib/primary-mirror";
             user = "root";
