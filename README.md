@@ -332,7 +332,8 @@ sbctl verify
 
 2. Edit `modules/nixosModules/hosts/zeta/configuration.nix` to add the
    modules and settings your new machine needs (hardware config, desktop,
-   features, etc.). See `epsilon` or `delta` for reference.
+   features, etc.). See [`epsilon`](./modules/nixosModules/hosts/epsilon/configuration.nix)
+   or [`delta`](./modules/nixosModules/hosts/delta/configuration.nix) for reference.
 
 3. Build and switch to the new host.
 
