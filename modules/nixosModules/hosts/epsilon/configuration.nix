@@ -130,6 +130,11 @@
               icon = "services.syncthing";
             };
 
+            monerod = {
+              name = "Monero";
+              icon = "services.monerod";
+            };
+
             ente = {
               name = "Ente Photos";
               icon = "services.ente";

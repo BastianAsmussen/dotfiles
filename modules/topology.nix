@@ -16,6 +16,7 @@
             icons = {
               services = {
                 syncthing.file = "${pkgs.syncthing}/share/icons/hicolor/scalable/apps/syncthing.svg";
+                monerod.file = "${pkgs.monero-gui}/share/icons/hicolor/256x256/apps/monero.png";
                 ente.file = pkgs.runCommand "ente.svg" { } ''
                   sed 's|<title>[^<]*</title>||; s|<path |<path fill="#00BC45" |' ${
                     builtins.fetchurl {
