@@ -67,7 +67,7 @@ just iso-install /dev/sdX
 > nix-shell --experimental-features 'nix-command flakes'
 > ```
 
-3. Choose a host.
+1. Choose a host.
    1. View available host options.
 
       ```sh
@@ -80,13 +80,13 @@ just iso-install /dev/sdX
       HOSTNAME=delta
       ```
 
-4. Set up the disk configuration.
+2. Set up the disk configuration.
 
    ```sh
    just disko $HOSTNAME
    ```
 
-5. Finally, install NixOS with the given configuration.
+3. Finally, install NixOS with the given configuration.
 
    ```sh
    just install $HOSTNAME
@@ -290,7 +290,7 @@ sbctl verify
 ### Recipe Reference
 
 | Recipe | Purpose |
-|---|---|
+| --- | --- |
 | `just rebuild` | Rebuild and switch the current host |
 | `just upgrade` | Update flake.lock + rebuild |
 | `just update [input]` | Update flake.lock without rebuilding |
@@ -343,7 +343,8 @@ sbctl verify
 ## To-Do Tracking
 
 I track stuff I need to get done and stuff that annoys me about my current
-setup with [Tuxedo](https://github.com/webstonehq/tuxedo).  
+setup with [Tuxedo](https://github.com/webstonehq/tuxedo) in
+[todo.txt](./todo.txt).  
 If you have suggestions or notice something that could be improved, feel free
 to open a pull request. I'll review and consider integrating your contributions.
 
