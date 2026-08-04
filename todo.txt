@@ -11,4 +11,4 @@ x 2026-06-18 2026-06-18 Refactor +nixvim module system to use +flake-parts like 
 (A) Add specific post-install instructions for +lanzaboote setups.
 x 2026-08-04 2026-08-04 Add +tuxedo Catppuccin theme.
 (C) 2026-08-03 Split +persistence directory declaration between modules.
-(A) 2026-08-04 Set XDG default browser back to +schizofox instead of +tor browser.
+x 2026-08-04 2026-08-04 Set XDG default browser back to +schizofox instead of +tor browser.
