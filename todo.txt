@@ -7,7 +7,7 @@ x 2026-06-03 2026-06-03 Add development environments for Zig, C#, Haskell and C.
 (C) Make +schizofox able to use +gopass clipboard.
 x 2026-06-18 2026-06-18 Refactor +nixvim module system to use +flake-parts like here: https://github.com/traxys/Nixfiles
 (B) Modularize +nixvim module.
-(A) Switch to Lanzaboote and enroll Secrue Boot keys on @epsilon and @delta devices.
+x 2026-08-04 2026-08-04 Switch to Lanzaboote and enroll Secrue Boot keys on @epsilon and @delta devices.
 (A) Add specific post-install instructions for +lanzaboote setups.
 x 2026-08-04 2026-08-04 Add +tuxedo Catppuccin theme.
 (C) 2026-08-03 Split +persistence directory declaration between modules.
