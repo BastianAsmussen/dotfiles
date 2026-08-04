@@ -34,6 +34,7 @@
         self.nixosModules.language
         self.nixosModules.lanzaboote
         self.nixosModules.misc
+        self.nixosModules.time
         self.nixosModules.stylix
 
         # Desktop.
@@ -332,6 +333,11 @@
           "/var/lib/bluetooth"
           "/var/lib/power-profiles-daemon"
           "/var/lib/private/meilisearch"
+          {
+            directory = "/var/lib/chrony";
+            user = "chrony";
+            group = "chrony";
+          }
           {
             directory = "/var/lib/ente";
             user = "ente";
