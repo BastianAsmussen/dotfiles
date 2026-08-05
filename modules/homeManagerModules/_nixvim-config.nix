@@ -895,10 +895,10 @@
           action = "resume";
           options.desc = "[S]earch [R]esume";
         };
-        "<leader>s" = {
+        "<leader>so" = {
           mode = "n";
           action = "oldfiles";
-          options.desc = "[S]earch Recent Files ('.' for repeat)";
+          options.desc = "[S]earch [O]ld/Recent Files ('.' for repeat)";
         };
         "<leader><leader>" = {
           mode = "n";
