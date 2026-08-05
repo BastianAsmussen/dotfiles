@@ -26,7 +26,7 @@
       # The daemon writes its output files (news.json, digest.html) into its
       # dataDir on the pusher; the receiver keeps the same layout so the
       # website always reads "<dir>/news.json".
-      remoteDir = cfg.remoteDir;
+      inherit (cfg) remoteDir;
 
       pushScript = pkgs.writeShellScript "news-sync-push" ''
         set -euo pipefail
