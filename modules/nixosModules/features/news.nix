@@ -24,7 +24,7 @@
       cfg = config.newsSync;
 
       # The receiver mirrors the daemon's dataDir layout for the website.
-      remoteDir = cfg.remoteDir;
+      inherit (cfg) remoteDir;
 
       pushScript = pkgs.writeShellScript "news-sync-push" ''
         set -euo pipefail
