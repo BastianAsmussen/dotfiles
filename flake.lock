@@ -1577,11 +1577,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785941268,
-        "narHash": "sha256-tOcwhlVJUvugR679BdsOH4OuKui3E65QMgGlN/QmixM=",
+        "lastModified": 1785941473,
+        "narHash": "sha256-MOi8FnXP80UQWjBrxj1BktY1zW3Z4lp8wBvDfO4jyFw=",
         "owner": "BastianAsmussen",
         "repo": "website",
-        "rev": "b6110f1cb7063fe519ae3b0eb6528e3558ee260a",
+        "rev": "08804f254280a4be4210be37372e5be4635c97a6",
         "type": "github"
       },
       "original": {
