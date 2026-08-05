@@ -85,6 +85,7 @@
         self.nixosModules.topology
         self.nixosModules.virtualisation
         self.nixosModules.website
+        self.nixosModules.news
         self.nixosModules.winapps
         self.nixosModules.arcticVault
         self.nixosModules.pia
@@ -775,6 +776,12 @@
       programs.egg-mouse-config.enable = true;
 
       primaryBusy.enable = true;
+
+      # Aggregates and assesses the global news feed locally (Ollama is here),
+      # serves it to epsilon's own website, and pushes copies to eta over
+      # WireGuard SSH so asmussen.tech/news works while epsilon is offline.
+      newsSync.push.enable = true;
+
       btrfs.scrub.fileSystems = [
         "/persist"
         "/srv/media"
@@ -865,6 +872,8 @@
         monero.node.enable = mkForce false;
         arcticVault.enable = mkForce false;
 
+        newsSync.push.enable = mkForce false;
+
         virtualisation = {
           podman.enable = mkForce false;
           libvirtd.enable = mkForce false;
@@ -876,6 +885,7 @@
           syncthing.enable = mkForce false;
           nix-serve.enable = mkForce false;
           website.enable = mkForce false;
+          news.enable = mkForce false;
           ollama.enable = mkForce false;
           garage.enable = mkForce false;
           tor.enable = mkForce false;

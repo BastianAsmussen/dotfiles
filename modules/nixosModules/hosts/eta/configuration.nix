@@ -78,6 +78,7 @@
         self.nixosModules.remoteBuilder
         self.nixosModules.topology
         self.nixosModules.website
+        self.nixosModules.news
       ];
 
       # Support building from x86_64.
@@ -248,7 +249,15 @@
         // lib.genAttrs enteDomains (_: {
           primaryAddress = "10.10.0.2:443";
         });
+
         busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
+      };
+
+      # Receive the news feed pushed by epsilon over WireGuard SSH and serve it
+      # at asmussen.tech/news (stays up while epsilon is offline).
+      newsSync.receive = {
+        enable = true;
+        authorizedKeys = [ inputs.nix-secrets.hosts.epsilon.news-sync-ssh-public-key ];
       };
 
       sops.secrets = {
