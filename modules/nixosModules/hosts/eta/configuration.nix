@@ -76,6 +76,7 @@
         self.nixosModules.remoteBuilder
         self.nixosModules.topology
         self.nixosModules.website
+        self.nixosModules.news
       ];
 
       # Support building from x86_64.
@@ -244,7 +245,14 @@
         // lib.genAttrs enteDomains (_: {
           primaryAddress = "10.10.0.2:443";
         });
+
         busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
+      };
+
+      # Serve epsilon's pushed feed while epsilon is offline.
+      newsSync.receive = {
+        enable = true;
+        authorizedKeys = [ inputs.nix-secrets.hosts.epsilon.news-sync-ssh-public-key ];
       };
 
       sops.secrets = {

@@ -85,6 +85,7 @@
         self.nixosModules.topology
         self.nixosModules.virtualisation
         self.nixosModules.website
+        self.nixosModules.news
         self.nixosModules.winapps
         self.nixosModules.arcticVault
         self.nixosModules.pia
@@ -750,6 +751,10 @@
       programs.egg-mouse-config.enable = true;
 
       primaryBusy.enable = true;
+
+      # Aggregate news locally and push the feed to eta for availability.
+      newsSync.push.enable = true;
+
       btrfs.scrub.fileSystems = [
         "/persist"
         "/srv/media"
@@ -837,6 +842,8 @@
         monero.node.enable = mkForce false;
         arcticVault.enable = mkForce false;
 
+        newsSync.push.enable = mkForce false;
+
         virtualisation = {
           podman.enable = mkForce false;
           libvirtd.enable = mkForce false;
@@ -848,6 +855,7 @@
           syncthing.enable = mkForce false;
           nix-serve.enable = mkForce false;
           website.enable = mkForce false;
+          news.enable = mkForce false;
           ollama.enable = mkForce false;
           garage.enable = mkForce false;
           tor.enable = mkForce false;
