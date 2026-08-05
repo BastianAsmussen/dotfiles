@@ -64,6 +64,20 @@
             ;;
         esac
       '';
+
+      # Stop the daemon while a gamemode session is active (the user is
+      # gaming) and resume it afterwards. The desktop user only toggles a
+      # marker file in /run; a root .path unit watches it via inotify and
+      # runs this gate. Purely event-driven, no polling.
+      newsBusyToggle = pkgs.writeShellScript "news-busy-toggle" ''
+        set -euo pipefail
+
+        if [ -e /run/news/pause ]; then
+          ${config.systemd.package}/bin/systemctl stop news.service
+        else
+          ${config.systemd.package}/bin/systemctl start news.service
+        fi
+      '';
     in
     {
       options.newsSync = {
@@ -147,6 +161,24 @@
           };
 
           systemd = {
+            tmpfiles.rules = [
+              "d /run/news 0755 ${config.preferences.user.name} ${config.preferences.user.name} - -"
+            ];
+
+            services.news-busy = {
+              description = "Gate news daemon on gamemode state";
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = newsBusyToggle;
+              };
+            };
+
+            paths.news-busy = {
+              description = "React to gamemode pause marker changes";
+              wantedBy = [ "multi-user.target" ];
+              pathConfig.PathChanged = "/run/news/pause";
+            };
+
             services.news-sync = {
               description = "Push news feed to mirror host";
               after = [

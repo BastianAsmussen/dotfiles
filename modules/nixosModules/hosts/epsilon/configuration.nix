@@ -782,6 +782,20 @@
       # WireGuard SSH so asmussen.tech/news works while epsilon is offline.
       newsSync.push.enable = true;
 
+      # While a gamemode session is active (the user is gaming) the news
+      # daemon must not aggregate or hit Ollama: gamemode's start/end hooks
+      # toggle the /run/news/pause marker that news-busy.path reacts to via
+      # inotify.
+      primaryBusy = {
+        gamemodeStartHooks = [
+          "${lib.getExe' pkgs.coreutils "touch"} /run/news/pause"
+        ];
+
+        gamemodeEndHooks = [
+          "${lib.getExe' pkgs.coreutils "rm"} -f /run/news/pause"
+        ];
+      };
+
       btrfs.scrub.fileSystems = [
         "/persist"
         "/srv/media"
