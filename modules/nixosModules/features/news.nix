@@ -45,15 +45,21 @@
         done
       '';
 
-      # The forced command accepts only the two feed files from the primary
-      # host.
+      # The forced command accepts only feed files; `remoteDir` is
+      # receive-user-owned.
       receiveScript = pkgs.writeShellScript "news-sync-receive" ''
         set -euo pipefail
 
         case "''${SSH_ORIGINAL_COMMAND:-}" in
           news.json|digest.html)
-            ${getExe' pkgs.coreutils "install"} -m 0644 -o root -g ${cfg.receive.sshGroup} \
-              /dev/stdin "${remoteDir}/''${SSH_ORIGINAL_COMMAND}"
+            dst="${remoteDir}/''${SSH_ORIGINAL_COMMAND}"
+            tmp="$dst.tmp"
+            trap '${getExe' pkgs.coreutils "rm"} -f "$tmp"' EXIT
+
+            # Rename each uploaded feed into place so readers never see partial
+            # files.
+            ${getExe' pkgs.coreutils "install"} -m 0644 /dev/stdin "$tmp"
+            ${getExe' pkgs.coreutils "mv"} -f "$tmp" "$dst"
             ;;
           *)
             echo "error: unsupported news-sync command" >&2
@@ -155,6 +161,9 @@
           systemd = {
             tmpfiles.rules = [
               "d /run/news 0755 ${config.preferences.user.name} ${config.preferences.user.name} - -"
+
+              # A dynamic uid drifts; re-own files a previous uid left behind.
+              "Z ${config.services.news.dataDir} - ${config.services.news.user} ${config.services.news.group} - -"
             ];
 
             services.news-busy = {
@@ -216,14 +225,24 @@
             };
           };
 
+          # Match preservation's rule exactly; duplicate tmpfiles lines must
+          # agree.
           systemd.tmpfiles.rules = [
-            "d ${remoteDir} 0755 root ${cfg.receive.sshGroup} -"
+            "d ${remoteDir} 0755 news-sync ${cfg.receive.sshGroup} -"
           ];
 
           services.website.newsFile = "${remoteDir}/news.json";
 
-          # Persist the latest feed while epsilon is offline.
-          persistence.directories = [ remoteDir ];
+          # Persist the latest feed and its receive-user ownership across
+          # reboots.
+          persistence.directories = [
+            {
+              directory = remoteDir;
+              user = "news-sync";
+              group = cfg.receive.sshGroup;
+              mode = "0755";
+            }
+          ];
         })
       ];
     };
