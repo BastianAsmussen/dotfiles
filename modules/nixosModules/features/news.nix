@@ -50,13 +50,23 @@
       # Forced command on the receiver's authorized key: only these two file
       # names may be written, only from the primary host, and the payload is
       # read from stdin so no scp/rsync machinery is exposed.
+      #
+      # This runs as the unprivileged receive user, so it cannot hand the files
+      # to another owner; remoteDir is owned by that user instead (see below).
       receiveScript = pkgs.writeShellScript "news-sync-receive" ''
         set -euo pipefail
 
         case "''${SSH_ORIGINAL_COMMAND:-}" in
           news.json|digest.html)
-            ${getExe' pkgs.coreutils "install"} -m 0644 -o root -g ${cfg.receive.sshGroup} \
-              /dev/stdin "${remoteDir}/''${SSH_ORIGINAL_COMMAND}"
+            dst="${remoteDir}/''${SSH_ORIGINAL_COMMAND}"
+            tmp="$dst.tmp"
+            trap '${getExe' pkgs.coreutils "rm"} -f "$tmp"' EXIT
+
+            # Land the payload beside the target and rename over it: the
+            # website reads these files at arbitrary times and must never see
+            # a half-written feed.
+            ${getExe' pkgs.coreutils "install"} -m 0644 /dev/stdin "$tmp"
+            ${getExe' pkgs.coreutils "mv"} -f "$tmp" "$dst"
             ;;
           *)
             echo "error: unsupported news-sync command" >&2
@@ -163,6 +173,15 @@
           systemd = {
             tmpfiles.rules = [
               "d /run/news 0755 ${config.preferences.user.name} ${config.preferences.user.name} - -"
+
+              # The daemon's uid is allocated dynamically, so it drifts whenever
+              # the user gets reallocated (a flake bump did exactly that, moving
+              # news from 985 to 995). It could still create files in dataDir,
+              # but not truncate the ones its previous uid owned, so every write
+              # failed with EACCES and the feed silently froze at the last good
+              # run. Upstream's own rule only covers the directory; re-take the
+              # contents on activation so a future drift heals itself.
+              "Z ${config.services.news.dataDir} - ${config.services.news.user} ${config.services.news.group} - -"
             ];
 
             services.news-busy = {
@@ -226,15 +245,29 @@
             };
           };
 
+          # The receive user replaces files in here, which needs write access to
+          # the directory itself, not just to the files. Keep this rule byte
+          # -identical to the one preservation emits below: two tmpfiles lines
+          # for one path only coexist while they agree, otherwise one is
+          # dropped as a duplicate and the ownership silently stays root:root.
           systemd.tmpfiles.rules = [
-            "d ${remoteDir} 0755 root ${cfg.receive.sshGroup} -"
+            "d ${remoteDir} 0755 news-sync ${cfg.receive.sshGroup} -"
           ];
 
           services.website.newsFile = "${remoteDir}/news.json";
 
           # Keep the last synced feed across reboots so the public site still
-          # shows fresh-enough news when epsilon is offline.
-          persistence.directories = [ remoteDir ];
+          # shows fresh-enough news when epsilon is offline. Ownership belongs
+          # on the persisted directory: it is bind-mounted over remoteDir, so
+          # its mode is what the receive user actually meets.
+          persistence.directories = [
+            {
+              directory = remoteDir;
+              user = "news-sync";
+              group = cfg.receive.sshGroup;
+              mode = "0755";
+            }
+          ];
         })
       ];
     };
