@@ -238,11 +238,28 @@
               };
             };
 
-            services.news-busy = {
-              description = "Gate news daemon on gamemode state";
-              serviceConfig = {
-                Type = "oneshot";
-                ExecStart = newsBusyToggle;
+            services = {
+              news-busy = {
+                description = "Gate news daemon on gamemode state";
+                serviceConfig = {
+                  Type = "oneshot";
+                  ExecStart = newsBusyToggle;
+                };
+              };
+
+              news-sync = {
+                description = "Push news feed to mirror host";
+                after = [
+                  "network-online.target"
+                  "wireguard-wg0.service"
+                  "news.service"
+                ];
+
+                wants = [ "network-online.target" ];
+                serviceConfig = {
+                  Type = "oneshot";
+                  ExecStart = pushScript;
+                };
               };
             };
 
@@ -250,21 +267,6 @@
               description = "React to gamemode pause marker changes";
               wantedBy = [ "multi-user.target" ];
               pathConfig.PathChanged = "/run/news/pause";
-            };
-
-            services.news-sync = {
-              description = "Push news feed to mirror host";
-              after = [
-                "network-online.target"
-                "wireguard-wg0.service"
-                "news.service"
-              ];
-              wants = [ "network-online.target" ];
-
-              serviceConfig = {
-                Type = "oneshot";
-                ExecStart = pushScript;
-              };
             };
 
             timers.news-sync = {
