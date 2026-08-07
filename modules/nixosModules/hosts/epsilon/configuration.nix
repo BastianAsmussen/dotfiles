@@ -152,7 +152,10 @@
 
         # Run once per day at 04:00.
         schedule = "04:00";
-        channels.Veritasium = "https://www.youtube.com/@veritasium";
+        channels = {
+          Veritasium = "https://www.youtube.com/@veritasium";
+          fern = "https://www.youtube.com/@fern-tv";
+        };
       };
 
       services = {
