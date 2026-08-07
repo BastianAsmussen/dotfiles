@@ -88,6 +88,21 @@
           ${config.systemd.package}/bin/systemctl start news.service
         fi
       '';
+
+      # The daemon polls once on startup and then sleeps for its refresh
+      # interval, so restarting it is what schedules a pass. Driving that from a
+      # calendar timer pins the work to a chosen hour instead of letting it
+      # drift from whenever the host last booted.
+      newsRefresh = pkgs.writeShellScript "news-refresh" ''
+        set -euo pipefail
+
+        # Never wake the daemon mid-gamemode: the pause marker owns that.
+        if [ -e /run/news/pause ]; then
+          exit 0
+        fi
+
+        ${config.systemd.package}/bin/systemctl restart news.service
+      '';
     in
     {
       options.newsSync = {
@@ -127,6 +142,16 @@
             default = 300;
             description = "Seconds between feed pushes.";
           };
+
+          refreshTime = mkOption {
+            type = types.str;
+            default = "04:00";
+            description = ''
+              systemd OnCalendar expression for the daily aggregation pass. The
+              pass saturates the GPU for as long as it runs, so this wants an
+              hour the machine is otherwise idle.
+            '';
+          };
         };
 
         receive = {
@@ -158,7 +183,15 @@
         # Pusher (epsilon): run the daemon, let the local website read the feed
         # straight from the dataDir, and push copies to the mirror host.
         (mkIf cfg.push.enable {
-          services.news.enable = true;
+          services.news = {
+            enable = true;
+
+            # Every poll costs a full assessment pass on the local model, which
+            # pins the GPU for hours on this machine. Daily is enough for a feed
+            # whose stories are day-scale anyway, and it leaves the card free.
+            refreshIntervalSecs = 86400;
+          };
+
           services.website.newsFile = "${config.services.news.dataDir}/news.json";
 
           programs.ssh.knownHosts."eta-wg-news" = {
@@ -183,6 +216,27 @@
               # contents on activation so a future drift heals itself.
               "Z ${config.services.news.dataDir} - ${config.services.news.user} ${config.services.news.group} - -"
             ];
+
+            services.news-refresh = {
+              description = "Kick off the daily news aggregation pass";
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = newsRefresh;
+              };
+            };
+
+            timers.news-refresh = {
+              description = "Daily news aggregation pass";
+              wantedBy = [ "timers.target" ];
+
+              timerConfig = {
+                OnCalendar = cfg.push.refreshTime;
+                # Catch up after downtime rather than skipping a whole day, but
+                # jitter it so a boot-time catch-up does not collide with login.
+                Persistent = true;
+                RandomizedDelaySec = "5min";
+              };
+            };
 
             services.news-busy = {
               description = "Gate news daemon on gamemode state";
