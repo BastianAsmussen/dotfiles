@@ -18,17 +18,15 @@
   };
 
   perSystem =
-    {
-      system,
-      pkgs,
-      ...
-    }:
+    { system, pkgs, ... }:
     {
       nixvimConfigurations = {
         default = inputs.nixvim.lib.evalNixvim {
           inherit system;
 
           modules = [
+            # The claude-code plugin needs the unfree claude-code CLI; the
+            # perSystem pkgs already allows it.
             { nixpkgs.pkgs = pkgs; }
             self.nixvimModules.default
           ];
