@@ -722,11 +722,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786055728,
-        "narHash": "sha256-Jh3CJ4eEHNCJvWRFpVTkfk+LX0woLFqpePfUHqmZTCM=",
+        "lastModified": 1786300157,
+        "narHash": "sha256-zglhZo9g2G6Q2NTbmWonFW6EZvCRqcdANTs8Sypqx3Q=",
         "ref": "refs/heads/master",
-        "rev": "1b2dc59f2a159d33421142c63f39f5ae27428cf0",
-        "revCount": 6,
+        "rev": "de6a4706a0da27a9bbb5c1d02127084ec27415c5",
+        "revCount": 7,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/news.git"
       },
