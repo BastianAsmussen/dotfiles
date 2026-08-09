@@ -20,7 +20,6 @@
             qbittorrent-webui-catppuccin
             repo-cloner
             todo
-            tuxedo
             ;
         }
       );

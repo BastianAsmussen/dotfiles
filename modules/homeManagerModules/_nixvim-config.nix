@@ -1025,8 +1025,8 @@
       src = pkgs.fetchFromGitHub {
         owner = "IogaMaster";
         repo = "tuxedo.nvim";
-        rev = "dcdfb10aca45ad366d83262f08e46feac1d8baf7";
-        hash = "sha256-F0xFQ6KYe6ont//txLgyPlH9J42dzSGQIbEnrQlwRig=";
+        rev = "65650b0ae3b1c3755a43306b07ada13bd78d47ac";
+        hash = "sha256-e8Vk2QvMNDDpYCiTWwm5IgDlDhVKj2g+kNHpLbkYGx4=";
       };
     })
   ];
