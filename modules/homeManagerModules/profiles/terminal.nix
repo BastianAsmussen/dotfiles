@@ -6,6 +6,7 @@
     imports = with self.homeModules; [
       bat
       btop
+      claudeCode
       direnv
       distrobox
       eza
