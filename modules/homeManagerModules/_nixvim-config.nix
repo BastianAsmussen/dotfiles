@@ -415,6 +415,7 @@
         '';
     };
 
+    claude-code.enable = true;
     dap = {
       enable = true;
       signs = {
