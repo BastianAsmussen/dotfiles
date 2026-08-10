@@ -46,7 +46,6 @@
           sl
           teams-for-linux
           tlrc
-          todo
           tokei
           wget
           xh

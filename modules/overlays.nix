@@ -19,7 +19,6 @@
             neovim-minimal
             qbittorrent-webui-catppuccin
             repo-cloner
-            todo
             ;
         }
       );
