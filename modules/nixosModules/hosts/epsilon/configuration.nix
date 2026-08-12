@@ -90,6 +90,7 @@
         self.nixosModules.arcticVault
         self.nixosModules.pia
         self.nixosModules.forgejoRunner
+        self.nixosModules.searx
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -146,6 +147,7 @@
         };
 
       jellyfin.enable = true;
+      searx.enable = true;
       youtubeArchive = {
         enable = true;
         uid = 984;
@@ -320,6 +322,7 @@
 
             # Pass Garage's RPC secret through the environment template.
             "services/ente/garage-rpc-secret" = { };
+            "services/searx/secret-key" = { };
           };
 
         templates."garage-rpc-env".content = ''
