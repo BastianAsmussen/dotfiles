@@ -91,6 +91,24 @@ jobs:
           API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
           TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
+          # Codeberg enforces a storage quota on release assets and rejects
+          # uploads with HTTP 413 once the account is over quota. Delete every
+          # previous iso-* release first so only the newest ISO is kept and
+          # quota usage stays bounded.
+          for PAGE in $(seq 1 10); do
+            RELEASES=$(curl -fsS "$API/releases?limit=50&page=$PAGE" \
+              -H "Authorization: token $TOKEN")
+            COUNT=$(jq 'length' <<<"$RELEASES")
+            jq -r '.[].tag_name' <<<"$RELEASES" \
+              | grep '^iso-' \
+              | while read -r TAG; do
+                  curl -fsS -X DELETE "$API/releases/tags/$TAG" \
+                    -H "Authorization: token $TOKEN" \
+                  || echo "warning: failed to delete release $TAG"
+                done
+            [ "$COUNT" -lt 50 ] && break
+          done
+
           ISO=$(ls dist/*.iso)
           BODY=$(jq -n \
             --arg tag "${{ steps.build.outputs.tag }}" \
