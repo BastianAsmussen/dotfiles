@@ -85,6 +85,21 @@ jobs:
           API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
           TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
+          # Delete old ISO releases to stay within Codeberg's asset quota.
+          for PAGE in $(seq 1 10); do
+            RELEASES=$(curl -fsS "$API/releases?limit=50&page=$PAGE" \
+              -H "Authorization: token $TOKEN")
+            COUNT=$(jq 'length' <<<"$RELEASES")
+            jq -r '.[].tag_name' <<<"$RELEASES" \
+              | grep '^iso-' \
+              | while read -r TAG; do
+                  curl -fsS -X DELETE "$API/releases/tags/$TAG" \
+                    -H "Authorization: token $TOKEN" \
+                  || echo "warning: failed to delete release $TAG"
+                done
+            [ "$COUNT" -lt 50 ] && break
+          done
+
           ISO=$(ls dist/*.iso)
           BODY=$(jq -n \
             --arg tag "${{ steps.build.outputs.tag }}" \
