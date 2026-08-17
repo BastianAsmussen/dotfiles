@@ -54,7 +54,7 @@
               keep-failed = true;
               warn-dirty = false;
               accept-flake-config = false;
-              use-cgroups = pkgs.stdenv.isLinux;
+              use-cgroups = pkgs.stdenv.hostPlatform.isLinux;
               min-free = mibToBytes 128;
               max-free = mibToBytes 1024;
 
