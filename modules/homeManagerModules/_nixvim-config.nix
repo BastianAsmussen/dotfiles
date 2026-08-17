@@ -87,7 +87,7 @@
       nbsp = "␣";
     };
 
-    termguicolors = pkgs.stdenv.isLinux;
+    termguicolors = pkgs.stdenv.hostPlatform.isLinux;
     updatetime = 50;
     timeoutlen = 300;
     colorcolumn = "80";
