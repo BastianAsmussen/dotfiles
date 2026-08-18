@@ -13,3 +13,4 @@ x 2026-08-04 2026-08-04 Add +tuxedo Catppuccin theme.
 (C) 2026-08-03 Split +persistence directory declaration between modules.
 x 2026-08-04 2026-08-04 Set XDG default browser back to +schizofox instead of +tor browser.
 (C) 2026-08-04 Split +nix-topology custom diagram declaration between modules.
+(B) 2026-08-18 Fix +gamemode hook for +news to not start after game close on @epsilon
