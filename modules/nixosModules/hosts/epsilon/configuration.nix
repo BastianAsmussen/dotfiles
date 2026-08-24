@@ -91,6 +91,7 @@
         self.nixosModules.pia
         self.nixosModules.forgejoRunner
         self.nixosModules.searx
+        self.nixosModules.deepseekHarness
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -194,6 +195,7 @@
             group = "chrony";
           }
           "/var/lib/qBittorrent"
+          "/var/lib/dsh" # DSH_HOME: dsh profiles, storages, UI-set credentials.
           {
             directory = "/var/lib/sonarr";
             user = "sonarr";
@@ -272,6 +274,7 @@
             ".password-store"
             ".pki"
             ".ssh"
+            ".dsh"
 
             ".local/share/bottles"
             ".local/share/containers"
@@ -368,6 +371,18 @@
             domain = "qbittorrent.asmussen.tech";
             location = "/";
             upstream = "http://localhost:${toString config.services.qbittorrent.webuiPort}";
+            mtls = {
+              enable = true;
+              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
+              localhostBypass = true;
+            };
+          };
+
+          dsh = {
+            enable = true;
+            domain = config.deepseek-harness.trustedHost;
+            location = "/";
+            upstream = "http://localhost:${toString config.deepseek-harness.port}";
             mtls = {
               enable = true;
               caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
@@ -496,6 +511,10 @@
 
       servarr.enable = true;
       seerr.enable = true;
+      deepseek-harness = {
+        enable = true;
+        checkouts."/projects".source = "/home/bastian/Projects";
+      };
 
       # Use the local mTLS proxy instead of routing qBittorrent through eta.
       networking = {
@@ -512,6 +531,7 @@
             "shoko.asmussen.tech"
             "sonarr.asmussen.tech"
             "prowlarr.asmussen.tech"
+            "dsh.asmussen.tech"
           ];
 
           "::1" = [
@@ -520,6 +540,7 @@
             "shoko.asmussen.tech"
             "sonarr.asmussen.tech"
             "prowlarr.asmussen.tech"
+            "dsh.asmussen.tech"
           ];
         };
 
