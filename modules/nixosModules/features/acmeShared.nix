@@ -47,6 +47,15 @@
             security.acme = {
               acceptTerms = lib.mkDefault true;
               defaults.email = lib.mkDefault config.preferences.user.email;
+
+              # Applies to every cert on the host, not just the wildcard.
+              # Without it nginx keeps the old certificate in memory after lego
+              # renews and serves an expired one until something else happens
+              # to reload it. Vhosts that name certificate paths directly get
+              # no reload wiring from the nginx module, so this is the only
+              # thing covering them.
+              defaults.reloadServices = lib.mkDefault [ "nginx.service" ];
+
               certs."asmussen.tech" = {
                 extraDomainNames = [ "*.asmussen.tech" ];
                 dnsProvider = "cloudflare";

@@ -459,8 +459,13 @@
               locations."/".return = "301 https://asmussen.tech$request_uri";
             };
 
-            # Redirect legacy path to subdomain for existing bookmarks.
-            "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+            # Redirect legacy paths for existing bookmarks. The Covenant moved
+            # to its own domain (served from eta), so nothing linking at the old
+            # path breaks. It sits at / there, hence no $request_uri.
+            "asmussen.tech".locations = {
+              "/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+              "/covenant".return = "301 https://covenantofearth.org/";
+            };
 
             "jellyfin.asmussen.tech".locations = {
               # Pre-auth endpoints no remote client needs. The LAN-only gates on

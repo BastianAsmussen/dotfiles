@@ -65,6 +65,7 @@
         self.nixosModules.remoteBuilder
         self.nixosModules.topology
         self.nixosModules.website
+        self.nixosModules.covenant
         self.nixosModules.news
       ];
 
@@ -219,6 +220,14 @@
       nginx.streamProxy = {
         enable = true;
         stateFile = "/var/lib/primary-mirror/stream-upstream.conf";
+
+        # The Covenant runs on eta itself, so it always terminates here rather
+        # than following the state file's default over to epsilon. Static
+        # routes, not primaryMirror ones: there is nothing to fail over to.
+        sniRoutes = {
+          "covenantofearth.org" = "127.0.0.1:8443";
+          "www.covenantofearth.org" = "127.0.0.1:8443";
+        };
       };
 
       primaryMirror = {
@@ -249,6 +258,18 @@
 
       nix-serve-extras.exposePublicly = false;
       website-extras.exposePublicly = false;
+
+      # covenantofearth.org sits outside the asmussen.tech wildcard, so it needs
+      # its own certificate. Same Cloudflare DNS-01 credentials; the token must
+      # have edit rights on the new zone. www is a SAN rather than a second
+      # cert, because its only job is to redirect to the apex.
+      security.acme.certs."covenantofearth.org" = {
+        extraDomainNames = [ "www.covenantofearth.org" ];
+        dnsProvider = "cloudflare";
+        environmentFile = config.sops.templates."cloudflare-acme-env".path;
+        inherit (config.services.nginx) group;
+      };
+
       services = {
         openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
         chrony = {
@@ -283,6 +304,15 @@
                 ssl_certificate ${acmeDir}/fullchain.pem;
                 ssl_certificate_key ${acmeDir}/key.pem;
               '';
+
+              covenantSsl =
+                let
+                  dir = "/var/lib/acme/${config.covenant-extras.domain}";
+                in
+                ''
+                  ssl_certificate ${dir}/fullchain.pem;
+                  ssl_certificate_key ${dir}/key.pem;
+                '';
             in
             {
               "_" = {
@@ -302,10 +332,35 @@
               "asmussen.tech" = {
                 listen = [ fallbackListen ];
                 extraConfig = sslConfig;
-                locations."/" = {
-                  proxyPass = "http://localhost:${toString config.services.website.port}";
-                  proxyWebsockets = true;
+                locations = {
+                  "/" = {
+                    proxyPass = "http://localhost:${toString config.services.website.port}";
+                    proxyWebsockets = true;
+                  };
+
+                  # Matches epsilon's redirect, so the old path still works when
+                  # this host is answering for asmussen.tech.
+                  "/covenant".return = "301 https://${config.covenant-extras.domain}/";
                 };
+              };
+
+              # The Covenant is served from eta only, so this is its home rather
+              # than a fallback. Its own certificate, not the shared wildcard.
+              #
+              # Explicit ssl_certificate paths, matching every other vhost here.
+              # useACMEHost does not emit them on a vhost with a hand-written
+              # listen list, so the handshake falls through to the default
+              # server and presents the asmussen.tech wildcard instead.
+              ${config.covenant-extras.domain} = {
+                listen = [ fallbackListen ];
+                extraConfig = covenantSsl;
+                locations."/".proxyPass = "http://localhost:${toString config.services.covenant.port}";
+              };
+
+              "www.${config.covenant-extras.domain}" = {
+                listen = [ fallbackListen ];
+                extraConfig = covenantSsl;
+                locations."/".return = "301 https://${config.covenant-extras.domain}$request_uri";
               };
 
               "jellyfin.asmussen.tech" = {
