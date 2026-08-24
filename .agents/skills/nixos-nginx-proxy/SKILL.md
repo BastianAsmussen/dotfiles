@@ -1,6 +1,6 @@
 ---
 name: nixos-nginx-proxy
-description: Use when configuring the custom nginx module in this flake — reverse proxies, mTLS, stream (TLS passthrough), redirects, ACME DNS-01, and proxySSL.
+description: Use when configuring the custom nginx module in this flake. Reverse proxies, mTLS, stream (TLS passthrough), redirects, ACME DNS-01, and proxySSL.
 ---
 
 # Configuring the Nginx Reverse Proxy Module
@@ -17,7 +17,7 @@ nginx = {
   acme.sharedHost = null;              # wildcard ACME host name
   streamProxy = { ... };               # TLS SNI passthrough
   reverseProxies = { ... };            # HTTP reverse proxies
-  redirects = { ... };                # HTTP → HTTPS redirects
+  redirects = { ... };                # HTTP -> HTTPS redirects
 };
 ```
 
@@ -113,7 +113,7 @@ nginx.streamProxy = {
 };
 ```
 
-When stream mode is active, regular HTTP virtual hosts are not created — only a `:80 → :443` redirect. The stream module handles TLS termination.
+When stream mode is active, regular HTTP virtual hosts are not created. Only a `:80 -> :443` redirect. The stream module handles TLS termination.
 
 ### Pattern: Eta's Stream Proxy
 
@@ -125,7 +125,7 @@ Eta uses stream proxy mode to route internet traffic to epsilon through WireGuar
 
 ## Redirects
 
-For domain-to-domain redirects (e.g., www → bare):
+For domain-to-domain redirects (e.g., www -> bare):
 
 ```nix
 nginx.redirects = {
@@ -150,7 +150,7 @@ Set `nginx.openFirewall = false` when the host is behind a stream proxy or anoth
 
 ## Testing
 
-The module has comprehensive assertions that catch misconfiguration at eval time:
+The module has assertions that catch misconfiguration at eval time:
 - `forceSSL` requires either `ssl.useACME` or both `ssl.certificate` + `ssl.certificateKey`
 - `dnsProvider` requires `environmentFile`
 - `mtls.enable` requires `caCertificate`

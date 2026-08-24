@@ -1,6 +1,6 @@
 ---
 name: nixos-impermanence
-description: Use when managing the preservation (impermanence) module — declaring persisted state, adding a new host with impermanence, or debugging missing-persist issues.
+description: Use when managing the preservation (impermanence) module. Declaring persisted state, adding a new host with impermanence, or debugging missing-persist issues.
 ---
 
 # Persisting State with the Preservation Module
@@ -44,7 +44,7 @@ persistence = {
   user = {
     directories = [
       "Documents"
-      ".config/sops"      # VERY important — age keys
+      ".config/sops"      # VERY important; age keys
       ".mozilla"
       ".local/share/nvim"
     ];
@@ -53,7 +53,7 @@ persistence = {
       ".gnupg" = "0700";
     };
 
-    # User cache (stored under /persist/usercache — rebuildable).
+    # User cache (stored under /persist/usercache; rebuildable).
     cache.directories = [
       ".cache/direnv"
     ];
@@ -67,8 +67,8 @@ persistence = {
 
 The module always persists (by default, no host config needed):
 
-- `/etc/ssh` — SSH host keys (also set `inInitrd = true` for fresh installs)
-- `/etc/machine-id` — stable machine ID
+- `/etc/ssh`. SSH host keys (also set `inInitrd = true` for fresh installs)
+- `/etc/machine-id`. Stable machine ID
 - `/var/log`
 - `/var/lib/nixos`
 - `/var/lib/systemd/timers`
@@ -80,9 +80,9 @@ These are declared in the module's `preservation.preserveAt` block.
 
 These are non-obvious but required:
 
-- `/var/lib/sbctl` — **Lanzaboote Secure Boot keys** (epsilon). Without this, sbctl keys vanish at reboot and the next rebuild cannot sign the boot chain → unbootable machine.
-- `.config/sops/age` — **User age keys**. Without this, `gopass` and `sops` can't decrypt anything after a reboot.
-- `/var/lib/acme` — **Let's Encrypt certificates**. They regenerate but at the cost of hitting rate limits.
+- `/var/lib/sbctl`. **Lanzaboote Secure Boot keys** (epsilon). Without this, sbctl keys vanish at reboot and the next rebuild cannot sign the boot chain: unbootable machine.
+- `.config/sops/age`. **User age keys**. Without this, `gopass` and `sops` can't decrypt anything after a reboot.
+- `/var/lib/acme`. **Let's Encrypt certificates**. They regenerate but at the cost of hitting rate limits.
 
 ## Adding Impermanence to a New Host
 
@@ -102,5 +102,5 @@ These are non-obvious but required:
 
 - **Forgotten state**: when adding a new service, ensure its data directory is in `persistence.directories`. After the first reboot with a fresh tmpfs, missing state means the service starts as a clean install every time.
 - **inInitrd**: freshly-installed hosts with tmpfs root need `/etc/ssh` persisted in initrd (the module does this by default) or `sshd` starts with no config on first boot.
-- **sops age key path**: with impermanence, the preservation module overrides `sops.age.sshKeyPaths` to point at `/persist/system/etc/ssh/ssh_host_ed25519_key`, not `/etc/ssh/...`. This is automatic — just make sure the host imports the preservation module.
-- **claude-code persistence**: the claude-code module (`modules/homeManagerModules/claude-code/default.nix`) manages its own persistence symlinks independently when `osConfig.persistence.enable == true` — no manual setup needed.
+- **sops age key path**: with impermanence, the preservation module overrides `sops.age.sshKeyPaths` to point at `/persist/system/etc/ssh/ssh_host_ed25519_key`, not `/etc/ssh/...`. This is automatic; just make sure the host imports the preservation module.
+- **claude-code persistence**: the claude-code module (`modules/homeManagerModules/claude-code/default.nix`) manages its own persistence symlinks independently when `osConfig.persistence.enable == true`. No manual setup needed.

@@ -1,6 +1,6 @@
 ---
 name: nixos-sops-secrets
-description: Use when working with sops-nix secrets — adding a new secret, wiring it in a module, generating age keys, or updating key registrations.
+description: Use when working with sops-nix secrets. Adding a new secret, wiring it in a module, generating age keys, or updating key registrations.
 ---
 
 # Managing sops-nix Secrets
@@ -11,8 +11,8 @@ Secrets live in a **separate private repository**: `git+ssh://git@codeberg.org/B
 
 The flake's sops module (`modules/nixosModules/features/sops.nix`) configures:
 
-- `sops.age.sshKeyPaths` — derives the age identity from the host's `/etc/ssh/ssh_host_ed25519_key`
-- `sops.age.generateKey = true` — creates the age key at activation time (no separate key file needed)
+- `sops.age.sshKeyPaths`. Derives the age identity from the host's `/etc/ssh/ssh_host_ed25519_key`
+- `sops.age.generateKey = true`. Creates the age key at activation time (no separate key file needed)
 - Default secrets file: `nix-secrets/hosts/<hostname>.yaml`
 - Shared secrets: `nix-secrets/shared.yaml`
 
@@ -117,9 +117,9 @@ sops.secrets."user/bastian/password-hash" = {
 
 When a host uses `persistence.enable = true` (tmpfs root), the following paths are already persisted through the preservation module:
 
-- `/persist/system/etc/ssh` — SSH host keys (required for sops age identity)
-- `/persist/system/var/lib/sops-nix` — sops-nix runtime state
-- User: `.config/sops` — user age keys
+- `/persist/system/etc/ssh`. SSH host keys (required for sops age identity)
+- `/persist/system/var/lib/sops-nix`. sops-nix runtime state
+- User: `.config/sops`. User age keys
 
 If a secret is written to a path that isn't persisted, it vanishes at reboot. Make sure the consuming service's data directory is listed in `persistence.directories`.
 

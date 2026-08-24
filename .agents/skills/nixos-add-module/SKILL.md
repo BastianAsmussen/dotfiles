@@ -1,6 +1,6 @@
 ---
 name: nixos-add-module
-description: Use when adding or modifying a NixOS module or home-manager module in this dotfiles flake — enforces the flake-parts export pattern, option declaration conventions, and module wiring rules.
+description: Use when adding or modifying a NixOS module or home-manager module in this dotfiles flake. Enforces the flake-parts export pattern, option declaration conventions, and module wiring rules.
 ---
 
 # Adding or Modifying a NixOS / Home-Manager Module
@@ -128,7 +128,7 @@ The secrets file itself lives in the separate `nix-secrets` repo. Update that re
 
 ## Common Pitfalls
 
-- Forgetting to export via `flake.nixosModules.<name>` or `flake.homeModules.<name>` — the file is imported by import-tree but the module must self-register
+- Forgetting to export via `flake.nixosModules.<name>` or `flake.homeModules.<name>`. The file is imported by import-tree but the module must self-register
 - Using `inputs.<thing>` without declaring `inputs` in the function arguments (or `{ inputs, ... }:` at the top level)
-- Hardcoding paths — use `toString inputs.nix-secrets` or `self` references, never absolute paths
-- Confusing `pkgs` scope: `perSystem` has `pkgs`, NixOS modules get `pkgs` from the module args, but home-manager modules get it differently — use `{ pkgs, ... }:` pattern
+- Hardcoding paths. Use `toString inputs.nix-secrets` or `self` references, never absolute paths
+- Confusing `pkgs` scope: `perSystem` has `pkgs`, NixOS modules get `pkgs` from the module args, but home-manager modules get it differently. Use `{ pkgs, ... }:` pattern
