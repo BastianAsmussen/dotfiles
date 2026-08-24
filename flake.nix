@@ -94,6 +94,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    covenant = {
+      url = "git+ssh://git@codeberg.org/BastianA/covenant.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     news = {
       url = "git+ssh://git@codeberg.org/BastianA/news.git";
       inputs.nixpkgs.follows = "nixpkgs";
