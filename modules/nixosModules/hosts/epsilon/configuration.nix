@@ -455,8 +455,11 @@
               locations."/".return = "301 https://asmussen.tech$request_uri";
             };
 
-            # Redirect legacy path to subdomain for existing bookmarks.
-            "asmussen.tech".locations."/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+            # Preserve legacy bookmarks; Covenant now lives at its domain root.
+            "asmussen.tech".locations = {
+              "/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
+              "/covenant".return = "301 https://covenantofearth.org/";
+            };
 
             "jellyfin.asmussen.tech".locations = {
               # Block pre-auth endpoints exposed by eta's TLS passthrough.

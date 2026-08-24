@@ -65,6 +65,7 @@
         self.nixosModules.remoteBuilder
         self.nixosModules.topology
         self.nixosModules.website
+        self.nixosModules.covenant
         self.nixosModules.news
       ];
 
@@ -219,6 +220,12 @@
       nginx.streamProxy = {
         enable = true;
         stateFile = "/var/lib/primary-mirror/stream-upstream.conf";
+
+        # Terminate Covenant locally; it has no epsilon failover.
+        sniRoutes = {
+          "covenantofearth.org" = "127.0.0.1:8443";
+          "www.covenantofearth.org" = "127.0.0.1:8443";
+        };
       };
 
       primaryMirror = {
@@ -248,6 +255,15 @@
 
       nix-serve-extras.exposePublicly = false;
       website-extras.exposePublicly = false;
+
+      # Issue a separate Cloudflare DNS-01 certificate with www as a SAN.
+      security.acme.certs."covenantofearth.org" = {
+        extraDomainNames = [ "www.covenantofearth.org" ];
+        dnsProvider = "cloudflare";
+        environmentFile = config.sops.templates."cloudflare-acme-env".path;
+        inherit (config.services.nginx) group;
+      };
+
       services = {
         openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
         chrony = {
@@ -282,6 +298,15 @@
                 ssl_certificate ${acmeDir}/fullchain.pem;
                 ssl_certificate_key ${acmeDir}/key.pem;
               '';
+
+              covenantSsl =
+                let
+                  dir = "/var/lib/acme/${config.covenant-extras.domain}";
+                in
+                ''
+                  ssl_certificate ${dir}/fullchain.pem;
+                  ssl_certificate_key ${dir}/key.pem;
+                '';
             in
             {
               "_" = {
@@ -301,10 +326,29 @@
               "asmussen.tech" = {
                 listen = [ fallbackListen ];
                 extraConfig = sslConfig;
-                locations."/" = {
-                  proxyPass = "http://localhost:${toString config.services.website.port}";
-                  proxyWebsockets = true;
+                locations = {
+                  "/" = {
+                    proxyPass = "http://localhost:${toString config.services.website.port}";
+                    proxyWebsockets = true;
+                  };
+
+                  # Match epsilon's legacy Covenant redirect.
+                  "/covenant".return = "301 https://${config.covenant-extras.domain}/";
                 };
+              };
+
+              # Set explicit certificate paths; useACMEHost does not handle
+              # custom listens.
+              ${config.covenant-extras.domain} = {
+                listen = [ fallbackListen ];
+                extraConfig = covenantSsl;
+                locations."/".proxyPass = "http://localhost:${toString config.services.covenant.port}";
+              };
+
+              "www.${config.covenant-extras.domain}" = {
+                listen = [ fallbackListen ];
+                extraConfig = covenantSsl;
+                locations."/".return = "301 https://${config.covenant-extras.domain}$request_uri";
               };
 
               "jellyfin.asmussen.tech" = {

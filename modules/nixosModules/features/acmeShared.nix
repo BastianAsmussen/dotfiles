@@ -43,6 +43,11 @@
             security.acme = {
               acceptTerms = lib.mkDefault true;
               defaults.email = lib.mkDefault config.preferences.user.email;
+
+              # Reload nginx after any certificate renewal, including
+              # explicit-path vhosts.
+              defaults.reloadServices = lib.mkDefault [ "nginx.service" ];
+
               certs."asmussen.tech" = {
                 extraDomainNames = [ "*.asmussen.tech" ];
                 dnsProvider = "cloudflare";
