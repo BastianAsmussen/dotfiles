@@ -1,6 +1,6 @@
 ---
 name: nixos-add-host
-description: Use when adding a new NixOS host to the flake — scaffolds the directory, wires the configuration, and optionally provisions Hetzner infra.
+description: Use when adding a new NixOS host to the flake. Scaffolds the directory, wires the configuration, and optionally provisions Hetzner infra.
 ---
 
 # Adding a New Host

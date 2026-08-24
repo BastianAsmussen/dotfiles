@@ -1,6 +1,6 @@
 ---
 name: jj-workflow
-description: Use for any version-control operation in this repo — committing, branching, reviewing history, or pushing. This repo uses jujutsu (jj) colocated on top of git, never raw git add/commit/branch.
+description: Use for any version-control operation in this repo. Committing, branching, reviewing history, or pushing. This repo uses jujutsu (jj) colocated on top of git, never raw git add/commit/branch.
 ---
 
 # Jujutsu (jj) Workflow
@@ -12,7 +12,7 @@ Running `jj` against a git remote always needs a `git fetch` first.
 ## Mental Model
 
 - The working copy is always a **change** (think: a commit you're still editing).
-- Changes are **anonymous by default** — no branch name required. Bookmarks
+- Changes are **anonymous by default**. No branch name required. Bookmarks
   (`jj bookmark`) are optional labels, the analog of git branches.
 - The `master` bookmark tracks the git `master` branch. `@` is the working copy.
 - Editing is non-linear and undoable: the commit you're editing is the working
@@ -32,7 +32,7 @@ jj diff                # show working-copy diff
 jj bookmark list       # list bookmarks (the git branches)
 ```
 
-The working copy already exists after a fresh clone — there is nothing to
+The working copy already exists after a fresh clone. There is nothing to
 "init" and no "uncommitted" limbo; every edit lives in `@` until you `jj new`.
 
 ## The Task Loop
@@ -42,7 +42,7 @@ The working copy already exists after a fresh clone — there is nothing to
 3. `jj describe -m "scope: summary"` to name it. This repo uses conventional
    prefixes seen in history, e.g. `docs(todo):`, `feat(...):`, `fix(...):`.
 4. `jj new` to start the next piece of work. The previous change is now frozen
-   (but still editable — just `jj edit <rev>` to revisit it).
+   (but still editable; just `jj edit <rev>` to revisit it).
 5. To amend instead of stacking, stay on `@` and `jj squash` into the parent.
 
 ## Rewriting / Undo
@@ -54,7 +54,7 @@ jj restore --from <r>  # restore files from another revision
 jj abandon <rev>       # drop a change entirely
 ```
 
-`jj undo` is the primary safety net — it reverses *any* jj operation,
+`jj undo` is the primary safety net. It reverses *any* jj operation,
 including a bad `squash`, `describe`, or `abandon`.
 
 ## Pushing / Pulling (the git boundary)
@@ -83,10 +83,10 @@ keep it when editing descriptions.
 
 ## Colocated Git Rules (Never Do These)
 
-- **Never `git add` / `git commit`** — jj manages the index and commits. A
+- **Never `git add` / `git commit`**. jj manages the index and commits. A
   raw `git commit` desynchronizes `.jj/` from `.git/`.
-- **Never `git checkout` / `git branch`** — use `jj edit` / `jj bookmark`.
-- **Never `git merge` / `git rebase`** — use `jj` operations.
+- **Never `git checkout` / `git branch`**. Use `jj edit` / `jj bookmark`.
+- **Never `git merge` / `git rebase`**. Use `jj` operations.
 - `git status` is safe to *read* (it mirrors the colocated index), but
   `git reset --hard` and friends will destroy jj's working-copy state.
 
@@ -98,10 +98,10 @@ Never commit anything under `.jj/`; it is entirely jj's own state.
 ## Colocated-Specific Quirks
 
 - On a fresh `git clone` there is no `.jj/` yet; run `jj git init` to create
-  the colocated repo. This repo already has it — no action needed here.
+  the colocated repo. This repo already has it; no action needed here.
 - `jj git import` / `jj git export` are automatic in colocated mode; no manual
   sync step is required for normal edits.
-- `jj log` may show changes with no bookmark. That's normal — bookmarks are
+- `jj log` may show changes with no bookmark. That's normal; bookmarks are
   only pinned at the `master` tip here.
 
 ## Config Sources

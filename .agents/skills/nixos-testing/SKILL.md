@@ -1,6 +1,6 @@
 ---
 name: nixos-testing
-description: Use when writing NixOS configuration tests — eval tests, VM tests, or library unit tests — following the patterns in modules/nixos-tests.nix and modules/tests/.
+description: Use when writing NixOS configuration tests. Eval tests, VM tests, or library unit tests. Follows the patterns in modules/nixos-tests.nix and modules/tests/.
 ---
 
 # Writing NixOS Configuration Tests
@@ -112,7 +112,7 @@ checks = lib.optionalAttrs (system == "x86_64-linux") {
 };
 ```
 
-VM tests are for runtime behaviour (daemon starts, ports listen, services respond). Use them sparingly — they're slow.
+VM tests are for runtime behaviour (daemon starts, ports listen, services respond). Use them sparingly; they're slow.
 
 ## Library Tests
 
@@ -135,7 +135,7 @@ nix build .#checks.x86_64-linux.nixos-eval-my-test
 nix run .#checks.x86_64-linux.nixos-vm-my-service.driverInteractive
 ```
 
-The CI (`just check` / `nix flake check`) runs all checks. Pre-commit only runs deadnix/statix/nixfmt — eval and VM tests run in CI.
+The CI (`just check` / `nix flake check`) runs all checks. Pre-commit only runs deadnix/statix/nixfmt; eval and VM tests run in CI.
 
 ## Test Coverage Conventions
 
