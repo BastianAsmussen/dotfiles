@@ -57,6 +57,22 @@ jj abandon <rev>       # drop a change entirely
 `jj undo` is the primary safety net. It reverses *any* jj operation,
 including a bad `squash`, `describe`, or `abandon`.
 
+## Splitting the Working Copy
+
+Need some paths in their own change while the rest stays put? Use `jj split`.
+It is the supported way to divide a change. Do not hand-roll it with
+`jj new` plus `jj restore --from @-`: restoring paths from a parent that
+lacks them deletes them from the working copy, and `@-` rarely points where
+you think it does mid-sequence.
+
+```sh
+jj split -m "docs(skills): ..." .agents/skills/
+```
+
+Named filesets become the first change (the parent) together with the `-m`
+description; the remainder stays in `@` and keeps the old description.
+Without filesets, `jj split` opens a diff editor instead.
+
 ## Pushing / Pulling (the git boundary)
 
 jj has no remote transport of its own; `git` handles the network:
@@ -110,3 +126,35 @@ Repo is `jj 0.44.0`; effective settings come from `~/.config/jj/config.toml`
 plus any repo override. The user is `Bastian Asmussen <bastian@asmussen.tech>`,
 signing backend `gpg`, key `0xD92D668B77A29897`, and
 `ui.default-command = "log"` (so a bare `jj` shows the log).
+
+## Recovery
+
+`jj abandon` hides a change; nothing is deleted. Hidden commits still resolve
+by ID and every past operation is recorded.
+
+```sh
+jj op log                       # every operation, with the args used
+jj op restore <op-id>           # rewind graph, refs, and working copy
+jj obslog -r <change>           # every predecessor version of a change
+jj restore --from <id> <paths>  # copy specific paths back onto @
+git show <commit-id>:<path>     # read a file straight out of a hidden commit
+```
+
+Prefer surgical recovery (`jj restore --from`) over `jj op restore` when only
+file content went missing: rewinding the op log also rewinds remote-tracking
+refs updated by any fetch since.
+
+## Sharp Edges
+
+- Relative revisions move under you. `@-` names one commit before a
+  `jj edit` / `jj new` / `jj abandon` and a different one after. Anything
+  destructive gets an explicit change ID or commit ID, never `@-` or `@--`.
+- `jj restore --from X <paths>` makes `@` match X for those paths; paths that
+  exist in `@` but not in X are deleted. Restoring `modules/` from a commit
+  without your new feature module removes the module.
+- Commits reachable from `master` are immutable. `jj squash` across that
+  boundary fails; stack on top or move the bookmark deliberately.
+- `jj rebase` wants `-r <revs> --onto <dest>` on this version; bare
+  positional destinations error out.
+- The graph can change between sessions (another terminal, another agent).
+  Re-check `jj st` and `jj op log` before trusting a remembered state.
