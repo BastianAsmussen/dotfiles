@@ -15,6 +15,7 @@
             mit
             calculator
             copy-file
+            deepseek-harness
             neovim
             neovim-minimal
             qbittorrent-webui-catppuccin
