@@ -1661,17 +1661,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1787644507,
-        "narHash": "sha256-IuQyJCCcwUANqK3qSFX/pCqe4atwNvdT+x5Tkrlq3dg=",
-        "owner": "BastianAsmussen",
-        "repo": "website",
-        "rev": "66491157228a0e1c334868b0b13ff00fff65f546",
-        "type": "github"
+        "lastModified": 1787654841,
+        "narHash": "sha256-zLiKDq2eXbjiCFCIF7qqUBaPJcClyMo/vv20VJwh+nk=",
+        "ref": "refs/heads/master",
+        "rev": "62e913bc33d481b8537d2efd9349a2bbff52615f",
+        "revCount": 118,
+        "type": "git",
+        "url": "ssh://git@codeberg.org/BastianA/website.git"
       },
       "original": {
-        "owner": "BastianAsmussen",
-        "repo": "website",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@codeberg.org/BastianA/website.git"
       }
     },
     "winapps": {
