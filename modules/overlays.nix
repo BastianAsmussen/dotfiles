@@ -20,6 +20,9 @@
             neovim-minimal
             qbittorrent-webui-catppuccin
             repo-cloner
+            worldmonitor
+            worldmonitor-relay
+            worldmonitor-redis-rest
             ;
         }
       );
