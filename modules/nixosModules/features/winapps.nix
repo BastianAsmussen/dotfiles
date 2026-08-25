@@ -73,7 +73,7 @@
           "d ${cfg.sharedDir} 0750 ${user} ${user} -"
         ];
 
-        programs.zsh.shellAliases =
+        environment.shellAliases =
           let
             compose = "podman-compose -f ${home}/.config/winapps/compose.yaml";
           in
