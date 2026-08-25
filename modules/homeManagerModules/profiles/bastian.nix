@@ -29,7 +29,7 @@
           jq
           jless
           just
-          libreoffice-fresh
+          libreoffice-stable
           man-pages
           man-pages-posix
           manix
