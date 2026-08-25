@@ -27,7 +27,7 @@
             # pro-test and the runtime handler set are separate lockfiles the
             # Dockerfile installs with their own `npm ci`. npm ci is lockfile-exact,
             # so the repo's overrides (incl. self-referential `$ws`/`$undici`)
-            # resolve exactly as under Docker — unlike importNpmLock, which rewrites
+            # resolve exactly as under Docker, unlike importNpmLock, which rewrites
             # `resolved` to file: paths and then trips EOVERRIDE.
             proDeps = pkgs.fetchNpmDeps {
               name = "worldmonitor-pro-npm-deps";

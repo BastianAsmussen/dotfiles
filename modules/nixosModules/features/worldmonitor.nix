@@ -308,8 +308,8 @@
             };
 
             serviceConfig = {
-              Type = "oneshot";
-              RemainAfterExit = true;
+              # Stop the ~30-min seeder batch from running during activation.
+              Type = "exec";
               # Wait for the REST proxy to answer (any status, incl. 401 = up)
               # before firing seeders that would otherwise all fail-fast.
               ExecStartPre = "${lib.getExe pkgs.curl} -s -o /dev/null --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:${toString cfg.redisRestPort}/";

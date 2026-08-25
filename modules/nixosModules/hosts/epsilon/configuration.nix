@@ -178,6 +178,17 @@
           "router/wifi-passphrase" = { };
 
           "services/searx/secret-key" = { };
+
+          # Dotenv of upstream data-provider API keys (+ OLLAMA_API_URL/
+          # OLLAMA_MODEL) for the worldmonitor sidecar/relay/seeders. Its own
+          # sops file, edited as a raw .env (`sops hosts/epsilon-worldmonitor.env`);
+          # key = "" decrypts the whole file so .path is a usable EnvironmentFile.
+          # Features degrade gracefully per missing key.
+          "worldmonitor/api-keys" = {
+            sopsFile = "${toString inputs.nix-secrets}/hosts/epsilon-worldmonitor.env";
+            format = "dotenv";
+            key = "";
+          };
         };
       };
 
@@ -545,7 +556,13 @@
         gid = 600;
         checkouts."/projects".source = "/home/bastian/Projects";
       };
-      worldmonitor.enable = true;
+      worldmonitor = {
+        enable = true;
+        # Upstream provider keys + LLM endpoint, injected into the sidecar,
+        # relay and seeder units. OLLAMA_API_URL points the AI panels at this
+        # host's local Ollama (services.ollama, 127.0.0.1:11434).
+        extraEnvironmentFiles = [ config.sops.secrets."worldmonitor/api-keys".path ];
+      };
 
       # Resolve qbittorrent to loopback so the browser hits the local mTLS proxy
       # instead of going out through eta (bypasses public DNS and the untrusted hop).
