@@ -1,0 +1,54 @@
+diff --git a/src/services/entitlements.ts b/src/services/entitlements.ts
+index d0574abc1..a4b56c778 100644
+--- a/src/services/entitlements.ts
++++ b/src/services/entitlements.ts
+@@ -67,8 +67,35 @@ export type EntitlementVerificationStatus =
+   | 'ready'
+   | 'unavailable';
+ 
++// Self-hosted build: pro is not sold here. This synthetic snapshot is the
++// module's permanent entitlement, so every gate that reads currentState
++// (isEntitled/hasTier/hasFeature/getEntitlementState and the isProUser →
++// hasPremiumAccess fold-ins) resolves to full access. Convex/Clerk are absent
++// on a self-host, so nothing ever overwrites it.
++const SELF_HOSTED_PRO: EntitlementState = {
++  planKey: 'pro_business_annual',
++  features: {
++    tier: 2,
++    apiAccess: true,
++    apiRateLimit: Number.MAX_SAFE_INTEGER,
++    planLimits: {
++      apiRequestsPerDay: null,
++      apiBurstRequestsPerMinute: null,
++      mcpCallsPerDay: null,
++      mcpBurstRequestsPerMinute: null,
++      dashboardAiCallsPerDay: null,
++    },
++    maxDashboards: Number.MAX_SAFE_INTEGER,
++    prioritySupport: true,
++    exportFormats: ['csv', 'json', 'pdf'],
++    mcpAccess: true,
++    dataExport: true,
++  },
++  validUntil: 8640000000000000,
++};
++
+ // Module-level state
+-let currentState: EntitlementState | null = null;
++let currentState: EntitlementState | null = SELF_HOSTED_PRO;
+ const listeners = new Set<(state: EntitlementState | null) => void>();
+ let verificationStatus: EntitlementVerificationStatus = 'idle';
+ const verificationListeners = new Set<(status: EntitlementVerificationStatus) => void>();
+@@ -218,8 +245,10 @@ export function destroyEntitlementSubscription(): void {
+  * account's premium snapshot until the next real Convex update.
+  */
+ export function resetEntitlementState(): void {
+-  currentState = null;
+-  notifyListeners(null);
++  // Self-hosted build: sign-out must not drop back to free — reseed the
++  // synthetic pro snapshot instead of nulling.
++  currentState = SELF_HOSTED_PRO;
++  notifyListeners(currentState);
+ }
+ 
+ /**

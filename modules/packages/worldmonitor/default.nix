@@ -49,6 +49,13 @@
             inherit version src nodejs;
 
             pname = "worldmonitor";
+
+            # Self-hosted build: neuter the client entitlement chokepoint so the
+            # "pro" paywall is gone (src/services/entitlements.ts seeds a
+            # synthetic full-tier snapshot). Touches no lockfile, so npmDeps and
+            # the shared src FOD hash are unaffected. Applied in patchPhase after
+            # fetchNpmDeps has already read the pristine lockfile.
+            patches = [ ./strip-pro-gating.patch ];
             npmDeps = pkgs.fetchNpmDeps {
               inherit src;
 
