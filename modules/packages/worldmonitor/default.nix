@@ -42,6 +42,10 @@
             inherit version src nodejs;
 
             pname = "worldmonitor";
+
+            # Strip the client entitlement gate without changing lockfiles or
+            # FOD hashes.
+            patches = [ ./strip-pro-gating.patch ];
             npmDeps = pkgs.fetchNpmDeps {
               inherit src;
 
