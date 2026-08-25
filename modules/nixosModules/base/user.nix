@@ -57,7 +57,18 @@
       };
 
       config = {
-        programs.zsh.enable = true;
+        programs = {
+          # Kept enabled so zsh stays a working fallback login shell.
+          zsh.enable = true;
+
+          fish = {
+            enable = true;
+
+            # Translate the NixOS environment once instead of in every shell.
+            useBabelfish = true;
+          };
+        };
+
         users = {
           mutableUsers = false;
 
@@ -70,7 +81,7 @@
               group = cfg.name;
               description = cfg.fullName;
               extraGroups = [ "wheel" ];
-              shell = pkgs.zsh;
+              shell = pkgs.fish;
               openssh.authorizedKeys.keyFiles = cfg.authorizedKeyFiles;
             };
           };

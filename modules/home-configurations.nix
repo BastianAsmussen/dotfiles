@@ -82,7 +82,7 @@ let
     eta = with self.homeModules; [
       git
       gpg
-      zsh
+      fish
       zoxide
       tmux
       ohMyPosh

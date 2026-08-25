@@ -93,7 +93,7 @@
 
       programs.tmux = {
         enable = true;
-        shell = getExe pkgs.zsh;
+        shell = getExe pkgs.fish;
         terminal = "tmux-256color";
         keyMode = "vi";
         newSession = true;

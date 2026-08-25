@@ -5,6 +5,7 @@
       programs.oh-my-posh = {
         enable = true;
         enableZshIntegration = config.programs.zsh.enable;
+        enableFishIntegration = config.programs.fish.enable;
         settings = {
           version = 2;
           final_space = true;
