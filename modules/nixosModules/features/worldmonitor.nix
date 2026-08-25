@@ -287,8 +287,8 @@
             };
 
             serviceConfig = {
-              Type = "oneshot";
-              RemainAfterExit = true;
+              # Stop the ~30-min seeder batch from running during activation.
+              Type = "exec";
               # Wait for the REST proxy before starting seeders.
               ExecStartPre = "${lib.getExe pkgs.curl} -s -o /dev/null --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:${toString cfg.redisRestPort}/";
               ExecStart = "${lib.getExe pkgs.bash} ${cfg.relayPackage}/share/worldmonitor-relay/scripts/run-seeders.sh";

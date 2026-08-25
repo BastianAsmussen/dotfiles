@@ -177,6 +177,13 @@
           "router/wifi-passphrase" = { };
 
           "services/searx/secret-key" = { };
+
+          # Provide upstream API keys and Ollama settings as a dotenv file.
+          "worldmonitor/api-keys" = {
+            sopsFile = "${toString inputs.nix-secrets}/hosts/epsilon-worldmonitor.env";
+            format = "dotenv";
+            key = "";
+          };
         };
       };
 
@@ -534,7 +541,12 @@
         gid = 600;
         checkouts."/projects".source = "/home/bastian/Projects";
       };
-      worldmonitor.enable = true;
+      worldmonitor = {
+        enable = true;
+        # Inject provider keys and local Ollama settings into sidecar, relay and
+        # seeders.
+        extraEnvironmentFiles = [ config.sops.secrets."worldmonitor/api-keys".path ];
+      };
 
       # Use the local mTLS proxy instead of routing qBittorrent through eta.
       networking = {
