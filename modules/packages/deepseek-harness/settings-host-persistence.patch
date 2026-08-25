@@ -1,0 +1,59 @@
+diff --git a/packages/client/connection/src/index.ts b/packages/client/connection/src/index.ts
+index a1764a3..1942b60 100644
+--- a/packages/client/connection/src/index.ts
++++ b/packages/client/connection/src/index.ts
+@@ -144,7 +144,7 @@ export function apply(ctx: Context, config?: ConnectionConfig): void {
+         : undefined
+       if (method !== undefined
+         && PRIVILEGED_METHODS.has(method)
+-        && !isTrustedApiRequest(request, [])) {
++        && !isTrustedApiRequest(request, trustedHosts)) {
+         return new Response('forbidden', { status: 403 })
+       }
+       if (request.method === 'GET' && (pathname === MUX_EVENTS_PATH || pathname === HOST_EVENTS_PATH)) {
+diff --git a/packages/client/connection/src/rpc-host.ts b/packages/client/connection/src/rpc-host.ts
+index 0da66c8..0f44869 100644
+--- a/packages/client/connection/src/rpc-host.ts
++++ b/packages/client/connection/src/rpc-host.ts
+@@ -79,7 +79,7 @@ export class HostConnectionService extends Service implements HostConnectionHand
+         if (endpoint === undefined || interceptor === undefined || !interceptor.matches(endpoint)) {
+           return fallback.fetch(request)
+         }
+-        if (interceptor.options.authority === 'loopback' && !isTrustedApiRequest(request, [])) {
++        if (interceptor.options.authority === 'loopback' && !isTrustedApiRequest(request, this.trustedHosts)) {
+           return Promise.resolve(new Response('forbidden', { status: 403 }))
+         }
+         return interceptor.fetchHandler.fetch(request)
+diff --git a/packages/client/ui-settings/src/client/index.ts b/packages/client/ui-settings/src/client/index.ts
+index f2763da..1762d57 100644
+--- a/packages/client/ui-settings/src/client/index.ts
++++ b/packages/client/ui-settings/src/client/index.ts
+@@ -49,10 +49,10 @@ export const inject = ['connection', 'remote']
+ export function apply(ctx: ClientContext): void {
+   const schema = new SettingsSchemaService(ctx)
+   const connection = ctx.get('connection') as ConnectionHandle
+-  const mirror = new SettingsDescribeMirror(
+-    connection.api,
+-    connection.isLoopback ? 'host' : 'memory',
+-  )
++  // Containerized deployment: /api is fenced by --trusted-host plus mTLS at
++  // the reverse proxy, so any origin that reaches the UI may persist its
++  // settings host-side instead of degrading to process-local memory.
++  const mirror = new SettingsDescribeMirror(connection.api, 'host')
+   ctx.effect(() => {
+     const disposers = [
+       (ctx.get('remote') as ClientContext['remote']).$on('settings/document-updated', () => { void mirror.load() }),
+diff --git a/packages/client/ui-settings/src/client/settings-scope.ts b/packages/client/ui-settings/src/client/settings-scope.ts
+index 36e674c..07dc85c 100644
+--- a/packages/client/ui-settings/src/client/settings-scope.ts
++++ b/packages/client/ui-settings/src/client/settings-scope.ts
+@@ -279,7 +279,8 @@ export class SettingsScopeBinder extends Service {
+       connection.api,
+       spec,
+       this.mirror,
+-      connection.isLoopback ? 'host' : 'memory',
++      // Same fence rationale as the describe mirror: trust the proxy.
++      'host',
+       this.schema,
+     )
+     ctx.effect(() => {

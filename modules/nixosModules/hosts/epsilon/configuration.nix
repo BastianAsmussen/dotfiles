@@ -539,6 +539,10 @@
       seerr.enable = true;
       deepseek-harness = {
         enable = true;
+        # Explicitly pinned away from the 98x band where unpinned system
+        # groups (searx et al.) drift across rebuilds.
+        uid = 600;
+        gid = 600;
         checkouts."/projects".source = "/home/bastian/Projects";
       };
       worldmonitor.enable = true;
@@ -726,6 +730,7 @@
         jellyfin.enable = mkForce false;
         youtubeArchive.enable = mkForce false;
         worldmonitor.enable = mkForce false;
+        deepseek-harness.enable = mkForce false;
 
         qbittorrent.enable = mkForce false;
         servarr.enable = mkForce false;
