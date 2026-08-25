@@ -40,6 +40,9 @@
           "net.ipv4.tcp_fastopen" = 3;
           "net.ipv4.tcp_congestion_control" = "bbr";
           "net.core.default_qdisc" = "cake";
+
+          ## Disable unprivileged user cloning.
+          "kernel.unprivileged_userns_clone" = true;
         };
 
         kernelModules = [ "tcp_bbr" ];
@@ -70,7 +73,6 @@
 
         protectKernelImage = true;
         forcePageTableIsolation = true;
-        unprivilegedUsernsClone = false;
         polkit.enable = true;
         rtkit.enable = true;
         sudo.enable = false;
