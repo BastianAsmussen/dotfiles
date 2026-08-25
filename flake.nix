@@ -90,7 +90,7 @@
     };
 
     website = {
-      url = "github:BastianAsmussen/website";
+      url = "git+ssh://git@codeberg.org/BastianA/website.git";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
