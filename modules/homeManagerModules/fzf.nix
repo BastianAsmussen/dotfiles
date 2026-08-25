@@ -14,6 +14,7 @@
       programs.fzf = {
         enable = true;
         enableZshIntegration = cfg.zsh.enable;
+        enableFishIntegration = cfg.fish.enable;
         tmux.enableShellIntegration = cfg.tmux.enable;
         defaultCommand = "${fd} --type=d --exclude=.git --hidden";
         fileWidget.command = "${fd} --type=f --exclude=.git --hidden";

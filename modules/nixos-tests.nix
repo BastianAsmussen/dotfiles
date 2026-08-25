@@ -113,6 +113,11 @@ in
           testUser
         ] (cfg: cfg.programs.zsh.enable);
 
+        nixos-eval-fish-system-enabled = mkEvalTest "fish-system-enabled" [
+          self.nixosModules.base
+          testUser
+        ] (cfg: cfg.programs.fish.enable);
+
         # SSH Module.
         nixos-eval-ssh-no-password-auth = mkEvalTest "ssh-no-password-auth" [
           self.nixosModules.base
@@ -167,7 +172,7 @@ in
             machine.wait_for_unit("multi-user.target")
             machine.succeed("id alice")
             machine.succeed("id alice | grep -q wheel")
-            machine.succeed("getent passwd alice | grep -q zsh")
+            machine.succeed("getent passwd alice | grep -q fish")
           '';
         };
 

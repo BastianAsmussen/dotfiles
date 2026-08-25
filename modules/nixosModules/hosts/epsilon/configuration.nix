@@ -287,6 +287,7 @@
             ".local/share/bottles"
             ".local/share/containers"
             ".local/share/direnv"
+            ".local/share/fish"
             ".local/share/flatpak"
             ".local/share/gopass"
             ".local/share/goxlr-utility"
