@@ -24,7 +24,7 @@
         description = "Per-user list of Home Manager modules to import. Each key is a username, each value is a list of Home Manager modules for that user.";
         example = lib.literalExpression ''
           {
-            alice = with self.homeModules; [ nixvim git zsh ];
+            alice = with self.homeModules; [ nixvim git fish ];
             bob = with self.homeModules; [ git tmux ];
           }
         '';

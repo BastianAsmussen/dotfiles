@@ -11,6 +11,7 @@
       distrobox
       eza
       fastfetch
+      fish
       fzf
       git
       gpg
@@ -24,7 +25,6 @@
       tmuxSessionizer
       tuxedo
       zoxide
-      zsh
     ];
   };
 }
