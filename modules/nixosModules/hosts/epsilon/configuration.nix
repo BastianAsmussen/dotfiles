@@ -529,6 +529,9 @@
       seerr.enable = true;
       deepseek-harness = {
         enable = true;
+        # Pin ids outside the drifting 98x system-group band.
+        uid = 600;
+        gid = 600;
         checkouts."/projects".source = "/home/bastian/Projects";
       };
       worldmonitor.enable = true;
@@ -707,6 +710,7 @@
         jellyfin.enable = mkForce false;
         youtubeArchive.enable = mkForce false;
         worldmonitor.enable = mkForce false;
+        deepseek-harness.enable = mkForce false;
 
         qbittorrent.enable = mkForce false;
         servarr.enable = mkForce false;
