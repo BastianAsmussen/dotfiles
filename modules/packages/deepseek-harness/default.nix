@@ -19,9 +19,10 @@
           version = "0.1.1-rc.2";
 
           src = pkgs.fetchFromGitHub {
+            inherit rev;
+
             owner = "deepseek-ai";
             repo = "deepseek-harness";
-            inherit rev;
             hash = "sha256-rrjXoyccTxKIbZ00Z4Vy7EA9tGZ15WUqLBFnZSgw1YE=";
           };
 
@@ -31,6 +32,9 @@
             fetcherVersion = 4;
             hash = "sha256-+PsdK9u3ZKv4XtSc8tBKKP48J/95/CGTMIUf8Q8dbok=";
           };
+
+          # Trust the mTLS proxy and persist settings host-side.
+          patches = [ ./settings-host-persistence.patch ];
 
           nativeBuildInputs = [
             nodejs
