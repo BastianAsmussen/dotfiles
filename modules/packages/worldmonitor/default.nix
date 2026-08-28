@@ -43,9 +43,13 @@
 
             pname = "worldmonitor";
 
-            # Strip the client entitlement gate without changing lockfiles or
+            # Strip entitlement and account gating without changing lockfiles or
             # FOD hashes.
-            patches = [ ./strip-pro-gating.patch ];
+            patches = [
+              ./strip-pro-gating.patch
+              ./fake-local-account.patch
+            ];
+
             npmDeps = pkgs.fetchNpmDeps {
               inherit src;
 

@@ -1,0 +1,79 @@
+diff --git a/src/services/billing.ts b/src/services/billing.ts
+index e76736e..7ea3aa4 100644
+--- a/src/services/billing.ts
++++ b/src/services/billing.ts
+@@ -47,7 +47,11 @@ export interface SubscriptionInfo {
+ 
+ // Module-level state
+ let currentSubscription: SubscriptionInfo | null = null;
+-let subscriptionLoaded = false;
++// Self-hosted build: no Convex means the subscription watch never settles, and
++// UnifiedSettings.renderUpgradeSection() reads a null-and-unloaded pair as
++// "still resolving" — a permanent "Checking your plan…" spinner on the billing
++// tab. Start settled so it renders the plan status it already has instead.
++let subscriptionLoaded = true;
+ const listeners = new Set<(sub: SubscriptionInfo | null) => void>();
+ let initialized = false;
+ let unsubscribeConvex: (() => void) | null = null;
+diff --git a/src/services/clerk.ts b/src/services/clerk.ts
+index ae4f651..6e2fb08 100644
+--- a/src/services/clerk.ts
++++ b/src/services/clerk.ts
+@@ -836,10 +836,25 @@ export function __setClerkInstanceForTests(instance: ClerkInstance | null): void
+ }
+ 
+ 
++// Self-hosted build: this instance runs no Clerk deployment, so `clerkInstance`
++// is never populated and every account-scoped surface — API keys, MCP clients,
++// notification channels, plan status — would sit behind a sign-in that can
++// never complete. Stand in a fixed local identity instead of signalling signed
++// out. This is the single chokepoint: services/auth-state.ts snapshots it, so
++// getAuthState().user and every `isSignedIn` derived from it follow. Pairs with
++// the synthetic pro entitlement in services/entitlements.ts.
++const SELF_HOSTED_USER = {
++  id: 'self-hosted',
++  name: 'Local',
++  email: 'local@localhost',
++  image: null,
++  plan: 'pro' as const,
++};
++
+ /** Get current Clerk user metadata. Returns null if signed out. */
+ export function getCurrentClerkUser(): { id: string; name: string; email: string; image: string | null; plan: 'free' | 'pro' } | null {
+   const user = clerkInstance?.user;
+-  if (!user) return null;
++  if (!user) return SELF_HOSTED_USER;
+   const plan = (user.publicMetadata as Record<string, unknown>)?.plan;
+   return {
+     id: user.id,
+diff --git a/src/styles/main.css b/src/styles/main.css
+index 6ed34c8..79c4713 100644
+--- a/src/styles/main.css
++++ b/src/styles/main.css
+@@ -28026,3 +28026,26 @@ body.map-width-resizing {
+   outline: 2px solid var(--text);
+   outline-offset: -2px;
+ }
++
++/* ============================================================
++   Self-hosted build: no Clerk, no Convex, no Dodo.
++
++   The header account chrome mounts a Clerk UserButton that can
++   never load, so it renders an empty avatar slot — hide it; the
++   gear opens the same settings. The PRO badges label features
++   this instance already grants, so they advertise an upgrade
++   with nowhere to go.
++
++   Hidden in CSS rather than deleted in TS so every component
++   keeps compiling against upstream types and the next rev bump
++   does not fight a structural patch.
++   ============================================================ */
++.auth-widget-mount,
++.auth-header-widget,
++.mobile-menu-account,
++.mobile-menu-account + .mobile-menu-divider,
++.panel-pro-badge,
++.panel-toggle-pro-badge,
++.widget-pro-badge {
++  display: none !important;
++}
