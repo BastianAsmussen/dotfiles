@@ -137,6 +137,24 @@
             description = "SOPS secret containing the SSH private key used to push the feed.";
           };
 
+          llmModel = mkOption {
+            type = types.str;
+            default = "gemma3:12b-it-q4_K_M";
+            description = ''
+              Model id used for per-article assessment and story restatement.
+            '';
+          };
+
+          llmConcurrency = mkOption {
+            type = types.ints.between 1 64;
+            default = 2;
+            description = ''
+              Max concurrent generation requests. Local VRAM bounds this:
+              parallel generations share the card's KV-cache and compute, so
+              it stays far below what a remote endpoint tolerates.
+            '';
+          };
+
           interval = mkOption {
             type = types.ints.positive;
             default = 300;
@@ -190,6 +208,12 @@
             # pins the GPU for hours on this machine. Daily is enough for a feed
             # whose stories are day-scale anyway, and it leaves the card free.
             refreshIntervalSecs = 86400;
+
+            llm = {
+              provider = "ollama";
+              model = cfg.push.llmModel;
+              concurrency = cfg.push.llmConcurrency;
+            };
           };
 
           services.website.newsFile = "${config.services.news.dataDir}/news.json";
