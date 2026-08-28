@@ -1,5 +1,5 @@
 diff --git a/src/services/billing.ts b/src/services/billing.ts
-index e76736e..7ea3aa4 100644
+index d8ab863..520a081 100644
 --- a/src/services/billing.ts
 +++ b/src/services/billing.ts
 @@ -47,7 +47,11 @@ export interface SubscriptionInfo {
@@ -16,10 +16,10 @@ index e76736e..7ea3aa4 100644
  let initialized = false;
  let unsubscribeConvex: (() => void) | null = null;
 diff --git a/src/services/clerk.ts b/src/services/clerk.ts
-index ae4f651..6e2fb08 100644
+index 4edd6ea..a0c4c8d 100644
 --- a/src/services/clerk.ts
 +++ b/src/services/clerk.ts
-@@ -836,10 +836,25 @@ export function __setClerkInstanceForTests(instance: ClerkInstance | null): void
+@@ -1004,10 +1004,25 @@ export function __setClerkInstanceForTests(instance: ClerkInstance | null): void
  }
  
  
@@ -47,13 +47,13 @@ index ae4f651..6e2fb08 100644
    return {
      id: user.id,
 diff --git a/src/styles/main.css b/src/styles/main.css
-index 6ed34c8..79c4713 100644
+index 7ff63ce..e6950b5 100644
 --- a/src/styles/main.css
 +++ b/src/styles/main.css
-@@ -28026,3 +28026,26 @@ body.map-width-resizing {
-   outline: 2px solid var(--text);
-   outline-offset: -2px;
+@@ -28646,3 +28646,26 @@ body.map-width-resizing {
+   align-self: flex-start;
  }
+ .pro-preview__reopen:hover, .pro-preview__reopen:focus-visible { opacity: 1; }
 +
 +/* ============================================================
 +   Self-hosted build: no Clerk, no Convex, no Dodo.

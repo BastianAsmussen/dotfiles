@@ -6,14 +6,14 @@
 
       # Pinned upstream commit. Bump rev + all four hashes (src + the three
       # npm closures) together on upgrade.
-      rev = "f5b728b6da9880172819e99cee955d9b85765d47";
-      version = "0-unstable-2026-08-23";
+      rev = "81033aa5f6d39580b4164e256d120dfb4c3923d7";
+      version = "0-unstable-2026-09-06";
 
       src = pkgs.fetchFromGitHub {
         owner = "koala73";
         repo = "worldmonitor";
         inherit rev;
-        hash = "sha256-2DVLoC9ZV5Dnqt28ukDFCVC6XY6jw5/cW5ecMWCVDmk=";
+        hash = "sha256-G4I/drjicMJjnBGrJBeURylnYlXxg6gMFy/ckBLi3as=";
       };
     in
     {
@@ -32,7 +32,7 @@
             proDeps = pkgs.fetchNpmDeps {
               name = "worldmonitor-pro-npm-deps";
               src = "${src}/pro-test";
-              hash = "sha256-AkF7ULggc3MCvE0yygfP5vJRm8cX5YZAIwP1qZa+IAA=";
+              hash = "sha256-BDQE8npzZGBRAcP4LSdxZf5vUDAUiBwQ9lHkwcbePTE=";
             };
 
             runtimeDeps = pkgs.fetchNpmDeps {
@@ -67,7 +67,7 @@
               inherit src;
 
               name = "worldmonitor-root-npm-deps";
-              hash = "sha256-emND5urZsI9X8JsSvQDwZLXOPhDRheGaF8u0ZNlbSLE=";
+              hash = "sha256-r5+yOtsRrQ3je7uRZtN9XxSizMwn4eV7pZRK1oL47EM=";
             };
 
             # The image build never runs install scripts (no native deps needed).
@@ -134,6 +134,10 @@
               cp -r data "$dir/data"
               cp src-tauri/sidecar/local-api-server.mjs "$dir/local-api-server.mjs"
               cp -r runtime-install/node_modules "$dir/node_modules"
+
+              # local-api-server.mjs resolves shared/llm-health-providers.js under
+              # LOCAL_API_RESOURCE_DIR at startup, so the tree has to sit next to it.
+              cp -r shared "$dir/shared"
 
               # nginx config + security-header includes, rendered to store paths so
               # the app's own nginx (see the worldmonitor NixOS module) serves the
