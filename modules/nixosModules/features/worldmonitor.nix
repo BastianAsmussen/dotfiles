@@ -18,41 +18,73 @@
 
       appDir = "${cfg.package}/share/worldmonitor";
 
-      # nginx expands ${VAR}; keep the template's placeholder literal so the
-      # substitute below can replace it rather than Nix interpolating it.
-      apiPlaceholder = "\${API_UPSTREAM}";
+      # nginx expands ${VAR}; keep the config's placeholders literal so the
+      # substitutions below replace them rather than Nix interpolating them.
+      apiPortPlaceholder = "\${LOCAL_API_PORT}";
+      apiTokenPlaceholder = "\${LOCAL_API_TOKEN}";
 
-      # The app's own nginx: docker/nginx.conf.template rendered to store paths.
-      # Serving it verbatim keeps its SPA fallback, /pro handling, asset caching
-      # and (large) CSP intact instead of re-deriving them as NixOS locations.
+      # The sidecar default-denies every route when LOCAL_API_TOKEN is unset
+      # (local-api-server.mjs), and the token reaches it as a request header
+      # nginx adds. nginx cannot expand an env var inside a directive, so the
+      # whole proxy_set_header line arrives as an included snippet. systemd
+      # stages it as a unit credential: root reads the 0400 sops file and
+      # re-exposes it to the DynamicUser, which cannot open the original. The
+      # credential directory path is fixed per unit, which is what makes an
+      # include (no variables allowed) possible at all.
+      localTokenConf = "/run/credentials/worldmonitor-nginx.service/local-token.conf";
+
+      # The app's own nginx: docker/nginx.conf rendered to store paths. That is
+      # the all-in-one image's config (root Dockerfile + docker/entrypoint.sh),
+      # matching the shape this module deploys — sidecar and nginx side by side.
+      # docker/nginx.conf.template belongs to the OTHER image (docker/Dockerfile,
+      # frontend-only, proxying to a remote API); it sets no sidecar token, so
+      # every /api route 503s under it.
+      #
+      # Serving this one verbatim keeps its SPA fallback, embed handling, asset
+      # caching and inlined CSP intact instead of re-deriving them as NixOS
+      # locations. Note it carries no /pro location — the paywall landing page
+      # falls through to the dashboard, which is correct for a self-host.
       # Bound to loopback; the host reverse proxy terminates TLS/mTLS in front.
       nginxConf = pkgs.runCommand "worldmonitor-nginx.conf" { } ''
-        substitute ${cfg.package.src}/docker/nginx.conf.template "$out" \
-          --replace-fail '${apiPlaceholder}' 'http://127.0.0.1:${toString cfg.sidecarPort}' \
+        substitute ${cfg.package.src}/docker/nginx.conf "$out" \
+          --replace-fail '${apiPortPlaceholder}' '${toString cfg.sidecarPort}' \
+          --replace-fail 'proxy_set_header X-WorldMonitor-Local-Token "${apiTokenPlaceholder}";' 'include ${localTokenConf};' \
           --replace-fail '/usr/share/nginx/html' '${appDir}/dist' \
           --replace-fail '/etc/nginx/mime.types' '${pkgs.nginx}/conf/mime.types' \
-          --replace-fail '/etc/nginx/security_headers.conf' '${appDir}/nginx/security_headers.conf' \
-          --replace-fail '/etc/nginx/embed_security_headers.conf' '${appDir}/nginx/embed_security_headers.conf' \
-          --replace-fail 'listen 80;' 'listen 127.0.0.1:${toString cfg.port};'
+          --replace-fail 'listen 8080;' 'listen 127.0.0.1:${toString cfg.port};' \
+          --replace-fail 'access_log /dev/stdout main;' 'access_log off;' \
+          --replace-fail 'error_log /dev/stderr warn;' 'error_log stderr warn;'
 
-        # Temp paths kept relative so nginx resolves them against its prefix
-        # (-p): /run/worldmonitor-nginx at runtime, $TMPDIR during the build-time
-        # -t. The template declares none, so nginx would otherwise use the
-        # compiled-in absolute defaults it cannot create as a non-root unit; an
-        # absolute /run/... path would instead fail `nginx -t` here, where /run
-        # does not exist. nginx creates these subdirs under the prefix itself.
-        substituteInPlace "$out" --replace-fail 'http {' 'http {
-          client_body_temp_path body;
-          proxy_temp_path       proxy;
-          fastcgi_temp_path     fastcgi;
-          uwsgi_temp_path       uwsgi;
-          scgi_temp_path        scgi;
-          access_log            off;'
+        # error_log takes the bare name `stderr`, not the /dev path: under
+        # systemd that path is a journal socket, and nginx open()s it as a file
+        # (ENXIO). The directive in the file also outranks the unit's -e, so
+        # rewriting it here is the only place that takes effect.
+        #
+        # The entrypoint generates this from WM_TRUSTED_PROXY_CIDRS; nothing
+        # generates it here, and a missing include is a hard parse error. The
+        # host reverse proxy is the only client, so real-IP rewriting would
+        # only ever substitute one loopback address for another.
+        substituteInPlace "$out" \
+          --replace-fail 'include       /tmp/nginx-realip.conf;' ""
 
-        # -g pid: the template sets no pid, so `nginx -t` would open its
-        # compiled-in default (/var/log/nginx/nginx.pid), unwritable here. The
-        # runtime unit passes the same override.
-        ${lib.getExe pkgs.nginx} -t -c "$out" -p "$TMPDIR" -e stderr -g "pid $TMPDIR/nginx.pid;"
+        # -g pid: the runtime unit passes its own, and a `pid` directive in the
+        # file would collide with it. Temp paths go relative so nginx resolves
+        # them against its prefix (-p): /run/worldmonitor-nginx at runtime,
+        # $TMPDIR during the build-time -t below. The upstream absolutes assume
+        # the container's writable /tmp. nginx creates the subdirs itself.
+        substituteInPlace "$out" \
+          --replace-fail 'pid /tmp/nginx.pid;' "" \
+          --replace-fail 'client_body_temp_path /tmp/nginx-client-body;' 'client_body_temp_path body;' \
+          --replace-fail 'proxy_temp_path /tmp/nginx-proxy;' 'proxy_temp_path proxy;' \
+          --replace-fail 'fastcgi_temp_path /tmp/nginx-fastcgi;' 'fastcgi_temp_path fastcgi;' \
+          --replace-fail 'uwsgi_temp_path /tmp/nginx-uwsgi;' 'uwsgi_temp_path uwsgi;' \
+          --replace-fail 'scgi_temp_path /tmp/nginx-scgi;' 'scgi_temp_path scgi;'
+
+        # The credential does not exist at build time and a missing include
+        # aborts the parse, so -t runs against a copy carrying a stand-in.
+        sed 's|include ${localTokenConf};|proxy_set_header X-WorldMonitor-Local-Token "check";|' \
+          "$out" > "$TMPDIR/check.conf"
+        ${lib.getExe pkgs.nginx} -t -c "$TMPDIR/check.conf" -p "$TMPDIR" -e stderr -g "pid $TMPDIR/nginx.pid;"
       '';
 
       # Env files that carry secrets are rendered by sops; non-secret env is set
@@ -154,7 +186,7 @@
       };
 
       config = mkIf cfg.enable {
-        # Four secrets with no safe defaults, mirroring the compose stack. Their
+        # Five secrets with no safe defaults, mirroring the compose stack. Their
         # encrypted values live in the nix-secrets repo.
         sops = {
           secrets = {
@@ -162,6 +194,7 @@
             "worldmonitor/redis-password" = { };
             "worldmonitor/session-secret" = { };
             "worldmonitor/relay-secret" = { };
+            "worldmonitor/local-api-token" = { };
           };
 
           templates = {
@@ -175,11 +208,33 @@
               UPSTASH_REDIS_REST_TOKEN=${config.sops.placeholder."worldmonitor/redis-token"}
             '';
 
-            "worldmonitor-sidecar.env".content = ''
-              UPSTASH_REDIS_REST_TOKEN=${config.sops.placeholder."worldmonitor/redis-token"}
-              WM_SESSION_SECRET=${config.sops.placeholder."worldmonitor/session-secret"}
-              RELAY_SHARED_SECRET=${config.sops.placeholder."worldmonitor/relay-secret"}
-            '';
+            # restartUnits on both halves of the local API token. A template's
+            # rendered content changing does not change the unit definition, so
+            # a `switch` otherwise leaves the running processes holding the old
+            # value: the sidecar keeps default-denying and nginx keeps sending a
+            # header that no longer matches.
+            "worldmonitor-sidecar.env" = {
+              restartUnits = [ "worldmonitor-sidecar.service" ];
+              content = ''
+                UPSTASH_REDIS_REST_TOKEN=${config.sops.placeholder."worldmonitor/redis-token"}
+                WM_SESSION_SECRET=${config.sops.placeholder."worldmonitor/session-secret"}
+                RELAY_SHARED_SECRET=${config.sops.placeholder."worldmonitor/relay-secret"}
+                LOCAL_API_TOKEN=${config.sops.placeholder."worldmonitor/local-api-token"}
+              '';
+            };
+
+            # The other half: nginx sends this on every /api request and the
+            # sidecar compares it against LOCAL_API_TOKEN above. A whole
+            # directive rather than a bare value because nginx cannot
+            # interpolate one into a config.
+            "worldmonitor-nginx-local-token.conf" = {
+              restartUnits = [ "worldmonitor-nginx.service" ];
+              content = ''
+                proxy_set_header X-WorldMonitor-Local-Token "${
+                  config.sops.placeholder."worldmonitor/local-api-token"
+                }";
+              '';
+            };
           };
         };
 
@@ -272,6 +327,12 @@
               ExecStart = "${lib.getExe pkgs.nginx} -c ${nginxConf} -p /run/worldmonitor-nginx -e stderr -g 'daemon off; pid /run/worldmonitor-nginx/nginx.pid;'";
               ExecReload = "${lib.getExe pkgs.nginx} -c ${nginxConf} -p /run/worldmonitor-nginx -s reload";
               RuntimeDirectory = "worldmonitor-nginx";
+              # Staged for the DynamicUser, which cannot read the 0400 original.
+              # The name fixes the path the rendered config includes.
+              LoadCredential = "local-token.conf:${
+                config.sops.templates."worldmonitor-nginx-local-token.conf".path
+              }";
+
               DynamicUser = true;
               Restart = "on-failure";
               RestartSec = 5;

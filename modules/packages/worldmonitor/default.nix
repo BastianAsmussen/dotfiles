@@ -50,12 +50,19 @@
 
             pname = "worldmonitor";
 
-            # Self-hosted build: neuter the client entitlement chokepoint so the
-            # "pro" paywall is gone (src/services/entitlements.ts seeds a
-            # synthetic full-tier snapshot). Touches no lockfile, so npmDeps and
-            # the shared src FOD hash are unaffected. Applied in patchPhase after
-            # fetchNpmDeps has already read the pristine lockfile.
-            patches = [ ./strip-pro-gating.patch ];
+            # Self-hosted build, two chokepoints. The first neuters the client
+            # entitlement snapshot so the "pro" paywall is gone. The second
+            # covers what tier alone cannot reach: the account-scoped surfaces
+            # gate on a Clerk sign-in this instance can never serve, so
+            # getCurrentClerkUser() stands in a fixed local identity and every
+            # `isSignedIn` downstream follows. Neither touches a lockfile, so
+            # npmDeps and the shared src FOD hash are unaffected. Applied in
+            # patchPhase, after fetchNpmDeps has read the pristine lockfile.
+            patches = [
+              ./strip-pro-gating.patch
+              ./fake-local-account.patch
+            ];
+
             npmDeps = pkgs.fetchNpmDeps {
               inherit src;
 
