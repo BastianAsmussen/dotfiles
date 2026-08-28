@@ -75,22 +75,34 @@ Without filesets, `jj split` opens a diff editor instead.
 
 ## Pushing / Pulling (the git boundary)
 
-jj has no remote transport of its own; `git` handles the network:
+Fetch via `git fetch`, but **push via `jj git push`, never raw `git push`**.
+`jj git push` knows the local↔remote bookmark relationship, refuses to clobber
+unrelated remote moves, and handles force-pushes (sideways bookmark moves
+after a rewrite) without any `--force` flag — the operation itself is the
+consent.
 
 ```sh
-git fetch origin                # fetch latest (always before pushing)
-git push origin master          # push the master bookmark's commit
+git fetch origin                        # fetch latest (always before pushing)
+jj git push --bookmark master           # push whatever master points at
 ```
 
-What `git push origin master` pushes is whatever commit the `master` bookmark
-points at. If your work is a child of `master` (not yet squashed in), it will
-**not** be pushed until you move the bookmark or squash down to it:
+If your work is a child of `master` (not yet squashed in), move the bookmark
+before pushing — or squash down first:
 
 ```sh
-jj squash                      # fold @ into parent
-jj bookmark move master --to @ # move master onto the working copy
-git push origin master
+jj bookmark set master -r @-            # move master onto the parent of @
+jj git push --bookmark master
+
+# alternative: fold @ into parent, then push
+jj squash
+jj bookmark move master --to @
+jj git push --bookmark master
 ```
+
+After a rewrite of an already-pushed commit (e.g. `jj split --ignore-immutable`
+on a commit reachable from `master`), `jj git push --bookmark master` is still
+the right command — it reports the sideways move and force-pushes.
+`git push --force` / `--force-with-lease` are not the tool here.
 
 Because `sign-on-push = true` and a GPG backend is configured
 (key `0xD92D668B77A29897`), pushes are GPG-signed. jj writes a
@@ -103,6 +115,8 @@ keep it when editing descriptions.
   raw `git commit` desynchronizes `.jj/` from `.git/`.
 - **Never `git checkout` / `git branch`**. Use `jj edit` / `jj bookmark`.
 - **Never `git merge` / `git rebase`**. Use `jj` operations.
+- **Never `git push` / `git push --force`**. Use `jj git push --bookmark <name>`.
+  It handles both fast-forward advances and sideways/force moves.
 - `git status` is safe to *read* (it mirrors the colocated index), but
   `git reset --hard` and friends will destroy jj's working-copy state.
 
