@@ -62,6 +62,13 @@
       redisConn = "redis://:${
         config.sops.placeholder."worldmonitor/redis-password"
       }@127.0.0.1:${toString cfg.redisPort}";
+
+      # Point seeders at local nginx so it attaches the sidecar token.
+      seedEnvironment = {
+        UPSTASH_REDIS_REST_URL = "http://127.0.0.1:${toString cfg.redisRestPort}";
+        UPSTASH_ALLOW_INSECURE_HTTP = "true";
+        API_BASE_URL = "http://127.0.0.1:${toString cfg.port}";
+      };
     in
     {
       options.worldmonitor = {
@@ -150,6 +157,24 @@
             fire. Redis is an unpersisted LRU cache, so it starts empty every
             boot and this reseeds it each time. Seeders that need an absent API
             key self-skip; the run always exits success.
+          '';
+        };
+
+        insightsInterval = mkOption {
+          type = types.nullOr types.str;
+          default = "30min";
+          example = "1h";
+          description = ''
+            How often to re-run the insights seeder on its own, as a systemd
+            time span. The AI Insights panel treats a world brief older than
+            60 minutes as missing and shows an UNAVAILABLE badge, so the
+            once-per-boot batch in {option}`worldmonitor.seedOnBoot` leaves the
+            panel unavailable for all but the first hour of any uptime.
+            Upstream runs this seeder on a 30-minute cron.
+
+            Invokes the seeder directly rather than through run-seeders.sh, so
+            its own diagnostics reach the journal instead of being reduced to
+            one summary line. Null disables the timer.
           '';
         };
       };
@@ -314,10 +339,7 @@
               curl
             ];
 
-            environment = {
-              UPSTASH_REDIS_REST_URL = "http://127.0.0.1:${toString cfg.redisRestPort}";
-              UPSTASH_ALLOW_INSECURE_HTTP = "true";
-            };
+            environment = seedEnvironment;
 
             serviceConfig = {
               # Stop the ~30-min seeder batch from running during activation.
@@ -334,16 +356,57 @@
               DynamicUser = true;
             };
           };
+        }
+        // lib.optionalAttrs (cfg.insightsInterval != null) {
+          # Run seed-insights separately; its Redis lock prevents overlap.
+          worldmonitor-seed-insights = {
+            description = "World Monitor insights seed";
+            after = [ "worldmonitor-redis-rest.service" ];
+            requires = [ "worldmonitor-redis-rest.service" ];
+
+            environment = seedEnvironment;
+
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = "${lib.getExe pkgs.nodejs_24} ${cfg.relayPackage}/share/worldmonitor-relay/scripts/seed-insights.mjs";
+              EnvironmentFile = [
+                config.sops.templates."worldmonitor-relay.env".path
+              ]
+              ++ cfg.extraEnvironmentFiles;
+              WorkingDirectory = "/var/lib/worldmonitor-seed-insights";
+              StateDirectory = "worldmonitor-seed-insights";
+              DynamicUser = true;
+              # Exit 75 is a graceful fetch failure that preserves prior data.
+              SuccessExitStatus = [
+                "0"
+                "75"
+              ];
+            };
+          };
         };
 
         # Use timers to keep the lengthy seed batch off the activation path.
-        systemd.timers = lib.optionalAttrs cfg.seedOnBoot {
-          worldmonitor-seed = {
-            description = "World Monitor initial Redis seed trigger";
-            wantedBy = [ "timers.target" ];
-            timerConfig.OnBootSec = "1min";
+        systemd.timers =
+          lib.optionalAttrs cfg.seedOnBoot {
+            worldmonitor-seed = {
+              description = "World Monitor initial Redis seed trigger";
+              wantedBy = [ "timers.target" ];
+              timerConfig.OnBootSec = "1min";
+            };
+          }
+          // lib.optionalAttrs (cfg.insightsInterval != null) {
+            worldmonitor-seed-insights = {
+              description = "World Monitor insights seed trigger";
+              wantedBy = [ "timers.target" ];
+              timerConfig = {
+                # Let the boot batch populate the digest before insights runs.
+                OnBootSec = "10min";
+                OnUnitActiveSec = cfg.insightsInterval;
+                # Catch up runs missed during suspend.
+                Persistent = true;
+              };
+            };
           };
-        };
       };
     };
 }
