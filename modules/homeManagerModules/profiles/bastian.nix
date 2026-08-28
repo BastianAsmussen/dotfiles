@@ -16,6 +16,7 @@
         sessionPath = [ "/run/wrappers/bin" ];
 
         packages = with pkgs; [
+          absolute-episode
           anki
           bacon
           cabal-install
