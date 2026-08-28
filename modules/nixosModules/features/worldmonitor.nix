@@ -93,6 +93,22 @@
       redisConn = "redis://:${
         config.sops.placeholder."worldmonitor/redis-password"
       }@127.0.0.1:${toString cfg.redisPort}";
+
+      # Shared by both seeder units.
+      #
+      # API_BASE_URL is where seeders reach the app's own HTTP API for the
+      # handful of round-trips Redis cannot serve (seed-insights warms the news
+      # digest through it; seed-resilience-scores reads rankings). Upstream
+      # defaults it to https://api.worldmonitor.app, which a self-host has no
+      # credentials for. Points at the local nginx, not the sidecar directly,
+      # because nginx is what attaches the sidecar's X-WorldMonitor-Local-Token.
+      # Listed before EnvironmentFile, so a value in extraEnvironmentFiles still
+      # wins if one is set there.
+      seedEnvironment = {
+        UPSTASH_REDIS_REST_URL = "http://127.0.0.1:${toString cfg.redisRestPort}";
+        UPSTASH_ALLOW_INSECURE_HTTP = "true";
+        API_BASE_URL = "http://127.0.0.1:${toString cfg.port}";
+      };
     in
     {
       options.worldmonitor = {
@@ -181,6 +197,24 @@
             fire. Redis is an unpersisted LRU cache, so it starts empty every
             boot and this reseeds it each time. Seeders that need an absent API
             key self-skip; the run always exits success.
+          '';
+        };
+
+        insightsInterval = mkOption {
+          type = types.nullOr types.str;
+          default = "30min";
+          example = "1h";
+          description = ''
+            How often to re-run the insights seeder on its own, as a systemd
+            time span. The AI Insights panel treats a world brief older than
+            60 minutes as missing and shows an UNAVAILABLE badge, so the
+            once-per-boot batch in {option}`worldmonitor.seedOnBoot` leaves the
+            panel unavailable for all but the first hour of any uptime.
+            Upstream runs this seeder on a 30-minute cron.
+
+            Invokes the seeder directly rather than through run-seeders.sh, so
+            its own diagnostics reach the journal instead of being reduced to
+            one summary line. Null disables the timer.
           '';
         };
       };
@@ -363,10 +397,7 @@
               curl
             ];
 
-            environment = {
-              UPSTASH_REDIS_REST_URL = "http://127.0.0.1:${toString cfg.redisRestPort}";
-              UPSTASH_ALLOW_INSECURE_HTTP = "true";
-            };
+            environment = seedEnvironment;
 
             serviceConfig = {
               # Stop the ~30-min seeder batch from running during activation.
@@ -384,19 +415,74 @@
               DynamicUser = true;
             };
           };
+        }
+        // lib.optionalAttrs (cfg.insightsInterval != null) {
+          # seed-insights on its own cadence. The batch above takes 30+ minutes
+          # end to end, so raising its frequency to match the brief's 60-minute
+          # freshness window would mean overlapping runs; this reruns the one
+          # seeder the AI Insights badge depends on.
+          #
+          # No run-seeders.sh wrapper: it captures each seeder's output to a
+          # temp file and reports a single classified line, which hides the
+          # `FETCH FAILED: ...` that precedes a graceful failure. Straight to
+          # the journal instead. The seeder takes its own Redis lock, so a run
+          # overlapping the batch skips itself rather than racing it.
+          worldmonitor-seed-insights = {
+            description = "World Monitor insights seed";
+            after = [ "worldmonitor-redis-rest.service" ];
+            requires = [ "worldmonitor-redis-rest.service" ];
+
+            environment = seedEnvironment;
+
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = "${lib.getExe pkgs.nodejs_24} ${cfg.relayPackage}/share/worldmonitor-relay/scripts/seed-insights.mjs";
+              EnvironmentFile = [
+                config.sops.templates."worldmonitor-relay.env".path
+              ]
+              ++ cfg.extraEnvironmentFiles;
+              WorkingDirectory = "/var/lib/worldmonitor-seed-insights";
+              StateDirectory = "worldmonitor-seed-insights";
+              DynamicUser = true;
+              # A graceful fetch failure is a distinct nonzero exit, not a
+              # crash; the seeder preserves the previous keys and the next tick
+              # retries. Failing the unit on it would only add journal noise.
+              SuccessExitStatus = [
+                "0"
+                "75"
+              ];
+            };
+          };
         };
 
         # Fire the seed off the activation path. On a reboot it runs OnBootSec
         # later; on a `switch` (boot already elapsed) it fires right away, but
         # asynchronously via the timer rather than inside the switch transaction,
         # so activation returns immediately instead of waiting out the seeders.
-        systemd.timers = lib.optionalAttrs cfg.seedOnBoot {
-          worldmonitor-seed = {
-            description = "World Monitor initial Redis seed trigger";
-            wantedBy = [ "timers.target" ];
-            timerConfig.OnBootSec = "1min";
+        systemd.timers =
+          lib.optionalAttrs cfg.seedOnBoot {
+            worldmonitor-seed = {
+              description = "World Monitor initial Redis seed trigger";
+              wantedBy = [ "timers.target" ];
+              timerConfig.OnBootSec = "1min";
+            };
+          }
+          // lib.optionalAttrs (cfg.insightsInterval != null) {
+            worldmonitor-seed-insights = {
+              description = "World Monitor insights seed trigger";
+              wantedBy = [ "timers.target" ];
+              timerConfig = {
+                # First tick after the boot batch has had time to lay down the
+                # news digest this seeder reads; from then on, on its own period.
+                OnBootSec = "10min";
+                OnUnitActiveSec = cfg.insightsInterval;
+                # The brief is only ever as fresh as the last tick, so a run
+                # missed across a suspend should catch up rather than wait out a
+                # full period with the badge stuck on UNAVAILABLE.
+                Persistent = true;
+              };
+            };
           };
-        };
       };
     };
 }
