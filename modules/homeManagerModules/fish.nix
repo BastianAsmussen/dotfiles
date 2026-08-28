@@ -158,54 +158,59 @@
           functions = {
             expand_named_dir = {
               argumentNames = [ "token" ];
-              body = ''
-                set -l name (string replace -r '^~([^/]+).*' '$1' -- $token)
-                set -l rest (string replace -r '^~[^/]+' "" -- $token)
+              body =
+                # fish
+                ''
+                  set -l name (string replace -r '^~([^/]+).*' '$1' -- $token)
+                  set -l rest (string replace -r '^~[^/]+' "" -- $token)
 
-                switch $name
-                ${lib.concatStringsSep "\n" (
-                  lib.mapAttrsToList (name: path: ''
-                    case ${name}
-                        echo "${path}$rest"'') namedDirs
-                )}
-                end
-              '';
+                  switch $name
+                  ${lib.concatStringsSep "\n" (
+                    lib.mapAttrsToList (name: path: ''
+                      case ${name}
+                          echo "${path}$rest"'') namedDirs
+                  )}
+                  end
+                '';
             };
 
-            clear-screen-and-scrollback = {
-              body = ''
+            clear-screen-and-scrollback.body =
+              # fish
+              ''
                 printf '\e[H\e[2J\e[3J'
                 commandline -f repaint
               '';
-            };
 
             # Activate a .venv found at or above $PWD, deactivate on leaving it.
             auto_venv = {
               onVariable = "PWD";
-              body = ''
-                if set -q VIRTUAL_ENV
-                    string match -q -- "$(path dirname $VIRTUAL_ENV)/*" "$PWD/"
-                    or deactivate
-                    return
-                end
+              body =
+                # fish
+                ''
+                  if set -q VIRTUAL_ENV
+                      string match -q -- "$(path dirname $VIRTUAL_ENV)/*" "$PWD/"
+                      or deactivate
+                      return
+                  end
 
-                set -l dir $PWD
-                while test "$dir" != /
-                    if test -f $dir/.venv/bin/activate.fish
-                        source $dir/.venv/bin/activate.fish
-                        return
-                    end
+                  set -l dir $PWD
+                  while test "$dir" != /
+                      if test -f $dir/.venv/bin/activate.fish
+                          source $dir/.venv/bin/activate.fish
+                          return
+                      end
 
-                    set dir (path dirname $dir)
-                end
-              '';
+                      set dir (path dirname $dir)
+                  end
+                '';
             };
 
           }
           // lib.optionalAttrs config.programs.nix-index.enable {
             # nix-index ships no fish snippet, so drive nix-locate directly.
-            fish_command_not_found = {
-              body = ''
+            fish_command_not_found.body =
+              # fish
+              ''
                 set -l cmd $argv[1]
                 set -l pkgs (${lib.getExe' config.programs.nix-index.package "nix-locate"} \
                     --minimal --no-group --type x --type s \
@@ -221,7 +226,6 @@
                     printf '  nix shell nixpkgs#%s\n' (string replace -r '\.out$' "" -- $p) >&2
                 end
               '';
-            };
           };
 
           interactiveShellInit =
