@@ -183,6 +183,10 @@
             sopsFile = "${toString inputs.nix-secrets}/hosts/epsilon-worldmonitor.env";
             format = "dotenv";
             key = "";
+            restartUnits = [
+              "worldmonitor-relay.service"
+              "worldmonitor-sidecar.service"
+            ];
           };
         };
       };
