@@ -103,7 +103,7 @@
 
       environment = {
         systemPackages = with pkgs; [
-          protonup-ng
+          protonup-rs
           lutris
           bottles
           prismlauncher
