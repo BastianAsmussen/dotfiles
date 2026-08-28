@@ -415,7 +415,18 @@
         '';
     };
 
-    claude-code.enable = true;
+    claude-code = {
+      enable = true;
+      settings.keymaps.toggle = {
+        normal = "<leader>cc";
+        terminal = "<leader>cc";
+        variants = {
+          continue = "<leader>cC";
+          resume = "<leader>cR";
+          verbose = "<leader>cV";
+        };
+      };
+    };
     dap = {
       enable = true;
       signs = {
