@@ -13,25 +13,25 @@
 
           # Pinned upstream release. master == this tag at time of writing; bump
           # rev + both hashes together on upgrade (dev preview: expect breakage).
-          rev = "b150a551b8d465e31e418e1b2eaf5e79bbb7d28e";
+          rev = "d347e703908d0406b7a7ef80e3a0e594d86b2215";
         in
         pkgs.stdenv.mkDerivation (finalAttrs: {
           pname = "dsh";
-          version = "0.1.1-rc.2";
+          version = "0.1.3-alpha.1";
 
           src = pkgs.fetchFromGitHub {
             inherit rev;
 
             owner = "deepseek-ai";
             repo = "deepseek-harness";
-            hash = "sha256-rrjXoyccTxKIbZ00Z4Vy7EA9tGZ15WUqLBFnZSgw1YE=";
+            hash = "sha256-7gje0bGlfRbo6qEubnKt3z8a6UjDGNW90g7phGU+s6g=";
           };
 
           pnpmDeps = pkgs.fetchPnpmDeps {
             inherit (finalAttrs) pname version src;
             inherit pnpm;
             fetcherVersion = 4;
-            hash = "sha256-+PsdK9u3ZKv4XtSc8tBKKP48J/95/CGTMIUf8Q8dbok=";
+            hash = "sha256-IoX7qY6lXVJtYDljhSJF157JwZR72QZ1YX8Jpts7awk=";
           };
 
           # Settings, themes, and provider config are client-gated to loopback
