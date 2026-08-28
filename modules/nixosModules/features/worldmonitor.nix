@@ -188,6 +188,7 @@
             "worldmonitor/session-secret" = { };
             "worldmonitor/relay-secret" = { };
             "worldmonitor/local-api-token" = { };
+            "worldmonitor/mcp-key" = { };
           };
 
           templates = {
@@ -201,7 +202,8 @@
               UPSTASH_REDIS_REST_TOKEN=${config.sops.placeholder."worldmonitor/redis-token"}
             '';
 
-            # Restart both token consumers when rendered secrets change.
+            # Restart both token consumers on changes; use an arbitrary operator
+            # key, not a Convex wm_ key.
             "worldmonitor-sidecar.env" = {
               restartUnits = [ "worldmonitor-sidecar.service" ];
               content = ''
@@ -209,6 +211,7 @@
                 WM_SESSION_SECRET=${config.sops.placeholder."worldmonitor/session-secret"}
                 RELAY_SHARED_SECRET=${config.sops.placeholder."worldmonitor/relay-secret"}
                 LOCAL_API_TOKEN=${config.sops.placeholder."worldmonitor/local-api-token"}
+                WORLDMONITOR_VALID_KEYS=${config.sops.placeholder."worldmonitor/mcp-key"}
               '';
             };
 
