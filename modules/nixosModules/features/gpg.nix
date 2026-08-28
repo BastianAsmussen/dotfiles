@@ -54,6 +54,10 @@
           "f /home/${name}/.gnupg-fwd/gpg.conf 0600 ${name} ${name} - no-autostart"
           "L+ /home/${name}/.gnupg-fwd/pubring.kbx - - - - /home/${name}/.gnupg/pubring.kbx"
           "L+ /home/${name}/.gnupg-fwd/trustdb.gpg - - - - /home/${name}/.gnupg/trustdb.gpg"
+
+          # Second RemoteForward target. Server hosts have no home-manager ssh
+          # module to create this, so sshd has nowhere to bind the socket.
+          "d /home/${name}/.ssh 0700 ${name} ${name} -"
         ];
     };
 }
