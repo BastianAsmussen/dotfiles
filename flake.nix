@@ -13,7 +13,6 @@
     import-tree.url = "github:vic/import-tree";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-topology = {
       url = "github:oddlama/nix-topology";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -1,4 +1,3 @@
-{ inputs, ... }:
 {
   flake.nixosModules.gaming =
     {
@@ -8,28 +7,7 @@
       ...
     }:
     {
-      # Use the CachyOS gaming-focused kernel.
-      nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
       boot = {
-        kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto.extend (
-          _: prev:
-          let
-            ccacheLLVMStdenv = pkgs.ccacheStdenv.override {
-              stdenv = prev.kernel.stdenv;
-            };
-          in
-          {
-            kernel = prev.kernel.override {
-              stdenv = ccacheLLVMStdenv;
-              extraMakeFlags = [
-                "CC=${ccacheLLVMStdenv.cc}/bin/clang"
-                "HOSTCC=${ccacheLLVMStdenv.cc}/bin/clang"
-                "HOSTCXX=${ccacheLLVMStdenv.cc}/bin/clang++"
-              ];
-            };
-          }
-        );
-
         # Expose /dev/ntsync so Wine/Proton can use in-kernel NT synchronization
         # primitives instead of esync/fsync emulation.
         kernelModules = [ "ntsync" ];
