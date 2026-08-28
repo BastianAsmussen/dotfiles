@@ -12,17 +12,18 @@
         { config, ... }:
         {
           inherit (config.packages)
-            mit
-            calculator
-            copy-file
             deepseek-harness
-            neovim
-            neovim-minimal
+            mit
             qbittorrent-webui-catppuccin
-            repo-cloner
             worldmonitor
             worldmonitor-relay
             worldmonitor-redis-rest
+            absolute-episode
+            calculator
+            copy-file
+            neovim
+            neovim-minimal
+            repo-cloner
             ;
         }
       );
