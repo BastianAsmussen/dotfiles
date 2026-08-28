@@ -220,7 +220,7 @@
       };
 
       config = mkIf cfg.enable {
-        # Five secrets with no safe defaults, mirroring the compose stack. Their
+        # Six secrets with no safe defaults, mirroring the compose stack. Their
         # encrypted values live in the nix-secrets repo.
         sops = {
           secrets = {
@@ -229,6 +229,7 @@
             "worldmonitor/session-secret" = { };
             "worldmonitor/relay-secret" = { };
             "worldmonitor/local-api-token" = { };
+            "worldmonitor/mcp-key" = { };
           };
 
           templates = {
@@ -247,6 +248,10 @@
             # a `switch` otherwise leaves the running processes holding the old
             # value: the sidecar keeps default-denying and nginx keeps sending a
             # header that no longer matches.
+            #
+            # WORLDMONITOR_VALID_KEYS is the MCP operator-key allowlist, which
+            # auth.ts resolves to the `env_key` principal: ungated, unmetered,
+            # no Convex. Any secret works; a wm_ key would go through Convex.
             "worldmonitor-sidecar.env" = {
               restartUnits = [ "worldmonitor-sidecar.service" ];
               content = ''
@@ -254,6 +259,7 @@
                 WM_SESSION_SECRET=${config.sops.placeholder."worldmonitor/session-secret"}
                 RELAY_SHARED_SECRET=${config.sops.placeholder."worldmonitor/relay-secret"}
                 LOCAL_API_TOKEN=${config.sops.placeholder."worldmonitor/local-api-token"}
+                WORLDMONITOR_VALID_KEYS=${config.sops.placeholder."worldmonitor/mcp-key"}
               '';
             };
 
