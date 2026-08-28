@@ -84,6 +84,16 @@
 
         nixpkgs = {
           overlays = builtins.attrValues outputs.overlays;
+
+          # `nix.registry` and `nix.nixPath` above already cover every flake
+          # input, including nixpkgs. Leaving these on makes nixpkgs-flake.nix
+          # define `nix.registry.nixpkgs` a second time, from the nixpkgs that
+          # evaluated the system, which conflicts on a stable host.
+          flake = {
+            setFlakeRegistry = false;
+            setNixPath = false;
+          };
+
           config = {
             allowUnfree = true;
             android_sdk.accept_license = true;

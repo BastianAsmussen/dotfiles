@@ -4,10 +4,14 @@
   ...
 }:
 {
-  flake.nixosConfigurations.eta = inputs.nixpkgs.lib.nixosSystem {
+  # Eta is the only internet-facing host, so it tracks the nixpkgs release
+  # branch rather than unstable. `lib` must come from the same channel as the
+  # nixpkgs building the system.
+  flake.nixosConfigurations.eta = inputs.nixpkgs-stable.lib.nixosSystem {
     specialArgs = {
       inherit inputs self;
-      inherit (self) lib;
+
+      lib = self.libStable;
 
       outputs = self;
     };
@@ -28,8 +32,8 @@
       imports = [
         # External modules.
         inputs.disko.nixosModules.disko
-        inputs.stylix.nixosModules.stylix
-        inputs.home-manager.nixosModules.home-manager
+        inputs.stylix-stable.nixosModules.stylix
+        inputs.home-manager-stable.nixosModules.home-manager
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEta
