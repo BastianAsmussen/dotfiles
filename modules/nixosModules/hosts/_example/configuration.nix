@@ -24,6 +24,7 @@
         # External modules.
         inputs.nix-index-database.nixosModules.nix-index
         inputs.stylix.nixosModules.stylix
+        inputs.home-manager.nixosModules.home-manager
 
         # Base modules.
         self.nixosModules.base

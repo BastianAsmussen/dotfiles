@@ -25,6 +25,7 @@
         inputs.disko.nixosModules.disko
         inputs.stylix.nixosModules.stylix
         inputs.nix-index-database.nixosModules.nix-index
+        inputs.home-manager.nixosModules.home-manager
 
         # Host-specific hardware.
         self.diskoConfigurations.hostDelta

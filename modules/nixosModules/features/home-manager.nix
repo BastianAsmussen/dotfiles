@@ -1,3 +1,4 @@
+# Hosts import the home-manager module matching their nixpkgs channel.
 { inputs, ... }:
 {
   flake.nixosModules.homeManager =
@@ -14,10 +15,6 @@
       cfg = config.home-manager;
     in
     {
-      imports = [
-        inputs.home-manager.nixosModules.home-manager
-      ];
-
       options.home-manager.userModules = mkOption {
         type = types.attrsOf (types.listOf types.raw);
         default = { };

@@ -102,6 +102,7 @@
         inputs.disko.nixosModules.disko
         inputs.stylix.nixosModules.stylix
         inputs.nix-index-database.nixosModules.nix-index
+        inputs.home-manager.nixosModules.home-manager
 
         # Hardware-specific.
         inputs.nixos-hardware.nixosModules.common-cpu-amd
