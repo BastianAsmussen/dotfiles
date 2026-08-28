@@ -88,6 +88,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Provides buildGoApplication for cross-built Go packages.
+    gomod2nix = {
+      url = "github:nix-community/gomod2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     website = {
       url = "git+ssh://git@codeberg.org/BastianA/website.git";
       inputs.nixpkgs.follows = "nixpkgs";
