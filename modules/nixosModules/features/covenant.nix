@@ -1,11 +1,21 @@
-{ inputs, ... }:
+{ inputs, withSystem, ... }:
 {
   flake.nixosModules.covenant =
     {
       config,
       lib,
+      pkgs,
       ...
     }:
+    let
+      # Cross-compile natively instead of building aarch64 Go through QEMU.
+      crossPackage = withSystem "x86_64-linux" (
+        { pkgs, ... }:
+        (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.gomod2nix.overlays.default).callPackage
+          "${inputs.covenant}/default.nix"
+          { }
+      );
+    in
     {
       options.covenant-extras = {
         domain = lib.mkOption {
@@ -40,6 +50,10 @@
           port = lib.mkDefault 8084;
           canonicalURL = "https://${config.covenant-extras.domain}";
         };
+
+        services.covenant.package = lib.mkIf (
+          pkgs.stdenv.hostPlatform.system == "aarch64-linux"
+        ) crossPackage;
 
         nginx.reverseProxies.covenant = lib.mkIf config.covenant-extras.exposePublicly {
           enable = true;

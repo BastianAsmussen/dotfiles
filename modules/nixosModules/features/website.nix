@@ -1,11 +1,21 @@
-{ inputs, ... }:
+{ inputs, withSystem, ... }:
 {
   flake.nixosModules.website =
     {
       config,
       lib,
+      pkgs,
       ...
     }:
+    let
+      # Cross-compile natively instead of building aarch64 Go through QEMU.
+      crossPackage = withSystem "x86_64-linux" (
+        { pkgs, ... }:
+        (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.gomod2nix.overlays.default).callPackage
+          "${inputs.website}/default.nix"
+          { }
+      );
+    in
     {
       options.website-extras.exposePublicly = lib.mkOption {
         type = lib.types.bool;
@@ -23,6 +33,10 @@
           enable = true;
           port = lib.mkDefault 8080;
         };
+
+        services.website.package = lib.mkIf (
+          pkgs.stdenv.hostPlatform.system == "aarch64-linux"
+        ) crossPackage;
 
         nginx.reverseProxies.website = lib.mkIf config.website-extras.exposePublicly {
           enable = true;
