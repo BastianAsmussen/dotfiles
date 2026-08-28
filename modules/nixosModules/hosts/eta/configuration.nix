@@ -4,10 +4,12 @@
   ...
 }:
 {
-  flake.nixosConfigurations.eta = inputs.nixpkgs.lib.nixosSystem {
+  # Eta uses stable nixpkgs and matching lib for its public host.
+  flake.nixosConfigurations.eta = inputs.nixpkgs-stable.lib.nixosSystem {
     specialArgs = {
       inherit inputs self;
-      inherit (self) lib;
+
+      lib = self.libStable;
 
       outputs = self;
     };
@@ -28,8 +30,8 @@
       imports = [
         # External modules.
         inputs.disko.nixosModules.disko
-        inputs.stylix.nixosModules.stylix
-        inputs.home-manager.nixosModules.home-manager
+        inputs.stylix-stable.nixosModules.stylix
+        inputs.home-manager-stable.nixosModules.home-manager
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEta

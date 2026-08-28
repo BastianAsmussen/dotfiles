@@ -9,9 +9,14 @@ let
       hostName,
       system,
       modules,
+
+      # Defaults track unstable; eta overrides them to match its host channel.
+      nixpkgs ? inputs.nixpkgs,
+      homeManager ? inputs.home-manager,
+      stylix ? inputs.stylix,
     }:
-    inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = import inputs.nixpkgs {
+    homeManager.lib.homeManagerConfiguration {
+      pkgs = import nixpkgs {
         inherit system;
 
         config.allowUnfree = true;
@@ -25,7 +30,7 @@ let
       extraSpecialArgs = { inherit inputs self hostName; };
 
       modules = [
-        inputs.stylix.homeModules.stylix
+        stylix.homeModules.stylix
 
         # Baseline required by standalone home-manager.
         {
@@ -116,6 +121,10 @@ in
         hostName = "eta";
         system = "aarch64-linux";
         modules = bastianModules.eta;
+
+        nixpkgs = inputs.nixpkgs-stable;
+        homeManager = inputs.home-manager-stable;
+        stylix = inputs.stylix-stable;
       };
     };
   };

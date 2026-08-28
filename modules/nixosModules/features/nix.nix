@@ -84,6 +84,13 @@
 
         nixpkgs = {
           overlays = builtins.attrValues outputs.overlays;
+
+          # Avoid duplicate nixpkgs registry definitions on stable hosts.
+          flake = {
+            setFlakeRegistry = false;
+            setNixPath = false;
+          };
+
           config = {
             allowUnfree = true;
             android_sdk.accept_license = true;

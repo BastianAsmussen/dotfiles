@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
@@ -45,9 +45,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Release-branch home-manager for hosts pinned to nixpkgs-stable (eta).
+    home-manager-stable = {
+      url = "github:nix-community/home-manager/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Release-branch stylix, matching home-manager-stable.
+    stylix-stable = {
+      url = "github:danth/stylix/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
     nixvim = {
