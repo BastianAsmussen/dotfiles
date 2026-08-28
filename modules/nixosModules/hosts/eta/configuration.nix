@@ -29,6 +29,7 @@
         # External modules.
         inputs.disko.nixosModules.disko
         inputs.stylix.nixosModules.stylix
+        inputs.home-manager.nixosModules.home-manager
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEta
