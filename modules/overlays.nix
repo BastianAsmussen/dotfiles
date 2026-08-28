@@ -35,6 +35,21 @@
       bottles = prev.bottles.override {
         removeWarningPopup = true;
       };
+
+      # Two upstream bugs in `fish.completion`: `test -a` was removed in fish 4,
+      # and `PROG` is set without `-g`, so it is out of scope by the time the
+      # completion function runs.
+      gopass = prev.gopass.overrideAttrs (old: {
+        postPatch =
+          (old.postPatch or "")
+          +
+          # fish
+          ''
+            substituteInPlace fish.completion \
+              --replace-fail '[ (count $cmd) -eq 1 -a $cmd[1] = $PROG ]' \
+                '[ (count $cmd) -eq 1 ]; and [ "$cmd[1]" = gopass ]'
+          '';
+      });
     };
 
     # Convenient access to the nixpkgs stable branch.
