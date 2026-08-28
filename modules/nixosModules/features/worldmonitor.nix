@@ -20,30 +20,42 @@
 
       # Keep nginx placeholders literal for substitution instead of Nix
       # interpolation.
-      apiPlaceholder = "\${API_UPSTREAM}";
+      apiPortPlaceholder = "\${LOCAL_API_PORT}";
+      apiTokenPlaceholder = "\${LOCAL_API_TOKEN}";
 
-      # Use upstream nginx config to preserve SPA fallback, /pro handling and
-      # CSP.
+      # Pass the sidecar token through a fixed-path unit credential and nginx
+      # include.
+      localTokenConf = "/run/credentials/worldmonitor-nginx.service/local-token.conf";
+
+      # Use the all-in-one nginx config with sidecar auth and SPA fallback.
       nginxConf = pkgs.runCommand "worldmonitor-nginx.conf" { } ''
-        substitute ${cfg.package.src}/docker/nginx.conf.template "$out" \
-          --replace-fail '${apiPlaceholder}' 'http://127.0.0.1:${toString cfg.sidecarPort}' \
+        substitute ${cfg.package.src}/docker/nginx.conf "$out" \
+          --replace-fail '${apiPortPlaceholder}' '${toString cfg.sidecarPort}' \
+          --replace-fail 'proxy_set_header X-WorldMonitor-Local-Token "${apiTokenPlaceholder}";' 'include ${localTokenConf};' \
           --replace-fail '/usr/share/nginx/html' '${appDir}/dist' \
           --replace-fail '/etc/nginx/mime.types' '${pkgs.nginx}/conf/mime.types' \
-          --replace-fail '/etc/nginx/security_headers.conf' '${appDir}/nginx/security_headers.conf' \
-          --replace-fail '/etc/nginx/embed_security_headers.conf' '${appDir}/nginx/embed_security_headers.conf' \
-          --replace-fail 'listen 80;' 'listen 127.0.0.1:${toString cfg.port};'
+          --replace-fail 'listen 8080;' 'listen 127.0.0.1:${toString cfg.port};' \
+          --replace-fail 'access_log /dev/stdout main;' 'access_log off;' \
+          --replace-fail 'error_log /dev/stderr warn;' 'error_log stderr warn;'
 
-        # Use prefix-relative temp paths for unprivileged nginx.
-        substituteInPlace "$out" --replace-fail 'http {' 'http {
-          client_body_temp_path body;
-          proxy_temp_path       proxy;
-          fastcgi_temp_path     fastcgi;
-          uwsgi_temp_path       uwsgi;
-          scgi_temp_path        scgi;
-          access_log            off;'
+        # nginx must log to `stderr`; omit the absent real-IP include.
+        substituteInPlace "$out" \
+          --replace-fail 'include       /tmp/nginx-realip.conf;' ""
 
-        # Override the default pid path for build-time checks and runtime.
-        ${lib.getExe pkgs.nginx} -t -c "$out" -p "$TMPDIR" -e stderr -g "pid $TMPDIR/nginx.pid;"
+        # Use prefix-relative temp paths and let the unit supply the pid path.
+        substituteInPlace "$out" \
+          --replace-fail 'pid /tmp/nginx.pid;' "" \
+          --replace-fail 'client_body_temp_path /tmp/nginx-client-body;' 'client_body_temp_path body;' \
+          --replace-fail 'proxy_temp_path /tmp/nginx-proxy;' 'proxy_temp_path proxy;' \
+          --replace-fail 'fastcgi_temp_path /tmp/nginx-fastcgi;' 'fastcgi_temp_path fastcgi;' \
+          --replace-fail 'uwsgi_temp_path /tmp/nginx-uwsgi;' 'uwsgi_temp_path uwsgi;' \
+          --replace-fail 'scgi_temp_path /tmp/nginx-scgi;' 'scgi_temp_path scgi;'
+
+        # Test with a stand-in token include; the real credential is
+        # runtime-only.
+        sed 's|include ${localTokenConf};|proxy_set_header X-WorldMonitor-Local-Token "check";|' \
+          "$out" > "$TMPDIR/check.conf"
+        ${lib.getExe pkgs.nginx} -t -c "$TMPDIR/check.conf" -p "$TMPDIR" -e stderr -g "pid $TMPDIR/nginx.pid;"
       '';
 
       # Allow plain HTTP only for the loopback REST proxy.
@@ -150,6 +162,7 @@
             "worldmonitor/redis-password" = { };
             "worldmonitor/session-secret" = { };
             "worldmonitor/relay-secret" = { };
+            "worldmonitor/local-api-token" = { };
           };
 
           templates = {
@@ -163,11 +176,26 @@
               UPSTASH_REDIS_REST_TOKEN=${config.sops.placeholder."worldmonitor/redis-token"}
             '';
 
-            "worldmonitor-sidecar.env".content = ''
-              UPSTASH_REDIS_REST_TOKEN=${config.sops.placeholder."worldmonitor/redis-token"}
-              WM_SESSION_SECRET=${config.sops.placeholder."worldmonitor/session-secret"}
-              RELAY_SHARED_SECRET=${config.sops.placeholder."worldmonitor/relay-secret"}
-            '';
+            # Restart both token consumers when rendered secrets change.
+            "worldmonitor-sidecar.env" = {
+              restartUnits = [ "worldmonitor-sidecar.service" ];
+              content = ''
+                UPSTASH_REDIS_REST_TOKEN=${config.sops.placeholder."worldmonitor/redis-token"}
+                WM_SESSION_SECRET=${config.sops.placeholder."worldmonitor/session-secret"}
+                RELAY_SHARED_SECRET=${config.sops.placeholder."worldmonitor/relay-secret"}
+                LOCAL_API_TOKEN=${config.sops.placeholder."worldmonitor/local-api-token"}
+              '';
+            };
+
+            # Send the same local token from nginx to the sidecar.
+            "worldmonitor-nginx-local-token.conf" = {
+              restartUnits = [ "worldmonitor-nginx.service" ];
+              content = ''
+                proxy_set_header X-WorldMonitor-Local-Token "${
+                  config.sops.placeholder."worldmonitor/local-api-token"
+                }";
+              '';
+            };
           };
         };
 
@@ -259,6 +287,11 @@
               ExecStart = "${lib.getExe pkgs.nginx} -c ${nginxConf} -p /run/worldmonitor-nginx -e stderr -g 'daemon off; pid /run/worldmonitor-nginx/nginx.pid;'";
               ExecReload = "${lib.getExe pkgs.nginx} -c ${nginxConf} -p /run/worldmonitor-nginx -s reload";
               RuntimeDirectory = "worldmonitor-nginx";
+              # Stage the root-only token for nginx's DynamicUser.
+              LoadCredential = "local-token.conf:${
+                config.sops.templates."worldmonitor-nginx-local-token.conf".path
+              }";
+
               DynamicUser = true;
               Restart = "on-failure";
               RestartSec = 5;
