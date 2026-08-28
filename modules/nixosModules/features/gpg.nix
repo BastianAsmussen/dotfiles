@@ -52,6 +52,10 @@
           "f /home/${name}/.gnupg-fwd/gpg.conf 0600 ${name} ${name} - no-autostart"
           "L+ /home/${name}/.gnupg-fwd/pubring.kbx - - - - /home/${name}/.gnupg/pubring.kbx"
           "L+ /home/${name}/.gnupg-fwd/trustdb.gpg - - - - /home/${name}/.gnupg/trustdb.gpg"
+
+          # Server hosts need this directory for the second RemoteForward
+          # socket.
+          "d /home/${name}/.ssh 0700 ${name} ${name} -"
         ];
     };
 }
