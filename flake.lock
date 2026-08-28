@@ -77,11 +77,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787515262,
-        "narHash": "sha256-EPAy2O9Rs/mf8wDHfwlopdck/4yLSQT59hQhbCG3bCw=",
+        "lastModified": 1788050821,
+        "narHash": "sha256-rNaZLviI9qZf7bhPW2P5j8NQOIDBna0VOT5NyjZ4e3o=",
         "ref": "refs/heads/master",
-        "rev": "155d4b38db67accb724147964f3f02254eca2777",
-        "revCount": 22,
+        "rev": "c89a35b9087cf1534c60eeda1d2f0b5abe0b86e4",
+        "revCount": 23,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/covenant.git"
       },
@@ -787,11 +787,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786524351,
-        "narHash": "sha256-V69v8W0SnbBaZnE1jm3KTskNfXQ9/RnJITftSqwOi78=",
+        "lastModified": 1787917312,
+        "narHash": "sha256-SFLYG4rQHZETn1IdLtO5WhBytAfPw5H485RGKrMX+cQ=",
         "ref": "refs/heads/master",
-        "rev": "52b11023d5f1180b4c2e319bba9a4ceee7518721",
-        "revCount": 8,
+        "rev": "1ae58f06b26a52be69685e7ceafb2b48e3b41e00",
+        "revCount": 13,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/news.git"
       },
@@ -858,10 +858,10 @@
     },
     "nix-secrets": {
       "locked": {
-        "lastModified": 1787660770,
-        "narHash": "sha256-BngqbKyAOHYssNEmVnArbPrxeTvkEqJbgvoKA8CYgpg=",
+        "lastModified": 1787907617,
+        "narHash": "sha256-rtRtWIm88NV4wsShh0eO369zRKcdT1NHTSMLnCLmfRw=",
         "ref": "refs/heads/master",
-        "rev": "b439a6c5d687fe61c6893c0eff95c33ad3adf768",
+        "rev": "7da46972153039a9748a8bf2880b0bb86d89aa87",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/nix-secrets.git"
