@@ -7,10 +7,15 @@
     {
       config,
       lib,
+      options,
       pkgs,
       ...
     }:
     let
+      # Falls back to the literal default when gaming.nix is absent; the guard
+      # below means nothing on such a host ever reads it anyway.
+      pauseMarker = config.gamemode.pauseMarker or "/run/gamemode/pause";
+
       inherit (lib)
         getExe
         getExe'
@@ -75,20 +80,6 @@
         esac
       '';
 
-      # Stop the daemon while a gamemode session is active (the user is
-      # gaming) and resume it afterwards. The desktop user only toggles a
-      # marker file in /run; a root .path unit watches it via inotify and
-      # runs this gate. Purely event-driven, no polling.
-      newsBusyToggle = pkgs.writeShellScript "news-busy-toggle" ''
-        set -euo pipefail
-
-        if [ -e /run/news/pause ]; then
-          ${config.systemd.package}/bin/systemctl stop news.service
-        else
-          ${config.systemd.package}/bin/systemctl start news.service
-        fi
-      '';
-
       # The daemon polls once on startup and then sleeps for its refresh
       # interval, so restarting it is what schedules a pass. Driving that from a
       # calendar timer pins the work to a chosen hour instead of letting it
@@ -97,7 +88,7 @@
         set -euo pipefail
 
         # Never wake the daemon mid-gamemode: the pause marker owns that.
-        if [ -e /run/news/pause ]; then
+        if [ -e ${pauseMarker} ]; then
           exit 0
         fi
 
@@ -198,6 +189,16 @@
       imports = [ inputs.news.nixosModules.default ];
 
       config = mkMerge [
+        # Aggregation pins the GPU for hours, so it must not run while a game
+        # does. Pausing is enough: the daemon polls once on start, and the daily
+        # timer owns scheduling the pass. Only the gaming host declares this
+        # option, so the whole attribute has to disappear elsewhere.
+        (lib.optionalAttrs (options ? gamemode) (
+          mkIf cfg.push.enable {
+            gamemode.pauseUnits = [ "news.service" ];
+          }
+        ))
+
         # Pusher (epsilon): run the daemon, let the local website read the feed
         # straight from the dataDir, and push copies to the mirror host.
         (mkIf cfg.push.enable {
@@ -229,8 +230,6 @@
 
           systemd = {
             tmpfiles.rules = [
-              "d /run/news 0755 ${config.preferences.user.name} ${config.preferences.user.name} - -"
-
               # The daemon's uid is allocated dynamically, so it drifts whenever
               # the user gets reallocated (a flake bump did exactly that, moving
               # news from 985 to 995). It could still create files in dataDir,
@@ -263,14 +262,6 @@
             };
 
             services = {
-              news-busy = {
-                description = "Gate news daemon on gamemode state";
-                serviceConfig = {
-                  Type = "oneshot";
-                  ExecStart = newsBusyToggle;
-                };
-              };
-
               news-sync = {
                 description = "Push news feed to mirror host";
                 after = [
@@ -285,12 +276,6 @@
                   ExecStart = pushScript;
                 };
               };
-            };
-
-            paths.news-busy = {
-              description = "React to gamemode pause marker changes";
-              wantedBy = [ "multi-user.target" ];
-              pathConfig.PathChanged = "/run/news/pause";
             };
 
             timers.news-sync = {

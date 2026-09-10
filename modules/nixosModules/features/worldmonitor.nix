@@ -461,6 +461,12 @@
           };
         };
 
+        # The seeders are the only GPU-hungry part of this stack; the relay,
+        # sidecar and Redis are cheap enough to leave running while a game does.
+        gamemode.pauseUnits =
+          lib.optional cfg.seedOnBoot "worldmonitor-seed.timer"
+          ++ lib.optional (cfg.insightsInterval != null) "worldmonitor-seed-insights.timer";
+
         # Fire the seed off the activation path. On a reboot it runs OnBootSec
         # later; on a `switch` (boot already elapsed) it fires right away, but
         # asynchronously via the timer rather than inside the switch transaction,

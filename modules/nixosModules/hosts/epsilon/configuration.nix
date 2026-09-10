@@ -157,6 +157,10 @@
         };
       };
 
+      # Ollama holds the model in VRAM even when idle, so stopping it for the
+      # duration of a game is what actually frees the card.
+      gamemode.pauseUnits = [ "ollama.service" ];
+
       services = {
         ollama = {
           enable = true;
@@ -658,20 +662,6 @@
       # serves it to epsilon's own website, and pushes copies to eta over
       # WireGuard SSH so asmussen.tech/news works while epsilon is offline.
       newsSync.push.enable = true;
-
-      # While a gamemode session is active (the user is gaming) the news
-      # daemon must not aggregate or hit Ollama: gamemode's start/end hooks
-      # toggle the /run/news/pause marker that news-busy.path reacts to via
-      # inotify.
-      primaryBusy = {
-        gamemodeStartHooks = [
-          "${lib.getExe' pkgs.coreutils "touch"} /run/news/pause"
-        ];
-
-        gamemodeEndHooks = [
-          "${lib.getExe' pkgs.coreutils "rm"} -f /run/news/pause"
-        ];
-      };
 
       btrfs.scrub.fileSystems = [
         "/persist"

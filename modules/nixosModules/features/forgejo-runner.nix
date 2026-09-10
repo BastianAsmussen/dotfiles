@@ -29,6 +29,11 @@
         "forgejo/deploy-key" = { };
       };
 
+      # CI builds saturate every core and can be scheduled at any other time.
+      # Stopping the runner lets an in-flight job finish; it just stops picking
+      # up new ones.
+      gamemode.pauseUnits = [ "gitea-runner-${hostname}.service" ];
+
       services.gitea-actions-runner = {
         package = pkgs.forgejo-runner;
         instances.${hostname} = {

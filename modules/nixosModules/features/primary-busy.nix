@@ -9,7 +9,6 @@
     }:
     let
       inherit (lib)
-        concatStringsSep
         mkEnableOption
         mkIf
         mkOption
@@ -69,22 +68,6 @@
           description = "How often, in seconds, to sync gamemode state to the mirror host.";
         };
 
-        gamemodeStartHooks = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-          description = ''
-            Extra shell commands run when a gamemode session starts, in
-            parallel with the busy-state sync. Lets other features (e.g. the
-            news daemon) react to gaming without fighting over
-            programs.gamemode.settings.custom.
-          '';
-        };
-
-        gamemodeEndHooks = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-          description = "Extra shell commands run when a gamemode session ends.";
-        };
       };
 
       config = mkIf cfg.enable {
@@ -98,9 +81,9 @@
           mode = "0400";
         };
 
-        programs.gamemode.settings.custom = {
-          start = concatStringsSep " & " ([ "${notifyScript} busy" ] ++ cfg.gamemodeStartHooks);
-          end = concatStringsSep " & " ([ "${notifyScript} available" ] ++ cfg.gamemodeEndHooks);
+        gamemode = {
+          startHooks = [ "${notifyScript} busy" ];
+          endHooks = [ "${notifyScript} available" ];
         };
 
         systemd = {

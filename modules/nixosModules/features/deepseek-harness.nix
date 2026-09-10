@@ -240,6 +240,10 @@
       };
 
       config = lib.mkIf cfg.enable {
+        # Shares the GPU with everything else that talks to Ollama. The unit is
+        # the host-side container, not the service inside it.
+        gamemode.pauseUnits = [ "container@dsh.service" ];
+
         assertions = [
           {
             assertion = lib.length checkoutNames == lib.length (lib.unique checkoutNames);

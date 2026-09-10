@@ -2,7 +2,7 @@ x 2026-06-18 2026-06-18 Fix @delta +kanata keyboard Unicode bug.
 x 2026-08-04 2026-06-02 Fix @epsilon +noctalia idle multi-monitor wake bug.
 (B) Fix +undotree state +persistence
 x 2026-06-03 2026-06-03 Add development environments for Zig, C#, Haskell and C.
-(B) Add +gamemode daemon hooks for new @epsilon services.
+x 2026-09-10 Add +gamemode daemon hooks for new @epsilon services.
 (A) Make +schizofox sandbox able to open YubiKey initially.
 (B) Make +schizofox able to use +gopass clipboard.
 x 2026-06-18 2026-06-18 Refactor +nixvim module system to use +flake-parts like here: https://github.com/traxys/Nixfiles
@@ -13,5 +13,5 @@ x 2026-08-04 2026-08-04 Add +tuxedo Catppuccin theme.
 (C) 2026-08-03 Split +persistence directory declaration between modules.
 x 2026-08-04 2026-08-04 Set XDG default browser back to +schizofox instead of +tor browser.
 (C) 2026-08-04 Split +nix-topology custom diagram declaration between modules.
-(B) 2026-08-18 Fix +gamemode hook for +news to not start after game close on @epsilon
+x 2026-09-10 2026-08-18 Fix +gamemode hook for +news to not start after game close on @epsilon
 (C) 2026-08-27 Fix +arr torrent fetching.
