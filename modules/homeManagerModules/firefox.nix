@@ -25,10 +25,97 @@
             value.install_url = "file://${pkg}/share/mozilla/extensions/${firefoxAppId}/${pkg.addonId}.xpi";
           }) pkgList
         );
+
+      # Schizofox sandboxes Firefox with NixPak, whose bwrap arguments are baked
+      # into the launcher at build time. That sandbox mounts a fresh, empty
+      # devtmpfs over /dev and binds exactly one device (/dev/dri), so WebAuthn
+      # can never reach the YubiKey: Firefox opens /dev/hidraw* directly and
+      # needs it read-write. `security.sandbox.extraBinds` cannot help; it maps
+      # to --ro-bind, and a read-only bind of a character device fails that
+      # O_RDWR. Upstream exposes no device-bind, read-write-bind or raw
+      # bubblewrap option, and its mkNixPak call is a closed literal.
+      #
+      # NixPak reads `bubblewrap.package` from whatever pkgs it is handed and
+      # never overrides it, so shimming bwrap is the one seam left.
+      #
+      # Scoped to this import on purpose. `nix.nix` applies every entry of
+      # flake.overlays to every host, so overriding pkgs.bubblewrap there would
+      # rebuild webkitgtk, flatpak, bottles and steam-run on each nixpkgs bump,
+      # for a need that is only ever schizofox's.
+      sandboxPkgs = pkgs.extend (
+        _: prev: {
+          bubblewrap = prev.bubblewrap.overrideAttrs (old: {
+            # overrideAttrs rather than a symlinkJoin: this keeps pname, version,
+            # passthru and meta.mainProgram, so consumers that resolve the binary
+            # through `lib.getExe` still find bin/bwrap.
+            postInstall = (old.postInstall or "") + ''
+              mv "$out/bin/bwrap" "$out/bin/.bwrap-real"
+
+              cat > "$out/bin/bwrap" <<'SHIM'
+              #!${prev.runtimeShell}
+              set -eu
+
+              real="$(dirname "$(readlink -f "$0")")/.bwrap-real"
+
+              extra=()
+              case "''${NIXPAK_APP_EXE:-}" in
+                *schizofox*)
+                  # Only the token's own nodes. Binding every /dev/hidraw* would
+                  # hand the sandbox the keyboard and mouse HID devices as well,
+                  # which is a keylogging surface inside the thing meant to
+                  # prevent one. 1050 is Yubico's USB vendor id.
+                  for uevent in /sys/class/hidraw/hidraw*/device/uevent; do
+                    [ -e "$uevent" ] || continue
+
+                    if grep -qi '^HID_ID=.*:0\{0,4\}1050:' "$uevent"; then
+                      node=''${uevent#/sys/class/hidraw/}
+                      node=''${node%%/*}
+                      extra+=( --dev-bind-try "/dev/$node" "/dev/$node" )
+                    fi
+                  done
+
+                  # gopass-jsonapi runs inside the sandbox, so gpg and scdaemon
+                  # need to write here: lock files, random_seed, and the shadow
+                  # keys a smartcard operation creates. Schizofox binds it
+                  # read-only.
+                  extra+=( --bind-try "$HOME/.gnupg" "$HOME/.gnupg" )
+                  ;;
+              esac
+
+              if [ ''${#extra[@]} -eq 0 ]; then
+                exec "$real" "$@"
+              fi
+
+              # bwrap applies mounts in argv order and the app command follows a
+              # bare `--`, so inserting there lands after the --dev /dev that
+              # would otherwise shadow these.
+              args=()
+              inserted=0
+              for arg in "$@"; do
+                if [ "$inserted" -eq 0 ] && [ "$arg" = "--" ]; then
+                  args+=( "''${extra[@]}" )
+                  inserted=1
+                fi
+
+                args+=( "$arg" )
+              done
+
+              [ "$inserted" -eq 1 ] || args+=( "''${extra[@]}" )
+              exec "$real" "''${args[@]}"
+              SHIM
+
+              chmod +x "$out/bin/bwrap"
+            '';
+          });
+        }
+      );
     in
     {
       imports = [
-        inputs.schizofox.homeManagerModule
+        # A lambda with no formals receives the whole module-argument set, so
+        # this shadows pkgs for schizofox alone and leaves every other module
+        # (and the global package set) on the stock bubblewrap.
+        (args: inputs.schizofox.homeManagerModule (args // { pkgs = sandboxPkgs; }))
       ];
 
       stylix.targets.firefox.enable = false;
