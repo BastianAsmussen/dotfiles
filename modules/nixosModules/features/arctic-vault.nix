@@ -22,7 +22,8 @@
       recipientArgs = lib.concatMapStringsSep " " (r: "-r ${lib.escapeShellArg r}") cfg.recipients;
 
       # Resolve source paths: relative paths are anchored to $HOME, absolute paths pass through.
-      resolvedSources = map (s: if lib.hasPrefix "/" s then s else "${home}/${s}") cfg.sources;
+      resolvePaths = map (s: if lib.hasPrefix "/" s then s else "${home}/${s}");
+      resolvedSources = resolvePaths cfg.sources;
 
       sourceArgs = lib.concatMapStringsSep " " lib.escapeShellArg resolvedSources;
 
@@ -125,6 +126,82 @@
           default = null;
           description = "Months to keep snapshots. Null means keep all.";
         };
+
+        # The full archive above is the right shape for a handful of small,
+        # irreplaceable things: restoring it needs only age, tar and zstd, with
+        # no repo format and no repo key that might itself be locked inside the
+        # thing you cannot open. It is the wrong shape for bulk data, where a
+        # fresh copy every run fills the disk in weeks. Anything large goes
+        # through restic instead, on the same disk.
+        incremental = {
+          enable = mkEnableOption "Deduplicating incremental snapshots (restic) alongside the full archive";
+
+          passwordFile = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = ''
+              File holding the restic repository password.
+
+              Back this up somewhere other than the vault: without it the
+              repository cannot be read, and a copy stored only inside the
+              thing it unlocks is not a backup.
+            '';
+          };
+
+          paths = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Paths to back up. Relative paths are resolved from the user's home directory; absolute paths are used as-is.";
+            example = [
+              "Documents"
+              "Projects"
+            ];
+          };
+
+          exclude = mkOption {
+            type = types.listOf types.str;
+            default = [
+              "node_modules"
+              "target"
+              ".venv"
+              "__pycache__"
+              ".direnv"
+              ".mypy_cache"
+              ".pytest_cache"
+              "zig-cache"
+              "zig-out"
+              "result"
+              "result-*"
+            ];
+
+            description = ''
+              Patterns to skip. The defaults are build output and dependency
+              trees, which are large, rebuildable, and churn every commit.
+
+              Cargo tags its own `target` directories with CACHEDIR.TAG, which
+              `--exclude-caching` already catches; the literal entry here only
+              covers directories left by versions predating that.
+            '';
+          };
+
+          calendar = mkOption {
+            type = types.str;
+            default = "weekly";
+            description = "systemd OnCalendar expression for the incremental run.";
+          };
+
+          pruneOpts = mkOption {
+            type = types.listOf types.str;
+            default = [
+              "--keep-daily 7"
+              "--keep-weekly 5"
+              "--keep-monthly 12"
+              "--keep-yearly 3"
+            ];
+
+            description = "Retention policy passed to `restic forget`.";
+          };
+        };
       };
 
       config = mkIf cfg.enable {
@@ -137,7 +214,61 @@
             assertion = cfg.sources != [ ];
             message = "arcticVault.sources must contain at least one path.";
           }
+          {
+            assertion = !cfg.incremental.enable || cfg.incremental.passwordFile != null;
+            message = "arcticVault.incremental.passwordFile must be set when incremental snapshots are enabled.";
+          }
+          {
+            assertion = !cfg.incremental.enable || cfg.incremental.paths != [ ];
+            message = "arcticVault.incremental.paths must contain at least one path when incremental snapshots are enabled.";
+          }
         ];
+
+        # Restic re-reads the pack index from the repository whenever its cache
+        # is missing, and root is a tmpfs here. Only epsilon imports this module
+        # and it has preservation, so no optionalAttrs guard is needed.
+        persistence.directories = lib.optionals cfg.incremental.enable [
+          {
+            directory = "/root/.cache/restic";
+            mode = "0700";
+          }
+        ];
+
+        services.restic.backups = lib.mkIf cfg.incremental.enable {
+          arctic-vault = {
+            inherit (cfg.incremental) exclude passwordFile pruneOpts;
+
+            repository = "${cfg.mountpoint}/restic";
+            paths = resolvePaths cfg.incremental.paths;
+            initialize = true;
+
+            # Verify a slice of the data on every run. The full-archive job
+            # checks nothing, which is how a backup rots unnoticed.
+            runCheck = true;
+            checkOpts = [ "--read-data-subset=5%" ];
+
+            # Gives a `restic-arctic-vault` wrapper with the repository and
+            # password already set, so a restore does not start with guessing
+            # environment variables.
+            createWrapper = true;
+
+            extraBackupArgs = [
+              # Cargo and friends drop CACHEDIR.TAG in their build directories.
+              "--exclude-caching"
+            ];
+
+            timerConfig = {
+              OnCalendar = cfg.incremental.calendar;
+              Persistent = true;
+              RandomizedDelaySec = "2h";
+            };
+          };
+        };
+
+        # The vault disk is nofail and may genuinely be absent.
+        systemd.services.restic-backups-arctic-vault = lib.mkIf cfg.incremental.enable {
+          unitConfig.RequiresMountsFor = [ cfg.mountpoint ];
+        };
 
         systemd = {
           services.arctic-vault = {

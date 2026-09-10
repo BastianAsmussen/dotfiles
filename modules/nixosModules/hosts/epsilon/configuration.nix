@@ -174,6 +174,7 @@
 
       sops = {
         secrets = {
+          "services/restic/vault-password" = { };
           "wireguard/psk-eta-epsilon" = { };
           "meilisearch/master-key" = { };
 
@@ -652,11 +653,30 @@
         enable = true;
         calendar = "weekly";
         timestampFormat = "%Y-W%V";
+
+        # Kept deliberately small. These restore with nothing but age, tar and
+        # zstd, which is what you want when the age keys are the thing you are
+        # restoring.
         sources = [
           "dotfiles"
           "nix-secrets"
           ".password-store"
         ];
+
+        # Everything bulky goes through restic instead: the Syncthing folders
+        # plus Projects come to roughly 100G, and a full copy of that every
+        # week would fill the 466G disk inside a month.
+        incremental = {
+          enable = true;
+          passwordFile = config.sops.secrets."services/restic/vault-password".path;
+
+          paths = [
+            "Documents"
+            "Pictures"
+            "Videos"
+            "Projects"
+          ];
+        };
 
         recipients = map (f: lib.strings.trim (builtins.readFile f)) lib.custom.keys.default.agePaths;
       };
