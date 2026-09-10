@@ -173,6 +173,7 @@
 
       sops = {
         secrets = {
+          "services/restic/vault-password" = { };
           "wireguard/psk-eta-epsilon" = { };
           "meilisearch/master-key" = { };
 
@@ -628,11 +629,26 @@
         enable = true;
         calendar = "weekly";
         timestampFormat = "%Y-W%V";
+
+        # Keep the vault restorable with only age, tar and zstd.
         sources = [
           "dotfiles"
           "nix-secrets"
           ".password-store"
         ];
+
+        # Use Restic for bulky data to avoid filling the 466G disk.
+        incremental = {
+          enable = true;
+          passwordFile = config.sops.secrets."services/restic/vault-password".path;
+
+          paths = [
+            "Documents"
+            "Pictures"
+            "Videos"
+            "Projects"
+          ];
+        };
 
         recipients = map (f: lib.strings.trim (builtins.readFile f)) lib.custom.keys.default.agePaths;
       };
