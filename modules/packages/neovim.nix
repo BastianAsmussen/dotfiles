@@ -1,3 +1,4 @@
+{ self, ... }:
 {
   perSystem =
     {
@@ -21,7 +22,7 @@
           neovim =
             (inputs'.nixvim.legacyPackages.makeNixvimWithModule {
               module = {
-                imports = [ (import ../homeManagerModules/_nixvim-config.nix) ];
+                imports = [ self.nixvimModules.default ];
                 nixpkgs.pkgs = pkgs;
               };
             })
@@ -36,7 +37,7 @@
               module =
                 { lib, ... }:
                 {
-                  imports = [ (import ../homeManagerModules/_nixvim-config.nix) ];
+                  imports = [ self.nixvimModules.default ];
                   nixpkgs.pkgs = pkgs;
                   plugins = {
                     # LSP.
