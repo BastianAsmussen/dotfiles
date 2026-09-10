@@ -508,6 +508,14 @@
           # AnimeTosho's long tracker URLs break Prowlarr's proxy links.
           torrentFileIndexers = [ "AnimeTosho" ];
         };
+
+        # Keep both *arr copies of the WebUI password synchronized.
+        downloadClient = {
+          syncCredentials = true;
+
+          username = config.qbittorrent.webuiUsername;
+          passwordFile = config.qbittorrent.webuiPasswordFile;
+        };
       };
       seerr.enable = true;
       deepseek-harness = {

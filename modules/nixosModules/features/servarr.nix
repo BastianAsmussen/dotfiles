@@ -128,6 +128,61 @@
           reconcile ${lib.escapeShellArg name} '(.fields[] | select(.name == "torrentBaseSettings.preferMagnetUrl") | .value) = false' "torrent file over magnet"
         '') cfg.prowlarr.torrentFileIndexers}
       '';
+
+      # Synchronize both *arr password copies; masked API reads prevent diffing.
+      clientSyncScript = pkgs.writeShellScript "servarr-sync-download-clients" ''
+        set -euo pipefail
+
+        password="$(< ${toString cfg.downloadClient.passwordFile})"
+
+        sync_one() {
+          local name="$1" port="$2" config="$3"
+          local key base clients
+
+          key="$(${lib.getExe' pkgs.gnused "sed"} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' "$config")"
+          if [ -z "$key" ]; then
+            echo "Could not read $name's API key from $config." >&2
+            return 1
+          fi
+
+          base="http://localhost:$port/api/v3"
+
+          for attempt in $(seq 60); do
+            status="$(${curl} -sS -o /dev/null -w '%{http_code}' \
+              -H "X-Api-Key: $key" "$base/system/status" 2>/dev/null || true)"
+            [ "$status" = "200" ] && break
+
+            if [ "$attempt" -eq 60 ]; then
+              echo "$name API never became ready on port $port (last HTTP $status)!" >&2
+              return 1
+            fi
+
+            sleep 1
+          done
+
+          clients="$(${curl} -sS --fail-with-body -H "X-Api-Key: $key" "$base/downloadclient")"
+
+          echo "$clients" \
+            | ${jq} -c '.[] | select(.implementation == "QBittorrent")' \
+            | while read -r client; do
+                echo "$client" \
+                  | ${jq} -c --arg u ${lib.escapeShellArg cfg.downloadClient.username} --arg p "$password" \
+                      '.fields |= map(
+                         if .name == "username" then .value = $u
+                         elif .name == "password" then .value = $p
+                         else . end
+                       )' \
+                  | ${curl} -sS --fail-with-body -X PUT \
+                      -H "X-Api-Key: $key" -H 'Content-Type: application/json' \
+                      -d @- "$base/downloadclient/$(echo "$client" | ${jq} -r .id)" > /dev/null
+
+                echo "Reconciled $name download client: $(echo "$client" | ${jq} -r .name)"
+              done
+        }
+
+        sync_one sonarr ${toString config.services.sonarr.settings.server.port} ${config.services.sonarr.dataDir}/config.xml
+        sync_one radarr ${toString config.services.radarr.settings.server.port} ${config.services.radarr.dataDir}/config.xml
+      '';
     in
     {
       options.servarr = {
@@ -174,6 +229,29 @@
               record as an indexer failure. Torrent-file URLs have a bounded
               length, so they cannot trip it.
             '';
+          };
+        };
+
+        downloadClient = {
+          syncCredentials = lib.mkEnableOption ''
+            Reconciling the qBittorrent download client credentials in Sonarr
+            and Radarr from {option}`servarr.downloadClient.passwordFile`.
+
+            The *arr services keep a copy of the WebUI password in their own
+            database, so rotating the secret otherwise means editing it by hand
+            in every UI, and downloads fail silently until you do
+          '';
+
+          username = mkOption {
+            type = types.str;
+            default = "admin";
+            description = "WebUI username the *arr services authenticate with.";
+          };
+
+          passwordFile = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "File holding the qBittorrent WebUI password. Normally the sops secret the qBittorrent module already uses, so the secret has one home.";
           };
         };
       };
@@ -242,6 +320,32 @@
 
             radarr = serviceConfig;
             prowlarr = serviceConfig;
+
+            servarr-sync-download-clients = lib.mkIf cfg.downloadClient.syncCredentials {
+              description = "Reconcile *arr download client credentials";
+              requires = [
+                "sonarr.service"
+                "radarr.service"
+              ];
+
+              after = [
+                "sonarr.service"
+                "radarr.service"
+                "qbittorrent.service"
+              ];
+
+              # Reconcile credentials even when qBittorrent is down.
+              wants = [ "qbittorrent.service" ];
+              wantedBy = [ "multi-user.target" ];
+              restartTriggers = [ clientSyncScript ];
+
+              serviceConfig = {
+                Type = "oneshot";
+
+                # The script reads each service's 0700-owned config.xml as root.
+                ExecStart = clientSyncScript;
+              };
+            };
 
             prowlarr-sync-indexers =
               lib.mkIf (cfg.prowlarr.flaresolverrIndexers != [ ] || cfg.prowlarr.torrentFileIndexers != [ ])
