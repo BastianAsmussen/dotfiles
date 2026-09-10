@@ -510,6 +510,9 @@
           torrentFileIndexers = [ "AnimeTosho" ];
         };
 
+        # Seerr skips root overrides for admins; reconcile admin anime requests.
+        radarr.syncAnimeRoot = true;
+
         # Keep both *arr copies of the WebUI password synchronized.
         downloadClient = {
           syncCredentials = true;
