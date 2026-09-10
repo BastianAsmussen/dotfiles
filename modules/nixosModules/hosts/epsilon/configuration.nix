@@ -459,10 +459,14 @@
               # these are bypassed because eta's TLS passthrough makes every
               # internet request look WireGuard-local to epsilon.
               "~* ^/Users/ForgotPassword".return = "403";
-              "~* ^/Users/Public".return = "403";
               "~* ^/QuickConnect".return = "403";
               "~* ^/Startup".return = "403";
               "~* ^/ClientLog".return = "403";
+
+              "~* ^/Users/Public".extraConfig = ''
+                default_type application/json;
+                return 200 "[]";
+              '';
 
               "~* ^/Users/AuthenticateByName" = {
                 proxyPass = "http://localhost:8096";
