@@ -482,10 +482,20 @@
               )
               (_: {
                 owner = svc.user;
+
+                # Both reconcilers authenticate with this, so a rotation should
+                # push itself out rather than wait for the next activation.
+                restartUnits = [ "qbittorrent-sync-categories.service" ];
               });
 
           templates."qbittorrent.conf" = {
             owner = svc.user;
+
+            # sops renders this at activation, so restartTriggers on the
+            # template content cannot see a rotation: the content is a
+            # placeholder token that never changes. sops-nix restarts the unit
+            # when the *rendered* file changes instead.
+            restartUnits = [ "qbittorrent.service" ];
 
             content = ''
               [BitTorrent]
@@ -589,7 +599,6 @@
               "sops-install-secrets.service"
             ];
 
-            restartTriggers = [ config.sops.templates."qbittorrent.conf".content ];
             serviceConfig = {
               ExecStartPre = [ "+${prepareScript}" ];
               NoNewPrivileges = true;

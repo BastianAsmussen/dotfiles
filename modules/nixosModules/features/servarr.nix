@@ -174,6 +174,13 @@
           echo "$clients" \
             | ${jq} -c '.[] | select(.implementation == "QBittorrent")' \
             | while read -r client; do
+                id="$(echo "$client" | ${jq} -r .id)"
+
+                # forceSave skips the connection test the API runs on save.
+                # Without it this cannot repair a wrong password: the *arr
+                # service refuses the write with a 400 because it cannot reach
+                # the client using the credential it is being handed, which is
+                # exactly the state a rotation leaves behind.
                 echo "$client" \
                   | ${jq} -c --arg u ${lib.escapeShellArg cfg.downloadClient.username} --arg p "$password" \
                       '.fields |= map(
@@ -183,7 +190,7 @@
                        )' \
                   | ${curl} -sS --fail-with-body -X PUT \
                       -H "X-Api-Key: $key" -H 'Content-Type: application/json' \
-                      -d @- "$base/downloadclient/$(echo "$client" | ${jq} -r .id)" > /dev/null
+                      -d @- "$base/downloadclient/$id?forceSave=true"
 
                 echo "Reconciled $name download client: $(echo "$client" | ${jq} -r .name)"
               done
