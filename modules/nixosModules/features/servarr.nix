@@ -208,22 +208,57 @@
         # Shoko is the librarian for anime, so these hold nothing Jellyfin
         # reads. Sonarr/Radarr hardlink-import here purely to track what they
         # already have.
-        systemd.tmpfiles.rules = [
-          "d /srv/media/sonarr        2775 root                           media - -"
-          "d /srv/media/sonarr/anime  2770 ${config.services.sonarr.user} media - -"
-          "d /srv/media/radarr        2775 root                           media - -"
-          "d /srv/media/radarr/anime  2770 ${config.services.radarr.user} media - -"
-        ];
+        systemd.tmpfiles.rules =
+          let
+            sonarr = config.services.sonarr;
+            radarr = config.services.radarr;
+          in
+          [
+            "d /srv/media/sonarr        2775 root         media - -"
+            "d /srv/media/sonarr/anime  2770 ${sonarr.user} media - -"
+            "d /srv/media/radarr        2775 root         media - -"
+            "d /srv/media/radarr/anime  2770 ${radarr.user} media - -"
+
+            # UMask below is 0002 so the media tree stays group-writable, which
+            # also makes everything these services write under their own state
+            # directory group- and world-readable. That state is not media: it
+            # holds the API key in config.xml, and the download client password
+            # in the database, which Sonarr and Radarr store in plaintext by
+            # design (there is no encryption option to reach for). Upstream
+            # already gives Radarr's dataDir 0700 but not Sonarr's.
+            "d ${sonarr.dataDir} 0700 ${sonarr.user} ${sonarr.group} - -"
+            "d ${radarr.dataDir} 0700 ${radarr.user} ${radarr.group} - -"
+
+            # Heal state written before the above. `~` masks against the current
+            # bits, so directories land on 0700 and plain files on 0600.
+            "Z ${sonarr.dataDir} ~0700 ${sonarr.user} ${sonarr.group} - -"
+            "Z ${radarr.dataDir} ~0700 ${radarr.user} ${radarr.group} - -"
+          ];
 
         systemd.services =
           let
             serviceConfig = {
               unitConfig.RequiresMountsFor = [ "/srv/media" ];
+
+              # Group-writable so the other `media` members (shoko, jellyfin)
+              # can manage what these import. It is the wrong lever for the
+              # state directory, which the tmpfiles rules above pin instead.
               serviceConfig.UMask = lib.mkForce "0002";
             };
           in
           {
-            sonarr = serviceConfig;
+            sonarr = lib.mkMerge [
+              serviceConfig
+              {
+                # Only Sonarr uses StateDirectory=, so this is the one service
+                # where the mode is not dead config. Without it systemd creates
+                # /var/lib/sonarr at 0755 and the chain above dataDir stays
+                # traversable. Radarr and Prowlarr get their own 0700 from
+                # upstream's tmpfiles rule and DynamicUser respectively.
+                serviceConfig.StateDirectoryMode = "0700";
+              }
+            ];
+
             radarr = serviceConfig;
             prowlarr = serviceConfig;
 
