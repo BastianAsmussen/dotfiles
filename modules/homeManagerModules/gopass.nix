@@ -52,7 +52,13 @@
 
       xdg.configFile."gopass/config".source = (pkgs.formats.ini { }).generate "gopass-config" {
         mounts.path = "${config.home.homeDirectory}/.password-store";
-        core.autosync = true;
+
+        core = {
+          autosync = true;
+
+          # No clipboard manager clears secrets, so set a 45-second timeout.
+          cliptimeout = 45;
+        };
       };
 
       persistence.directories = [
