@@ -165,6 +165,10 @@
           echo "$clients" \
             | ${jq} -c '.[] | select(.implementation == "QBittorrent")' \
             | while read -r client; do
+                id="$(echo "$client" | ${jq} -r .id)"
+
+                # Skip the connection test so broken credentials can be
+                # repaired.
                 echo "$client" \
                   | ${jq} -c --arg u ${lib.escapeShellArg cfg.downloadClient.username} --arg p "$password" \
                       '.fields |= map(
@@ -174,7 +178,7 @@
                        )' \
                   | ${curl} -sS --fail-with-body -X PUT \
                       -H "X-Api-Key: $key" -H 'Content-Type: application/json' \
-                      -d @- "$base/downloadclient/$(echo "$client" | ${jq} -r .id)" > /dev/null
+                      -d @- "$base/downloadclient/$id?forceSave=true"
 
                 echo "Reconciled $name download client: $(echo "$client" | ${jq} -r .name)"
               done
