@@ -79,5 +79,12 @@
           ++ (lib.strings.splitString " " config.home.sessionVariables.RUSTFLAGS);
         };
       };
+
+      persistence.directories = [
+        # Persist Neovim data and state; secret files are excluded from
+        # undo/shada.
+        ".local/share/nvim"
+        ".local/state/nvim"
+      ];
     };
 }

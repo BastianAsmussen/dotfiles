@@ -182,15 +182,23 @@ sops.secrets."my-secret" = { };
 
 The `preservation` module (`features/preservation.nix`) manages a
 tmpfs-on-root setup.  All persistent state is bind-mounted from
-`/persist`.  Hosts declare what to persist:
+`/persist`.  Each module declares the state it owns; hosts declare only
+what no module owns:
 
 ```nix
+# Host: only what no module owns.
 persistence = {
   enable = true;
-  directories = [ "/var/lib/acme" ... ];
+  directories = [ "/var/lib/AccountsService" ... ];
   files = [ { file = "/var/lib/systemd/random-seed"; how = "symlink"; } ];
-  user.directories = [ "Documents" ".config/sops" ... ];
+  user.directories = [ "Documents" "Projects" ... ];
 };
+
+# Feature module: the state it creates (see features/acmeShared.nix).
+persistence.directories = [ "/var/lib/acme" ];
+
+# Home module: paths relative to ~ (see homeManagerModules/gopass.nix).
+persistence.directories = [ ".password-store" ];
 ```
 
 ## Key Technologies
@@ -278,8 +286,11 @@ persistence = {
 2. Export via `flake.nixosModules.<name>`
 3. Import in the host `configuration.nix` under the appropriate section
 4. If it needs secrets, declare them with `sops.secrets`
-5. If it needs persistent state and the host uses impermanence, document
-   what directories need to be in `persistence.directories`
+5. If it needs persistent state, declare it in the module itself with
+   `persistence.directories` (guarded by `lib.optionalAttrs (options ?
+   persistence)` when a non-preservation host imports the module). Home-manager
+   modules declare paths relative to `~` and need no guard. See the
+   `nixos-impermanence` skill
 
 ### Adding a new home-manager module
 

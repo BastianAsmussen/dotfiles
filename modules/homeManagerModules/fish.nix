@@ -242,5 +242,7 @@
             '';
         };
       };
+
+      persistence.directories = [ ".local/share/fish" ];
     };
 }

@@ -17,7 +17,53 @@ The preservation module (`modules/nixosModules/features/preservation.nix`) imple
 
 ## Adding Persisted State
 
-Edit the host's `configuration.nix`:
+**State belongs to the module that creates it, not to the host.** The option
+types are `listOf`/`attrsOf`, so definitions merge from every module.
+
+In a NixOS feature module, guard the definition when the module is also
+imported by a host without preservation (delta):
+
+```nix
+{ config, lib, options, ... }:
+{
+  config = lib.mkMerge [
+    (lib.optionalAttrs (options ? persistence) {
+      persistence.directories = [
+        { directory = "/var/lib/myService"; user = "myuser"; group = "mygroup"; }
+      ];
+    })
+
+    { services.myService.enable = true; }
+  ];
+}
+```
+
+`lib.optionalAttrs` must wrap the attrset *containing* `persistence`: writing
+`persistence = lib.optionalAttrs ... { ... }` still defines the option path and
+fails on hosts that never declare it. The guard cannot live in `imports` either
+(`options` is not available that early -- infinite recursion).
+
+Modules imported only by preservation hosts can define it directly, as
+`news.nix` does.
+
+In a **home-manager module**, declare paths relative to `~`; no guard is needed
+because `homeModules.persistence` is imported into every user config:
+
+```nix
+persistence = {
+  directories = [ ".local/share/myapp" ];
+  directoriesWithMode.".secrets" = "0700";
+  cache.directories = [ ".cache/myapp" ];
+};
+```
+
+The NixOS preservation module reads these back out of
+`config.home-manager.users.<name>.persistence` and folds them into
+`preserveAt`. A module that splits `options`/`config` must put the definition
+inside its `config` block.
+
+Only genuinely host-specific paths stay in the host's `configuration.nix`
+(XDG user dirs, `Projects`, `Games`, and anything no module owns):
 
 ```nix
 persistence = {

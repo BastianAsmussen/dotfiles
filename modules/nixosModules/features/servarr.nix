@@ -5,6 +5,21 @@
       options.servarr.enable = lib.mkEnableOption "Enable the *arr stack.";
 
       config = lib.mkIf config.servarr.enable {
+        # Prowlarr's DynamicUser stores its real state under `/var/lib/private`.
+        persistence.directories = [
+          {
+            directory = "/var/lib/sonarr";
+            user = config.services.sonarr.user;
+            group = config.services.sonarr.group;
+          }
+          {
+            directory = "/var/lib/radarr";
+            user = config.services.radarr.user;
+            group = config.services.radarr.group;
+          }
+          "/var/lib/private/prowlarr"
+        ];
+
         users.extraGroups.media.members = [
           config.services.sonarr.user
           config.services.radarr.user

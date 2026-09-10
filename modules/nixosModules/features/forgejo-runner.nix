@@ -28,6 +28,9 @@
       # Stop scheduling CI jobs during games; in-flight jobs can finish.
       gamemode.pauseUnits = [ "gitea-runner-${hostname}.service" ];
 
+      # Persist the DynamicUser state that holds the runner registration.
+      persistence.directories = [ "/var/lib/private/gitea-runner" ];
+
       services.gitea-actions-runner = {
         package = pkgs.forgejo-runner;
         instances.${hostname} = {

@@ -17,5 +17,11 @@
         defaultSopsFile = "${toString inputs.nix-secrets}/hosts/${resolvedHostName}.yaml";
         age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
       };
+
+      persistence.directories = [
+        # Age keys. Without these nothing decrypts after a reboot.
+        ".config/sops"
+        ".config/sops-nix"
+      ];
     };
 }

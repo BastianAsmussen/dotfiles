@@ -213,6 +213,16 @@
           };
         };
 
+        # Persist the busy state used to select SNI routing after reboot.
+        persistence.directories = [
+          {
+            directory = "/var/lib/primary-mirror";
+            user = "root";
+            group = "builder";
+            mode = "0775";
+          }
+        ];
+
         systemd = {
           tmpfiles.rules = [
             "d ${stateDir}        2775 root ${cfg.busyGroup} -"

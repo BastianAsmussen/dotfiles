@@ -4,6 +4,7 @@
     {
       config,
       lib,
+      options,
       ...
     }:
     let
@@ -26,6 +27,11 @@
 
       config = lib.mkIf cfg.enable (
         lib.mkMerge [
+          # Persist ACME certificates across reboots.
+          (lib.optionalAttrs (options ? persistence) {
+            persistence.directories = [ "/var/lib/acme" ];
+          })
+
           {
             # Fallback for hosts where nginx does not define Cloudflare
             # credentials.
