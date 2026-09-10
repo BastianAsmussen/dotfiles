@@ -24,10 +24,74 @@
             value.install_url = "file://${pkg}/share/mozilla/extensions/${firefoxAppId}/${pkg.addonId}.xpi";
           }) pkgList
         );
+
+      # Shim bwrap only for schizofox to give WebAuthn read-write YubiKey
+      # access.
+      sandboxPkgs = pkgs.extend (
+        _: prev: {
+          bubblewrap = prev.bubblewrap.overrideAttrs (old: {
+            # Preserve bwrap metadata and mainProgram so lib.getExe still
+            # resolves bin/bwrap.
+            postInstall = (old.postInstall or "") + ''
+              mv "$out/bin/bwrap" "$out/bin/.bwrap-real"
+
+              cat > "$out/bin/bwrap" <<'SHIM'
+              #!${prev.runtimeShell}
+              set -eu
+
+              real="$(dirname "$(readlink -f "$0")")/.bwrap-real"
+
+              extra=()
+              case "''${NIXPAK_APP_EXE:-}" in
+                *schizofox*)
+                  # Bind only Yubico hidraw nodes (vendor 1050), not keyboard or
+                  # mouse HID.
+                  for uevent in /sys/class/hidraw/hidraw*/device/uevent; do
+                    [ -e "$uevent" ] || continue
+
+                    if grep -qi '^HID_ID=.*:0\{0,4\}1050:' "$uevent"; then
+                      node=''${uevent#/sys/class/hidraw/}
+                      node=''${node%%/*}
+                      extra+=( --dev-bind-try "/dev/$node" "/dev/$node" )
+                    fi
+                  done
+
+                  # gopass-jsonapi needs writable .gnupg for gpg and scdaemon
+                  # state.
+                  extra+=( --bind-try "$HOME/.gnupg" "$HOME/.gnupg" )
+                  ;;
+              esac
+
+              if [ ''${#extra[@]} -eq 0 ]; then
+                exec "$real" "$@"
+              fi
+
+              # Insert mounts before the app command, after bwrap's --dev /dev.
+              args=()
+              inserted=0
+              for arg in "$@"; do
+                if [ "$inserted" -eq 0 ] && [ "$arg" = "--" ]; then
+                  args+=( "''${extra[@]}" )
+                  inserted=1
+                fi
+
+                args+=( "$arg" )
+              done
+
+              [ "$inserted" -eq 1 ] || args+=( "''${extra[@]}" )
+              exec "$real" "''${args[@]}"
+              SHIM
+
+              chmod +x "$out/bin/bwrap"
+            '';
+          });
+        }
+      );
     in
     {
       imports = [
-        inputs.schizofox.homeManagerModule
+        # Override pkgs only in schizofox's module argument set.
+        (args: inputs.schizofox.homeManagerModule (args // { pkgs = sandboxPkgs; }))
       ];
 
       stylix.targets.firefox.enable = false;
