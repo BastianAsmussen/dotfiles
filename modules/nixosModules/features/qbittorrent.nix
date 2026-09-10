@@ -482,10 +482,18 @@
               )
               (_: {
                 owner = svc.user;
+
+                # Restart the reconcilers immediately when their shared secret
+                # rotates.
+                restartUnits = [ "qbittorrent-sync-categories.service" ];
               });
 
           templates."qbittorrent.conf" = {
             owner = svc.user;
+
+            # sops placeholders never change; restart on changes to the rendered
+            # file.
+            restartUnits = [ "qbittorrent.service" ];
 
             content = ''
               [BitTorrent]
@@ -588,7 +596,6 @@
               "sops-install-secrets.service"
             ];
 
-            restartTriggers = [ config.sops.templates."qbittorrent.conf".content ];
             serviceConfig = {
               ExecStartPre = [ "+${prepareScript}" ];
               NoNewPrivileges = true;
