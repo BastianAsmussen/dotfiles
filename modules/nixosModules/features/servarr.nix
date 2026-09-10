@@ -201,22 +201,45 @@
 
         # Keep acquisition-only anime roots outside Jellyfin; Shoko catalogs
         # them.
-        systemd.tmpfiles.rules = [
-          "d /srv/media/sonarr        2775 root                           media - -"
-          "d /srv/media/sonarr/anime  2770 ${config.services.sonarr.user} media - -"
-          "d /srv/media/radarr        2775 root                           media - -"
-          "d /srv/media/radarr/anime  2770 ${config.services.radarr.user} media - -"
-        ];
+        systemd.tmpfiles.rules =
+          let
+            sonarr = config.services.sonarr;
+            radarr = config.services.radarr;
+          in
+          [
+            "d /srv/media/sonarr        2775 root         media - -"
+            "d /srv/media/sonarr/anime  2770 ${sonarr.user} media - -"
+            "d /srv/media/radarr        2775 root         media - -"
+            "d /srv/media/radarr/anime  2770 ${radarr.user} media - -"
+
+            # Holds the API key and plaintext client password; keep it 0700.
+            "d ${sonarr.dataDir} 0700 ${sonarr.user} ${sonarr.group} - -"
+            "d ${radarr.dataDir} 0700 ${radarr.user} ${radarr.group} - -"
+
+            # `~` limits the mode mask, producing 0700 directories and 0600
+            # files.
+            "Z ${sonarr.dataDir} ~0700 ${sonarr.user} ${sonarr.group} - -"
+            "Z ${radarr.dataDir} ~0700 ${radarr.user} ${radarr.group} - -"
+          ];
 
         systemd.services =
           let
             serviceConfig = {
               unitConfig.RequiresMountsFor = [ "/srv/media" ];
+
+              # Lets other `media` members (shoko, jellyfin) manage imports.
               serviceConfig.UMask = lib.mkForce "0002";
             };
           in
           {
-            sonarr = serviceConfig;
+            sonarr = lib.mkMerge [
+              serviceConfig
+              {
+                # Sonarr alone sets StateDirectory=, which defaults to 0755.
+                serviceConfig.StateDirectoryMode = "0700";
+              }
+            ];
+
             radarr = serviceConfig;
             prowlarr = serviceConfig;
 
