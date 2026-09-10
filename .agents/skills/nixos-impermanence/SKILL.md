@@ -9,11 +9,11 @@ The preservation module (`modules/nixosModules/features/preservation.nix`) imple
 
 ## Which Hosts Use Impermanence
 
-| Host    | Impermanence | Details                                           |
-|---------|--------------|---------------------------------------------------|
+| Host    | Impermanence | Details                                                                           |
+|---------|--------------|-----------------------------------------------------------------------------------|
 | epsilon | yes          | tmpfs root (4G), `/persist` on btrfs, `/srv/media` + `/srv/arctic-vault` separate |
-| eta     | yes          | tmpfs root (2G), `/persist` on btrfs/LUKS         |
-| delta   | no           | Traditional root on btrfs                          |
+| eta     | yes          | tmpfs root (2G), `/persist` on btrfs/LUKS                                         |
+| delta   | no           | Traditional root on btrfs                                                         |
 
 ## Adding Persisted State
 
@@ -78,7 +78,7 @@ persistence = {
   # System directories with explicit mode (key = path, value = mode).
   directoriesWithMode = {
     "/var/lib/private" = "0700";
-    "/var/lib/sbctl" = "0700";   # Secure Boot keys must survive reboot
+    "/var/lib/sbctl" = "0700"; # Secure Boot keys must survive reboot
   };
 
   # System files (optional: symlink instead of bind-mount).
@@ -90,7 +90,7 @@ persistence = {
   user = {
     directories = [
       "Documents"
-      ".config/sops"      # VERY important; age keys
+      ".config/sops" # VERY important; age keys
       ".mozilla"
       ".local/share/nvim"
     ];
@@ -133,6 +133,7 @@ These are non-obvious but required:
 ## Adding Impermanence to a New Host
 
 1. Use a disko config with tmpfs root:
+
    ```nix
    nodev."/" = {
      fsType = "tmpfs";

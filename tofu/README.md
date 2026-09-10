@@ -32,7 +32,7 @@ not be scripted into this repo.
 
 ```sh
 cd tofu
-tofu init      # fetches the hcloud provider, writes .terraform.lock.hcl
+tofu init # fetches the hcloud provider, writes .terraform.lock.hcl
 tofu plan
 tofu apply
 ```

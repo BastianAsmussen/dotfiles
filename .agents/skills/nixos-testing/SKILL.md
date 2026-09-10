@@ -7,11 +7,11 @@ description: Use when writing NixOS configuration tests. Eval tests, VM tests, o
 
 Tests live in three places:
 
-| Type           | Location                     | Purpose                                  |
-|----------------|------------------------------|------------------------------------------|
-| Eval tests     | `modules/nixos-tests.nix`    | Assert config values without booting     |
-| VM tests       | `modules/nixos-tests.nix`    | Runtime behaviour (booted VMs, x86_64)   |
-| Lib tests      | `modules/tests/<topic>/default.nix` | Unit tests for `lib.custom.*`    |
+| Type       | Location                            | Purpose                                |
+|------------|-------------------------------------|----------------------------------------|
+| Eval tests | `modules/nixos-tests.nix`           | Assert config values without booting   |
+| VM tests   | `modules/nixos-tests.nix`           | Runtime behaviour (booted VMs, x86_64) |
+| Lib tests  | `modules/tests/<topic>/default.nix` | Unit tests for `lib.custom.*`          |
 
 All tests run as flake checks (`nix flake check`).
 
