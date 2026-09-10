@@ -508,7 +508,24 @@
         portSync.passwordFile = config.qbittorrent.webuiPasswordFile;
       };
 
-      servarr.enable = true;
+      servarr = {
+        enable = true;
+
+        prowlarr = {
+          # Both sit behind Cloudflare. 1337x was already tagged by hand; EZTV
+          # was not, so every EZTV query failed until Prowlarr's circuit breaker
+          # started answering Sonarr with 429 instead.
+          flaresolverrIndexers = [
+            "1337x"
+            "EZTV"
+          ];
+
+          # AnimeTosho carries the odd release with a tracker list long enough
+          # that Prowlarr's proxy link exceeds what .NET's Uri accepts, which
+          # 500s the whole result page.
+          torrentFileIndexers = [ "AnimeTosho" ];
+        };
+      };
       seerr.enable = true;
       deepseek-harness = {
         enable = true;
