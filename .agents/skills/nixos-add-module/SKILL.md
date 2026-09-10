@@ -67,10 +67,10 @@ For modules with sub-resources (e.g. `goxlr/`):
 
 ```
 modules/homeManagerModules/<name>/
-├── default.nix    # exports flake.homeModules.<name>
-├── module.nix     # the actual module body
-├── profiles/      # sub-resources
-└── icons/         # sub-resources
+├── default.nix # exports flake.homeModules.<name>
+├── module.nix  # the actual module body
+├── profiles/   # sub-resources
+└── icons/      # sub-resources
 ```
 
 `default.nix` does the flake export and delegates to the real module:

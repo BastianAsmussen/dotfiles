@@ -14,10 +14,10 @@ nginx = {
   enable = true;
   openFirewall = true;
   acme.email = "admin@example.com";
-  acme.sharedHost = null;              # wildcard ACME host name
-  streamProxy = { ... };               # TLS SNI passthrough
-  reverseProxies = { ... };            # HTTP reverse proxies
-  redirects = { ... };                # HTTP -> HTTPS redirects
+  acme.sharedHost = null;   # wildcard ACME host name
+  streamProxy = { ... };    # TLS SNI passthrough
+  reverseProxies = { ... }; # HTTP reverse proxies
+  redirects = { ... };      # HTTP -> HTTPS redirects
 };
 ```
 
@@ -36,7 +36,7 @@ nginx.reverseProxies = {
 
     ssl = {
       useACME = true;
-      dnsProvider = "cloudflare";         # DNS-01 challenge
+      dnsProvider = "cloudflare"; # DNS-01 challenge
       environmentFile = config.sops.templates."cloudflare-acme-env".path;
     };
   };
@@ -59,7 +59,7 @@ nginx.reverseProxies = {
     mtls = {
       enable = true;
       caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-      localhostBypass = true;   # allow 127.0.0.1/::1 without client cert
+      localhostBypass = true; # allow 127.0.0.1/::1 without client cert
     };
   };
 };
@@ -74,12 +74,12 @@ nginx.reverseProxies = {
   remoteService = {
     domain = "remote.asmussen.tech";
     location = "/";
-    upstream = "https://10.10.0.1";   # through WireGuard
+    upstream = "https://10.10.0.1"; # through WireGuard
 
     proxySSL = {
       clientCertificate = config.sops.secrets."mtls/epsilon-client-cert".path;
       clientCertificateKey = config.sops.secrets."mtls/epsilon-client-key".path;
-      serverName = "remote.asmussen.tech";   # override SNI
+      serverName = "remote.asmussen.tech"; # override SNI
       verify = false;
     };
   };
@@ -151,6 +151,7 @@ Set `nginx.openFirewall = false` when the host is behind a stream proxy or anoth
 ## Testing
 
 The module has assertions that catch misconfiguration at eval time:
+
 - `forceSSL` requires either `ssl.useACME` or both `ssl.certificate` + `ssl.certificateKey`
 - `dnsProvider` requires `environmentFile`
 - `mtls.enable` requires `caCertificate`

@@ -21,15 +21,15 @@ Running `jj` against a git remote always needs a `git fetch` first.
 ## Core Commands
 
 ```sh
-jj st                  # status: working-copy changes + parent/child info
-jj log                 # history (this repo sets default-command = "log")
-jj log -r '@ | @-'     # just the working copy and its parent
-jj describe -m "msg"   # set the working copy's description (the "commit message")
-jj new                 # start a new change on top of the current one
-jj new @-              # start a new change *below* the current one (for stacking)
-jj squash              # fold the working copy into its parent (amend)
-jj diff                # show working-copy diff
-jj bookmark list       # list bookmarks (the git branches)
+jj st                # status: working-copy changes + parent/child info
+jj log               # history (this repo sets default-command = "log")
+jj log -r '@ | @-'   # just the working copy and its parent
+jj describe -m "msg" # set the working copy's description (the "commit message")
+jj new               # start a new change on top of the current one
+jj new @-            # start a new change *below* the current one (for stacking)
+jj squash            # fold the working copy into its parent (amend)
+jj diff              # show working-copy diff
+jj bookmark list     # list bookmarks (the git branches)
 ```
 
 The working copy already exists after a fresh clone. There is nothing to
@@ -48,10 +48,10 @@ The working copy already exists after a fresh clone. There is nothing to
 ## Rewriting / Undo
 
 ```sh
-jj edit <rev>          # make an old change the working copy again to edit it
-jj undo                # undo the last operation (jj's op log, not git reflog)
-jj restore --from <r>  # restore files from another revision
-jj abandon <rev>       # drop a change entirely
+jj edit <rev>         # make an old change the working copy again to edit it
+jj undo               # undo the last operation (jj's op log, not git reflog)
+jj restore --from <r> # restore files from another revision
+jj abandon <rev>      # drop a change entirely
 ```
 
 `jj undo` is the primary safety net. It reverses *any* jj operation,
@@ -82,15 +82,15 @@ after a rewrite) without any `--force` flag — the operation itself is the
 consent.
 
 ```sh
-git fetch origin                        # fetch latest (always before pushing)
-jj git push --bookmark master           # push whatever master points at
+git fetch origin              # fetch latest (always before pushing)
+jj git push --bookmark master # push whatever master points at
 ```
 
 If your work is a child of `master` (not yet squashed in), move the bookmark
 before pushing — or squash down first:
 
 ```sh
-jj bookmark set master -r @-            # move master onto the parent of @
+jj bookmark set master -r @- # move master onto the parent of @
 jj git push --bookmark master
 
 # alternative: fold @ into parent, then push
@@ -147,11 +147,11 @@ signing backend `gpg`, key `0xD92D668B77A29897`, and
 by ID and every past operation is recorded.
 
 ```sh
-jj op log                       # every operation, with the args used
-jj op restore <op-id>           # rewind graph, refs, and working copy
-jj obslog -r <change>           # every predecessor version of a change
-jj restore --from <id> <paths>  # copy specific paths back onto @
-git show <commit-id>:<path>     # read a file straight out of a hidden commit
+jj op log                      # every operation, with the args used
+jj op restore <op-id>          # rewind graph, refs, and working copy
+jj obslog -r <change>          # every predecessor version of a change
+jj restore --from <id> <paths> # copy specific paths back onto @
+git show <commit-id>:<path>    # read a file straight out of a hidden commit
 ```
 
 Prefer surgical recovery (`jj restore --from`) over `jj op restore` when only
