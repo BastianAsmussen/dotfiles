@@ -9,12 +9,23 @@
     checks.enable = true;
   };
 
-  flake.nixvimModules = {
-    default = {
-      imports = [
-        ./homeManagerModules/_nixvim-config.nix
-      ];
-    };
+  # Every sibling module under nixvimModules/ registers itself; `default` is
+  # just the whole set, and is what every consumer imports.
+  flake.nixvimModules.default = {
+    imports = [
+      self.nixvimModules.settings
+      self.nixvimModules.autocmds
+      self.nixvimModules.clipboard
+      self.nixvimModules.theme
+      self.nixvimModules.keymaps
+      self.nixvimModules.completion
+      self.nixvimModules.lsp
+      self.nixvimModules.debugging
+      self.nixvimModules.telescope
+      self.nixvimModules.ui
+      self.nixvimModules.editing
+      self.nixvimModules.extra-plugins
+    ];
   };
 
   perSystem =
