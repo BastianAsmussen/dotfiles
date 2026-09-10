@@ -1,4 +1,15 @@
 {
+  # The diagram's icon for this service, declared where the service is.
+  perSystem =
+    { pkgs, ... }:
+    {
+      topology.modules = [
+        {
+          icons.services.monerod.file = "${pkgs.monero-gui}/share/icons/hicolor/256x256/apps/monero.png";
+        }
+      ];
+    };
+
   flake.nixosModules.monero =
     {
       config,
