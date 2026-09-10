@@ -388,6 +388,11 @@
           };
         };
 
+        # Pause only the GPU-heavy seeder timers during games.
+        gamemode.pauseUnits =
+          lib.optional cfg.seedOnBoot "worldmonitor-seed.timer"
+          ++ lib.optional (cfg.insightsInterval != null) "worldmonitor-seed-insights.timer";
+
         # Use timers to keep the lengthy seed batch off the activation path.
         systemd.timers =
           lib.optionalAttrs cfg.seedOnBoot {

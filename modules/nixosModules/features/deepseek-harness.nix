@@ -232,6 +232,9 @@
       };
 
       config = lib.mkIf cfg.enable {
+        # Pause the host container to free the shared GPU during games.
+        gamemode.pauseUnits = [ "container@dsh.service" ];
+
         assertions = [
           {
             assertion = lib.length checkoutNames == lib.length (lib.unique checkoutNames);

@@ -7,10 +7,13 @@
     {
       config,
       lib,
+      options,
       pkgs,
       ...
     }:
     let
+      pauseMarker = config.gamemode.pauseMarker or "/run/gamemode/pause";
+
       inherit (lib)
         getExe
         getExe'
@@ -68,23 +71,12 @@
         esac
       '';
 
-      # A root .path unit watches the user's pause marker without polling.
-      newsBusyToggle = pkgs.writeShellScript "news-busy-toggle" ''
-        set -euo pipefail
-
-        if [ -e /run/news/pause ]; then
-          ${config.systemd.package}/bin/systemctl stop news.service
-        else
-          ${config.systemd.package}/bin/systemctl start news.service
-        fi
-      '';
-
       # A calendar timer schedules refreshes instead of tying them to boot time.
       newsRefresh = pkgs.writeShellScript "news-refresh" ''
         set -euo pipefail
 
         # Never wake the daemon mid-gamemode: the pause marker owns that.
-        if [ -e /run/news/pause ]; then
+        if [ -e ${pauseMarker} ]; then
           exit 0
         fi
 
@@ -185,6 +177,13 @@
       imports = [ inputs.news.nixosModules.default ];
 
       config = mkMerge [
+        # Pause news aggregation during gamemode to keep the GPU free.
+        (lib.optionalAttrs (options ? gamemode) (
+          mkIf cfg.push.enable {
+            gamemode.pauseUnits = [ "news.service" ];
+          }
+        ))
+
         (mkIf cfg.push.enable {
           services.news = {
             enable = true;
@@ -212,8 +211,6 @@
 
           systemd = {
             tmpfiles.rules = [
-              "d /run/news 0755 ${config.preferences.user.name} ${config.preferences.user.name} - -"
-
               # A dynamic uid drifts; re-own files a previous uid left behind.
               "Z ${config.services.news.dataDir} - ${config.services.news.user} ${config.services.news.group} - -"
             ];
@@ -240,14 +237,6 @@
             };
 
             services = {
-              news-busy = {
-                description = "Gate news daemon on gamemode state";
-                serviceConfig = {
-                  Type = "oneshot";
-                  ExecStart = newsBusyToggle;
-                };
-              };
-
               news-sync = {
                 description = "Push news feed to mirror host";
                 after = [
@@ -262,12 +251,6 @@
                   ExecStart = pushScript;
                 };
               };
-            };
-
-            paths.news-busy = {
-              description = "React to gamemode pause marker changes";
-              wantedBy = [ "multi-user.target" ];
-              pathConfig.PathChanged = "/run/news/pause";
             };
 
             timers.news-sync = {
