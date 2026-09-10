@@ -126,6 +126,31 @@ iso-install drive:
 fido2-enroll device:
     sudo systemd-cryptenroll --fido2-device=auto {{ device }}
 
+# Create and enroll Secure Boot keys for a Lanzaboote host (run once, post-install).
+[group("install")]
+secureboot-setup:
+    #!/usr/bin/env bash
+
+    set -euo pipefail
+
+    if [ ! -d /var/lib/sbctl ]; then
+        sudo sbctl create-keys
+    else
+        echo "Keys already exist at /var/lib/sbctl; skipping create-keys."
+    fi
+
+    echo "Enrolling into firmware. This needs Setup Mode; --microsoft keeps"
+    echo "vendor-signed option ROMs (GPU, SSD) working."
+    sudo sbctl enroll-keys --microsoft
+
+    just secureboot-verify
+
+# Check that the current boot chain is signed.
+[group("install")]
+secureboot-verify:
+    sudo sbctl status
+    sudo sbctl verify
+
 # Generate a standalone age key for sops-nix (user/dev key).
 [group("secrets")]
 age-keygen:
