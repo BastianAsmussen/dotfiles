@@ -157,6 +157,9 @@
         };
       };
 
+      # Stop Ollama during games to free its idle VRAM.
+      gamemode.pauseUnits = [ "ollama.service" ];
+
       services = {
         ollama = {
           enable = true;
@@ -639,17 +642,6 @@
 
       # Aggregate news locally and push the feed to eta for availability.
       newsSync.push.enable = true;
-
-      # Toggle the pause marker from gamemode hooks to stop news aggregation.
-      primaryBusy = {
-        gamemodeStartHooks = [
-          "${lib.getExe' pkgs.coreutils "touch"} /run/news/pause"
-        ];
-
-        gamemodeEndHooks = [
-          "${lib.getExe' pkgs.coreutils "rm"} -f /run/news/pause"
-        ];
-      };
 
       btrfs.scrub.fileSystems = [
         "/persist"

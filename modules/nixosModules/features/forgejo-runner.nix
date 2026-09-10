@@ -25,6 +25,9 @@
         "forgejo/deploy-key" = { };
       };
 
+      # Stop scheduling CI jobs during games; in-flight jobs can finish.
+      gamemode.pauseUnits = [ "gitea-runner-${hostname}.service" ];
+
       services.gitea-actions-runner = {
         package = pkgs.forgejo-runner;
         instances.${hostname} = {
