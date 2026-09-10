@@ -495,7 +495,20 @@
         portSync.passwordFile = config.qbittorrent.webuiPasswordFile;
       };
 
-      servarr.enable = true;
+      servarr = {
+        enable = true;
+
+        prowlarr = {
+          # Both sit behind Cloudflare.
+          flaresolverrIndexers = [
+            "1337x"
+            "EZTV"
+          ];
+
+          # AnimeTosho's long tracker URLs break Prowlarr's proxy links.
+          torrentFileIndexers = [ "AnimeTosho" ];
+        };
+      };
       seerr.enable = true;
       deepseek-harness = {
         enable = true;
