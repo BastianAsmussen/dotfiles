@@ -17,14 +17,19 @@
 
       prowlarrUrl = "http://localhost:${toString config.services.prowlarr.settings.server.port}";
 
+      # Share the anime root and tag between tmpfiles and the reconciler.
+      animeRoot = "/srv/media/radarr/anime";
+      animeTag = "anime";
+
       curl = getExe pkgs.curl;
       jq = getExe pkgs.jq;
+      sed = lib.getExe pkgs.gnused;
 
       # Reconcile Prowlarr's SQLite-backed indexers through its API.
       syncScript = pkgs.writeShellScript "prowlarr-sync-indexers" ''
         set -euo pipefail
 
-        key="$(${lib.getExe' pkgs.gnused "sed"} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' /var/lib/prowlarr/config.xml)"
+        key="$(${sed} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' /var/lib/prowlarr/config.xml)"
         if [ -z "$key" ]; then
           echo "Could not read Prowlarr's API key." >&2
           exit 1
@@ -139,7 +144,7 @@
           local name="$1" port="$2" config="$3"
           local key base clients
 
-          key="$(${lib.getExe' pkgs.gnused "sed"} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' "$config")"
+          key="$(${sed} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' "$config")"
           if [ -z "$key" ]; then
             echo "Could not read $name's API key from $config." >&2
             return 1
@@ -186,6 +191,91 @@
 
         sync_one sonarr ${toString config.services.sonarr.settings.server.port} ${config.services.sonarr.dataDir}/config.xml
         sync_one radarr ${toString config.services.radarr.settings.server.port} ${config.services.radarr.dataDir}/config.xml
+      '';
+
+      # Move admin-requested anime afterward; Seerr skips root overrides for
+      # admins.
+      animeRootSyncScript = pkgs.writeShellScript "radarr-sync-anime-root" ''
+        set -euo pipefail
+
+        key="$(${sed} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' ${config.services.radarr.dataDir}/config.xml)"
+        if [ -z "$key" ]; then
+          echo "Could not read Radarr's API key." >&2
+          exit 1
+        fi
+
+        base="http://localhost:${toString config.services.radarr.settings.server.port}/api/v3"
+
+        api() {
+          ${curl} -sS --fail-with-body -H "X-Api-Key: $key" "$@"
+        }
+
+        # Skip the run when Radarr is unavailable instead of failing the timer.
+        for attempt in $(seq 30); do
+          status="$(${curl} -sS -o /dev/null -w '%{http_code}' -H "X-Api-Key: $key" \
+            "$base/system/status" 2>/dev/null || true)"
+          [ "$status" = "200" ] && break
+
+          if [ "$attempt" -eq 30 ]; then
+            echo "Radarr API not ready (last HTTP $status); skipping this run." >&2
+            exit 0
+          fi
+
+          sleep 1
+        done
+
+        tag_id="$(api "$base/tag" \
+          | ${jq} -r --arg l ${lib.escapeShellArg animeTag} \
+              'map(select(.label == $l)) | first | .id // empty')"
+
+        if [ -z "$tag_id" ]; then
+          tag_id="$(api -X POST -H 'Content-Type: application/json' \
+            -d "$(${jq} -nc --arg l ${lib.escapeShellArg animeTag} '{label: $l}')" \
+            "$base/tag" | ${jq} -r .id)"
+          echo "Created Radarr tag: ${animeTag} (id $tag_id)"
+        fi
+
+        movies="$(api "$base/movie")"
+
+        # Select Radarr's `anime` keyword exactly, matching Seerr's override
+        # rule.
+        select_ids() {
+          echo "$movies" | ${jq} -c --arg root ${lib.escapeShellArg animeRoot} --argjson t "$tag_id" "$1"
+        }
+
+        untagged="$(select_ids '[.[]
+          | select((.keywords // []) | index("anime"))
+          | select((.tags | index($t)) | not)
+          | .id]')"
+
+        misplaced="$(select_ids '[.[]
+          | select((.keywords // []) | index("anime"))
+          | select(.rootFolderPath != $root)
+          | .id]')"
+
+        edit() {
+          local ids="$1" body="$2" label="$3"
+
+          # Not `[ ... ] && return`: under set -e a false test fails the list.
+          if [ "$(echo "$ids" | ${jq} 'length')" -eq 0 ]; then
+            return 0
+          fi
+
+          echo "$body" | api -X PUT -H 'Content-Type: application/json' -d @- \
+            "$base/movie/editor" > /dev/null
+          echo "Reconciled $(echo "$ids" | ${jq} 'length') movie(s): $label"
+        }
+
+        # Tag before moving so the next run retries only unfinished work.
+        edit "$untagged" \
+          "$(${jq} -nc --argjson ids "$untagged" --argjson t "$tag_id" \
+              '{movieIds: $ids, tags: [$t], applyTags: "add"}')" \
+          "tagged ${animeTag}"
+
+        edit "$misplaced" \
+          "$(${jq} -nc --argjson ids "$misplaced" --arg root ${lib.escapeShellArg animeRoot} \
+              '{movieIds: $ids, rootFolderPath: $root, moveFiles: true}')" \
+          "moved to ${animeRoot}"
       '';
     in
     {
@@ -236,6 +326,16 @@
           };
         };
 
+        radarr.syncAnimeRoot = lib.mkEnableOption ''
+          Reconciling anime movies onto {file}`${animeRoot}`.
+
+          Radarr picks a root folder once, when the movie is added, and has no
+          rule for choosing a different one per title. Seerr's override rules
+          are the intended lever, but Seerr skips them for any requester
+          holding ADMIN or MANAGE_REQUESTS, so anything an admin requests lands
+          on the default root instead
+        '';
+
         downloadClient = {
           syncCredentials = lib.mkEnableOption ''
             Reconciling the qBittorrent download client credentials in Sonarr
@@ -283,96 +383,126 @@
 
         # Keep acquisition-only anime roots outside Jellyfin; Shoko catalogs
         # them.
-        systemd.tmpfiles.rules =
-          let
-            sonarr = config.services.sonarr;
-            radarr = config.services.radarr;
-          in
-          [
-            "d /srv/media/sonarr        2775 root         media - -"
-            "d /srv/media/sonarr/anime  2770 ${sonarr.user} media - -"
-            "d /srv/media/radarr        2775 root         media - -"
-            "d /srv/media/radarr/anime  2770 ${radarr.user} media - -"
+        systemd = {
+          tmpfiles.rules =
+            let
+              sonarr = config.services.sonarr;
+              radarr = config.services.radarr;
+            in
+            [
+              "d /srv/media/sonarr        2775 root         media - -"
+              "d /srv/media/sonarr/anime  2770 ${sonarr.user} media - -"
+              "d /srv/media/radarr        2775 root         media - -"
+              "d ${animeRoot}  2770 ${radarr.user} media - -"
 
-            # Holds the API key and plaintext client password; keep it 0700.
-            "d ${sonarr.dataDir} 0700 ${sonarr.user} ${sonarr.group} - -"
-            "d ${radarr.dataDir} 0700 ${radarr.user} ${radarr.group} - -"
+              # Holds the API key and plaintext client password; keep it 0700.
+              "d ${sonarr.dataDir} 0700 ${sonarr.user} ${sonarr.group} - -"
+              "d ${radarr.dataDir} 0700 ${radarr.user} ${radarr.group} - -"
 
-            # `~` limits the mode mask, producing 0700 directories and 0600
-            # files.
-            "Z ${sonarr.dataDir} ~0700 ${sonarr.user} ${sonarr.group} - -"
-            "Z ${radarr.dataDir} ~0700 ${radarr.user} ${radarr.group} - -"
-          ];
-
-        systemd.services =
-          let
-            serviceConfig = {
-              unitConfig.RequiresMountsFor = [ "/srv/media" ];
-
-              # Lets other `media` members (shoko, jellyfin) manage imports.
-              serviceConfig.UMask = lib.mkForce "0002";
-            };
-          in
-          {
-            sonarr = lib.mkMerge [
-              serviceConfig
-              {
-                # Sonarr alone sets StateDirectory=, which defaults to 0755.
-                serviceConfig.StateDirectoryMode = "0700";
-              }
+              # `~` limits the mode mask, producing 0700 directories and 0600
+              # files.
+              "Z ${sonarr.dataDir} ~0700 ${sonarr.user} ${sonarr.group} - -"
+              "Z ${radarr.dataDir} ~0700 ${radarr.user} ${radarr.group} - -"
             ];
 
-            radarr = serviceConfig;
-            prowlarr = serviceConfig;
-
-            servarr-sync-download-clients = lib.mkIf cfg.downloadClient.syncCredentials {
-              description = "Reconcile *arr download client credentials";
-              requires = [
-                "sonarr.service"
-                "radarr.service"
-              ];
-
-              after = [
-                "sonarr.service"
-                "radarr.service"
-                "qbittorrent.service"
-              ];
-
-              # Reconcile credentials even when qBittorrent is down.
-              wants = [ "qbittorrent.service" ];
-              wantedBy = [ "multi-user.target" ];
-              restartTriggers = [ clientSyncScript ];
-
+          services =
+            let
               serviceConfig = {
-                Type = "oneshot";
+                unitConfig.RequiresMountsFor = [ "/srv/media" ];
 
-                # The script reads each service's 0700-owned config.xml as root.
-                ExecStart = clientSyncScript;
+                # Lets other `media` members (shoko, jellyfin) manage imports.
+                serviceConfig.UMask = lib.mkForce "0002";
+              };
+            in
+            {
+              sonarr = lib.mkMerge [
+                serviceConfig
+                {
+                  # Sonarr alone sets StateDirectory=, which defaults to 0755.
+                  serviceConfig.StateDirectoryMode = "0700";
+                }
+              ];
+
+              radarr = serviceConfig;
+              prowlarr = serviceConfig;
+
+              servarr-sync-download-clients = lib.mkIf cfg.downloadClient.syncCredentials {
+                description = "Reconcile *arr download client credentials";
+                requires = [
+                  "sonarr.service"
+                  "radarr.service"
+                ];
+
+                after = [
+                  "sonarr.service"
+                  "radarr.service"
+                  "qbittorrent.service"
+                ];
+
+                # Reconcile credentials even when qBittorrent is down.
+                wants = [ "qbittorrent.service" ];
+                wantedBy = [ "multi-user.target" ];
+                restartTriggers = [ clientSyncScript ];
+
+                serviceConfig = {
+                  Type = "oneshot";
+
+                  # The script reads each service's 0700-owned config.xml as
+                  # root.
+                  ExecStart = clientSyncScript;
+                };
+              };
+
+              prowlarr-sync-indexers =
+                lib.mkIf (cfg.prowlarr.flaresolverrIndexers != [ ] || cfg.prowlarr.torrentFileIndexers != [ ])
+                  {
+                    description = "Reconcile Prowlarr indexer proxy and per-indexer settings";
+                    requires = [ "prowlarr.service" ];
+                    after = [
+                      "prowlarr.service"
+                      "flaresolverr.service"
+                    ];
+
+                    wants = [ "flaresolverr.service" ];
+                    wantedBy = [ "multi-user.target" ];
+                    restartTriggers = [ syncScript ];
+
+                    serviceConfig = {
+                      Type = "oneshot";
+
+                      # Only root can read DynamicUser Prowlarr's config.xml.
+                      ExecStart = syncScript;
+                    };
+                  };
+
+              radarr-sync-anime-root = lib.mkIf cfg.radarr.syncAnimeRoot {
+                description = "Reconcile Radarr's anime root folder";
+
+                # Ordering only: the timer drives this, not multi-user.target.
+                after = [ "radarr.service" ];
+                wants = [ "radarr.service" ];
+                restartTriggers = [ animeRootSyncScript ];
+
+                serviceConfig = {
+                  Type = "oneshot";
+
+                  # The script reads Radarr's 0700-owned config.xml as root.
+                  ExecStart = animeRootSyncScript;
+                };
               };
             };
 
-            prowlarr-sync-indexers =
-              lib.mkIf (cfg.prowlarr.flaresolverrIndexers != [ ] || cfg.prowlarr.torrentFileIndexers != [ ])
-                {
-                  description = "Reconcile Prowlarr indexer proxy and per-indexer settings";
-                  requires = [ "prowlarr.service" ];
-                  after = [
-                    "prowlarr.service"
-                    "flaresolverr.service"
-                  ];
+          # Run periodically because movies can be added at any time.
+          timers.radarr-sync-anime-root = lib.mkIf cfg.radarr.syncAnimeRoot {
+            description = "Reconcile Radarr's anime root folder";
+            wantedBy = [ "timers.target" ];
 
-                  wants = [ "flaresolverr.service" ];
-                  wantedBy = [ "multi-user.target" ];
-                  restartTriggers = [ syncScript ];
-
-                  serviceConfig = {
-                    Type = "oneshot";
-
-                    # Only root can read DynamicUser Prowlarr's config.xml.
-                    ExecStart = syncScript;
-                  };
-                };
+            timerConfig = {
+              OnBootSec = "5m";
+              OnUnitActiveSec = "15m";
+            };
           };
+        };
 
         services =
           let
