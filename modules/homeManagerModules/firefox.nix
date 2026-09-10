@@ -115,9 +115,9 @@
         security.sandbox = {
           enable = true;
 
-          # Bind gopass/gpg runtime paths for the sandboxed native host.
+          # Bind gopass/gpg paths for the sandboxed native host; the shim
+          # handles writable .gnupg.
           extraBinds = [
-            "${config.home.homeDirectory}/.gnupg" # keyring + trustdb
             "${config.home.homeDirectory}/.password-store" # the secrets
             "${config.home.homeDirectory}/.config/gopass" # gopass config
             "/run/user/1000/gnupg" # gpg-agent socket
