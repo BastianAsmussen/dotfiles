@@ -1,5 +1,16 @@
 { inputs, ... }:
 {
+  # The diagram's icon for this service, declared where the service is.
+  perSystem =
+    { pkgs, ... }:
+    {
+      topology.modules = [
+        {
+          icons.services.syncthing.file = "${pkgs.syncthing}/share/icons/hicolor/scalable/apps/syncthing.svg";
+        }
+      ];
+    };
+
   flake.nixosModules.syncthing =
     {
       config,
