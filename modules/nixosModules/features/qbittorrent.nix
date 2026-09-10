@@ -560,6 +560,9 @@
           };
         };
 
+        # Persist torrents, categories, resume data and WebUI state.
+        persistence.directories = [ svc.profileDir ];
+
         services.qbittorrent = {
           enable = true;
           webuiPort = 8081;

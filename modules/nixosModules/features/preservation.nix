@@ -18,6 +18,18 @@
       cfg = config.persistence;
       mkDirWithMode = lib.mapAttrsToList (directory: mode: { inherit directory mode; });
       user = config.preferences.user.name;
+
+      # Read home-module persistence declarations into the NixOS configuration.
+      homeCfg =
+        config.home-manager.users.${user}.persistence or {
+          directories = [ ];
+          directoriesWithMode = { };
+          files = [ ];
+          cache = {
+            directories = [ ];
+            files = [ ];
+          };
+        };
     in
     {
       imports = [
@@ -26,12 +38,6 @@
 
       options.persistence = {
         enable = mkEnableOption "Erase root on every boot (preservation)";
-        tmpfsSize = mkOption {
-          type = types.str;
-          default = "4G";
-          description = "Size of the tmpfs root filesystem.";
-        };
-
         persistPath = mkOption {
           type = types.str;
           default = "/persist";
@@ -137,13 +143,18 @@
             };
 
             "${cfg.persistPath}/userdata".users.${user} = {
-              inherit (cfg.user) files;
+              files = cfg.user.files ++ homeCfg.files;
 
-              directories = cfg.user.directories ++ mkDirWithMode cfg.user.directoriesWithMode;
+              directories =
+                cfg.user.directories
+                ++ mkDirWithMode cfg.user.directoriesWithMode
+                ++ homeCfg.directories
+                ++ mkDirWithMode homeCfg.directoriesWithMode;
             };
 
             "${cfg.persistPath}/usercache".users.${user} = {
-              inherit (cfg.user.cache) directories files;
+              directories = cfg.user.cache.directories ++ homeCfg.cache.directories;
+              files = cfg.user.cache.files ++ homeCfg.cache.files;
             };
           };
         };

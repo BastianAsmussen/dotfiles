@@ -92,6 +92,8 @@
       };
 
       config = mkIf cfg.enable {
+        persistence.directoriesWithMode.".gnupg" = "0700";
+
         warnings = concatLists [
           (
             if length missingKeys.disallowList > 0 then

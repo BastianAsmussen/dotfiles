@@ -20,5 +20,10 @@
             shuffle
           ];
         };
+
+      persistence = {
+        directories = [ ".config/spotify" ];
+        cache.directories = [ ".cache/spotify/Storage" ];
+      };
     };
 }
