@@ -20,7 +20,7 @@ After `just add-host zeta`:
 ```
 modules/nixosModules/hosts/zeta/
 ├── configuration.nix
-├── disko-config.nix      # if copied from template
+├── disko-config.nix # if copied from template
 └── hardware-configuration.nix
 ```
 
@@ -76,7 +76,7 @@ Then configure host-specific values:
 
 ```nix
 networking.hostName = "zeta";
-nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";  # or "aarch64-linux"
+nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux"; # or "aarch64-linux"
 ```
 
 Reference `epsilon/configuration.nix` for a full desktop+server, or `eta/configuration.nix` for a cloud server.
@@ -96,7 +96,7 @@ bastianModules = {
   # ...
   zeta = with self.homeModules; [
     bastian
-    terminal     # or: git, gpg, zsh, zoxide, tmux, ...
+    terminal # or: git, gpg, zsh, zoxide, tmux, ...
     # desktop for graphical hosts
   ];
 };
