@@ -117,10 +117,14 @@
           enable = true;
 
           # gopassbridge's native host (gopass-jsonapi) runs *inside* this
-          # sandbox, so it needs the gopass/gpg runtime paths bound in
-          # or it can't decrypt and corrupts the native-messaging stream.
+          # sandbox, so it needs the gopass/gpg runtime paths bound in or it
+          # can't decrypt and corrupts the native-messaging stream.
+          #
+          # ~/.gnupg is deliberately absent: these are all --ro-bind, and gpg
+          # needs to write there (lock files, random_seed, shadow keys). The
+          # bwrap shim in overlays.nix binds it read-write instead, alongside
+          # the YubiKey's hidraw nodes.
           extraBinds = [
-            "${config.home.homeDirectory}/.gnupg" # keyring + trustdb
             "${config.home.homeDirectory}/.password-store" # the secrets
             "${config.home.homeDirectory}/.config/gopass" # gopass config
             "/run/user/1000/gnupg" # gpg-agent socket
