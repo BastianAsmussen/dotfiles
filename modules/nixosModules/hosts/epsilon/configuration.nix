@@ -448,10 +448,14 @@
             "jellyfin.asmussen.tech".locations = {
               # Block pre-auth endpoints exposed by eta's TLS passthrough.
               "~* ^/Users/ForgotPassword".return = "403";
-              "~* ^/Users/Public".return = "403";
               "~* ^/QuickConnect".return = "403";
               "~* ^/Startup".return = "403";
               "~* ^/ClientLog".return = "403";
+
+              "~* ^/Users/Public".extraConfig = ''
+                default_type application/json;
+                return 200 "[]";
+              '';
 
               "~* ^/Users/AuthenticateByName" = {
                 proxyPass = "http://localhost:8096";
