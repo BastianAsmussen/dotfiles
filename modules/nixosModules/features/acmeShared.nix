@@ -4,6 +4,7 @@
     {
       config,
       lib,
+      options,
       ...
     }:
     let
@@ -26,6 +27,12 @@
 
       config = lib.mkIf cfg.enable (
         lib.mkMerge [
+          # Certificates regenerate on their own, but only at the cost of
+          # burning Let's Encrypt rate limits on every reboot.
+          (lib.optionalAttrs (options ? persistence) {
+            persistence.directories = [ "/var/lib/acme" ];
+          })
+
           {
             # Cloudflare DNS-01 environment for the wildcard cert. The nginx
             # feature module also auto-defines these when a proxy or redirect

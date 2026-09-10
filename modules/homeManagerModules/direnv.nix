@@ -30,5 +30,12 @@
             }
           '';
       };
+
+      persistence = {
+        directories = [ ".local/share/direnv" ];
+
+        # Rebuildable, so it goes to the cache tree rather than userdata.
+        cache.directories = [ ".cache/direnv" ];
+      };
     };
 }

@@ -56,5 +56,11 @@
         mounts.path = "${config.home.homeDirectory}/.password-store";
         core.autosync = true;
       };
+
+      persistence.directories = [
+        # The encrypted store itself, and gopass's index beside it.
+        ".password-store"
+        ".local/share/gopass"
+      ];
     };
 }

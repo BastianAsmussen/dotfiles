@@ -10,5 +10,7 @@
         enableFishIntegration = config.programs.fish.enable;
         options = [ "--cmd cd" ];
       };
+
+      persistence.directories = [ ".local/share/zoxide" ];
     };
 }

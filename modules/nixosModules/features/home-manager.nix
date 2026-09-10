@@ -35,7 +35,9 @@
           useGlobalPkgs = true;
           backupFileExtension = "backup";
           users = mapAttrs (username: modules: {
-            imports = modules;
+            # persistence declares the options the preservation module reads
+            # back out below; every user config needs it in scope.
+            imports = modules ++ [ self.homeModules.persistence ];
 
             home = {
               inherit username;

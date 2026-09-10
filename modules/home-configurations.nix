@@ -32,6 +32,7 @@ let
 
       modules = [
         stylix.homeModules.stylix
+        self.homeModules.persistence
 
         # Baseline required by standalone home-manager.
         {

@@ -83,5 +83,12 @@
           ++ (lib.strings.splitString " " config.home.sessionVariables.RUSTFLAGS);
         };
       };
+
+      persistence.directories = [
+        # Plugin data (share) plus undo history, sessions and shada (state). The
+        # secret-file autocmd keeps anything from /dev/shm out of the latter.
+        ".local/share/nvim"
+        ".local/state/nvim"
+      ];
     };
 }

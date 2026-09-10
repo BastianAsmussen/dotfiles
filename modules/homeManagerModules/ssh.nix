@@ -46,5 +46,7 @@
           };
         };
       };
+
+      persistence.directories = [ ".ssh" ];
     };
 }

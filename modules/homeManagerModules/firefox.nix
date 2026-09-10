@@ -156,5 +156,10 @@
             "x-scheme-handler/unknown" = browser;
           };
       };
+
+      persistence.directories = [
+        # Profile, cookies, and the extensions' own storage.
+        ".mozilla"
+      ];
     };
 }

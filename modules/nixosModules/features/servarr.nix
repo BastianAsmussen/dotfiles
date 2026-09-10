@@ -5,6 +5,23 @@
       options.servarr.enable = lib.mkEnableOption "Enable the *arr stack.";
 
       config = lib.mkIf config.servarr.enable {
+        # Each *arr keeps its library, history and indexer wiring in a SQLite DB
+        # under its state directory. Prowlarr runs as a DynamicUser, so its real
+        # state is under /var/lib/private and the /var/lib path is a symlink.
+        persistence.directories = [
+          {
+            directory = "/var/lib/sonarr";
+            user = config.services.sonarr.user;
+            group = config.services.sonarr.group;
+          }
+          {
+            directory = "/var/lib/radarr";
+            user = config.services.radarr.user;
+            group = config.services.radarr.group;
+          }
+          "/var/lib/private/prowlarr"
+        ];
+
         users.extraGroups.media.members = [
           config.services.sonarr.user
           config.services.radarr.user

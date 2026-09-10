@@ -1,40 +1,63 @@
 {
   flake.nixosModules.ccache =
-    { config, ... }:
     {
-      programs.ccache.enable = true;
-      nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
-      nixpkgs.overlays = [
-        (_: super: {
-          ccacheWrapper = super.ccacheWrapper.override {
-            extraConfig = ''
-              export CCACHE_COMPRESS=1
-              export CCACHE_DIR="${config.programs.ccache.cacheDir}"
-              export CCACHE_UMASK=007
-              export CCACHE_SLOPPINESS=random_seed
-
-              if [ ! -d "$CCACHE_DIR" ]; then
-                echo "====="
-                echo "Directory '$CCACHE_DIR' does not exist"
-                echo "Please create it with:"
-                echo "  sudo mkdir -m0770 '$CCACHE_DIR'"
-                echo "  sudo chown root:nixbld '$CCACHE_DIR'"
-                echo "====="
-
-                exit 1
-              fi
-
-              if [ ! -w "$CCACHE_DIR" ]; then
-                echo "====="
-                echo "Directory '$CCACHE_DIR' is not accessible for user $(whoami)"
-                echo "Please verify its access permissions"
-                echo "====="
-
-                exit 1
-              fi
-            '';
-          };
+      config,
+      lib,
+      options,
+      ...
+    }:
+    {
+      config = lib.mkMerge [
+        # The cache is rebuildable, but re-warming it costs a full kernel/LLVM
+        # build. nixbld needs group write, hence the explicit mode.
+        # Hosts without preservation get an empty attrset instead.
+        (lib.optionalAttrs (options ? persistence) {
+          persistence.directories = [
+            {
+              directory = config.programs.ccache.cacheDir;
+              user = "root";
+              group = "nixbld";
+              mode = "0770";
+            }
+          ];
         })
+
+        {
+          programs.ccache.enable = true;
+          nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
+          nixpkgs.overlays = [
+            (_: super: {
+              ccacheWrapper = super.ccacheWrapper.override {
+                extraConfig = ''
+                  export CCACHE_COMPRESS=1
+                  export CCACHE_DIR="${config.programs.ccache.cacheDir}"
+                  export CCACHE_UMASK=007
+                  export CCACHE_SLOPPINESS=random_seed
+
+                  if [ ! -d "$CCACHE_DIR" ]; then
+                    echo "====="
+                    echo "Directory '$CCACHE_DIR' does not exist"
+                    echo "Please create it with:"
+                    echo "  sudo mkdir -m0770 '$CCACHE_DIR'"
+                    echo "  sudo chown root:nixbld '$CCACHE_DIR'"
+                    echo "====="
+
+                    exit 1
+                  fi
+
+                  if [ ! -w "$CCACHE_DIR" ]; then
+                    echo "====="
+                    echo "Directory '$CCACHE_DIR' is not accessible for user $(whoami)"
+                    echo "Please verify its access permissions"
+                    echo "====="
+
+                    exit 1
+                  fi
+                '';
+              };
+            })
+          ];
+        }
       ];
     };
 }

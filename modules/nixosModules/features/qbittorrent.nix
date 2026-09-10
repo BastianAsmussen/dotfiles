@@ -560,6 +560,10 @@
           };
         };
 
+        # The profile holds the torrent list, categories, resume data and the
+        # WebUI's own state; losing it means re-adding every torrent.
+        persistence.directories = [ svc.profileDir ];
+
         services.qbittorrent = {
           enable = true;
           webuiPort = 8081;

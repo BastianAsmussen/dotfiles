@@ -206,7 +206,6 @@
 
         # System state that must survive reboot.
         directories = [
-          "/var/lib/acme" # ACME/Let's Encrypt certificates.
           "/var/lib/AccountsService" # User list / icons.
           "/var/lib/bluetooth"
           "/var/lib/power-profiles-daemon"
@@ -216,46 +215,14 @@
             user = "chrony";
             group = "chrony";
           }
-          "/var/lib/qBittorrent"
           "/var/lib/dsh" # DSH_HOME: dsh profiles, storages, UI-set credentials.
-          {
-            directory = "/var/lib/sonarr";
-            user = "sonarr";
-            group = "sonarr";
-          }
-          {
-            directory = "/var/lib/radarr";
-            user = "radarr";
-            group = "radarr";
-          }
           "/var/lib/systemd/coredump"
-          "/var/lib/private/gitea-runner" # Forgejo runner state.
-          "/var/lib/private/prowlarr"
-          "/var/lib/private/seerr"
           "/var/lib/private/ollama"
-          {
-            # Keep a stable entry-guard set instead of selecting new guards on
-            # every reboot.
-            directory = "/var/lib/tor";
-            user = "tor";
-            group = "tor";
-            mode = "0700";
-          }
-          {
-            directory = "/var/cache/ccache";
-            user = "root";
-            group = "nixbld";
-            mode = "0770";
-          }
         ];
 
         directoriesWithMode = {
           "/var/lib/private" = "0700";
 
-          # Secure Boot keys (lanzaboote pkiBundle). Root tmpfs is wiped every
-          # boot, so this must persist or the next rebuild can't sign the boot
-          # chain and the machine becomes unbootable.
-          "/var/lib/sbctl" = "0700";
         };
 
         files = [
@@ -288,50 +255,35 @@
             "Postman"
 
             # App state / configs not fully managed by HM.
-            ".config/sops" # VERY important!
-            ".config/sops-nix"
             ".config/libreoffice"
             ".config/Signal"
             ".config/vesktop"
-            ".config/spotify"
             ".config/teams-for-linux"
-            ".mozilla"
-            ".password-store"
             ".pki"
-            ".ssh"
             ".dsh"
 
             ".local/share/bottles"
             ".local/share/containers"
-            ".local/share/direnv"
-            ".local/share/fish"
             ".local/share/flatpak"
-            ".local/share/gopass"
             ".local/share/goxlr-utility"
+
+            # zsh has real history here, but homeModules.zsh is imported by no
+            # profile or host set, so no module owns this path to declare it.
+            ".local/share/zsh"
             ".local/share/lutris"
-            ".local/share/nvim"
             ".local/share/Steam"
             ".local/share/umu"
-            ".local/share/zoxide"
-            ".local/share/zsh"
 
             ".local/state/home-manager"
             ".local/state/nix"
-            ".local/state/nvim"
             ".local/state/wireplumber"
             ".local/state/mpv"
           ];
 
           directoriesWithMode = {
-            ".gnupg" = "0700";
             ".local/share/keyrings" = "0700";
             ".tor project" = "0700";
           };
-
-          cache.directories = [
-            ".cache/direnv"
-            ".cache/spotify/Storage"
-          ];
         };
       };
 

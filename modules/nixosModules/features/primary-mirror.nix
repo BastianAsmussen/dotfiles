@@ -213,6 +213,17 @@
           };
         };
 
+        # The mirror's recorded busy state; without it a reboot loses which side
+        # SNI routing should point at until the next health check.
+        persistence.directories = [
+          {
+            directory = "/var/lib/primary-mirror";
+            user = "root";
+            group = "builder";
+            mode = "0775";
+          }
+        ];
+
         systemd = {
           tmpfiles.rules = [
             "d ${stateDir}        2775 root ${cfg.busyGroup} -"

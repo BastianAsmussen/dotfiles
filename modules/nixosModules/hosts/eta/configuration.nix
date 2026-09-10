@@ -202,17 +202,10 @@
       persistence = {
         enable = true;
         directories = [
-          "/var/lib/acme"
           {
             directory = "/var/lib/chrony";
             user = "chrony";
             group = "chrony";
-          }
-          {
-            directory = "/var/lib/primary-mirror";
-            user = "root";
-            group = "builder";
-            mode = "0775";
           }
         ];
       };

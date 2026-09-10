@@ -34,6 +34,10 @@
       # up new ones.
       gamemode.pauseUnits = [ "gitea-runner-${hostname}.service" ];
 
+      # DynamicUser, so the real state is under /var/lib/private. Losing it
+      # deregisters the runner and CI stops picking up jobs.
+      persistence.directories = [ "/var/lib/private/gitea-runner" ];
+
       services.gitea-actions-runner = {
         package = pkgs.forgejo-runner;
         instances.${hostname} = {
