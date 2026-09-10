@@ -527,6 +527,11 @@
           torrentFileIndexers = [ "AnimeTosho" ];
         };
 
+        # Seerr's override rule covers every other user, but Seerr skips
+        # override rules for anyone holding ADMIN, so anime requested from the
+        # admin account otherwise lands on the movie root.
+        radarr.syncAnimeRoot = true;
+
         # Sonarr and Radarr each keep their own copy of the WebUI password, so
         # without this a rotation silently breaks downloads until both UIs are
         # edited by hand.
