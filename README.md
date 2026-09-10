@@ -11,6 +11,7 @@ This is a repository for my NixOS configuration.
 - [Installation Guide](#installation-guide)
   - [LUKS & FIDO2](#luks--fido2)
   - [Age Key Generation (sops-nix)](#age-key-generation-sops-nix)
+  - [Lanzaboote / Secure Boot (UEFI)](#lanzaboote--secure-boot-uefi)
 - [Maintenance Guide](#maintenance-guide)
 - [To-Do Tracking](#to-do-tracking)
 - [Development Templates](#development-templates)
@@ -86,11 +87,18 @@ just iso-install /dev/sdX
    just disko $HOSTNAME
    ```
 
-3. Finally, install NixOS with the given configuration.
+3. Install NixOS with the given configuration.
 
    ```sh
    just install $HOSTNAME
    ```
+
+4. Reboot, then finish the post-install steps that cannot be done
+   declaratively:
+   - [Enroll a FIDO2 token](#enrolling-a-fido2-token) if the host uses LUKS.
+   - [Set up Secure Boot](#lanzaboote--secure-boot-uefi) if the host imports
+     `lanzaboote` (`epsilon`). **Skipping this leaves the machine running an
+     unsigned boot chain**, which is the whole point of importing the module.
 
 ### Possible Errors and Workarounds
 
@@ -238,30 +246,77 @@ chain with [sbctl](https://github.com/Foxboron/sbctl), protecting against
 evil-maid attacks. The module automatically disables the stock systemd-boot
 installer — do not enable both.
 
-Secure Boot keys are **not** created automatically. You must set them up
-manually after the first rebuild:
+Note that `delta` uses [Limine](https://limine-bootloader.org) rather than
+Lanzaboote, so none of this applies there.
+
+#### Post-Install Setup
+
+Secure Boot keys are **not** created automatically, and nothing in the
+configuration can create them for you: enrolling into firmware needs the
+machine to be in Setup Mode. Do this once, after the first boot into the
+installed system.
+
+1. Put the firmware into Setup Mode. This lives in the UEFI menu, usually under
+   *Security -> Secure Boot -> Key Management*, as "Erase all Secure Boot
+   settings", "Delete all keys", or "Clear Secure Boot keys". Leave Secure Boot
+   itself **disabled** for now.
+
+2. Confirm the machine is actually in Setup Mode before going further:
+
+   ```sh
+   just secureboot-verify
+   ```
+
+   `Setup Mode` must read `Enabled`. If it reads `Disabled`, the firmware did
+   not clear its keys and `enroll-keys` below will fail.
+
+3. Create the keys and enroll them:
+
+   ```sh
+   just secureboot-setup
+   ```
+
+   This runs `sbctl create-keys` (PK, KEK and db under `/var/lib/sbctl`), then
+   `sbctl enroll-keys --microsoft`. Keep `--microsoft`: without the vendor
+   certificates, firmware that verifies its own option ROMs (most discrete GPUs
+   and some NVMe drives) will refuse to initialise them.
+
+4. Rebuild so the current generation is signed with the new keys, then reboot:
+
+   ```sh
+   just rebuild
+   sudo reboot
+   ```
+
+5. Re-enable Secure Boot in the UEFI menu, boot, and check:
+
+   ```sh
+   just secureboot-verify
+   ```
+
+   `Secure Boot` should read `Enabled` and every file in the `sbctl verify`
+   output should be marked as signed. Unsigned entries are usually stale
+   generations; they disappear once garbage-collected.
+
+#### Ongoing
+
+After any rebuild you can re-check the chain:
 
 ```sh
-# Generate PK, KEK, and db certificates at /var/lib/sbctl.
-sudo sbctl create-keys
-
-# Write the keys into the UEFI firmware (requires Setup Mode, or enroll
-# via your firmware's custom-key menu). The --microsoft flag keeps
-# Microsoft-signed option ROMs (GPU, SSD) working.
-sudo sbctl enroll-keys --microsoft
-```
-
-After every rebuild, verify the boot chain is signed:
-
-```sh
-sbctl verify
+just secureboot-verify
 ```
 
 > [!WARNING]
-> If the host uses impermanence (tmpfs on `/`), the directory
-> `/var/lib/sbctl` **must** be persisted across reboots. Otherwise the keys
-> vanish and the next rebuild cannot sign the boot chain, leaving the machine
-> unbootable. See `epsilon`'s `directoriesWithMode` for a working example.
+> `lanzaboote.nix` declares `/var/lib/sbctl` as persisted state, so on a
+> tmpfs-root host the keys survive a reboot without the host having to list
+> them. If you ever move the `pkiBundle` path, move that declaration with it:
+> keys that vanish leave the next rebuild unable to sign the boot chain, and
+> the machine unbootable.
+
+> [!TIP]
+> If you end up in that state, boot the installer ISO, disable Secure Boot in
+> firmware, and rebuild. The generation will boot unsigned, and you can redo
+> the enrollment from step 1.
 
 ## Maintenance Guide
 
@@ -303,6 +358,21 @@ sbctl verify
 | `just topology` | Regenerate the network diagram (`docs/topology.svg`) |
 | `just vault` | Trigger an arctic vault backup snapshot |
 | `just infra <args>` | OpenTofu IaC commands (Hetzner Cloud) |
+
+Install and secrets recipes, used once per host rather than day to day:
+
+| Recipe | Purpose |
+| --- | --- |
+| `just add-host <name>` | Scaffold a new host from `_example` |
+| `just disko <host>` | Partition and format disks (**destructive**) |
+| `just install <host>` | Run `nixos-install` for a host |
+| `just iso` | Build the custom installer ISO |
+| `just iso-install <drive>` | Write the latest ISO to a flash drive |
+| `just fido2-enroll <device>` | Enroll a FIDO2 token for LUKS |
+| `just secureboot-setup` | Create and enroll Secure Boot keys (Lanzaboote) |
+| `just secureboot-verify` | Check the boot chain is signed |
+| `just age-keygen` | Generate a standalone age key |
+| `just age-host-key` | Derive an age key from the host's SSH key |
 
 ### Rename Host
 
