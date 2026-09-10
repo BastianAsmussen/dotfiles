@@ -525,6 +525,16 @@
           # 500s the whole result page.
           torrentFileIndexers = [ "AnimeTosho" ];
         };
+
+        # Sonarr and Radarr each keep their own copy of the WebUI password, so
+        # without this a rotation silently breaks downloads until both UIs are
+        # edited by hand.
+        downloadClient = {
+          syncCredentials = true;
+
+          username = config.qbittorrent.webuiUsername;
+          passwordFile = config.qbittorrent.webuiPasswordFile;
+        };
       };
       seerr.enable = true;
       deepseek-harness = {
