@@ -100,7 +100,12 @@
                 args+=( "$arg" )
               done
 
-              [ "$inserted" -eq 1 ] || args+=( "''${extra[@]}" )
+              # No separator means this is not the app invocation. Nixpak runs
+              # its xdg-dbus-proxy through this same bwrap, appending the proxy
+              # command bare, and NIXPAK_APP_EXE is exported for that call too.
+              # Appending there hands the binds to xdg-dbus-proxy, which exits
+              # on the unknown argument and takes the launcher down with it.
+              [ "$inserted" -eq 1 ] || exec "$real" "$@"
               exec "$real" "''${args[@]}"
               SHIM
 
