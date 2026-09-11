@@ -78,7 +78,8 @@
                 args+=( "$arg" )
               done
 
-              [ "$inserted" -eq 1 ] || args+=( "''${extra[@]}" )
+              # Do not add binds to xdg-dbus-proxy invocations.
+              [ "$inserted" -eq 1 ] || exec "$real" "$@"
               exec "$real" "''${args[@]}"
               SHIM
 
