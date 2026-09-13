@@ -8,13 +8,22 @@
       ...
     }:
     let
+      # Reuse x86_64 map geometry on aarch64; the data bytes are identical.
+      mapStatic =
+        if config.covenant-extras.includeMap then
+          inputs.covenant.packages.x86_64-linux.map-static
+        else
+          null;
+
       # Cross-compile natively instead of building aarch64 Go through QEMU.
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
         (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.gomod2nix.overlays.default).callPackage
           "${inputs.covenant}/default.nix"
-          { }
+          { inherit mapStatic; }
       );
+
+      nativePackage = inputs.covenant.packages.${pkgs.system}.default.override { inherit mapStatic; };
     in
     {
       options.covenant-extras = {
@@ -25,6 +34,24 @@
             Domain the Covenant is served on.  It deliberately does not live
             under asmussen.tech: the document stands on its own, and the shared
             wildcard certificate therefore does not cover it.
+          '';
+        };
+
+        includeMap = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = ''
+            Whether to ship the derived boundary geometry that /map draws.
+
+            Building it is a ten to fifteen minute geometry pass over roughly
+            620MB of pinned source data, cached like any other derivation once
+            built, so the cost falls on the first deploy after the sources
+            change and on no other.
+
+            With this off the site is unchanged except that /map returns 404:
+            the server treats missing metadata as "no map derived" rather than
+            as a failure, so the two documents are never held hostage to the
+            geometry.
           '';
         };
 
@@ -51,9 +78,9 @@
           canonicalURL = "https://${config.covenant-extras.domain}";
         };
 
-        services.covenant.package = lib.mkIf (
-          pkgs.stdenv.hostPlatform.system == "aarch64-linux"
-        ) crossPackage;
+        # Apply the map override to native and cross builds.
+        services.covenant.package =
+          if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then crossPackage else nativePackage;
 
         nginx.reverseProxies.covenant = lib.mkIf config.covenant-extras.exposePublicly {
           enable = true;
