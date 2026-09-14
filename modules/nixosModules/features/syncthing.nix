@@ -15,6 +15,7 @@
     {
       config,
       lib,
+      options,
       ...
     }:
     let
@@ -44,70 +45,86 @@
       allDevices = lib.attrNames devices;
     in
     {
-      sops.secrets = {
-        "services/syncthing/gui-password" = {
-          sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
-          owner = user;
-        };
+      config = lib.mkMerge [
+        {
+          sops.secrets = {
+            "services/syncthing/gui-password" = {
+              sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
+              owner = user;
+            };
 
-        "hosts/${config.networking.hostName}/syncthing-key".owner = user;
-        "hosts/${config.networking.hostName}/syncthing-cert".owner = user;
-      };
-
-      networking.firewall.interfaces.wg0 = {
-        allowedTCPPorts = [ 22000 ];
-        allowedUDPPorts = [ 22000 ];
-      };
-
-      services.syncthing = {
-        inherit user;
-
-        enable = true;
-        group = "users";
-        dataDir = home;
-        cert = config.sops.secrets."hosts/${config.networking.hostName}/syncthing-cert".path;
-        key = config.sops.secrets."hosts/${config.networking.hostName}/syncthing-key".path;
-        guiPasswordFile = config.sops.secrets."services/syncthing/gui-password".path;
-        overrideDevices = true;
-        overrideFolders = true;
-        settings = {
-          inherit devices;
-
-          options = {
-            urAccepted = -1;
-            globalAnnounceEnabled = false;
-            localAnnounceEnabled = false;
-            relaysEnabled = false;
-            listenAddresses = [
-              "tcp://0.0.0.0:22000"
-              "quic://0.0.0.0:22000"
-            ];
+            "hosts/${config.networking.hostName}/syncthing-key".owner = user;
+            "hosts/${config.networking.hostName}/syncthing-cert".owner = user;
           };
 
-          gui = {
+          networking.firewall.interfaces.wg0 = {
+            allowedTCPPorts = [ 22000 ];
+            allowedUDPPorts = [ 22000 ];
+          };
+
+          services.syncthing = {
             inherit user;
 
-            insecureSkipHostcheck = true;
-            theme = "dark";
+            enable = true;
+            group = "users";
+            dataDir = home;
+            cert = config.sops.secrets."hosts/${config.networking.hostName}/syncthing-cert".path;
+            key = config.sops.secrets."hosts/${config.networking.hostName}/syncthing-key".path;
+            guiPasswordFile = config.sops.secrets."services/syncthing/gui-password".path;
+            overrideDevices = true;
+            overrideFolders = true;
+            settings = {
+              inherit devices;
+
+              options = {
+                urAccepted = -1;
+                globalAnnounceEnabled = false;
+                localAnnounceEnabled = false;
+                relaysEnabled = false;
+                listenAddresses = [
+                  "tcp://0.0.0.0:22000"
+                  "quic://0.0.0.0:22000"
+                ];
+              };
+
+              gui = {
+                inherit user;
+
+                insecureSkipHostcheck = true;
+                theme = "dark";
+              };
+
+              folders = {
+                "Documents" = {
+                  path = "${home}/Documents";
+                  devices = allDevices;
+                };
+
+                "Pictures" = {
+                  path = "${home}/Pictures";
+                  devices = allDevices;
+                };
+
+                "Videos" = {
+                  path = "${home}/Videos";
+                  devices = allDevices;
+                };
+              };
+            };
           };
+        }
 
-          folders = {
-            "Documents" = {
-              path = "${home}/Documents";
-              devices = allDevices;
-            };
-
-            "Pictures" = {
-              path = "${home}/Pictures";
-              devices = allDevices;
-            };
-
-            "Videos" = {
-              path = "${home}/Videos";
-              devices = allDevices;
-            };
-          };
-        };
-      };
+        (lib.optionalAttrs (options ? persistence) {
+          # Index only; cert/key are re-copied from sops on every start.
+          persistence.user.cache.directories = [
+            {
+              directory = ".config/syncthing/index-v2";
+              group = "users";
+              mode = "0700";
+              configureParent = true;
+            }
+          ];
+        })
+      ];
     };
 }
