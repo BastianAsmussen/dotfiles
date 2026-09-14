@@ -20,6 +20,7 @@
             worldmonitor-redis-rest
             absolute-episode
             calculator
+            caveman-cli
             copy-file
             neovim
             neovim-minimal

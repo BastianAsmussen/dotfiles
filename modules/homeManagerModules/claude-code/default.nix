@@ -1,62 +1,145 @@
 {
   flake.homeModules.claudeCode =
     {
-      config,
-      osConfig ? null,
+      pkgs,
       lib,
       ...
     }:
     let
-      # Present only on hosts that import the preservation module (epsilon).
-      persistence = if osConfig == null then null else osConfig.persistence or null;
-      persistEnabled = persistence != null && persistence.enable;
+      inherit (lib) getExe' genAttrs getExe;
 
-      home = config.home.homeDirectory;
+      proxyHook = {
+        type = "command";
+        command = "${getExe' pkgs.caveman-cli "caveman-proxy"} native-hook claude --adapter '${pkgs.caveman-cli}/lib/caveman-cli/dist/native-hook-fast.js'";
+        timeout = 30;
+      };
 
-      # Preservation wipes the tmpfs root on every boot, so everything the CLI
-      # writes under ~/.claude (OAuth credentials, session state) and
-      # ~/.claude.json must live on /persist. Home-manager cannot register
-      # entries with the NixOS-side preservation module, so this feature owns
-      # its own state by symlinking into the same userdata tree preservation
-      # uses for the rest of the home directory.
-      persistBase = "${persistence.persistPath}/userdata${home}";
-
-      claudeDir = "${home}/.claude";
-      claudeJson = "${home}/.claude.json";
-      persistDir = "${persistBase}/.claude";
-      persistJson = "${persistBase}/.claude.json";
+      proxyHooks = genAttrs [
+        "SessionStart"
+        "UserPromptSubmit"
+        "PreToolUse"
+        "PostToolUse"
+        "PostToolUseFailure"
+        "PreCompact"
+        "SubagentStart"
+        "SubagentStop"
+        "Stop"
+        "SessionEnd"
+      ] (_: [ { hooks = [ proxyHook ]; } ]);
     in
     {
       programs.claude-code = {
         enable = true;
-
-        # Nix-managed global context, linked to ~/.claude/CLAUDE.md. Populate
-        # the imported file in-repo; runtime edits belong in per-project
-        # CLAUDE.md files instead.
         context = ./CLAUDE.md;
+        skills = ./skills;
+        outputStyles.tolerable = ./output-styles/tolerable.md;
+
+        settings = {
+          outputStyle = "Tolerable";
+          model = "opus";
+          effortLevel = "xhigh";
+          theme = "dark-ansi";
+          timeFormat = "24-hour";
+
+          autoCompactEnabled = true;
+          autoModeDuringPlan = false;
+          awaySummaryEnabled = false;
+          enableWorkflows = true;
+          promptSuggestionEnabled = false;
+          remoteControlAtStartup = false;
+          skipWorkflowUsageWarning = true;
+
+          env = {
+            ANTHROPIC_BASE_URL = "http://127.0.0.1:8787/w/claude";
+            CLAUDE_CODE_SCROLL_SPEED = "8";
+            ENABLE_TOOL_SEARCH = "auto";
+            _CLAUDE_CODE_ASSUME_FIRST_PARTY_BASE_URL = "1";
+          };
+
+          modelSettings =
+            genAttrs
+              [
+                "claude-opus-5"
+                "claude-sonnet-5"
+                "claude-sonnet-4-6"
+              ]
+              (_: {
+                effortLevel = "xhigh";
+              });
+
+          hooks = proxyHooks // {
+            PreToolUse = proxyHooks.PreToolUse ++ [
+              {
+                hooks = [
+                  {
+                    type = "command";
+                    command = "${getExe pkgs.caveman-cli} shrink-hook";
+                    timeout = 30;
+                  }
+                ];
+              }
+            ];
+          };
+
+          enabledPlugins = {
+            "skill-creator@claude-plugins-official" = true;
+            "rust-analyzer-lsp@claude-plugins-official" = true;
+            "typescript-lsp@claude-plugins-official" = true;
+          };
+
+        };
+
+        lspServers = {
+          rust = {
+            command = "${getExe pkgs.rust-analyzer}";
+            extensionToLanguage.".rs" = "rust";
+          };
+
+          go = {
+            args = [ "serve" ];
+            command = "${getExe pkgs.gopls}";
+            extensionToLanguage.".go" = "go";
+          };
+
+          typescript = {
+            args = [ "--stdio" ];
+            command = "${getExe pkgs.typescript-language-server}";
+            extensionToLanguage = {
+              ".js" = "javascript";
+              ".jsx" = "javascriptreact";
+              ".ts" = "typescript";
+              ".tsx" = "typescriptreact";
+            };
+          };
+        };
+
+        mcpServers.caveman = {
+          type = "stdio";
+          command = getExe' pkgs.caveman-cli "caveman-mcp";
+        };
+
+        package =
+          (pkgs.writeShellScriptBin "claude" ''
+            export PATH="${
+              lib.strings.makeSearchPathOutput "bin" "bin" [
+                pkgs.caveman-cli
+                pkgs.claude-code
+              ]
+            }:$PATH"
+
+            exec ${getExe pkgs.caveman-cli} claude "$@"
+          '').overrideAttrs
+            (_: {
+              inherit (pkgs.claude-code) version;
+            });
       };
 
-      # Establish the persist symlinks before home-manager links its own files
-      # (CLAUDE.md, settings.json, plugins) into ~/.claude, so those writes
-      # land on /persist instead of the tmpfs that is erased at boot. Existing
-      # real state from a pre-persistence layout is adopted once, then replaced.
-      home.activation.claudeCodePersist = lib.mkIf persistEnabled (
-        lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
-          run mkdir -p "${persistDir}"
-          run chmod 700 "${persistDir}"
-
-          if [ -e "${claudeDir}" ] && [ ! -L "${claudeDir}" ]; then
-            run cp -a "${claudeDir}/." "${persistDir}/"
-            run rm -rf "${claudeDir}"
-          fi
-          run ln -sfn "${persistDir}" "${claudeDir}"
-
-          if [ -e "${claudeJson}" ] && [ ! -L "${claudeJson}" ]; then
-            run mv "${claudeJson}" "${persistJson}"
-          fi
-          [ -e "${persistJson}" ] || run touch "${persistJson}"
-          run ln -sfn "${persistJson}" "${claudeJson}"
-        ''
-      );
+      persistence = {
+        files = [ ".claude.json" ];
+        directoriesWithMode = {
+          ".caveman" = "0700";
+          ".claude" = "0700";
+        };
+      };
     };
 }
