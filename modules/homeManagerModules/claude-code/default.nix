@@ -82,9 +82,10 @@
           };
 
           enabledPlugins = {
-            "skill-creator@claude-plugins-official" = true;
             "rust-analyzer-lsp@claude-plugins-official" = true;
             "typescript-lsp@claude-plugins-official" = true;
+            "skill-creator@claude-plugins-official" = true;
+            "frontend-design@claude-plugins-official" = true;
           };
 
         };
