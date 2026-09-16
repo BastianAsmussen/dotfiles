@@ -14,6 +14,7 @@
         firefox
         nixcord
         noctalia
+        obsidian
         spicetify
         torBrowser
       ];
