@@ -24,6 +24,7 @@
       tmux
       tmuxSessionizer
       tuxedo
+      uv
       zoxide
     ];
   };
