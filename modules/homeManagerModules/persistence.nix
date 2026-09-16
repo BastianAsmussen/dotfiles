@@ -1,4 +1,3 @@
-# Let home modules declare persisted state for preservation to read back.
 {
   flake.homeModules.persistence =
     { lib, ... }:
@@ -8,23 +7,24 @@
       dirs =
         description:
         mkOption {
+          inherit description;
+
           type = types.listOf (types.either types.str types.attrs);
           default = [ ];
-          inherit description;
         };
 
       files =
         description:
         mkOption {
+          inherit description;
+
           type = types.listOf types.str;
           default = [ ];
-          inherit description;
         };
     in
     {
       options.persistence = {
         directories = dirs "Directories under the home directory to persist, relative to it.";
-
         directoriesWithMode = mkOption {
           type = types.attrsOf types.str;
           default = { };
