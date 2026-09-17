@@ -13,7 +13,7 @@
       config = lib.mkMerge [
         # Persist the signing keys; without them the next rebuild cannot sign.
         (lib.optionalAttrs (options ? persistence) {
-          persistence.directoriesWithMode."/var/lib/sbctl" = "0700";
+          persistence.directoriesWithMode."/var/lib/sbctl".mode = "0700";
         })
 
         {

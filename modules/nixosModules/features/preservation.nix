@@ -19,6 +19,27 @@
       mkDirWithMode = lib.mapAttrsToList (directory: mode: { inherit directory mode; });
       user = config.preferences.user.name;
 
+      dirWithModeType = types.submodule {
+        options = {
+          mode = mkOption {
+            type = types.str;
+            description = "Directory mode, e.g. \"0700\".";
+          };
+
+          user = mkOption {
+            type = types.str;
+            default = "root";
+            description = "Owning user.";
+          };
+
+          group = mkOption {
+            type = types.str;
+            default = "root";
+            description = "Owning group.";
+          };
+        };
+      };
+
       # Read home-module persistence declarations into the NixOS configuration.
       homeCfg =
         config.home-manager.users.${user}.persistence or {
@@ -51,9 +72,9 @@
         };
 
         directoriesWithMode = mkOption {
-          type = types.attrsOf types.str;
+          type = types.attrsOf dirWithModeType;
           default = { };
-          description = "Extra system directories to persist, with explicit permissions. Keys are paths, values are mode strings (e.g. \"0700\").";
+          description = "Extra system directories to persist, with explicit permissions. Keys are paths, values set the mode and owner.";
         };
 
         files = mkOption {
@@ -131,7 +152,10 @@
                 "/var/lib/sops-nix"
               ]
               ++ cfg.directories
-              ++ mkDirWithMode cfg.directoriesWithMode;
+              ++ lib.mapAttrsToList (directory: dir: {
+                inherit directory;
+                inherit (dir) mode user group;
+              }) cfg.directoriesWithMode;
 
               files = [
                 {
