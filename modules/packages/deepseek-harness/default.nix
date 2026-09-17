@@ -11,30 +11,32 @@
           nodejs = pkgs.nodejs_22;
           pnpm = pkgs.pnpm_11;
 
-          # Pinned release; update rev and both hashes together.
-          rev = "d347e703908d0406b7a7ef80e3a0e594d86b2215";
+          rev = "00102833dfaee1da9f48a3a8eae9d34005a75218";
         in
         pkgs.stdenv.mkDerivation (finalAttrs: {
           pname = "dsh";
-          version = "0.1.3-alpha.1";
+          version = "0.1.7-alpha.2";
 
           src = pkgs.fetchFromGitHub {
             inherit rev;
 
             owner = "deepseek-ai";
             repo = "deepseek-harness";
-            hash = "sha256-7gje0bGlfRbo6qEubnKt3z8a6UjDGNW90g7phGU+s6g=";
+            hash = "sha256-Fgc2qYdmMghr6f1zqIjTSNETjJ1PtLhVCBoqrNhuJsA=";
           };
 
           pnpmDeps = pkgs.fetchPnpmDeps {
             inherit (finalAttrs) pname version src;
             inherit pnpm;
+
             fetcherVersion = 4;
-            hash = "sha256-IoX7qY6lXVJtYDljhSJF157JwZR72QZ1YX8Jpts7awk=";
+            hash = "sha256-i5XoYAHernnWFi3iAMrTUPJ5CQB4yx8XeSaChMotGyI=";
           };
 
-          # Trust the mTLS proxy and persist settings host-side.
-          patches = [ ./settings-host-persistence.patch ];
+          patches = [
+            ./settings-host-persistence.patch
+            ./expose-internals-builtins.patch
+          ];
 
           nativeBuildInputs = [
             nodejs
@@ -45,7 +47,7 @@
             pkgs.makeWrapper
           ];
 
-          # Embed the source commit and use esbuild's pinned bundled binary.
+          # Unset, the build shells out to `git rev-parse HEAD`.
           env = {
             CI = "true";
             DSH_CLIENT_COMMIT_HASH = builtins.substring 0 7 rev;
@@ -56,8 +58,7 @@
 
             export HOME=$(mktemp -d)
 
-            # Build node-pty offline against nixpkgs headers; pnpm skips install
-            # scripts.
+            # pnpmConfigHook implies --ignore-scripts, and prebuild.js wants the network.
             ptydir=$(find node_modules/.pnpm -type d -name node-pty -path '*/node_modules/node-pty' | head -n1)
             pushd "$ptydir"
             node-gyp rebuild --nodedir=${pkgs.srcOnly nodejs}
@@ -74,8 +75,7 @@
             mkdir -p $out/lib/dsh
             cp -a . $out/lib/dsh/
 
-            # Node's internal loader requires --expose-internals for workspace
-            # plugin resolution.
+            # vendor/loader hooks Node's internal ESM loader for the plugins.
             makeWrapper ${lib.getExe' nodejs "node"} $out/bin/dsh \
               --add-flags "--expose-internals $out/lib/dsh/apps/cli/lib/bin.js"
 
