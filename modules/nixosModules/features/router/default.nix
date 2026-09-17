@@ -18,10 +18,10 @@
 
       # Pin the firmware's header, checksum descriptor and ordered record
       # schema.
-      template = builtins.fromJSON (builtins.readFile ./router.template.json);
+      template = builtins.fromJSON (builtins.readFile ./template.json);
 
-      generator = ./router.generate.py;
-      python = "${pkgs.python3}/bin/python3";
+      generator = ./generate.py;
+      python = lib.getExe pkgs.python3;
 
       # The firmware exposes a fixed number of slots for these tables.
       maxLeases = 4;
@@ -137,6 +137,7 @@
       plan = {
         inherit (cfg) host;
         inherit (template) header_b64 checksum_b64;
+
         records = planRecords;
         login = {
           user = cfg.adminUser;
@@ -321,6 +322,7 @@
             serviceConfig = {
               Type = "oneshot";
               StateDirectory = "icotera-router";
+
               # The rendered backup contains cleartext passwords; keep it
               # root-only.
               StateDirectoryMode = "0700";
