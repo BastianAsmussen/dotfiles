@@ -55,6 +55,7 @@
         self.nixosModules.ssh
         self.nixosModules.tor
         self.nixosModules.luksFido2
+        self.nixosModules.schizofoxDev
         self.nixosModules.yubiKey
         self.nixosModules.preservation
         self.nixosModules.wireguard

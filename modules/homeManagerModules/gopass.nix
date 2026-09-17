@@ -16,6 +16,9 @@
         # gpg-agent falls back to its graphical pinentry, which is what we want.
         tty=$(tty 2>/dev/null) && export GPG_TTY="$tty"
 
+        # gpg forwards this to pinentry, which runs outside the sandbox.
+        unset DBUS_SESSION_BUS_ADDRESS
+
         export GNUPGHOME="''${GNUPGHOME:-$HOME/.gnupg}"
         export PATH="${
           lib.makeBinPath (
