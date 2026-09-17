@@ -165,6 +165,8 @@
         ollama = {
           enable = true;
           package = pkgs.ollama-cuda;
+
+          environmentVariables.OLLAMA_NUM_PARALLEL = "4";
         };
 
         meilisearch.masterKeyFile = config.sops.secrets."meilisearch/master-key".path;
@@ -682,6 +684,8 @@
       newsSync.push = {
         enable = true;
         llmModel = "hf.co/unsloth/Qwen3.5-9B-GGUF:Q6_K";
+        llmConcurrency = 4;
+        llmNumCtx = 16384;
       };
 
       btrfs.scrub.fileSystems = [

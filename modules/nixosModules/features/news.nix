@@ -140,9 +140,20 @@
             type = types.ints.between 1 64;
             default = 2;
             description = ''
-              Max concurrent generation requests. Local VRAM bounds this:
-              parallel generations share the card's KV-cache and compute, so
-              it stays far below what a remote endpoint tolerates.
+              Max concurrent generation requests. Ollama serves these from a
+              fixed slot pool, so anything above OLLAMA_NUM_PARALLEL queues
+              and runs serially no matter what is set here.
+            '';
+          };
+
+          llmNumCtx = mkOption {
+            type = types.ints.positive;
+            default = 8192;
+            description = ''
+              Ollama context window. The daemon derives its per-call output
+              budget from this as num_ctx / 2, so a story whose claim ledger
+              needs more than half the window is cut off mid-JSON and held
+              back for the next pass.
             '';
           };
 
@@ -214,6 +225,7 @@
               provider = "ollama";
               model = cfg.push.llmModel;
               concurrency = cfg.push.llmConcurrency;
+              ollama.numCtx = cfg.push.llmNumCtx;
             };
           };
 
