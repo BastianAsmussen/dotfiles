@@ -130,7 +130,7 @@
 
           llmModel = mkOption {
             type = types.str;
-            default = "gemma3:12b-it-q4_K_M";
+            default = "gemma3:4b-it-q4_K_M";
             description = ''
               Model id used for per-article assessment and story restatement.
             '';
