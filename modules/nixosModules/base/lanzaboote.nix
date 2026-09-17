@@ -16,7 +16,7 @@
         # unbootable machine; owning the entry here means importing lanzaboote
         # is enough. Hosts without preservation get an empty attrset instead.
         (lib.optionalAttrs (options ? persistence) {
-          persistence.directoriesWithMode."/var/lib/sbctl" = "0700";
+          persistence.directoriesWithMode."/var/lib/sbctl".mode = "0700";
         })
 
         {
