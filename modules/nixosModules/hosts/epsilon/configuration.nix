@@ -437,6 +437,23 @@
           appendHttpConfig = ''
             limit_req_zone $binary_remote_addr zone=jellyfin_auth:10m rate=5r/m;
             limit_req_zone $binary_remote_addr zone=seerr_auth:10m rate=5r/m;
+
+            # Clients hardcode image quality and expose no setting for it.
+            map $arg_fillwidth $jellyfin_thumb_w {
+              default 0;
+              "~^[0-9]{1,3}$" 1;
+            }
+
+            map $arg_fillheight $jellyfin_thumb_h {
+              default 0;
+              "~^[0-9]{1,3}$" 1;
+            }
+
+            map "$jellyfin_thumb_w$jellyfin_thumb_h:$args" $jellyfin_image_args {
+              default $args;
+              "~^(?:01|10|11):(?<pre>.*)quality=\d+(?<post>.*)$" "''${pre}quality=70''${post}";
+              "~^(?:01|10|11):(?<all>.+)$" "''${all}&quality=70";
+            }
           '';
 
           virtualHosts = {
@@ -471,6 +488,11 @@
               "~* ^/Users/AuthenticateByName" = {
                 proxyPass = "http://localhost:8096";
                 extraConfig = "limit_req zone=jellyfin_auth burst=3 nodelay;";
+              };
+
+              "~* ^/Items/[^/]+/Images/" = {
+                proxyPass = "http://localhost:8096";
+                extraConfig = "set $args $jellyfin_image_args;";
               };
             };
 
