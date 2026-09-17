@@ -647,10 +647,10 @@
 
       primaryBusy.enable = true;
 
-      # Aggregates and assesses the global news feed locally (Ollama is here),
-      # serves it to epsilon's own website, and pushes copies to eta over
-      # WireGuard SSH so asmussen.tech/news works while epsilon is offline.
-      newsSync.push.enable = true;
+      newsSync.push = {
+        enable = true;
+        llmModel = "hf.co/unsloth/Qwen3.5-9B-GGUF:Q6_K";
+      };
 
       btrfs.scrub.fileSystems = [
         "/persist"
