@@ -39,9 +39,6 @@
         };
       };
 
-      # Boot to text mode.
-      boot.initrd.kernelModules = [ "nvidia" ];
-
       # Load NVIDIA drivers for Xorg and Wayland.
       services.xserver.videoDrivers = [ "nvidia" ];
       environment = {
