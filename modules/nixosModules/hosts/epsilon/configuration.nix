@@ -623,8 +623,10 @@
 
       primaryBusy.enable = true;
 
-      # Aggregate news locally and push the feed to eta for availability.
-      newsSync.push.enable = true;
+      newsSync.push = {
+        enable = true;
+        llmModel = "hf.co/unsloth/Qwen3.5-9B-GGUF:Q6_K";
+      };
 
       btrfs.scrub.fileSystems = [
         "/persist"
