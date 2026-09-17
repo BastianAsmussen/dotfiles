@@ -1,0 +1,14 @@
+--- a/packages/boot/app-boot/src/profile-resolution/resolver.ts
++++ b/packages/boot/app-boot/src/profile-resolution/resolver.ts
+@@ -612,7 +612,10 @@
+ 
+ function internalModules(): InternalModules {
+   const require = createRequire(import.meta.url)
+-  const addon = require('node-addon-require-builtin') as { requireBuiltin(moduleId: string): unknown }
++  // The addon's prebuilt realm probe fails against nixpkgs node builds.
++  const addon = (process.execArgv.includes('--expose-internals')
++    ? { requireBuiltin: require }
++    : require('node-addon-require-builtin')) as { requireBuiltin(moduleId: string): unknown }
+   const esmModule = addon.requireBuiltin('internal/modules/esm/loader') as {
+     getOrInitializeCascadedLoader(): ModuleLoaderV1 | ModuleLoaderV2
+   }

@@ -1,16 +1,14 @@
 diff --git a/packages/client/ui-settings/src/client/index.ts b/packages/client/ui-settings/src/client/index.ts
-index d595952..2771382 100644
+index 151a94d..4805489 100644
 --- a/packages/client/ui-settings/src/client/index.ts
 +++ b/packages/client/ui-settings/src/client/index.ts
-@@ -55,7 +55,11 @@ export function apply(ctx: Context): void {
+@@ -35,8 +35,8 @@ export const inject = ['remote', 'remote.settings']
+  */
+ export function apply(ctx: Context): void {
    const schema = new SettingsSchemaService(ctx)
-   // Resolved once here, where `remote` is declared in this plugin's own
-   // `inject`; the binder hands the same answer to every scope it binds.
+-  // Every form uses the persistence mode resolved from the connected Host.
 -  const persistence = ctx.remote.$host.isLoopback ? 'host' : 'memory'
-+  //
-+  // Containerized deployment: /api is fenced by --trusted-host plus mTLS at
-+  // the reverse proxy, so any origin that reaches the UI may persist its
-+  // settings host-side instead of degrading to process-local memory.
++  // mTLS at the reverse proxy fences /api, so no origin has to degrade to memory.
 +  const persistence: 'host' | 'memory' = 'host'
    const mirror = new SettingsDescribeMirror(ctx, persistence)
    ctx.effect(() => {
