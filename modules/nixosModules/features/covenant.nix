@@ -80,6 +80,14 @@
           enable = true;
           port = lib.mkDefault 8084;
           canonicalURL = "https://${config.covenant-extras.domain}";
+          smtp = {
+            host = "smtp.protonmail.ch";
+            port = 587;
+            user = "contact@asmussen.tech";
+            from = "contact@asmussen.tech";
+            to = "contact@asmussen.tech";
+            passwordFile = config.sops.secrets."covenant/smtp-token".path;
+          };
         };
 
         # Set on both paths rather than only the cross one: a native host needs
