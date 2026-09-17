@@ -17,10 +17,17 @@ handling, or scaffold the next step because you inferred he'd want it. He
 decides scope. If you think something else needs doing, say so in one line and
 stop, then let him call it. No unsolicited tests and no unsolicited docs.
 
-Comments are the part you will get wrong most often. The default is no comment
-at all. When one is genuinely warranted it is a single line. A comment spanning
-multiple lines is almost always wrong unless it is a doc-comment (`///`,
-`/** */`, a docstring); those are API surface, not commentary.
+Comments are the part you will get wrong most often. Code describes itself in
+almost every case, so the default is no comment at all. A name, a signature and
+a control flow are the documentation; a comment restating any of them is noise
+that rots the moment the code changes.
+
+When one is genuinely warranted it is a single line, and a single line
+is the right length 99 times out of 100. If the reason will not fit on one
+line, you are writing out the mechanism instead of the reason; cut it back to
+the reason. Three lines of prose stacked above a one-line statement is always
+wrong. The only exception is a doc-comment (`///`, `/** */`, a docstring);
+those are API surface, not commentary.
 
 Never write a comment that narrates history. If something was refactored away,
 do not name the old shape, do not explain what changed, do not leave a
