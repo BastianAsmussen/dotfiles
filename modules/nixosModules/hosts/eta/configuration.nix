@@ -247,6 +247,7 @@
         "wireguard/psk-eta-epsilon" = { };
         "wireguard/psk-eta-delta" = { };
         "wireguard/psk-eta-mu" = { };
+        "covenant/smtp-token" = { };
       };
 
       nix-serve-extras.exposePublicly = false;
