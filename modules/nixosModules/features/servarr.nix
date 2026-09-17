@@ -33,19 +33,10 @@
       syncScript = pkgs.writeShellScript "prowlarr-sync-indexers" ''
         set -euo pipefail
 
-        key="$(${sed} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' /var/lib/prowlarr/config.xml)"
-        if [ -z "$key" ]; then
-          echo "Could not read Prowlarr's API key." >&2
-          exit 1
-        fi
-
-        api() {
-          ${curl} -sS --fail-with-body -H "X-Api-Key: $key" "$@"
-        }
-
+        # `/ping` is the one endpoint that answers without the key.
         for attempt in $(seq 60); do
-          status="$(${curl} -sS -o /dev/null -w '%{http_code}' -H "X-Api-Key: $key" \
-            "${prowlarrUrl}/api/v1/health" 2>/dev/null || true)"
+          status="$(${curl} -sS -o /dev/null -w '%{http_code}' \
+            "${prowlarrUrl}/ping" 2>/dev/null || true)"
           [ "$status" = "200" ] && break
 
           if [ "$attempt" -eq 60 ]; then
@@ -55,6 +46,16 @@
 
           sleep 1
         done
+
+        key="$(${sed} -n 's:.*<ApiKey>\(.*\)</ApiKey>.*:\1:p' /var/lib/prowlarr/config.xml)"
+        if [ -z "$key" ]; then
+          echo "Could not read Prowlarr's API key." >&2
+          exit 1
+        fi
+
+        api() {
+          ${curl} -sS --fail-with-body -H "X-Api-Key: $key" "$@"
+        }
 
         # The tag is what binds an indexer to the proxy; Prowlarr applies a
         # proxy only to indexers sharing one of its tags.
