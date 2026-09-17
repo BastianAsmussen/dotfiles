@@ -76,6 +76,14 @@
           enable = true;
           port = lib.mkDefault 8084;
           canonicalURL = "https://${config.covenant-extras.domain}";
+          smtp = {
+            host = "smtp.protonmail.ch";
+            port = 587;
+            user = "contact@asmussen.tech";
+            from = "contact@asmussen.tech";
+            to = "contact@asmussen.tech";
+            passwordFile = config.sops.secrets."covenant/smtp-token".path;
+          };
         };
 
         # Apply the map override to native and cross builds.
