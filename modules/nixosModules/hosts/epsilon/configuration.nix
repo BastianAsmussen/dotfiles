@@ -511,20 +511,30 @@
         categories =
           let
             animePath = "/srv/media/torrents/complete/anime";
+            showsPath = "/srv/media/torrents/complete/shows";
+            moviesPath = "/srv/media/torrents/complete/movies";
           in
           {
             linux-isos = { };
 
             # Manual / Shoko-managed anime library. Monitored by no *arr client.
             anime.path = animePath;
-            shows = { };
-            movies = { };
+            shows.path = showsPath;
+            movies.path = moviesPath;
 
             # Sonarr/Radarr anime grabs land here but share the anime save path,
             # so Shoko still catalogs them while the *arr clients only ever
             # enumerate their own downloads instead of the whole seeding library.
             sonarr-anime.path = animePath;
             radarr-anime.path = animePath;
+
+            # Where Sonarr and Radarr park imported torrents so they stop
+            # tracking them. ATM relocates on a category change, so the paths
+            # must match.
+            sonarr-anime-imported.path = animePath;
+            shows-imported.path = showsPath;
+            radarr-anime-imported.path = animePath;
+            movies-imported.path = moviesPath;
           };
       };
 

@@ -189,16 +189,24 @@
                 # service refuses the write with a 400 because it cannot reach
                 # the client using the credential it is being handed, which is
                 # exactly the state a rotation leaves behind.
-                echo "$client" \
+                if ! response="$(echo "$client" \
                   | ${jq} -c --arg u ${lib.escapeShellArg cfg.downloadClient.username} --arg p "$password" \
-                      '.fields |= map(
+                      '([.fields[]
+                          | select(.name == "tvCategory" or .name == "movieCategory")
+                          | .value // ""] | first // "") as $cat
+                       | .fields |= map(
                          if .name == "username" then .value = $u
                          elif .name == "password" then .value = $p
+                         elif (.name == "tvImportedCategory" or .name == "movieImportedCategory") and $cat != "" then
+                           .value = ($cat + "-imported")
                          else . end
                        )' \
                   | ${curl} -sS --fail-with-body -X PUT \
                       -H "X-Api-Key: $key" -H 'Content-Type: application/json' \
-                      -d @- "$base/downloadclient/$id?forceSave=true"
+                      -d @- "$base/downloadclient/$id?forceSave=true")"; then
+                  echo "$response" >&2
+                  exit 1
+                fi
 
                 echo "Reconciled $name download client: $(echo "$client" | ${jq} -r .name)"
               done
@@ -476,6 +484,7 @@
                   "sonarr.service"
                   "radarr.service"
                   "qbittorrent.service"
+                  "qbittorrent-sync-categories.service"
                 ];
 
                 # Ordering only: the reconcile is worth doing even when the
