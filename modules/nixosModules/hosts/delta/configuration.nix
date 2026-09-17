@@ -213,19 +213,6 @@
               verify = false;
             };
           };
-
-          worldmonitor = {
-            enable = true;
-            domain = "worldmonitor.asmussen.tech";
-            location = "/";
-            upstream = "https://10.10.0.1";
-            proxySSL = {
-              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-              serverName = "worldmonitor.asmussen.tech";
-              verify = false;
-            };
-          };
         };
       };
 
@@ -244,7 +231,6 @@
           "radarr.asmussen.tech"
           "prowlarr.asmussen.tech"
           "dsh.asmussen.tech"
-          "worldmonitor.asmussen.tech"
         ];
 
         "::1" = [
@@ -254,7 +240,6 @@
           "radarr.asmussen.tech"
           "prowlarr.asmussen.tech"
           "dsh.asmussen.tech"
-          "worldmonitor.asmussen.tech"
         ];
       };
 

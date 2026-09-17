@@ -92,7 +92,6 @@
         self.nixosModules.forgejoRunner
         self.nixosModules.searx
         self.nixosModules.deepseekHarness
-        self.nixosModules.worldmonitor
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -184,17 +183,6 @@
           "router/wifi-passphrase" = { };
 
           "services/searx/secret-key" = { };
-
-          # Provide upstream API keys and Ollama settings as a dotenv file.
-          "worldmonitor/api-keys" = {
-            sopsFile = "${toString inputs.nix-secrets}/hosts/epsilon-worldmonitor.env";
-            format = "dotenv";
-            key = "";
-            restartUnits = [
-              "worldmonitor-relay.service"
-              "worldmonitor-sidecar.service"
-            ];
-          };
         };
       };
 
@@ -410,18 +398,6 @@
               localhostBypass = true;
             };
           };
-
-          worldmonitor = {
-            enable = true;
-            domain = config.worldmonitor.trustedHost;
-            location = "/";
-            upstream = "http://localhost:${toString config.worldmonitor.port}";
-            mtls = {
-              enable = true;
-              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-              localhostBypass = true;
-            };
-          };
         };
       };
 
@@ -566,12 +542,6 @@
         gid = 600;
         checkouts."/projects".source = "/home/bastian/Projects";
       };
-      worldmonitor = {
-        enable = true;
-        # Inject provider keys and local Ollama settings into sidecar, relay and
-        # seeders.
-        extraEnvironmentFiles = [ config.sops.secrets."worldmonitor/api-keys".path ];
-      };
 
       # Use the local mTLS proxy instead of routing qBittorrent through eta.
       networking = {
@@ -589,7 +559,6 @@
             "sonarr.asmussen.tech"
             "prowlarr.asmussen.tech"
             "dsh.asmussen.tech"
-            "worldmonitor.asmussen.tech"
           ];
 
           "::1" = [
@@ -599,7 +568,6 @@
             "sonarr.asmussen.tech"
             "prowlarr.asmussen.tech"
             "dsh.asmussen.tech"
-            "worldmonitor.asmussen.tech"
           ];
         };
 
@@ -754,7 +722,6 @@
 
         jellyfin.enable = mkForce false;
         youtubeArchive.enable = mkForce false;
-        worldmonitor.enable = mkForce false;
         deepseek-harness.enable = mkForce false;
 
         qbittorrent.enable = mkForce false;
