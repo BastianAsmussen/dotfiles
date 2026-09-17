@@ -15,9 +15,6 @@
             deepseek-harness
             mit
             qbittorrent-webui-catppuccin
-            worldmonitor
-            worldmonitor-relay
-            worldmonitor-redis-rest
             absolute-episode
             calculator
             caveman-cli
