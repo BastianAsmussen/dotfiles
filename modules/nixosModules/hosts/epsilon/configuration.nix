@@ -186,6 +186,9 @@
           "router/wifi-passphrase" = { };
 
           "services/searx/secret-key" = { };
+        }
+        // lib.optionalAttrs config.services.news.enable {
+          "services/news/llm-api-key".owner = config.services.news.user;
         };
       };
 
@@ -479,6 +482,15 @@
         };
 
         openssh.openFirewall = false;
+
+        # The news module pins the provider to ollama for this host.
+        news.llm = {
+          provider = mkForce "openai";
+          openai = {
+            apiKeyFile = config.sops.secrets."services/news/llm-api-key".path;
+            maxTokens = 4096;
+          };
+        };
       };
 
       qbittorrent = {
@@ -647,8 +659,8 @@
 
       newsSync.push = {
         enable = true;
-        llmModel = "hf.co/unsloth/Qwen3.5-9B-GGUF:Q6_K";
-        llmConcurrency = 4;
+        llmModel = "deepseek-v4-flash";
+        llmConcurrency = 8;
         llmNumCtx = 16384;
       };
 
