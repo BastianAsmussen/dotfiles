@@ -210,7 +210,7 @@
         ];
 
         directoriesWithMode = {
-          "/var/lib/private" = "0700";
+          "/var/lib/private".mode = "0700";
 
         };
 

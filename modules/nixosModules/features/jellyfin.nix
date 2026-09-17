@@ -107,7 +107,11 @@
                 }
               ];
 
-              directoriesWithMode.${svc.cacheDir} = "0755";
+              directoriesWithMode.${svc.cacheDir} = {
+                mode = "0755";
+                user = jellyfinUser;
+                group = jellyfinGroup;
+              };
             };
           })
         ]
