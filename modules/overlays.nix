@@ -35,7 +35,7 @@
         removeWarningPopup = true;
       };
 
-      # Fix fish 4's removed `test -a` and make PROG global for completions.
+      # Make gopass's PROG global so completion functions can read it.
       gopass = prev.gopass.overrideAttrs (old: {
         postPatch =
           (old.postPatch or "")
@@ -43,8 +43,7 @@
           # fish
           ''
             substituteInPlace fish.completion \
-              --replace-fail '[ (count $cmd) -eq 1 -a $cmd[1] = $PROG ]' \
-                '[ (count $cmd) -eq 1 ]; and [ "$cmd[1]" = gopass ]'
+              --replace-fail "set PROG 'gopass'" "set -g PROG 'gopass'"
           '';
       });
     };

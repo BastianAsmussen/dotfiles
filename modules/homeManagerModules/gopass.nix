@@ -14,6 +14,9 @@
         # Export GPG_TTY only for a real TTY; otherwise use graphical pinentry.
         tty=$(tty 2>/dev/null) && export GPG_TTY="$tty"
 
+        # gpg forwards this to pinentry, which runs outside the sandbox.
+        unset DBUS_SESSION_BUS_ADDRESS
+
         export GNUPGHOME="''${GNUPGHOME:-$HOME/.gnupg}"
         export PATH="${
           lib.makeBinPath (

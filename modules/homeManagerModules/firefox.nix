@@ -9,12 +9,10 @@
       ...
     }:
     let
-      # Use pinned rycee addons; update them with `nix flake update
-      # firefox-addons`.
+      # Bump these declaratively with `nix flake update firefox-addons`.
       addons = pkgs.firefox-addons;
 
-      # Install signed addons under Firefox's application id using their addon
-      # ids.
+      # Firefox reads system extensions from under its own application id.
       firefoxAppId = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
       mkExtensions =
         pkgList:
@@ -25,13 +23,10 @@
           }) pkgList
         );
 
-      # Shim bwrap only for schizofox to give WebAuthn read-write YubiKey
-      # access.
+      # Nixpak's mkNixPak call is a closed literal; bubblewrap.package is the seam.
       sandboxPkgs = pkgs.extend (
         _: prev: {
           bubblewrap = prev.bubblewrap.overrideAttrs (old: {
-            # Preserve bwrap metadata and mainProgram so lib.getExe still
-            # resolves bin/bwrap.
             postInstall = (old.postInstall or "") + ''
               mv "$out/bin/bwrap" "$out/bin/.bwrap-real"
 
@@ -44,20 +39,11 @@
               extra=()
               case "''${NIXPAK_APP_EXE:-}" in
                 *schizofox*)
-                  # Bind only Yubico hidraw nodes (vendor 1050), not keyboard or
-                  # mouse HID.
-                  for uevent in /sys/class/hidraw/hidraw*/device/uevent; do
-                    [ -e "$uevent" ] || continue
+                  # Firefox enumerates FIDO tokens with libudev, which needs both.
+                  extra+=( --ro-bind-try /sys/class/hidraw /sys/class/hidraw )
+                  extra+=( --ro-bind-try /run/udev /run/udev )
 
-                    if grep -qi '^HID_ID=.*:0\{0,4\}1050:' "$uevent"; then
-                      node=''${uevent#/sys/class/hidraw/}
-                      node=''${node%%/*}
-                      extra+=( --dev-bind-try "/dev/$node" "/dev/$node" )
-                    fi
-                  done
-
-                  # gopass-jsonapi needs writable .gnupg for gpg and scdaemon
-                  # state.
+                  # gpg and scdaemon write here; schizofox binds it read-only.
                   extra+=( --bind-try "$HOME/.gnupg" "$HOME/.gnupg" )
                   ;;
               esac
@@ -66,10 +52,23 @@
                 exec "$real" "$@"
               fi
 
-              # Insert mounts before the app command, after bwrap's --dev /dev.
               args=()
               inserted=0
+              swap=0
               for arg in "$@"; do
+                # udev adds tokens to this after launch; bwrap's own /dev is nodev.
+                if [ "$swap" -eq 1 ]; then
+                  swap=0
+                  args+=( --dev-bind /run/schizofox-dev "$arg" )
+                  continue
+                fi
+
+                if [ "$arg" = "--dev" ]; then
+                  swap=1
+                  continue
+                fi
+
+                # bwrap applies mounts in argv order and the app follows a bare --.
                 if [ "$inserted" -eq 0 ] && [ "$arg" = "--" ]; then
                   args+=( "''${extra[@]}" )
                   inserted=1
@@ -78,7 +77,7 @@
                 args+=( "$arg" )
               done
 
-              # Do not add binds to xdg-dbus-proxy invocations.
+              # Nixpak runs xdg-dbus-proxy through this same bwrap, separator-less.
               [ "$inserted" -eq 1 ] || exec "$real" "$@"
               exec "$real" "''${args[@]}"
               SHIM
@@ -91,8 +90,8 @@
     in
     {
       imports = [
-        # Override pkgs only in schizofox's module argument set.
-        (args: inputs.schizofox.homeManagerModule (args // { pkgs = sandboxPkgs; }))
+        # A formals-free lambda takes the whole argument set, shadowing pkgs here only.
+        (args: inputs.schizofox.homeManagerModules.default (args // { pkgs = sandboxPkgs; }))
       ];
 
       stylix.targets.firefox.enable = false;
@@ -180,8 +179,7 @@
         security.sandbox = {
           enable = true;
 
-          # Bind gopass/gpg paths for the sandboxed native host; the shim
-          # handles writable .gnupg.
+          # gopass-jsonapi runs inside the sandbox and decrypts from these paths.
           extraBinds = [
             "${config.home.homeDirectory}/.password-store" # the secrets
             "${config.home.homeDirectory}/.config/gopass" # gopass config
