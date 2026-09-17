@@ -20,10 +20,10 @@
       # opaque 1 KiB header, the fixed checksum descriptor, and the ordered
       # record list (key/len/type/kind + firmware defaults). Records flagged
       # `secret` carry no value here; their bytes come from sops at run time.
-      template = builtins.fromJSON (builtins.readFile ./router.template.json);
+      template = builtins.fromJSON (builtins.readFile ./template.json);
 
-      generator = ./router.generate.py;
-      python = "${pkgs.python3}/bin/python3";
+      generator = ./generate.py;
+      python = lib.getExe pkgs.python3;
 
       # The firmware exposes a fixed number of slots for these tables.
       maxLeases = 4;
@@ -144,6 +144,7 @@
       plan = {
         inherit (cfg) host;
         inherit (template) header_b64 checksum_b64;
+
         records = planRecords;
         login = {
           user = cfg.adminUser;
@@ -330,6 +331,7 @@
             serviceConfig = {
               Type = "oneshot";
               StateDirectory = "icotera-router";
+
               # The rendered backup embeds the cleartext admin password and WPA
               # passphrase, so keep the directory and file root-only (the script
               # also chmods the file 0600 as a belt-and-braces guard).
