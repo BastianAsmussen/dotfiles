@@ -145,11 +145,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789838216,
-        "narHash": "sha256-od/IxNzVD1E/atgEF2h5BWVepY6vn8xviBDaUvqz0fA=",
+        "lastModified": 1790089208,
+        "narHash": "sha256-LG23GBDeZocBmqRdAPgoWksQ2Jce3dOsaig7WDVQCHA=",
         "ref": "refs/heads/master",
-        "rev": "608916698002dae2ef7eaf71e52c7f166b860b6c",
-        "revCount": 79,
+        "rev": "8eb6f2f0eb5469b752450c815c94fa4e45a8a19b",
+        "revCount": 84,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/covenant.git"
       },
