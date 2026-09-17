@@ -500,18 +500,27 @@
         categories =
           let
             animePath = "/srv/media/torrents/complete/anime";
+            showsPath = "/srv/media/torrents/complete/shows";
+            moviesPath = "/srv/media/torrents/complete/movies";
           in
           {
             linux-isos = { };
 
             # Manual / Shoko-managed anime library. Monitored by no *arr client.
             anime.path = animePath;
-            shows = { };
-            movies = { };
+            shows.path = showsPath;
+            movies.path = moviesPath;
 
             # Share anime with Shoko without exposing the whole seeding library.
             sonarr-anime.path = animePath;
             radarr-anime.path = animePath;
+
+            # ATM relocates imported torrents on category changes; keep paths
+            # aligned.
+            sonarr-anime-imported.path = animePath;
+            shows-imported.path = showsPath;
+            radarr-anime-imported.path = animePath;
+            movies-imported.path = moviesPath;
           };
       };
 
