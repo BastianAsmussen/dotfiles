@@ -2,8 +2,8 @@
   perSystem =
     { pkgs, ... }:
     let
-      template = builtins.fromJSON (builtins.readFile ../../nixosModules/features/router.template.json);
-      generator = ../../nixosModules/features/router.generate.py;
+      template = builtins.fromJSON (builtins.readFile ../../nixosModules/features/router/template.json);
+      generator = ../../nixosModules/features/router/generate.py;
 
       # Empty secret files encode to an all-NUL fixed-width field, exactly the
       # bytes the expected fixture has redacted. So rendering the template
