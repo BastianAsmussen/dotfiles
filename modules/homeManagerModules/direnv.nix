@@ -2,7 +2,6 @@
   flake.homeModules.direnv =
     {
       pkgs,
-      config,
       ...
     }:
     {
@@ -10,8 +9,6 @@
 
       programs.direnv = {
         enable = true;
-        enableZshIntegration = config.programs.zsh.enable;
-        enableFishIntegration = config.programs.fish.enable;
         silent = true;
         nix-direnv.enable = true;
 
