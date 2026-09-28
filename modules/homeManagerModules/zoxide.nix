@@ -1,16 +1,12 @@
 {
-  flake.homeModules.zoxide =
-    { config, ... }:
-    {
-      home.shellAliases."cd.." = "cd ..";
+  flake.homeModules.zoxide = {
+    home.shellAliases."cd.." = "cd ..";
 
-      programs.zoxide = {
-        enable = true;
-        enableZshIntegration = config.programs.zsh.enable;
-        enableFishIntegration = config.programs.fish.enable;
-        options = [ "--cmd cd" ];
-      };
-
-      persistence.directories = [ ".local/share/zoxide" ];
+    programs.zoxide = {
+      enable = true;
+      options = [ "--cmd cd" ];
     };
+
+    persistence.directories = [ ".local/share/zoxide" ];
+  };
 }
