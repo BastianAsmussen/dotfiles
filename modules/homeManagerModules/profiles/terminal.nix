@@ -3,6 +3,7 @@
 {
   flake.homeModules.terminal = {
     imports = with self.homeModules; [
+      bash
       bat
       btop
       claudeCode
