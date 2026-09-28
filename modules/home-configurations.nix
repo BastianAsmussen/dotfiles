@@ -93,6 +93,7 @@ let
       zoxide
       tmux
       ohMyPosh
+      bash
       bat
       btop
       eza
