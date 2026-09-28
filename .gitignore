@@ -6,3 +6,6 @@ result*
 .pre-commit-config.yaml
 
 *.tuxedo-lock
+
+# Claude Code per-machine permission state.
+.claude/settings.local.json
