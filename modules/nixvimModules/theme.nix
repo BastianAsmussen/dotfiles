@@ -1,5 +1,5 @@
 {
-  # Colorscheme. Stylix drives everything else; nixvim opts out.
+  # Colorscheme.
   flake.nixvimModules.theme = _: {
     colorschemes.catppuccin = {
       enable = true;
