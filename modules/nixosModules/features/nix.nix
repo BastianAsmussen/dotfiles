@@ -73,7 +73,7 @@
           };
 
         sops = {
-          secrets."github-access-token".sopsFile = lib.custom.secrets.file "shared.yaml";
+          secrets."github-access-token".sopsFile = inputs.nix-secrets.sopsFiles."shared.yaml";
           templates."access-tokens.conf" = {
             mode = "0440";
             group = config.users.groups.nixbld.name;
