@@ -1,4 +1,3 @@
-{ inputs, ... }:
 {
   flake.nixosModules.nix-serve =
     {
@@ -39,9 +38,10 @@
           hostname = config.networking.hostName;
           cacheKeySecret = "hosts/${hostname}/cache-private-key";
 
-          privateHashes = map (
-            name: builtins.unsafeDiscardStringContext (builtins.substring 11 32 inputs.${name}.outPath)
-          ) lib.custom.privateInputs;
+          serveCfg = config.services.nix-serve;
+
+          allowlistDir = "/run/nix-cache-allowlist";
+          allowlistFile = "${allowlistDir}/allowed.map";
         in
         {
           sops.secrets.${cacheKeySecret} = { };
@@ -56,26 +56,90 @@
 
           nix.settings.secret-key-files = [ config.sops.secrets.${cacheKeySecret}.path ];
 
-          # Private sources on both routes; unconditional so hand-written cache vhosts get it too.
-          services.nginx.virtualHosts."cache.asmussen.tech".locations."~ ^/(nar/)?(${lib.concatStringsSep "|" privateHashes})".return =
-            "403";
+          # Only paths something built are served: sources, sops copies and .drv files have no deriver.
+          systemd = {
+            tmpfiles.rules = [
+              "d ${allowlistDir} 0755 root root -"
+              "f ${allowlistFile} 0644 root root -"
+            ];
+
+            services.nix-cache-allowlist = {
+              description = "Allowlist built store paths for the binary cache";
+              after = [ "nix-daemon.socket" ];
+              path = [
+                config.nix.package
+                pkgs.jq
+                pkgs.diffutils
+              ];
+
+              serviceConfig.Type = "oneshot";
+              script = ''
+                tmp="${allowlistFile}.tmp"
+                nix path-info --all --json --json-format 1 \
+                  | jq -r 'to_entries[] | select(.value.deriver != null) | "\(.key[11:43]) 1;"' > "$tmp"
+
+                if cmp -s "$tmp" "${allowlistFile}"; then
+                  rm "$tmp"
+                else
+                  mv "$tmp" "${allowlistFile}"
+                  if systemctl is-active -q nginx; then
+                    systemctl reload nginx
+                  fi
+                fi
+              '';
+            };
+
+            timers.nix-cache-allowlist = {
+              description = "Periodic binary cache allowlist refresh";
+              wantedBy = [ "timers.target" ];
+              timerConfig = {
+                OnBootSec = "1min";
+                OnUnitActiveSec = "10min";
+              };
+            };
+          };
+
+          services.nginx = {
+            mapHashMaxSize = 262144;
+            mapHashBucketSize = 128;
+
+            # Keyed on the raw request line, which is what proxy_pass forwards.
+            appendHttpConfig = ''
+              map $request_uri $nix_cache_hash {
+                "~^/(?<h>[0-9a-z]{32})\.narinfo$" $h;
+                "~^/nar/(?<h>[0-9a-z]{32})(?:-[0-9a-z]{52})?\.nar$" $h;
+                default "";
+              }
+
+              map $nix_cache_hash $nix_cache_allowed {
+                include ${allowlistFile};
+                default 0;
+              }
+            '';
+
+            # Unconditional so hand-written cache vhosts are gated too.
+            virtualHosts."cache.asmussen.tech".locations = {
+              "/".extraConfig = ''
+                if ($nix_cache_allowed = 0) {
+                  return 404;
+                }
+              '';
+
+              "= /nix-cache-info".proxyPass = "http://${serveCfg.bindAddress}:${toString serveCfg.port}";
+            };
+          };
 
           # Expose the cache behind nginx with HTTPS only when requested.
-          nginx.reverseProxies.nix-cache = mkIf cfg.exposePublicly (
-            let
-              serveCfg = config.services.nix-serve;
-            in
-            {
-              enable = true;
-              domain = "cache.asmussen.tech";
-              location = "/";
-              upstream = "http://${serveCfg.bindAddress}:${toString serveCfg.port}";
-              ssl = {
-                dnsProvider = "cloudflare";
-                environmentFile = config.sops.templates."cloudflare-acme-env".path;
-              };
-            }
-          );
+          nginx.reverseProxies.nix-cache = mkIf cfg.exposePublicly {
+            enable = true;
+            domain = "cache.asmussen.tech";
+            location = "/";
+            upstream = "http://${serveCfg.bindAddress}:${toString serveCfg.port}";
+            ssl = {
+              dnsProvider = "cloudflare";
+              environmentFile = config.sops.templates."cloudflare-acme-env".path;
+            };
+          };
         };
     };
 }

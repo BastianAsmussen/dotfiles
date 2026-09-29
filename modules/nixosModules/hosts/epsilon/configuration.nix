@@ -308,7 +308,6 @@
 
       ssh.fail2ban.enable = false;
 
-      nix-serve-extras.bindAddress = "10.10.0.2";
       nginx = {
         acme.sharedHost = "asmussen.tech";
 
@@ -607,7 +606,6 @@
 
         # Allow WireGuard peers (eta, delta) to reach proxied services on epsilon.
         firewall.interfaces.wg0.allowedTCPPorts = config.services.openssh.ports ++ [
-          config.services.nix-serve.port
           config.services.website.port
           443 # nginx, WG peers reach epsilon directly
         ];
