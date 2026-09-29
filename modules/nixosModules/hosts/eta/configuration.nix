@@ -65,7 +65,6 @@
         self.nixosModules.nginx
         self.nixosModules.nix-serve
         self.nixosModules.primaryMirror
-        self.nixosModules.remoteBuilder
         self.nixosModules.topology
         self.nixosModules.website
         self.nixosModules.covenant
@@ -188,8 +187,7 @@
         ];
       };
 
-      # Offload all builds to epsilon; do not build locally when it is
-      # unavailable.
+      # Closures arrive via `just deploy`; eta never builds.
       nix.settings.max-jobs = lib.mkForce 0;
       btrfs.scrub.fileSystems = [
         "/persist"
