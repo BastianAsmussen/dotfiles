@@ -48,7 +48,7 @@
         {
           sops.secrets = {
             "services/syncthing/gui-password" = {
-              sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
+              sopsFile = lib.custom.secrets.file "shared.yaml";
               owner = user;
             };
 
