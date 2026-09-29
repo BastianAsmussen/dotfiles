@@ -1,4 +1,3 @@
-{ inputs, ... }:
 {
   flake.nixosModules.acmeShared =
     {
@@ -41,8 +40,7 @@
             # doesn't trigger the auto-define (e.g. delta, which proxies with
             # client certs rather than ACME).
             sops = {
-              secrets."cloudflare-api-token".sopsFile =
-                lib.mkDefault "${toString inputs.nix-secrets}/shared.yaml";
+              secrets."cloudflare-api-token".sopsFile = lib.mkDefault (lib.custom.secrets.file "shared.yaml");
               templates."cloudflare-acme-env" = {
                 owner = lib.mkDefault "acme";
                 content = lib.mkDefault "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";

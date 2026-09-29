@@ -39,10 +39,9 @@
           hostname = config.networking.hostName;
           cacheKeySecret = "hosts/${hostname}/cache-private-key";
 
-          # Block nix-secrets flake source from being served.
-          secretsStoreHash = builtins.unsafeDiscardStringContext (
-            builtins.substring 11 32 inputs.nix-secrets.outPath
-          );
+          privateHashes = map (
+            name: builtins.unsafeDiscardStringContext (builtins.substring 11 32 inputs.${name}.outPath)
+          ) lib.custom.privateInputs;
         in
         {
           sops.secrets.${cacheKeySecret} = { };
@@ -57,10 +56,9 @@
 
           nix.settings.secret-key-files = [ config.sops.secrets.${cacheKeySecret}.path ];
 
-          # Deny access to the nix-secrets flake source store path.
-          services.nginx.virtualHosts."cache.asmussen.tech".locations = mkIf cfg.exposePublicly {
-            "= /${secretsStoreHash}.narinfo".return = "403";
-          };
+          # Private sources on both routes; unconditional so hand-written cache vhosts get it too.
+          services.nginx.virtualHosts."cache.asmussen.tech".locations."~ ^/(nar/)?(${lib.concatStringsSep "|" privateHashes})".return =
+            "403";
 
           # Expose the cache behind nginx with HTTPS only when requested.
           nginx.reverseProxies.nix-cache = mkIf cfg.exposePublicly (
