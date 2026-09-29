@@ -22,9 +22,9 @@
       # rather than compiling Go under binfmt QEMU.
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
-        (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.gomod2nix.overlays.default).callPackage
-          "${inputs.covenant}/default.nix"
-          { inherit mapStatic; }
+        (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.covenant.overlays.default).covenant.override {
+          inherit mapStatic;
+        }
       );
 
       nativePackage = inputs.covenant.packages.${pkgs.system}.default.override { inherit mapStatic; };

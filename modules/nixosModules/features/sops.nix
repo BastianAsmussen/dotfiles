@@ -22,9 +22,9 @@
       ];
 
       sops = {
-        defaultSopsFile = lib.custom.secrets.file "hosts/${config.networking.hostName}.yaml";
+        defaultSopsFile = inputs.nix-secrets.sopsFiles."hosts/${config.networking.hostName}.yaml";
         secrets."user/bastian/password-hash" = {
-          sopsFile = lib.custom.secrets.file "shared.yaml";
+          sopsFile = inputs.nix-secrets.sopsFiles."shared.yaml";
           neededForUsers = true;
         };
 
