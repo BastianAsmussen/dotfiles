@@ -220,6 +220,15 @@
           "covenantofearth.org" = "127.0.0.1:8443";
           "www.covenantofearth.org" = "127.0.0.1:8443";
         };
+
+        # Local vhosts get the client address; epsilon's 443 does not speak PROXY.
+        proxyProtocol = {
+          enable = true;
+          strip = lib.unique (
+            [ "${config.primaryMirror.primaryHost}:${toString config.primaryMirror.primaryPort}" ]
+            ++ lib.mapAttrsToList (_: route: route.primaryAddress) config.primaryMirror.sniRoutes
+          );
+        };
       };
 
       primaryMirror = {
@@ -278,6 +287,10 @@
             }
 
             add_header Strict-Transport-Security $hsts_header always;
+
+            # Client address from the stream hop's PROXY header.
+            set_real_ip_from 127.0.0.1;
+            real_ip_header proxy_protocol;
           '';
 
           virtualHosts =
@@ -287,6 +300,7 @@
                 addr = "127.0.0.1";
                 port = 8443;
                 ssl = true;
+                proxyProtocol = true;
               };
 
               sslConfig = ''
@@ -337,7 +351,11 @@
               ${config.covenant-extras.domain} = {
                 listen = [ fallbackListen ];
                 extraConfig = covenantSsl;
-                locations."/".proxyPass = "http://localhost:${toString config.services.covenant.port}";
+                locations."/" = {
+                  proxyPass = "http://localhost:${toString config.services.covenant.port}";
+                  # Overwrite, not append: covenant rate-limits on this header.
+                  extraConfig = "proxy_set_header X-Forwarded-For $remote_addr;";
+                };
               };
 
               "www.${config.covenant-extras.domain}" = {

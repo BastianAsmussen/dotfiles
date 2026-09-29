@@ -84,6 +84,26 @@
             default = "3s";
             description = "Timeout for connecting to the upstream.";
           };
+
+          proxyProtocol = {
+            enable = mkEnableOption "sending a PROXY protocol header to every upstream, so local listeners see the client address";
+
+            strip = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              description = ''
+                Upstreams (host:port) that do not accept the PROXY protocol. Each
+                is reached through a loopback relay that consumes the header and
+                forwards the raw stream. Must match the map values verbatim.
+              '';
+            };
+
+            relayBasePort = mkOption {
+              type = types.port;
+              default = 9443;
+              description = "First loopback port for strip relays, one port per entry in `strip`.";
+            };
+          };
         };
 
         redirects = mkOption {
@@ -333,6 +353,12 @@
                 cfg.streamProxy.stateFile == null && cfg.streamProxy.defaultUpstream != null
               ) "default ${cfg.streamProxy.defaultUpstream};";
               mapEntries = lib.concatStringsSep "\n    " (includeLines ++ sniLines ++ defaultLine);
+
+              pp = cfg.streamProxy.proxyProtocol;
+              relays = lib.imap0 (i: upstream: {
+                inherit upstream;
+                port = pp.relayBasePort + i;
+              }) pp.strip;
             in
             {
               networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
@@ -353,10 +379,28 @@
 
                     ssl_preread on;
 
-                    proxy_pass $tls_backend;
+                    proxy_pass ${if pp.enable then "$tls_upstream" else "$tls_backend"};
+                    proxy_connect_timeout ${cfg.streamProxy.connectTimeout};
+                    ${lib.optionalString pp.enable "proxy_protocol on;"}
+                  }
+                ''
+                + lib.optionalString pp.enable ''
+
+                  map $tls_backend $tls_upstream {
+                    ${
+                      lib.concatMapStrings (r: ''"${r.upstream}" 127.0.0.1:${toString r.port};'' + "\n    ") relays
+                    }default $tls_backend;
+                  }
+                ''
+                + lib.concatMapStrings (r: ''
+
+                  server {
+                    listen 127.0.0.1:${toString r.port} proxy_protocol;
+
+                    proxy_pass ${r.upstream};
                     proxy_connect_timeout ${cfg.streamProxy.connectTimeout};
                   }
-                '';
+                '') (lib.optionals pp.enable relays);
 
                 virtualHosts."_stream_http_redirect" = {
                   listen = [
