@@ -14,7 +14,8 @@
           let
             inherit (lib.custom.units) mibToBytes;
 
-            flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+            # A registry pin puts a private input's whole source in every closure.
+            flakeInputs = lib.filterAttrs (_: lib.isType "flake") (removeAttrs inputs lib.custom.privateInputs);
           in
           {
             # Map flake registry and Nix path to the flake inputs.
@@ -72,7 +73,7 @@
           };
 
         sops = {
-          secrets."github-access-token".sopsFile = "${toString inputs.nix-secrets}/shared.yaml";
+          secrets."github-access-token".sopsFile = lib.custom.secrets.file "shared.yaml";
           templates."access-tokens.conf" = {
             mode = "0440";
             group = config.users.groups.nixbld.name;

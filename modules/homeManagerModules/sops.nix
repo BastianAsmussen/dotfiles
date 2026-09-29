@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, self, ... }:
 {
   flake.homeModules.sops =
     {
@@ -14,7 +14,7 @@
       imports = [ inputs.sops-nix.homeManagerModules.sops ];
 
       sops = {
-        defaultSopsFile = "${toString inputs.nix-secrets}/hosts/${resolvedHostName}.yaml";
+        defaultSopsFile = self.lib.custom.secrets.file "hosts/${resolvedHostName}.yaml";
         age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
       };
 
