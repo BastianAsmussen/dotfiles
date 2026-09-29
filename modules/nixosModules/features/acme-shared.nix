@@ -1,3 +1,4 @@
+{ inputs, ... }:
 {
   flake.nixosModules.acmeShared =
     {
@@ -35,7 +36,7 @@
             # Fallback for hosts where nginx does not define Cloudflare
             # credentials.
             sops = {
-              secrets."cloudflare-api-token".sopsFile = lib.mkDefault (lib.custom.secrets.file "shared.yaml");
+              secrets."cloudflare-api-token".sopsFile = lib.mkDefault inputs.nix-secrets.sopsFiles."shared.yaml";
               templates."cloudflare-acme-env" = {
                 owner = lib.mkDefault "acme";
                 content = lib.mkDefault "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";

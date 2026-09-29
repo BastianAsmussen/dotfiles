@@ -11,9 +11,7 @@
       # Cross-compile natively instead of building aarch64 Go through QEMU.
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
-        (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.gomod2nix.overlays.default).callPackage
-          "${inputs.website}/default.nix"
-          { }
+        (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.website.overlays.default).website
       );
     in
     {
