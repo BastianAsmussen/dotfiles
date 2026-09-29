@@ -82,6 +82,7 @@
         self.nixosModules.nginx
         self.nixosModules.router
         self.nixosModules.nix-serve
+        self.nixosModules.buildHost
         self.nixosModules.nvidia
         self.nixosModules.topology
         self.nixosModules.virtualisation

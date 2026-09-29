@@ -55,10 +55,7 @@
             secretKeyFile = config.sops.secrets.${cacheKeySecret}.path;
           };
 
-          nix.settings = {
-            secret-key-files = [ config.sops.secrets.${cacheKeySecret}.path ];
-            trusted-users = [ "builder" ];
-          };
+          nix.settings.secret-key-files = [ config.sops.secrets.${cacheKeySecret}.path ];
 
           # Deny access to the nix-secrets flake source store path.
           services.nginx.virtualHosts."cache.asmussen.tech".locations = mkIf cfg.exposePublicly {
@@ -81,25 +78,6 @@
               };
             }
           );
-
-          users = {
-            users.builder = {
-              description = "NixOS Remote Builder";
-              isSystemUser = true;
-              createHome = false;
-              uid = 500;
-              group = "builder";
-              useDefaultShell = true;
-              hashedPassword = "*";
-              openssh.authorizedKeys.keys = [
-                inputs.nix-secrets.hosts.epsilon.builder-ssh-public-key
-                inputs.nix-secrets.hosts.delta.builder-ssh-public-key
-                inputs.nix-secrets.hosts.eta.builder-ssh-public-key
-              ];
-            };
-
-            groups.builder.gid = 500;
-          };
         };
     };
 }

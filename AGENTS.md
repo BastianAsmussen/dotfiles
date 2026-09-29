@@ -20,7 +20,7 @@ WireGuard mesh in a star, eta is the hub.
   PIA, arctic vault backups, news sync to eta, primary-busy health check.
 - eta: nginx stream TLS passthrough to epsilon (primary-mirror health checks
   toggle SNI routing to epsilon or a local fallback), nix cache
-  `cache.asmussen.tech`, website, aarch64 remote builder.
+  `cache.asmussen.tech`, website. Never builds; deploys are pushed.
 - delta: niri desktop, WireGuard client, kanata, `max-jobs=0` so builds go to
   the cache host.
 
