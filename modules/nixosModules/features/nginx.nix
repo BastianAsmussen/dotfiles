@@ -374,10 +374,6 @@
                   locations."/".return = "301 https://$host$request_uri";
                 };
               };
-
-              systemd.tmpfiles.rules = [
-                "d /var/lib/primary-mirror 0775 root builder -"
-              ];
             }
           ))
 

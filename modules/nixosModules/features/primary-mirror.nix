@@ -217,10 +217,10 @@
         # SNI routing should point at until the next health check.
         persistence.directories = [
           {
-            directory = "/var/lib/primary-mirror";
+            directory = stateDir;
             user = "root";
-            group = "builder";
-            mode = "0775";
+            group = cfg.busyGroup;
+            mode = "2775";
           }
         ];
 
