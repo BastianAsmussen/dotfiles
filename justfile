@@ -25,7 +25,7 @@ show-templates:
 
 # Rebuild and switch to the specified host (defaults to current hostname).
 [group("building")]
-rebuild *args:
+rebuild *args: pre-commit
     nh os switch . {{ args }}
 
 # Clean up NixOS generations.
@@ -51,7 +51,7 @@ build host=HOST *args:
 
 # Deploy a configuration to a target.
 [group("building")]
-deploy host=HOST target=host:
+deploy host=HOST target=host: pre-commit
     nixos-rebuild switch \
         --no-reexec \
         --target-host {{ target }} \
