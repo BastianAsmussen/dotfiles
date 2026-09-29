@@ -216,10 +216,10 @@
         # Persist the busy state used to select SNI routing after reboot.
         persistence.directories = [
           {
-            directory = "/var/lib/primary-mirror";
+            directory = stateDir;
             user = "root";
-            group = "builder";
-            mode = "0775";
+            group = cfg.busyGroup;
+            mode = "2775";
           }
         ];
 
