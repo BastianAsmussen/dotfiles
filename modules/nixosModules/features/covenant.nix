@@ -19,7 +19,8 @@
           null;
 
       # Same reasoning as features/website.nix: cross from the x86_64 builder
-      # rather than compiling Go under binfmt QEMU.
+      # rather than compiling the crate graph under binfmt QEMU. crane sets the
+      # target, linker and C compiler from pkgsCross on its own.
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
         (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.covenant.overlays.default).covenant.override {
