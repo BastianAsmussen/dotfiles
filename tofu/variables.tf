@@ -15,3 +15,9 @@ variable "host_ipv4" {
   default     = {}
   description = "IPv4 of existing (unmanaged) hosts, keyed by hostname. Supply via TF_VAR_host_ipv4 as JSON, e.g. {\"eta\":\"x.x.x.x\"}."
 }
+
+variable "cloudflare_api_token" {
+  type        = string
+  sensitive   = true
+  description = "Cloudflare API token, the cloudflare-api-token from nix-secrets' shared.yaml. Supply via the TF_VAR_cloudflare_api_token environment variable from your own secret store; never commit it."
+}
