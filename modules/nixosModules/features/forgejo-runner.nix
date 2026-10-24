@@ -32,73 +32,55 @@
       # CI builds saturate every core and can be scheduled at any other time.
       # Stopping the runner lets an in-flight job finish; it just stops picking
       # up new ones.
-      gamemode.pauseUnits = [ "gitea-runner-${hostname}.service" ];
+      gamemode.pauseUnits = [ "forgejo-runner-${hostname}.service" ];
 
-      # DynamicUser, so the real state is under /var/lib/private. Losing it
-      # deregisters the runner and CI stops picking up jobs.
-      persistence.directories = [ "/var/lib/private/gitea-runner" ];
+      # Disk-backed so the ISO job's workdir copy stays off the tmpfs root.
+      persistence.directories = [ "/var/lib/private/forgejo-runner" ];
 
-      services.gitea-actions-runner = {
-        package = pkgs.forgejo-runner;
-        instances.${hostname} = {
-          enable = true;
-          name = hostname;
-          url = "https://codeberg.org";
+      services.forgejo-runner.instances.${hostname} = {
+        enable = true;
 
-          # The legacy register step is disabled below, but the module still
-          # asserts exactly one of token/tokenFile is set.
-          token = "unused";
+        # The `:host` label is what makes the module put hostPackages on the
+        # job PATH (host executor); jobs then run directly against this
+        # machine's Nix daemon and store, so CI builds warm cache.asmussen.tech.
+        hostPackages = with pkgs; [
+          config.nix.package
+          bash
+          coreutils
+          curl
+          gawk
+          git
+          gnugrep
+          gnused
+          gnutar
+          gzip
+          jq
+          nodejs
+          openssh
+        ];
 
-          # The `:host` label is what makes the module put hostPackages on the
-          # job PATH (host executor); jobs then run directly against this
-          # machine's Nix daemon and store, so CI builds warm cache.asmussen.tech.
-          labels = [ "nix:host" ];
-          hostPackages = with pkgs; [
-            config.nix.package
-            bash
-            coreutils
-            curl
-            gawk
-            git
-            gnugrep
-            gnused
-            gnutar
-            gzip
-            jq
-            nodejs
-            openssh
-          ];
-
-          settings = {
-            runner.labels = [ "nix:host" ];
-            server.connections.codeberg = {
-              url = "https://codeberg.org/";
-              uuid = inputs.nix-secrets.hosts.${hostname}.forgejo-runner-uuid;
-              token_url = "file:$CREDENTIALS_DIRECTORY/token.txt";
-              labels = [ "nix:host" ];
-            };
+        settings = {
+          runner.labels = [ "nix:host" ];
+          server.connections.default = {
+            url = "https://codeberg.org/";
+            uuid = inputs.nix-secrets.hosts.${hostname}.forgejo-runner-uuid;
+            labels = [ "nix:host" ];
           };
         };
+
+        secrets.server.connections.default.token_url = config.sops.secrets."forgejo/runner-token".path;
       };
 
-      # Replace the deprecated `register --token` ExecStartPre with a bare
-      # workdir create, and hand the secret token to `token_url` through a
-      # systemd credential (readable by the DynamicUser).
-      systemd.services."gitea-runner-${hostname}".serviceConfig = {
-        ExecStartPre = lib.mkForce [
+      systemd.services."forgejo-runner-${hostname}".serviceConfig = {
+        ExecStartPre = [
           (pkgs.writeShellScript "forgejo-runner-${hostname}-pre" ''
-            mkdir -p "$STATE_DIRECTORY/${hostname}"
-
             install -d -m 700 "$HOME/.ssh"
             install -m 600 "$CREDENTIALS_DIRECTORY/deploy-key" "$HOME/.ssh/id_ed25519"
             printf '%s\n' ${lib.escapeShellArg codebergHostKey} > "$HOME/.ssh/known_hosts"
           '')
         ];
 
-        LoadCredential = [
-          "token.txt:${config.sops.secrets."forgejo/runner-token".path}"
-          "deploy-key:${config.sops.secrets."forgejo/deploy-key".path}"
-        ];
+        LoadCredential = [ "deploy-key:${config.sops.secrets."forgejo/deploy-key".path}" ];
       };
     };
 }

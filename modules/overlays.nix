@@ -47,6 +47,11 @@
               --replace-fail "set PROG 'gopass'" "set -g PROG 'gopass'"
           '';
       });
+
+      # Archived fork; backports quickshell 5d5d498 so it builds against Qt 6.12.
+      noctalia-qs = prev.noctalia-qs.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./patches/noctalia-qs-qt-6.12.patch ];
+      });
     };
 
     # Convenient access to the nixpkgs stable branch.

@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, self, ... }:
 {
   imports = [
     inputs.disko.flakeModules.default
@@ -29,6 +29,7 @@
         inherit system;
 
         config.allowUnfree = true;
+        overlays = [ self.overlays.modifications ];
       };
     };
 }

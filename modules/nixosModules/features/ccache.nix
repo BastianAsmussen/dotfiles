@@ -24,6 +24,8 @@
 
         {
           programs.ccache.enable = true;
+          # Upstream points this at a perl script, which the wrapper integrity check rejects.
+          security.wrappers.nix-ccache.enable = false;
           nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
           nixpkgs.overlays = [
             (_: super: {

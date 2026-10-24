@@ -781,7 +781,7 @@
         };
 
         services = {
-          gitea-actions-runner.instances.epsilon.enable = mkForce false;
+          forgejo-runner.instances.epsilon.enable = mkForce false;
 
           syncthing.enable = mkForce false;
           nix-serve.enable = mkForce false;
