@@ -9,6 +9,7 @@
             p.hetznercloud_hcloud
             p.hashicorp_null
             p.hashicorp_external
+            p.cloudflare_cloudflare
           ]))
           pkgs.nixos-anywhere
           pkgs.sops

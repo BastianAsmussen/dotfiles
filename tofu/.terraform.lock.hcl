@@ -1,24 +1,32 @@
 # This file is maintained automatically by "tofu init".
 # Manual edits may be lost in future updates.
 
-provider "registry.opentofu.org/hashicorp/external" {
-  version = "2.4.0"
+provider "registry.opentofu.org/cloudflare/cloudflare" {
+  version     = "5.25.0"
+  constraints = "~> 5.0"
   hashes = [
-    "h1:eqVnvE+IDmlGh/5DuU7jWlTyBikGgkyXXzGw2AntOCc=",
+    "h1:rkkg+/O2+wC3X95/mdrfp3Si3dhSnKErGg/Nm2BqrbI=",
+  ]
+}
+
+provider "registry.opentofu.org/hashicorp/external" {
+  version = "2.4.1"
+  hashes = [
+    "h1:+YwSV6Wcqvr+e9HyEkq/Ni+Bl9GsLcMzhxxih+oC0v0=",
   ]
 }
 
 provider "registry.opentofu.org/hashicorp/null" {
-  version = "3.3.0"
+  version = "3.3.1"
   hashes = [
-    "h1:4wb90a+5B2kNr3O0VLWlwo3CWLfKfN7nUR4ryzJ4v3Q=",
+    "h1:3LGWlbSri/udg6qmIkrOmnbtpyotRpqgzCETpaViTU4=",
   ]
 }
 
 provider "registry.opentofu.org/hetznercloud/hcloud" {
-  version     = "1.64.0"
+  version     = "1.69.0"
   constraints = "~> 1.51"
   hashes = [
-    "h1:6AMLMYzith9gYZy3SaODIpsP8gdnk2hqV8U4m4ltNyA=",
+    "h1:rz6V5a71sJLNuhqkRevBPfytI5qQ9mj8JkywPlHecyQ=",
   ]
 }

@@ -14,7 +14,7 @@ resource "cloudflare_dns_record" "covenant_agents_index" {
   data = {
     priority = 1
     target   = "covenantofearth.org."
-    value    = "alpn=\"http/1.1\" port=443 well-known=ai-catalog.json"
+    value    = "alpn=\"http/1.1\" port=443"
   }
 }
 
