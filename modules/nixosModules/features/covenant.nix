@@ -15,7 +15,7 @@
         else
           null;
 
-      # Cross-compile natively instead of building aarch64 Go through QEMU.
+      # Cross-compile from x86_64 instead of running the crate build under QEMU.
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
         (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.covenant.overlays.default).covenant.override {
