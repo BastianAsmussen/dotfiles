@@ -8,9 +8,13 @@
         autoPrune.enable = true;
       };
 
-      containers.storage.settings.storage = {
-        driver = "overlay";
-        graphRoot = "/var/lib/containers/storage";
+      containers = {
+        storage.settings.storage = {
+          driver = "overlay";
+          graphRoot = "/var/lib/containers/storage";
+        };
+
+        registries.settings.unqualified-search-registries = [ "docker.io" ];
       };
     };
   };
