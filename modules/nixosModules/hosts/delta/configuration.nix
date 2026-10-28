@@ -200,19 +200,6 @@
               verify = false;
             };
           };
-
-          dsh = {
-            enable = true;
-            domain = "dsh.asmussen.tech";
-            location = "/";
-            upstream = "https://10.10.0.1";
-            proxySSL = {
-              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-              serverName = "dsh.asmussen.tech";
-              verify = false;
-            };
-          };
         };
       };
 
@@ -231,7 +218,6 @@
           "sonarr.asmussen.tech"
           "radarr.asmussen.tech"
           "prowlarr.asmussen.tech"
-          "dsh.asmussen.tech"
         ];
 
         "::1" = [
@@ -240,7 +226,6 @@
           "sonarr.asmussen.tech"
           "radarr.asmussen.tech"
           "prowlarr.asmussen.tech"
-          "dsh.asmussen.tech"
         ];
       };
 
