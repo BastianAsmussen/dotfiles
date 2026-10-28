@@ -12,6 +12,8 @@
         mkEnableOption
         mkIf
         types
+        concatMapStringsSep
+        escapeShellArg
         ;
 
       cfg = config.arcticVault;
@@ -19,15 +21,26 @@
 
       inherit (config.users.users.${user}) home;
 
-      # Resolve source paths: relative paths are anchored to $HOME, absolute paths pass through.
       resolvePaths = map (s: if lib.hasPrefix "/" s then s else "${home}/${s}");
       resolvedSources = resolvePaths cfg.sources;
 
-      recipientArgs = lib.concatMapStringsSep " " (r: "-r ${lib.escapeShellArg r}") cfg.recipients;
-      sourceArgs = lib.concatMapStringsSep " " lib.escapeShellArg resolvedSources;
+      recipientArgs = concatMapStringsSep " " (r: "-r ${escapeShellArg r}") cfg.recipients;
+      sourceArgs = concatMapStringsSep " " escapeShellArg resolvedSources;
 
-      snapshotScript =
-        pkgs.writeBashBin "arctic-vault-snapshot"
+      vaultSnapshot =
+        let
+          retentionScriptSrc =
+            # sh
+            ''
+              echo "Pruning snapshots older than ${toString cfg.retention} months..."
+              findutils "${cfg.mountpoint}" \
+                -maxdepth 1 \
+                -name 'vault-*.tar.zst.age' \
+                -mtime +${toString (cfg.retention * 31)} \
+                -print -delete
+            '';
+        in
+        pkgs.writers.writeBashBin "arctic-vault-snapshot"
           {
             makeWrapperArgs = [
               "--prefix"
@@ -80,18 +93,9 @@
             trap - EXIT
 
             echo "Snapshot written: $dest ($(du -h "$dest" | cut -f1))"
-          ''
-        ++
-          lib.optionalString (cfg.retention != null)
-            # sh
-            ''
-              echo "Pruning snapshots older than ${toString cfg.retention} months..."
-              findutils "${cfg.mountpoint}" \
-                -maxdepth 1 \
-                -name 'vault-*.tar.zst.age' \
-                -mtime +${toString (cfg.retention * 31)} \
-                -print -delete
-            '';
+
+            ${lib.optionalString (cfg.retention != null) retentionScriptSrc}
+          '';
     in
     {
       options.arcticVault = {
@@ -270,22 +274,21 @@
 
         systemd = {
           services = {
-            restic-backups-arctic-vault = mkIf cfg.incremental.enable {
-              unitConfig.RequiresMountsFor = [ cfg.mountpoint ];
-            };
-
             arctic-vault = {
               description = "Arctic vault: encrypted archival snapshot";
               after = [ "local-fs.target" ];
               wants = [ "local-fs.target" ];
-
               serviceConfig = {
                 Type = "oneshot";
-                ExecStart = snapshotScript;
+                ExecStart = lib.getExe vaultSnapshot;
                 User = user;
                 Group = user;
                 ReadWritePaths = [ cfg.mountpoint ];
               };
+            };
+
+            restic-backups-arctic-vault = mkIf cfg.incremental.enable {
+              unitConfig.RequiresMountsFor = [ cfg.mountpoint ];
             };
           };
 
