@@ -30,20 +30,21 @@ in
 
         check-yaml.enable = true;
         ripsecrets.enable = true;
-
         private-input-access = {
           enable = true;
           name = "private-input-access";
-          description = "Use private flake inputs through their outputs, never their source.";
+          description = "Use private flake inputs through their outputs instead of their source.";
           files = "\\.nix$";
           pass_filenames = false;
           entry = toString (
             pkgs.writeShellScript "private-input-access" (
-              lib.optionalString (hits != [ ]) ''
-                printf '%s\n' ${lib.escapeShellArgs hits}
-                echo "Use the input's outputs (packages, overlays, nixosModules, sopsFiles, hosts, user), not its source." >&2
-                exit 1
-              ''
+              lib.optionalString (hits != [ ])
+                # sh
+                ''
+                  printf '%s\n' ${lib.escapeShellArgs hits}
+                  echo "Use the input's outputs (packages, overlays, nixosModules, sopsFiles, hosts, user), not its source." >&2
+                  exit 1
+                ''
             )
           );
         };
