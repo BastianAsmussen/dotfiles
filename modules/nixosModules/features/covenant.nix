@@ -15,18 +15,18 @@
         else
           null;
 
-      # The embedding model and the constitution's vectors.
-      semanticStatic = inputs.covenant.packages.x86_64-linux.semantic-static;
+      # The text, its search vectors and its PDFs, architecture neutral.
+      bundle = inputs.covenant.packages.x86_64-linux.bundle;
 
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
         (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.covenant.overlays.default).covenant.override {
-          inherit mapStatic semanticStatic;
+          inherit mapStatic bundle;
         }
       );
 
       nativePackage = inputs.covenant.packages.${pkgs.system}.default.override {
-        inherit mapStatic semanticStatic;
+        inherit mapStatic bundle;
       };
     in
     {
@@ -42,11 +42,6 @@
           default = true;
           description = ''
             Whether to ship the derived boundary geometry that /map draws.
-
-            Building it is a ten to fifteen minute geometry pass over roughly
-            620MB of pinned source data, cached like any other derivation once
-            built, so the cost falls on the first deploy after the sources
-            change and on no other.
 
             With this off the site is unchanged except that /map returns 404:
             the server treats missing metadata as "no map derived" rather than
@@ -86,7 +81,39 @@
             to = "contact@asmussen.tech";
             passwordFile = config.sops.secrets."covenant/smtp-token".path;
           };
+          environmentFile = config.sops.templates."covenant-env".path;
+          content = {
+            url = "ssh://git@codeberg.org/BastianA/covenant-text.git";
+            deployKeyFile = config.sops.secrets."covenant/deploy-key".path;
+          };
+          # Built on epsilon while the builder probe finds it up.
+          publish = {
+            enable = true;
+            remoteSystem = "x86_64-linux";
+          };
         };
+
+        # The deploy key is only offered to a host this pins.
+        programs.ssh.knownHosts.codeberg = {
+          hostNames = [ "codeberg.org" ];
+          publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB";
+        };
+
+        # systemd does not expand an EnvironmentFile, so the hash's $ fields stay literal.
+        sops.templates."covenant-env" = {
+          content = ''
+            COVENANT_ADMIN_EMAIL=${config.sops.placeholder."covenant/admin-email"}
+            COVENANT_ADMIN_NAME=Bastian Asmussen
+            COVENANT_ADMIN_PASSWORD_HASH=${config.sops.placeholder."covenant/admin-password-hash"}
+          '';
+          restartUnits = [ "covenant.service" ];
+        };
+
+        # The site's state, and the published bundle with its build status.
+        persistence.directories = [
+          "/var/lib/private/covenant"
+          "/var/lib/covenant-publish"
+        ];
 
         nginx.reverseProxies.covenant = lib.mkIf config.covenant-extras.exposePublicly {
           inherit (config.covenant-extras) domain;

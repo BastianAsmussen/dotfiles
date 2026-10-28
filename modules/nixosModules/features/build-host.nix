@@ -14,6 +14,7 @@
         hashedPassword = "*";
         openssh.authorizedKeys.keys = [
           ''restrict,from="10.10.0.3,fd00:10:10::3" ${inputs.nix-secrets.hosts.delta.builder-ssh-public-key}''
+          ''restrict,from="10.10.0.1,fd00:10:10::1" ${inputs.nix-secrets.hosts.eta.builder-ssh-public-key}''
         ];
       };
 
