@@ -16,8 +16,9 @@
         ;
 
       cfg = config.persistence;
-      mkDirWithMode = lib.mapAttrsToList (directory: mode: { inherit directory mode; });
       user = config.preferences.user.name;
+
+      mkDirWithMode = lib.mapAttrsToList (directory: mode: { inherit directory mode; });
 
       dirWithModeType = types.submodule {
         options = {
@@ -126,25 +127,19 @@
         ];
 
         systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
-        boot = {
-          initrd.systemd.enable = mkDefault true;
-          tmp = {
-            useTmpfs = false;
-            cleanOnBoot = mkDefault true;
-          };
+        boot.tmp = {
+          useTmpfs = false;
+          cleanOnBoot = mkDefault true;
         };
 
         preservation = {
           enable = true;
-
           preserveAt = {
             "${cfg.persistPath}/system" = {
               directories = [
-                # Mount /etc/ssh in initrd before setup-etc installs its config
-                # symlinks.
                 {
                   directory = "/etc/ssh";
-                  inInitrd = true;
+                  inInitrd = true; # Needed to prevent later bind-mount shadowing.
                 }
                 "/var/log"
                 "/var/lib/nixos"
