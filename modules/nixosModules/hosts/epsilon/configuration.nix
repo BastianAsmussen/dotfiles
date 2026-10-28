@@ -586,7 +586,11 @@
       };
 
       preferences = {
-        noctalia.idleEnabled = false;
+        noctalia = {
+          idleEnabled = false;
+          powerProfileEnabled = false;
+        };
+
         monitors = {
           "DP-1" = {
             width = 1920;
