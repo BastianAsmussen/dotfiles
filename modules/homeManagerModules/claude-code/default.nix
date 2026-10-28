@@ -30,40 +30,8 @@
     {
       programs.claude-code = {
         enable = true;
-        context = ./CLAUDE.md;
         skills = ./skills;
-
-        plugins.lean4 =
-          let
-            src = pkgs.fetchFromGitHub {
-              owner = "cameronfreer";
-              repo = "lean4-skills";
-              tag = "v4.11.0";
-              hash = "sha256-KYPn3GT8uY/IV6Rmo8jaI6fV8IPGWYQwO4EAHAOA7d4=";
-            };
-          in
-          pkgs.runCommandLocal "lean4-skills-plugin"
-            {
-              nativeBuildInputs = [ pkgs.python3 ];
-            }
-            ''
-              cp -r ${src}/plugins/lean4 "$out"
-              chmod -R u+w "$out"
-
-              # The bin/ wrappers exec the interpreter by name, so they bypass
-              # the shebang patchShebangs fixes up.
-              for f in $(grep -rlF 'LEAN4_PYTHON_BIN:-python3' "$out"); do
-                substituteInPlace "$f" \
-                  --replace-fail 'LEAN4_PYTHON_BIN:-python3' 'LEAN4_PYTHON_BIN:-${getExe pkgs.python3}'
-              done
-
-              patchShebangs "$out"
-            '';
-
-        outputStyles.tolerable = ./output-styles/tolerable.md;
-
         settings = {
-          outputStyle = "Tolerable";
           model = "opus";
           effortLevel = "xhigh";
           theme = "dark-ansi";
@@ -151,10 +119,13 @@
         package =
           (pkgs.writeShellScriptBin "claude" ''
             export PATH="${
-              lib.strings.makeSearchPathOutput "bin" "bin" [
-                pkgs.caveman-cli
-                pkgs.claude-code
-              ]
+              lib.strings.makeSearchPathOutput "bin" "bin" (
+                with pkgs;
+                [
+                  caveman-cli
+                  claude-code
+                ]
+              )
             }:$PATH"
 
             exec ${getExe pkgs.caveman-cli} claude "$@"
