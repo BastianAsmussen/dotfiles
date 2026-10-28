@@ -12,7 +12,6 @@
         { config, ... }:
         {
           inherit (config.packages)
-            deepseek-harness
             mit
             qbittorrent-webui-catppuccin
             absolute-episode

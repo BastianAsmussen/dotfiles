@@ -93,7 +93,6 @@
         self.nixosModules.pia
         self.nixosModules.forgejoRunner
         self.nixosModules.searx
-        self.nixosModules.deepseekHarness
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -205,7 +204,6 @@
             user = "chrony";
             group = "chrony";
           }
-          "/var/lib/dsh" # DSH_HOME: dsh profiles, storages, UI-set credentials.
           "/var/lib/systemd/coredump"
           "/var/lib/private/ollama"
         ];
@@ -250,7 +248,6 @@
             ".config/vesktop"
             ".config/teams-for-linux"
             ".pki"
-            ".dsh"
 
             ".local/share/bottles"
             ".local/share/containers"
@@ -337,18 +334,6 @@
             domain = "qbittorrent.asmussen.tech";
             location = "/";
             upstream = "http://localhost:${toString config.services.qbittorrent.webuiPort}";
-            mtls = {
-              enable = true;
-              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-              localhostBypass = true;
-            };
-          };
-
-          dsh = {
-            enable = true;
-            domain = config.deepseek-harness.trustedHost;
-            location = "/";
-            upstream = "http://localhost:${toString config.deepseek-harness.port}";
             mtls = {
               enable = true;
               caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
@@ -548,13 +533,6 @@
         };
       };
       seerr.enable = true;
-      deepseek-harness = {
-        enable = true;
-        # Pin ids outside the drifting 98x system-group band.
-        uid = 600;
-        gid = 600;
-        checkouts."/projects".source = "/home/bastian/Projects";
-      };
 
       # Use the local mTLS proxy instead of routing qBittorrent through eta.
       networking = {
@@ -571,7 +549,6 @@
             "shoko.asmussen.tech"
             "sonarr.asmussen.tech"
             "prowlarr.asmussen.tech"
-            "dsh.asmussen.tech"
           ];
 
           "::1" = [
@@ -580,7 +557,6 @@
             "shoko.asmussen.tech"
             "sonarr.asmussen.tech"
             "prowlarr.asmussen.tech"
-            "dsh.asmussen.tech"
           ];
         };
 
@@ -734,7 +710,6 @@
 
         jellyfin.enable = mkForce false;
         youtubeArchive.enable = mkForce false;
-        deepseek-harness.enable = mkForce false;
 
         qbittorrent.enable = mkForce false;
         servarr.enable = mkForce false;
@@ -754,8 +729,7 @@
         };
 
         services = {
-          gitea-actions-runner.instances.epsilon.enable = mkForce false;
-
+          forgejo-runner.instances.epsilon.enable = mkForce false;
           syncthing.enable = mkForce false;
           nix-serve.enable = mkForce false;
           website.enable = mkForce false;
