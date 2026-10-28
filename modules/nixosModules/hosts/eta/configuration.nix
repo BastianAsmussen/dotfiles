@@ -4,9 +4,6 @@
   ...
 }:
 {
-  # Eta is the only internet-facing host, so it tracks the nixpkgs release
-  # branch rather than unstable. `lib` must come from the same channel as the
-  # nixpkgs building the system.
   flake.nixosConfigurations.eta = inputs.nixpkgs-stable.lib.nixosSystem {
     specialArgs = {
       inherit inputs self;
@@ -71,6 +68,7 @@
         self.nixosModules.website
         self.nixosModules.covenant
         self.nixosModules.news
+        self.nixosModules.remoteBuilder
       ];
 
       # Support building from x86_64.
@@ -92,7 +90,6 @@
         ];
 
         # Required by the nftables firewall (ct state / ct status dnat rules).
-        # Must be declared here because lockKernelModules prevents runtime loading.
         kernelModules = [
           "nf_conntrack"
           "nft_ct"
@@ -260,6 +257,9 @@
         "wireguard/psk-eta-delta" = { };
         "wireguard/psk-eta-mu" = { };
         "covenant/smtp-token" = { };
+        "covenant/admin-email" = { };
+        "covenant/admin-password-hash" = { };
+        "covenant/deploy-key" = { };
       };
 
       nix-serve-extras.exposePublicly = false;
@@ -355,19 +355,11 @@
                 };
               };
 
-              # The Covenant is served from eta only, so this is its home rather
-              # than a fallback. Its own certificate, not the shared wildcard.
-              #
-              # Explicit ssl_certificate paths, matching every other vhost here.
-              # useACMEHost does not emit them on a vhost with a hand-written
-              # listen list, so the handshake falls through to the default
-              # server and presents the asmussen.tech wildcard instead.
               ${config.covenant-extras.domain} = {
                 listen = [ fallbackListen ];
                 extraConfig = covenantSsl;
                 locations."/" = {
                   proxyPass = "http://localhost:${toString config.services.covenant.port}";
-                  # Overwrite, not append: covenant rate-limits on this header.
                   extraConfig = "proxy_set_header X-Forwarded-For $remote_addr;";
                 };
               };
