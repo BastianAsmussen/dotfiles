@@ -16,8 +16,9 @@
         ;
 
       cfg = config.persistence;
-      mkDirWithMode = lib.mapAttrsToList (directory: mode: { inherit directory mode; });
       user = config.preferences.user.name;
+
+      mkDirWithMode = lib.mapAttrsToList (directory: mode: { inherit directory mode; });
 
       dirWithModeType = types.submodule {
         options = {
@@ -129,30 +130,19 @@
         ];
 
         systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
-        boot = {
-          initrd.systemd.enable = mkDefault true;
-          tmp = {
-            useTmpfs = false;
-            cleanOnBoot = mkDefault true;
-          };
+        boot.tmp = {
+          useTmpfs = false;
+          cleanOnBoot = mkDefault true;
         };
 
         preservation = {
           enable = true;
-
           preserveAt = {
             "${cfg.persistPath}/system" = {
               directories = [
-                # Mount in initrd so the bind-mount is active before stage-2
-                # `setup-etc` runs. Otherwise setup-etc writes the sshd_config /
-                # ssh_config / moduli symlinks onto the tmpfs /etc/ssh and the
-                # later bind-mount shadows them, leaving sshd with no config on a
-                # freshly-installed host (it works on long-lived hosts only
-                # because repeated switches eventually populate /persist).
-                # /persist is neededForBoot, so it is available in initrd.
                 {
                   directory = "/etc/ssh";
-                  inInitrd = true;
+                  inInitrd = true; # Needed to prevent later bind-mount shadowing.
                 }
                 "/var/log"
                 "/var/lib/nixos"

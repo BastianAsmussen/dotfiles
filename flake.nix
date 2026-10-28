@@ -84,7 +84,6 @@
     };
 
     eh.url = "github:NotAShelf/eh";
-
     pre-commit-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -96,10 +95,11 @@
     };
 
     wrapper-modules = {
-      url = "github:BirdeeHub/nix-wrapper-modules";
+      url = "github:nix-community/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    noctalia.url = "github:noctalia-dev/noctalia";
     website = {
       url = "git+ssh://git@codeberg.org/BastianA/website.git";
       inputs.nixpkgs.follows = "nixpkgs";
