@@ -1,10 +1,6 @@
 {
   flake.nixosModules.btrfs =
-    {
-      lib,
-      config,
-      ...
-    }:
+    { lib, config, ... }:
     let
       inherit (lib) mkOption types;
 

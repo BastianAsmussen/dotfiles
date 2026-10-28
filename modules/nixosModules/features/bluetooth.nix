@@ -1,6 +1,6 @@
 {
   flake.nixosModules.bluetooth =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     {
       hardware.bluetooth = {
         enable = true;
@@ -14,8 +14,9 @@
           "network.target"
           "sound.target"
         ];
+
         wantedBy = [ "default.target" ];
-        serviceConfig.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
+        serviceConfig.ExecStart = lib.getExe' pkgs.bluez "mpris-proxy";
       };
     };
 }
