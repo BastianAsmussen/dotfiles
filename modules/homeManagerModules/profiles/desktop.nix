@@ -20,7 +20,7 @@
 
       programs.tor-browser.enable = true;
 
-      # Standalone HM must supply the cursor that Stylix provides on NixOS.
+      # Only supply NixOS-owned cursor when unset.
       home.pointerCursor = lib.mkIf (osConfig == null) {
         enable = true;
         package = pkgs.bibata-cursors;
