@@ -4,7 +4,6 @@
   ...
 }:
 {
-  # Eta uses stable nixpkgs and matching lib for its public host.
   flake.nixosConfigurations.eta = inputs.nixpkgs-stable.lib.nixosSystem {
     specialArgs = {
       inherit inputs self;
@@ -69,6 +68,7 @@
         self.nixosModules.website
         self.nixosModules.covenant
         self.nixosModules.news
+        self.nixosModules.remoteBuilder
       ];
 
       # Support building from x86_64.
@@ -89,8 +89,7 @@
           "lockdown=confidentiality"
         ];
 
-        # Declare nftables modules because lockKernelModules prevents runtime
-        # loading.
+        # Required by the nftables firewall (ct state / ct status dnat rules).
         kernelModules = [
           "nf_conntrack"
           "nft_ct"
@@ -255,6 +254,9 @@
         "wireguard/psk-eta-delta" = { };
         "wireguard/psk-eta-mu" = { };
         "covenant/smtp-token" = { };
+        "covenant/admin-email" = { };
+        "covenant/admin-password-hash" = { };
+        "covenant/deploy-key" = { };
       };
 
       nix-serve-extras.exposePublicly = false;
@@ -346,14 +348,11 @@
                 };
               };
 
-              # Set explicit certificate paths; useACMEHost does not handle
-              # custom listens.
               ${config.covenant-extras.domain} = {
                 listen = [ fallbackListen ];
                 extraConfig = covenantSsl;
                 locations."/" = {
                   proxyPass = "http://localhost:${toString config.services.covenant.port}";
-                  # Overwrite, not append: covenant rate-limits on this header.
                   extraConfig = "proxy_set_header X-Forwarded-For $remote_addr;";
                 };
               };

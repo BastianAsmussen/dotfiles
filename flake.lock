@@ -136,8 +136,25 @@
         "type": "github"
       }
     },
+    "content": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793555689,
+        "narHash": "sha256-oX7hKDCDi6UBsV6Yzgj1w6xpNHQGb3m+zoGYh1MlBI8=",
+        "ref": "refs/heads/master",
+        "rev": "741b161564f3ee625a66a01a3d35037df9091032",
+        "revCount": 42,
+        "type": "git",
+        "url": "ssh://git@codeberg.org/BastianA/covenant-text.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@codeberg.org/BastianA/covenant-text.git"
+      }
+    },
     "covenant": {
       "inputs": {
+        "content": "content",
         "crane": "crane",
         "flake-parts": "flake-parts",
         "nixpkgs": [
@@ -145,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793224648,
-        "narHash": "sha256-X7xPaJkxNuCkGfjSObr7dkU8qTIFzUpE0vh6MP9WC3E=",
+        "lastModified": 1793571866,
+        "narHash": "sha256-38Bq5JrGOHkDYtwHi1stJ//r1WkfXFBlJk6pqSKAJ5A=",
         "ref": "refs/heads/master",
-        "rev": "4a72bba04c4f97bfc383d87ad3b1ff365dbfc1f8",
-        "revCount": 133,
+        "rev": "70858e9f5655d28ca3183aa6db94b52ecfbce125",
+        "revCount": 147,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/covenant.git"
       },
@@ -945,10 +962,10 @@
     },
     "nix-secrets": {
       "locked": {
-        "lastModified": 1792841993,
-        "narHash": "sha256-DqgwQz1ZLPlHezSVbuHcYhzwrEdBvcWG+MSu65UlD/0=",
+        "lastModified": 1793572334,
+        "narHash": "sha256-DSkIlYeg6xeZqnOxJVNNpEFMlNGglNotm6E8XsbDlFU=",
         "ref": "refs/heads/master",
-        "rev": "5c03ec3800fe9624e8ea881d4e9f2da92d56bd1d",
+        "rev": "3aad3d679da7289255c496770e5f64960e1235fe",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/nix-secrets.git"
