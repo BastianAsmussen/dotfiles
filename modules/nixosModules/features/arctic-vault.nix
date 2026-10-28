@@ -30,15 +30,16 @@
       vaultSnapshot =
         let
           retentionScriptSrc =
-            # sh
-            ''
-              echo "Pruning snapshots older than ${toString cfg.retention} months..."
-              findutils "${cfg.mountpoint}" \
-                -maxdepth 1 \
-                -name 'vault-*.tar.zst.age' \
-                -mtime +${toString (cfg.retention * 31)} \
-                -print -delete
-            '';
+            lib.optionalString (cfg.retention != null)
+              # sh
+              ''
+                echo "Pruning snapshots older than ${toString cfg.retention} months..."
+                findutils "${cfg.mountpoint}" \
+                  -maxdepth 1 \
+                  -name 'vault-*.tar.zst.age' \
+                  -mtime +${toString (cfg.retention * 31)} \
+                  -print -delete
+              '';
         in
         pkgs.writers.writeBashBin "arctic-vault-snapshot"
           {
@@ -94,7 +95,7 @@
 
             echo "Snapshot written: $dest ($(du -h "$dest" | cut -f1))"
 
-            ${lib.optionalString (cfg.retention != null) retentionScriptSrc}
+            ${retentionScriptSrc}
           '';
     in
     {
