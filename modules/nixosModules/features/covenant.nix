@@ -8,33 +8,33 @@
       ...
     }:
     let
-      # Reuse x86_64 map geometry on aarch64; the data bytes are identical.
+      # Derived boundary geometry for /map.
       mapStatic =
         if config.covenant-extras.includeMap then
           inputs.covenant.packages.x86_64-linux.map-static
         else
           null;
 
-      # Cross-compile from x86_64 instead of running the crate build under QEMU.
+      # The embedding model and the constitution's vectors.
+      semanticStatic = inputs.covenant.packages.x86_64-linux.semantic-static;
+
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
         (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.covenant.overlays.default).covenant.override {
-          inherit mapStatic;
+          inherit mapStatic semanticStatic;
         }
       );
 
-      nativePackage = inputs.covenant.packages.${pkgs.system}.default.override { inherit mapStatic; };
+      nativePackage = inputs.covenant.packages.${pkgs.system}.default.override {
+        inherit mapStatic semanticStatic;
+      };
     in
     {
       options.covenant-extras = {
         domain = lib.mkOption {
           type = lib.types.str;
           default = "covenantofearth.org";
-          description = ''
-            Domain the Covenant is served on.  It deliberately does not live
-            under asmussen.tech: the document stands on its own, and the shared
-            wildcard certificate therefore does not cover it.
-          '';
+          description = "Domain the Covenant is served on.";
         };
 
         includeMap = lib.mkOption {
@@ -74,6 +74,8 @@
       config = {
         services.covenant = {
           enable = true;
+          package =
+            if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then crossPackage else nativePackage;
           port = lib.mkDefault 8084;
           canonicalURL = "https://${config.covenant-extras.domain}";
           smtp = {
@@ -86,15 +88,10 @@
           };
         };
 
-        # Apply the map override to native and cross builds.
-        services.covenant.package =
-          if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then crossPackage else nativePackage;
-
         nginx.reverseProxies.covenant = lib.mkIf config.covenant-extras.exposePublicly {
-          enable = true;
-
           inherit (config.covenant-extras) domain;
 
+          enable = true;
           location = "/";
           upstream = "http://localhost:${toString config.services.covenant.port}/";
           ssl = {
