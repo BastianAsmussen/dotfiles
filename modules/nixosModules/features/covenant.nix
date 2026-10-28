@@ -8,38 +8,33 @@
       ...
     }:
     let
-      # Derived boundary geometry for /map: tiles, metadata and the Article I
-      # figure. Taken from x86_64 on every host because it is data rather than
-      # code, so an aarch64 host has nothing to gain from running a fifteen
-      # minute geometry pass under QEMU to reach the same bytes.
+      # Derived boundary geometry for /map.
       mapStatic =
         if config.covenant-extras.includeMap then
           inputs.covenant.packages.x86_64-linux.map-static
         else
           null;
 
-      # Same reasoning as features/website.nix: cross from the x86_64 builder
-      # rather than compiling the crate graph under binfmt QEMU. crane sets the
-      # target, linker and C compiler from pkgsCross on its own.
+      # The embedding model and the constitution's vectors.
+      semanticStatic = inputs.covenant.packages.x86_64-linux.semantic-static;
+
       crossPackage = withSystem "x86_64-linux" (
         { pkgs, ... }:
         (pkgs.pkgsCross.aarch64-multiplatform.extend inputs.covenant.overlays.default).covenant.override {
-          inherit mapStatic;
+          inherit mapStatic semanticStatic;
         }
       );
 
-      nativePackage = inputs.covenant.packages.${pkgs.system}.default.override { inherit mapStatic; };
+      nativePackage = inputs.covenant.packages.${pkgs.system}.default.override {
+        inherit mapStatic semanticStatic;
+      };
     in
     {
       options.covenant-extras = {
         domain = lib.mkOption {
           type = lib.types.str;
           default = "covenantofearth.org";
-          description = ''
-            Domain the Covenant is served on.  It deliberately does not live
-            under asmussen.tech: the document stands on its own, and the shared
-            wildcard certificate therefore does not cover it.
-          '';
+          description = "Domain the Covenant is served on.";
         };
 
         includeMap = lib.mkOption {
@@ -79,6 +74,8 @@
       config = {
         services.covenant = {
           enable = true;
+          package =
+            if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then crossPackage else nativePackage;
           port = lib.mkDefault 8084;
           canonicalURL = "https://${config.covenant-extras.domain}";
           smtp = {
@@ -91,17 +88,10 @@
           };
         };
 
-        # Set on both paths rather than only the cross one: a native host needs
-        # the override too, or it takes the flake's default build, which
-        # carries no map.
-        services.covenant.package =
-          if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then crossPackage else nativePackage;
-
         nginx.reverseProxies.covenant = lib.mkIf config.covenant-extras.exposePublicly {
-          enable = true;
-
           inherit (config.covenant-extras) domain;
 
+          enable = true;
           location = "/";
           upstream = "http://localhost:${toString config.services.covenant.port}/";
           ssl = {
