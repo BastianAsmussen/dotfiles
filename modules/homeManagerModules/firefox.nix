@@ -1,12 +1,7 @@
-{ self, inputs, ... }:
+{ inputs, self, ... }:
 {
   flake.homeModules.firefox =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { lib, pkgs, ... }:
     let
       # Bump these declaratively with `nix flake update firefox-addons`.
       addons = pkgs.firefox-addons;
@@ -21,79 +16,10 @@
             value.install_url = "file://${pkg}/share/mozilla/extensions/${firefoxAppId}/${pkg.addonId}.xpi";
           }) pkgList
         );
-
-      # Nixpak's mkNixPak call is a closed literal; bubblewrap.package is the seam.
-      sandboxPkgs = pkgs.extend (
-        _: prev: {
-          bubblewrap = prev.bubblewrap.overrideAttrs (old: {
-            postInstall = (old.postInstall or "") + ''
-              mv "$out/bin/bwrap" "$out/bin/.bwrap-real"
-
-              cat > "$out/bin/bwrap" <<'SHIM'
-              #!${prev.runtimeShell}
-              set -eu
-
-              real="$(dirname "$(readlink -f "$0")")/.bwrap-real"
-
-              extra=()
-              case "''${NIXPAK_APP_EXE:-}" in
-                *schizofox*)
-                  # Firefox enumerates FIDO tokens with libudev, which needs both.
-                  extra+=( --ro-bind-try /sys/class/hidraw /sys/class/hidraw )
-                  extra+=( --ro-bind-try /run/udev /run/udev )
-
-                  # gpg and scdaemon write here; schizofox binds it read-only.
-                  extra+=( --bind-try "$HOME/.gnupg" "$HOME/.gnupg" )
-                  ;;
-              esac
-
-              if [ ''${#extra[@]} -eq 0 ]; then
-                exec "$real" "$@"
-              fi
-
-              args=()
-              inserted=0
-              swap=0
-              for arg in "$@"; do
-                # udev adds tokens to this after launch; bwrap's own /dev is nodev.
-                if [ "$swap" -eq 1 ]; then
-                  swap=0
-                  args+=( --dev-bind /run/schizofox-dev "$arg" )
-                  continue
-                fi
-
-                if [ "$arg" = "--dev" ]; then
-                  swap=1
-                  continue
-                fi
-
-                # bwrap applies mounts in argv order and the app follows a bare --.
-                if [ "$inserted" -eq 0 ] && [ "$arg" = "--" ]; then
-                  args+=( "''${extra[@]}" )
-                  inserted=1
-                fi
-
-                args+=( "$arg" )
-              done
-
-              # Nixpak runs xdg-dbus-proxy through this same bwrap, separator-less.
-              [ "$inserted" -eq 1 ] || exec "$real" "$@"
-              exec "$real" "''${args[@]}"
-              SHIM
-
-              chmod +x "$out/bin/bwrap"
-            '';
-          });
-        }
-      );
     in
     {
-      imports = [
-        # Only shadow pkgs here.
-        (args: inputs.schizofox.homeManagerModules.default (args // { pkgs = sandboxPkgs; }))
-      ];
+      imports = [ inputs.schizofox.homeManagerModules.default ];
 
-      stylix.targets.firefox.enable = false;
       programs.schizofox = {
         enable = true;
         package = pkgs.firefox-esr-153-unwrapped;
@@ -170,6 +96,9 @@
           ];
         };
 
+        # Disable sandboxing for extensions such as `gopass-bridge`.
+        security.sandbox.enable = false;
+
         settings = {
           "browser.translations.automaticallyPopup" = false;
           "browser.display.use_system_colors" = true;
@@ -178,16 +107,33 @@
           "general.autoScroll" = true;
         };
 
-        security.sandbox = {
-          enable = true;
+        # Schizofox uses outdated selectors for theming.
+        theme.extraUserChrome =
+          with self.theme;
+          # css
+          ''
+            :root {
+              --toolbar-background-color: ${base00} !important;
+              --toolbar-text-color: ${base05} !important;
+              --toolbar-field-background-color: ${base01} !important;
+              --toolbar-field-background-color-focus: ${base01} !important;
+              --toolbar-field-text-color: ${base05} !important;
+              --toolbar-field-text-color-focus: ${base05} !important;
+              --toolbar-field-border-color-focus: ${base0D} !important;
+              --tab-background-color-selected: ${base00} !important;
+              --tab-selected-textcolor: ${base05} !important;
+              --panel-background-color: ${base00} !important;
+              --panel-text-color: ${base05} !important;
+              --panel-border-color: ${base03} !important;
+              --urlbarview-background-color-selected: ${base02} !important;
+              --urlbarview-text-color-selected: ${base05} !important;
+            }
 
-          # `gopass-jsonapi` is sandboxed and decrypts from these paths.
-          extraBinds = [
-            "${config.home.homeDirectory}/.password-store"
-            "${config.home.homeDirectory}/.config/gopass"
-            "/run/user/1000/gnupg"
-          ];
-        };
+            .urlbarView-row[selected] {
+              background-color: ${base02} !important;
+              color: ${base05} !important;
+            }
+          '';
 
         theme.colors = with self.themeNoHash; {
           background-darker = base01;
@@ -214,9 +160,9 @@
           };
       };
 
-      persistence.directories = [
-        # Profile, cookies, and the extensions' own storage.
-        ".mozilla"
-      ];
+      # Profile, cookies, and the extensions' own storage.
+      persistence.directories = [ ".mozilla" ];
+
+      stylix.targets.firefox.enable = false;
     };
 }
