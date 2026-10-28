@@ -81,7 +81,7 @@
             tmp="$(mktemp -p "${cfg.mountpoint}" .vault-XXXXXX.tmp)"
             trap 'rm -f "$tmp"' EXIT
 
-            gnutar \
+            tar \
               --create \
               --absolute-names \
               --exclude-vcs-ignores \
@@ -262,7 +262,7 @@
 
             extraBackupArgs = [
               # Cargo and friends drop CACHEDIR.TAG in their build directories.
-              "--exclude-caching"
+              "--exclude-caches"
             ];
 
             timerConfig = {
