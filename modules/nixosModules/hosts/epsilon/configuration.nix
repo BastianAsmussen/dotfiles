@@ -91,7 +91,6 @@
         self.nixosModules.arcticVault
         self.nixosModules.pia
         self.nixosModules.forgejoRunner
-        self.nixosModules.searx
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -143,7 +142,6 @@
         };
 
       jellyfin.enable = true;
-      searx.enable = true;
       youtubeArchive = {
         enable = true;
         uid = 984;
@@ -181,8 +179,6 @@
           # Router admin and WiFi secrets used to render and push configuration.
           "router/admin-password" = { };
           "router/wifi-passphrase" = { };
-
-          "services/searx/secret-key" = { };
         }
         // lib.optionalAttrs config.services.news.enable {
           "services/news/llm-api-key".owner = config.services.news.user;
