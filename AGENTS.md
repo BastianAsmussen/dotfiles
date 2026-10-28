@@ -16,8 +16,8 @@ under `modules/` is auto-imported as a flake-parts module. No explicit
 
 WireGuard mesh in a star, eta is the hub.
 
-- epsilon: *arr stack, Jellyfin, SearXNG, Monero node, qBittorrent bound to
-  PIA, arctic vault backups, news sync to eta, primary-busy health check.
+- epsilon: *arr stack, Jellyfin, Monero node, qBittorrent bound to PIA,
+  arctic vault backups, news sync to eta, primary-busy health check.
 - eta: nginx stream TLS passthrough to epsilon (primary-mirror health checks
   toggle SNI routing to epsilon or a local fallback), nix cache
   `cache.asmussen.tech`, website. Never builds; deploys are pushed.
