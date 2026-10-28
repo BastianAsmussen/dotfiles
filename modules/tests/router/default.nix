@@ -41,10 +41,10 @@
       checks.tests-router =
         pkgs.runCommandLocal "tests-router"
           {
-            nativeBuildInputs = [
-              pkgs.python3
-              pkgs.gnutar
-              pkgs.gzip
+            nativeBuildInputs = with pkgs; [
+              python3
+              gnutar
+              gzip
             ];
           }
           ''
