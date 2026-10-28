@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
 """Render and (optionally) push an Icotera i4850-20 config backup.
 
 The NixOS `router` module renders a "plan" JSON from typed options and hands it
-to this script. The plan fully describes the parameter database; this script
-turns it into the exact on-wire backup format the GETOUI web panel accepts:
+to this script. A plan fully describes the parameter database. This script
+turns it into the exact on-wire backup format the GETOUI web panel accepts
+through pain-staking reverse-engineering of the proprietary interface:
 
-    backup = gzip( tar( db.bin, db.bin_md5, db.bin_checksum ) )
+    backup = gzip(tar(db.bin, db.bin_md5, db.bin_checksum))
 
     db.bin          1024-byte firmware header + N records, each
                     <key>\\0 <len:u8> <type:u8> <value[len]>
@@ -21,12 +21,12 @@ result of reverse-engineering a real backup (round-trips byte-for-byte):
     ipv4pair  8 bytes  two dotted-quads (primary/secondary DNS)
     str       N bytes  ASCII, NUL-terminated, zero-padded to N
 
-Secrets (admin password, WiFi passphrase) are never part of the plan; the plan
-only carries their file paths and this script reads them at run time.
+Secrets (admin password, WiFi passphrase) aren't part of a plan. Plans only
+carry their file paths and this script reads them at run time.
 
 Subcommands:
-    generate <plan.json> <out.bin>   build the backup, no network access
-    push     <plan.json>             build in a temp dir, then log in and upload
+    generate <plan.json> <out.bin>   build the backup (no network access)
+    push     <plan.json>             build and upload blob to router
 """
 
 import base64
@@ -44,12 +44,11 @@ import urllib.request
 
 UPLOAD_FIELD = "upload_config_file_req"
 
-# The firmware routes the file-only upload by the session's current page, not by
-# a request id, so the session must "open" the customer-config page first.
+# The firmware routes the file-only upload by the session's current page, so
+# sessions must "open" the customer-config page first.
 CONFIG_PAGE = "SETTINGS/CUSTOMERCONFIG"
 
-# Upload response `msg` codes (from the web UI): 1 = applied, 2 = nothing to
-# change (the config already matches). Everything else is a failure.
+# Upload response `msg` codes (from the web UI). Everything else is a failure.
 UPLOAD_OK = {
     "1": "config uploaded",
     "2": "already matches the device (nothing to change)",
@@ -63,33 +62,36 @@ def encode_value(kind, length, value):
         if not 0 <= v <= 0xFF:
             raise ValueError(f"u8 out of range: {v}")
         return bytes([v])
+
     if kind == "u16be":
         v = int(value)
         if not 0 <= v <= 0xFFFF:
             raise ValueError(f"u16 out of range: {v}")
         return v.to_bytes(2, "big")
+
     if kind == "ipv4":
         return encode_ipv4(value)
+
     if kind == "ipv4pair":
         if len(value) != 2:
             raise ValueError(f"ipv4pair needs two addresses: {value!r}")
         return encode_ipv4(value[0]) + encode_ipv4(value[1])
+
     if kind == "str":
-        # The firmware stores single-byte (latin-1 / iso-8859-1) strings; that
-        # is the codec the byte-exact round-trip was proven against.
         try:
             raw = str(value).encode("latin-1")
         except UnicodeEncodeError as exc:
             raise ValueError(
                 f"value {value!r} has characters outside the device's "
-                "latin-1 range; restrict it to ASCII/iso-8859-1"
+                "latin-1 range! Restrict it to ASCII/iso-8859-1."
             ) from exc
-        # Leave room for at least one NUL terminator, matching the firmware.
+
         if len(raw) > length - 1:
             raise ValueError(
                 f"string {value!r} does not fit in {length} bytes (with NUL)"
             )
         return raw + b"\x00" * (length - len(raw))
+
     raise ValueError(f"unknown kind: {kind}")
 
 
@@ -121,8 +123,10 @@ def build_db_bin(plan):
         encoded = encode_value(rec["kind"], rec["len"], value)
         if len(encoded) != rec["len"]:
             raise ValueError(
-                f"{rec['key']}: encoded {len(encoded)} bytes, expected {rec['len']}"
+                f"{rec['key']}: encoded {len(encoded)} bytes, "
+                f"expected {rec['len']}"
             )
+
         out += rec["key"].encode("latin-1")
         out += b"\x00"
         out += bytes([rec["len"], rec["type"]])
@@ -142,10 +146,11 @@ def build_backup(plan):
         ("db.bin_checksum", db_checksum, 0o644),
     ]
 
+    # Builds a deterministic tar as the router to extract members by name.
     tar_buf = io.BytesIO()
-    # Deterministic tar: fixed mtime, no owner names, GNU format (as produced
-    # by the device). The router extracts members by name.
-    with tarfile.open(fileobj=tar_buf, mode="w", format=tarfile.GNU_FORMAT) as tar:
+    with tarfile.open(
+        fileobj=tar_buf, mode="w", format=tarfile.GNU_FORMAT
+    ) as tar:
         for name, payload, mode in members:
             info = tarfile.TarInfo(name)
             info.size = len(payload)
@@ -171,11 +176,9 @@ def cgi_url(host):
 
 
 def login(opener, host, user, password):
-    # Prime the session so the CGISID cookie is set before authenticating.
     opener.open(cgi_url(host), timeout=15).read()
-    # Percent-encode the password from its latin-1 bytes so the wire bytes match
-    # exactly what the firmware stored (the default UTF-8 would corrupt any
-    # non-ASCII byte); the encoded form is still pure ASCII.
+
+    # Percent-encode the password from its latin-1 bytes.
     body = urllib.parse.urlencode(
         {"req": "log_in", "username": user, "password": password},
         encoding="latin-1",
@@ -189,10 +192,10 @@ def login(opener, host, user, password):
 def select_page(opener, host, page):
     """Set the session's current page so the CGI routes the config upload.
 
-    The upload is a file-only multipart POST carrying no request id; the firmware
-    dispatches it by the session's current page (``curpg``), which the web UI
-    establishes by opening the page first. The server persists ``curpg`` for the
-    session, so this only needs to run once before the upload.
+    The upload is a file-only multipart POST. The firmware dispatches it by the
+    session's current page (``curpg``), which the web UI establishes by opening
+    the page first. The server persists ``curpg`` for the session, so this only
+    needs to run once before the upload.
     """
     body = urllib.parse.urlencode(
         {"curpg": page, "curmenu": page, "req": "page_prereq"}
@@ -200,7 +203,9 @@ def select_page(opener, host, page):
     resp = opener.open(cgi_url(host), data=body, timeout=15).read()
     parsed = json.loads(resp.decode("latin-1"))
     if parsed.get("resp_t") != "page_prereq_resp":
-        raise SystemExit(f"router: could not open {page}: {parsed.get('resp_body')}")
+        raise SystemExit(
+            f"router: could not open {page}: {parsed.get('resp_body')}"
+        )
 
 
 def upload_backup(opener, host, blob):
@@ -212,6 +217,7 @@ def upload_backup(opener, host, blob):
         "Content-Type: application/octet-stream",
         "",
     ]
+
     body = "\r\n".join(parts).encode("latin-1") + b"\r\n"
     body += blob + b"\r\n"
     body += f"--{boundary}--\r\n".encode("latin-1")
@@ -220,15 +226,14 @@ def upload_backup(opener, host, blob):
     req.add_header("Content-Type", f"multipart/form-data; boundary={boundary}")
     raw = opener.open(req, timeout=120).read().decode("latin-1", "replace")
 
-    # The device signals a rejected restore in-band as HTTP 200 plus a JSON
-    # envelope (the same shape a bad login returns: resp_t "error" with an
-    # errcode), so a successful HTTP request is NOT a successful restore. The
-    # success envelope is resp_t "upload_config_file_resp"; anything else is a
-    # failure we must surface, or the systemd unit reports success on a no-op.
+    # Have to check errors because the router returns HTTP 200 no matter the
+    # result of the operation is.
     try:
         parsed = json.loads(raw)
-    except ValueError:
-        raise SystemExit(f"router restore: non-JSON response: {raw[:400]!r}")
+    except ValueError as exc:
+        raise SystemExit(
+            f"router restore: non-JSON response: {raw[:400]!r}"
+        ) from exc
 
     resp_t = parsed.get("resp_t")
     resp_body = parsed.get("resp_body")
@@ -236,32 +241,35 @@ def upload_backup(opener, host, blob):
     if resp_t == "error":
         raise SystemExit(
             "router restore rejected: "
-            f"errcode={resp_body.get('errcode')} errmsg={resp_body.get('errmsg')!r}"
+            f"errcode={resp_body.get('errcode')} "
+            f"errmsg={resp_body.get('errmsg')!r}"
         )
     if resp_t != "upload_config_file_resp":
         raise SystemExit(
             f"router restore: unexpected response type {resp_t!r}: {raw[:400]}"
         )
-    # The upload envelope reports the applied-config result in `msg`; only
-    # 1 (applied) and 2 (nothing to change) are a successful end state.
+
     msg = str(resp_body.get("msg"))
     if msg not in UPLOAD_OK:
         raise SystemExit(f"router restore failed (msg={msg}): {raw[:400]}")
+
     errorlines = resp_body.get("errorlines")
     if errorlines:
         raise SystemExit(f"router restore reported errors: {errorlines}")
+
     return (
         f"{UPLOAD_OK[msg]} "
-        f"(applied={resp_body.get('success')}, failed={resp_body.get('failed')})"
+        f"(applied={resp_body.get('success')}, "
+        f"failed={resp_body.get('failed')})"
     )
 
 
 def cmd_generate(plan_path, out_path):
-    with open(plan_path) as fh:
+    with open(plan_path, encoding="latin-1") as fh:
         plan = json.load(fh)
     blob = build_backup(plan)
-    # The backup embeds the cleartext admin password and WPA passphrase, so it
-    # must be root-only regardless of the service UMask or StateDirectory mode.
+
+    # Backup embeds the cleartext admin password and WPA passphrase.
     fd = os.open(out_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "wb") as fh:
         fh.write(blob)
@@ -270,7 +278,7 @@ def cmd_generate(plan_path, out_path):
 
 
 def cmd_push(plan_path):
-    with open(plan_path) as fh:
+    with open(plan_path, encoding="latin-1") as fh:
         plan = json.load(fh)
     blob = build_backup(plan)
     login_cfg = plan["login"]
@@ -282,17 +290,20 @@ def cmd_push(plan_path):
         print(f"logging in to {host} as {login_cfg['user']}")
         login(opener, host, login_cfg["user"], password)
         select_page(opener, host, CONFIG_PAGE)
-        print(f"uploading {len(blob)}-byte config backup")
+
+        print(f"uploading config backup ({len(blob)} bytes)...")
         result = upload_backup(opener, host, blob)
     except urllib.error.HTTPError as exc:
-        raise SystemExit(f"router restore failed: HTTP {exc.code} {exc.reason}")
+        raise SystemExit(
+            f"router restore failed: HTTP {exc.code} {exc.reason}"
+        ) from exc
     except (urllib.error.URLError, OSError) as exc:
-        # A transport failure mid-upload leaves the device in an unknown state.
         raise SystemExit(
             f"router {host} unreachable / transport failed: {exc}. "
-            "Device state is unknown after a mid-transfer failure; verify on the "
-            "web panel before retrying."
-        )
+            "Device state is unknown after a mid-transfer failure! "
+            "Please verify system state on the web panel before retrying."
+        ) from exc
+
     print(f"router restore accepted. response: {result[:400]}")
 
 
@@ -304,6 +315,7 @@ def main(argv):
     else:
         print(__doc__)
         return 2
+
     return 0
 
 

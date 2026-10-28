@@ -6,38 +6,42 @@
       lib,
       ...
     }:
+    let
+      inherit (lib) filterAttrs mapAttrs importJSON;
+      inherit (builtins) readDir;
+    in
     {
       imports = [ self.homeModules.goxlrUtility ];
 
       services.goxlr-utility = {
         enable = true;
 
-        # Every directory under profiles/ is a profile: profile.json is the XML
-        # tree, all other files (the scribble images) join the archive.
+        # Directories under profiles/ is a profile: profile.json is the XML
+        # tree, all other files join the archive.
         # New profiles written by goxlr-export are picked up automatically.
-        profiles = lib.mapAttrs (
-          name: _:
+        profiles =
           let
-            dir = ./profiles + "/${name}";
+            profileDirs = filterAttrs (_: type: type == "directory") (readDir ./profiles);
           in
-          {
-            profile = lib.importJSON (dir + "/profile.json");
-            files = lib.mapAttrs (fileName: _: dir + "/${fileName}") (
-              lib.filterAttrs (fileName: type: type == "regular" && fileName != "profile.json") (
-                builtins.readDir dir
-              )
-            );
-          }
-        ) (lib.filterAttrs (_: type: type == "directory") (builtins.readDir ./profiles));
+          mapAttrs (
+            name: _:
+            let
+              dir = ./profiles + "/${name}";
+            in
+            {
+              profile = importJSON (dir + "/profile.json");
+              files = mapAttrs (fileName: _: dir + "/${fileName}") (
+                filterAttrs (fileName: type: type == "regular" && fileName != "profile.json") (readDir dir)
+              );
+            }
+          ) profileDirs;
 
         micProfiles = lib.mapAttrs' (
           fileName: _:
-          lib.nameValuePair (lib.removeSuffix ".json" fileName) (
-            lib.importJSON (./mic-profiles + "/${fileName}")
-          )
-        ) (builtins.readDir ./mic-profiles);
+          lib.nameValuePair (lib.removeSuffix ".json" fileName) (importJSON (./mic-profiles + "/${fileName}"))
+        ) (readDir ./mic-profiles);
 
-        icons = lib.mapAttrs (fileName: _: ./icons + "/${fileName}") (builtins.readDir ./icons);
+        icons = lib.mapAttrs (fileName: _: ./icons + "/${fileName}") (readDir ./icons);
         export.directory = "${config.home.homeDirectory}/dotfiles/modules/homeManagerModules/goxlr";
         settings = {
           show_tray_icon = true;

@@ -19,61 +19,79 @@
 
       inherit (config.users.users.${user}) home;
 
-      recipientArgs = lib.concatMapStringsSep " " (r: "-r ${lib.escapeShellArg r}") cfg.recipients;
-
       # Resolve source paths: relative paths are anchored to $HOME, absolute paths pass through.
       resolvePaths = map (s: if lib.hasPrefix "/" s then s else "${home}/${s}");
       resolvedSources = resolvePaths cfg.sources;
 
+      recipientArgs = lib.concatMapStringsSep " " (r: "-r ${lib.escapeShellArg r}") cfg.recipients;
       sourceArgs = lib.concatMapStringsSep " " lib.escapeShellArg resolvedSources;
 
-      snapshotScript = pkgs.writeShellScript "arctic-vault-snapshot" ''
-        set -euo pipefail
+      snapshotScript =
+        pkgs.writeBashBin "arctic-vault-snapshot"
+          {
+            makeWrapperArgs = [
+              "--prefix"
+              "PATH"
+              ":"
+              "${lib.makeBinPath (
+                with pkgs;
+                [
+                  gnutar
+                  zstd
+                  age
+                  findutils
+                ]
+              )}"
+            ];
+          }
+          # sh
+          ''
+            set -euo pipefail
 
-        timestamp="$(date +${cfg.timestampFormat})"
-        dest="${cfg.mountpoint}/vault-''${timestamp}.tar.zst.age"
+            timestamp="$(date +${cfg.timestampFormat})"
+            dest="${cfg.mountpoint}/vault-''${timestamp}.tar.zst.age"
 
-        if [ -f "$dest" ]; then
-          echo "Snapshot vault-''${timestamp} already exists, skipping."
-          exit 0
-        fi
+            if [ -f "$dest" ]; then
+              echo "Snapshot vault-''${timestamp} already exists, skipping."
+              exit 0
+            fi
 
-        echo "Creating arctic vault snapshot: vault-''${timestamp}"
+            echo "Creating arctic vault snapshot: vault-''${timestamp}"
+            for src in ${sourceArgs}; do
+              if [ ! -e "$src" ]; then
+                echo "ERROR: Source does not exist: $src" >&2
+                exit 1
+              fi
+            done
 
-        # Verify all sources exist before starting.
-        for src in ${sourceArgs}; do
-          if [ ! -e "$src" ]; then
-            echo "ERROR: Source does not exist: $src" >&2
-            exit 1
-          fi
-        done
+            tmp="$(mktemp -p "${cfg.mountpoint}" .vault-XXXXXX.tmp)"
+            trap 'rm -f "$tmp"' EXIT
 
-        tmp="$(mktemp -p "${cfg.mountpoint}" .vault-XXXXXX.tmp)"
-        trap 'rm -f "$tmp"' EXIT
+            gnutar \
+              --create \
+              --absolute-names \
+              --exclude-vcs-ignores \
+              ${sourceArgs} \
+              | zstd --ultra -${toString cfg.compressionLevel} -T0 \
+              | age --encrypt ${recipientArgs} -o "$tmp"
 
-        ${lib.getExe pkgs.gnutar} \
-          --create \
-          --absolute-names \
-          --exclude-vcs-ignores \
-          ${lib.concatMapStringsSep " " (s: lib.escapeShellArg s) resolvedSources} \
-        | ${lib.getExe pkgs.zstd} --ultra -${toString cfg.compressionLevel} -T0 \
-        | ${lib.getExe pkgs.age} --encrypt ${recipientArgs} -o "$tmp"
+            mv "$tmp" "$dest"
+            chmod 0400 "$dest"
+            trap - EXIT
 
-        mv "$tmp" "$dest"
-        chmod 0400 "$dest"
-        trap - EXIT
-
-        echo "Snapshot written: $dest ($(du -h "$dest" | cut -f1))"
-
-        ${lib.optionalString (cfg.retention != null) ''
-          echo "Pruning snapshots older than ${toString cfg.retention} months..."
-          ${lib.getExe pkgs.findutils} "${cfg.mountpoint}" \
-            -maxdepth 1 \
-            -name 'vault-*.tar.zst.age' \
-            -mtime +${toString (cfg.retention * 31)} \
-            -print -delete
-        ''}
-      '';
+            echo "Snapshot written: $dest ($(du -h "$dest" | cut -f1))"
+          ''
+        ++
+          lib.optionalString (cfg.retention != null)
+            # sh
+            ''
+              echo "Pruning snapshots older than ${toString cfg.retention} months..."
+              findutils "${cfg.mountpoint}" \
+                -maxdepth 1 \
+                -name 'vault-*.tar.zst.age' \
+                -mtime +${toString (cfg.retention * 31)} \
+                -print -delete
+            '';
     in
     {
       options.arcticVault = {
@@ -127,15 +145,8 @@
           description = "Months to keep snapshots. Null means keep all.";
         };
 
-        # The full archive above is the right shape for a handful of small,
-        # irreplaceable things: restoring it needs only age, tar and zstd, with
-        # no repo format and no repo key that might itself be locked inside the
-        # thing you cannot open. It is the wrong shape for bulk data, where a
-        # fresh copy every run fills the disk in weeks. Anything large goes
-        # through restic instead, on the same disk.
         incremental = {
           enable = mkEnableOption "Deduplicating incremental snapshots (restic) alongside the full archive";
-
           passwordFile = mkOption {
             type = types.nullOr types.str;
             default = null;
@@ -151,7 +162,7 @@
           paths = mkOption {
             type = types.listOf types.str;
             default = [ ];
-            description = "Paths to back up. Relative paths are resolved from the user's home directory; absolute paths are used as-is.";
+            description = "Paths to back up. Relative paths are resolved from the user's home directory. Absolute paths are used as-is.";
             example = [
               "Documents"
               "Projects"
@@ -192,14 +203,13 @@
 
           pruneOpts = mkOption {
             type = types.listOf types.str;
+            description = "Retention policy passed to `restic forget`.";
             default = [
               "--keep-daily 7"
               "--keep-weekly 5"
               "--keep-monthly 12"
               "--keep-yearly 3"
             ];
-
-            description = "Retention policy passed to `restic forget`.";
           };
         };
       };
@@ -225,8 +235,7 @@
         ];
 
         # Restic re-reads the pack index from the repository whenever its cache
-        # is missing, and root is a tmpfs here. Only epsilon imports this module
-        # and it has preservation, so no optionalAttrs guard is needed.
+        # is missing.
         persistence.directories = lib.optionals cfg.incremental.enable [
           {
             directory = "/root/.cache/restic";
@@ -234,7 +243,7 @@
           }
         ];
 
-        services.restic.backups = lib.mkIf cfg.incremental.enable {
+        services.restic.backups = mkIf cfg.incremental.enable {
           arctic-vault = {
             inherit (cfg.incremental) exclude passwordFile pruneOpts;
 
@@ -242,14 +251,9 @@
             paths = resolvePaths cfg.incremental.paths;
             initialize = true;
 
-            # Verify a slice of the data on every run. The full-archive job
-            # checks nothing, which is how a backup rots unnoticed.
+            # Verify a slice of the data on every run.
             runCheck = true;
             checkOpts = [ "--read-data-subset=5%" ];
-
-            # Gives a `restic-arctic-vault` wrapper with the repository and
-            # password already set, so a restore does not start with guessing
-            # environment variables.
             createWrapper = true;
 
             extraBackupArgs = [
@@ -265,26 +269,24 @@
           };
         };
 
-        # The vault disk is nofail and may genuinely be absent.
-        systemd.services.restic-backups-arctic-vault = lib.mkIf cfg.incremental.enable {
-          unitConfig.RequiresMountsFor = [ cfg.mountpoint ];
-        };
-
         systemd = {
-          services.arctic-vault = {
-            description = "Arctic vault: encrypted archival snapshot";
-            after = [ "local-fs.target" ];
-            wants = [ "local-fs.target" ];
+          services = {
+            restic-backups-arctic-vault = mkIf cfg.incremental.enable {
+              unitConfig.RequiresMountsFor = [ cfg.mountpoint ];
+            };
 
-            # Run as the user so we can read ~/dotfiles etc.
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = snapshotScript;
-              User = user;
-              Group = user;
+            arctic-vault = {
+              description = "Arctic vault: encrypted archival snapshot";
+              after = [ "local-fs.target" ];
+              wants = [ "local-fs.target" ];
 
-              # The vault mountpoint must be writable by the user.
-              ReadWritePaths = [ cfg.mountpoint ];
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = snapshotScript;
+                User = user;
+                Group = user;
+                ReadWritePaths = [ cfg.mountpoint ];
+              };
             };
           };
 

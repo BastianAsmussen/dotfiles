@@ -8,74 +8,67 @@
       ...
     }:
     let
+      inherit (lib) mkOption mkIf mkDefault;
+
       cfg = config.acmeShared;
     in
     {
       options.acmeShared = {
         enable = lib.mkEnableOption "Shared Let's Encrypt wildcard cert for asmussen.tech";
 
-        dkRedirects.enable = lib.mkOption {
+        dkRedirects.enable = mkOption {
           type = lib.types.bool;
           default = false;
           description = ''
-            Register the legacy .dk redirect domains (dotfiles.dk, fansly.dk,
+            Register the .dk redirect domains (dotfiles.dk, fansly.dk,
             tech-college.dk, harvard.dk) pointing at https://asmussen.tech.
-            Off by default; enable on hosts that publicly serve nginx.
           '';
         };
       };
 
-      config = lib.mkIf cfg.enable (
+      config = mkIf cfg.enable (
         lib.mkMerge [
-          # Certificates regenerate on their own, but only at the cost of
-          # burning Let's Encrypt rate limits on every reboot.
+          # Certificates regenerate on their own at the cost of burning rate
+          # limits a bit every reboot.
           (lib.optionalAttrs (options ? persistence) {
             persistence.directories = [ "/var/lib/acme" ];
           })
 
           {
-            # Cloudflare DNS-01 environment for the wildcard cert. The nginx
-            # feature module also auto-defines these when a proxy or redirect
-            # uses cloudflare; mkDefault lets that normal-priority definition
-            # win and keeps this one as a fallback for hosts whose nginx setup
-            # doesn't trigger the auto-define (e.g. delta, which proxies with
-            # client certs rather than ACME).
+            # Cloudflare DNS-01 environment for the wildcard cert.
             sops = {
-              secrets."cloudflare-api-token".sopsFile = lib.mkDefault inputs.nix-secrets.sopsFiles."shared.yaml";
+              secrets."cloudflare-api-token".sopsFile = mkDefault inputs.nix-secrets.sopsFiles."shared.yaml";
               templates."cloudflare-acme-env" = {
-                owner = lib.mkDefault "acme";
-                content = lib.mkDefault "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
+                owner = mkDefault "acme";
+                content = mkDefault "CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-api-token"}";
               };
             };
 
             users.users.acme.extraGroups = [ "keys" ];
-
             security.acme = {
-              acceptTerms = lib.mkDefault true;
-              defaults.email = lib.mkDefault config.preferences.user.email;
-
-              # Applies to every cert on the host, not just the wildcard.
-              # Without it nginx keeps the old certificate in memory after lego
-              # renews and serves an expired one until something else happens
-              # to reload it. Vhosts that name certificate paths directly get
-              # no reload wiring from the nginx module, so this is the only
-              # thing covering them.
-              defaults.reloadServices = lib.mkDefault [ "nginx.service" ];
+              acceptTerms = mkDefault true;
+              defaults = {
+                # Applies to every cert on the host.
+                reloadServices = mkDefault [ "nginx.service" ];
+                email = mkDefault config.preferences.user.email;
+              };
 
               certs."asmussen.tech" = {
+                inherit (config.services.nginx) group;
+
                 extraDomainNames = [ "*.asmussen.tech" ];
                 dnsProvider = "cloudflare";
                 environmentFile = config.sops.templates."cloudflare-acme-env".path;
-                inherit (config.services.nginx) group;
               };
             };
           }
 
-          (lib.mkIf cfg.dkRedirects.enable {
+          (mkIf cfg.dkRedirects.enable {
             nginx.redirects =
               let
                 dkRedirect = domain: {
                   inherit domain;
+
                   enable = true;
                   target = "https://asmussen.tech";
                   ssl = {

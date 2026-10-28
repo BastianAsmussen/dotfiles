@@ -1,14 +1,10 @@
 """Convert a GoXLR profile XML document into JSON.
 
-The GoXLR profile format is a pure attribute tree: elements carry attributes
-and child elements, never text. That maps onto an object where scalar values
-are attributes and object (or list-of-object) values are child elements. The
-root element's tag is dropped; the generator on the Nix side knows it
+The GoXLR profile format is a pure attribute tree: elements can only carry
+attributes and child elements. That maps onto an object where scalar values
+are attributes and object (or list-of-object) values are child elements.
+The root element's tag is dropped because the Nix-side generator knows it
 (ValueTreeRoot / MicProfileTree).
-
-Integers are emitted as numbers; everything else (floats, hex colors, text)
-stays a string so values round-trip byte-exact - float re-printing would mangle
-them.
 """
 
 import json
@@ -39,7 +35,7 @@ def convert(elem, path):
 
     for tag, instances in children.items():
         if tag in out:
-            sys.exit(f"error: attribute and child element both named "
+            sys.exit(f"error: attribute and child element both named"
                      f"{tag!r} at {path}")
         out[tag] = instances[0] if len(instances) == 1 else instances
 
