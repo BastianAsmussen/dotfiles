@@ -57,10 +57,26 @@
           default = true;
           description = "Whether to enable idle screen-off and lock timeouts.";
         };
+
+        powerProfileEnabled = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Whether to show power profile controls in the bar and control center.";
+        };
       };
 
       config = {
-        package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+          postPatch = (old.postPatch or "") + ''
+            substituteInPlace src/shell/bar/bar.cpp \
+              --replace-fail \
+                'reservedBarExclusiveZone(barConfig, shadowConfig) : 0;' \
+                'reservedBarExclusiveZone(barConfig, shadowConfig) : -1;' \
+              --replace-fail \
+                'instance.surface->setExclusiveZone(zone);' \
+                'instance.surface->setExclusiveZone(zone == 0 ? -1 : zone);'
+          '';
+        });
 
         env.NOCTALIA_CONFIG_HOME = "${configHome}";
         passthru = { inherit configHome; };
@@ -138,39 +154,139 @@
           };
 
           shell = {
-            avatar_path = "${../../assets/icons/bastian.png}";
+            avatar_path = "${../../../assets/icons/bastian.png}";
             clipboard_enabled = false;
             telemetry_enabled = false;
             shadow.direction = "down_right";
+            privacy.mic_filter_regex = "^GoXLR Utility$";
+            panel_anchor_bar = "main";
+            panel = {
+              open_near_click_control_center = true;
+              control_center_placement = "floating";
+              wallpaper_placement = "floating";
+              session_placement = "floating";
+            };
           };
 
-          bar.main = {
-            position = "left";
-            capsule = false;
-            start = [
-              "control-center"
-              "workspaces"
-            ];
+          bar =
+            let
+              strip = {
+                position = "top";
+                thickness = 34;
+                margin_ends = 0;
+                compositor_blur = false;
+                shadow = false;
+              };
+            in
+            {
+              order = [
+                "backing"
+                "main"
+              ];
 
-            end = [
-              "notifications"
-              "power_profile"
-              "volume"
-              "battery"
-              "microphone"
-              "keyboard_layout"
-              "clock"
-              "tray"
-            ];
-          };
+              backing = strip // {
+                background_opacity = 1.0;
+                reserve_space = false;
+                radius = 6;
+                shadow = true;
+                start = [ ];
+                center = [ ];
+                end = [ ];
+              };
+
+              main = strip // {
+                background_opacity = 0.0;
+                reserve_space = true;
+                padding = 5;
+                start = [
+                  "group:left"
+                  "group:window"
+                ];
+
+                center = [ "group:clock" ];
+                end = [
+                  "group:sysmon"
+                  "group:tray"
+                  "group:status"
+                ];
+
+                capsule_group = map (group: group // { fill = "surface"; }) [
+                  {
+                    id = "left";
+                    members = [
+                      "control-center"
+                      "workspaces"
+                    ];
+                  }
+                  {
+                    id = "window";
+                    members = [ "active_window" ];
+                  }
+                  {
+                    id = "clock";
+                    members = [ "clock" ];
+                  }
+                  {
+                    id = "sysmon";
+                    members = [
+                      "cpu"
+                      "ram"
+                      "temp"
+                    ];
+                  }
+                  {
+                    id = "tray";
+                    members = [ "tray" ];
+                  }
+                  {
+                    id = "status";
+                    members = [
+                      "notifications"
+                      "power_profile"
+                      "volume"
+                      "microphone"
+                      "battery"
+                    ];
+                  }
+                ];
+              };
+            };
 
           widget = {
+            control-center = {
+              custom_image = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake-white.svg";
+              custom_image_colorize = true;
+              color = "tertiary";
+              scale = 1.25;
+            };
+
             workspaces = {
-              show_labels = false;
+              style = "focus_hint";
+              show_icons = false;
+              scale = 1.25;
+              show_tooltip = false;
               hide_when_empty = true;
             };
 
-            volume.show_label = false;
+            cpu = {
+              type = "sysmon";
+              stat = "cpu_usage";
+              visualization = "none";
+            };
+
+            ram = {
+              type = "sysmon";
+              stat = "ram_pct";
+              visualization = "none";
+            };
+
+            temp = {
+              type = "sysmon";
+              stat = "cpu_temp";
+              visualization = "none";
+            };
+
+            power_profile.enabled = config.powerProfileEnabled;
             microphone = {
               type = "volume";
               device = "input";
@@ -178,30 +294,34 @@
             };
 
             clock = {
-              format = "{:%H:%M %a, %b %d}";
-              vertical_format = "{:%H\n%M\n-\n%d\n%m}";
+              font_weight = 700;
+              format = "{:%H:%M · %a %d %b}";
+              tooltip_format = "{:%A %d %B %Y}";
             };
 
             tray = {
               drawer = true;
+              detached_panel = true;
               hide_passive = false;
             };
           };
 
           control_center = {
-            shortcuts = map (type: { inherit type; }) [
-              "wifi"
-              "bluetooth"
-              "notification"
-              "power_profile"
-            ];
+            shortcuts = map (type: { inherit type; }) (
+              [
+                "wifi"
+                "bluetooth"
+                "notification"
+              ]
+              ++ lib.optional config.powerProfileEnabled "power_profile"
+            );
 
             calendar.show_week_numbers = true;
           };
 
           wallpaper = {
-            directory = "${../../assets/wallpapers}";
-            default.path = "${../../assets/wallpapers/tokyo.png}";
+            directory = "${../../../assets/wallpapers}";
+            default.path = "${../../../assets/wallpapers/tokyo.png}";
             transition = [
               "fade"
               "disc"
@@ -216,6 +336,7 @@
           };
 
           lockscreen = {
+            transition = [ ];
             blur_intensity = 0.4;
             tint_intensity = 0.6;
           };
@@ -250,7 +371,11 @@
             background_opacity = 1.0;
           };
 
-          osd.position = "bottom_center";
+          osd = {
+            position = "bottom_center";
+            background_opacity = 1.0;
+            kinds.media = false;
+          };
         };
       };
     };
@@ -258,9 +383,15 @@
   perSystem =
     { pkgs, ... }:
     {
-      packages.noctalia = inputs.wrapper-modules.lib.evalPackage [
-        { inherit pkgs; }
-        self.wrapperModules.noctalia
-      ];
+      packages = {
+        noctalia = inputs.wrapper-modules.lib.evalPackage [
+          { inherit pkgs; }
+          self.wrapperModules.noctalia
+        ];
+
+        noctalia-bar-watcher = pkgs.writers.writePython3Bin "noctalia-bar-watcher" { } (
+          builtins.readFile ./bar_watcher.py
+        );
+      };
     };
 }

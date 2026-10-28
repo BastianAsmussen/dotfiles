@@ -20,7 +20,7 @@
           "${pkgs.writeShellScript "autostart-${toString i}" entry}";
 
       noctaliaPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia.wrap {
-        inherit (config.preferences.noctalia) useIpLocation idleEnabled;
+        inherit (config.preferences.noctalia) useIpLocation idleEnabled powerProfileEnabled;
       };
 
       autostartEntries = lib.imap0 toStartupEntry config.preferences.autostart;
@@ -67,6 +67,22 @@
                 };
               }
             ];
+          };
+        };
+
+        systemd.user.services.noctalia-bar-watcher = {
+          wantedBy = [ "graphical-session.target" ];
+          partOf = [ "graphical-session.target" ];
+          after = [ "graphical-session.target" ];
+          path = [
+            config.programs.niri.package
+            noctaliaPackage
+          ];
+
+          serviceConfig = {
+            ExecStart = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-bar-watcher;
+            Restart = "on-failure";
+            RestartSec = 2;
           };
         };
 
