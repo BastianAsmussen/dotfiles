@@ -154,19 +154,8 @@
         };
       };
 
-      # Stop Ollama during games to free its idle VRAM.
-      gamemode.pauseUnits = [ "ollama.service" ];
-
       services = {
-        ollama = {
-          enable = true;
-          package = pkgs.ollama-cuda;
-
-          environmentVariables.OLLAMA_NUM_PARALLEL = "4";
-        };
-
         meilisearch.masterKeyFile = config.sops.secrets."meilisearch/master-key".path;
-
         website.port = 8083;
       };
 
@@ -733,7 +722,6 @@
           nix-serve.enable = mkForce false;
           website.enable = mkForce false;
           news.enable = mkForce false;
-          ollama.enable = mkForce false;
           tor.enable = mkForce false;
         };
       };
