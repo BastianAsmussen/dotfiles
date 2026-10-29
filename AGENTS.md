@@ -25,7 +25,7 @@ WireGuard mesh in a star, eta is the hub.
   the cache host.
 
 Less obvious inputs: niri (scrollable-tiling Wayland compositor),
-noctalia-shell (bar, launcher, control center, notifications), schizofox
+noctalia (bar, launcher, control center, notifications), schizofox
 (hardened Firefox wrapper), stylix (theming), preservation (tmpfs root),
 lanzaboote (Secure Boot, epsilon only).
 

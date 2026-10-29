@@ -1,9 +1,8 @@
-{ inputs, ... }:
+{ self, inputs, ... }:
 {
   flake.homeModules.firefox =
     {
       config,
-      osConfig,
       lib,
       pkgs,
       ...
@@ -90,26 +89,28 @@
     in
     {
       imports = [
-        # A formals-free lambda takes the whole argument set, shadowing pkgs here only.
+        # Only shadow pkgs here.
         (args: inputs.schizofox.homeManagerModules.default (args // { pkgs = sandboxPkgs; }))
       ];
 
       stylix.targets.firefox.enable = false;
       programs.schizofox = {
         enable = true;
+        package = pkgs.firefox-esr-153-unwrapped;
         extensions = {
           enableDefaultExtensions = true;
           enableExtraExtensions = true;
-          darkreader.enable = true;
-          extraExtensions = mkExtensions [
-            addons.gopass-bridge
-            addons.clearurls
-            addons.sponsorblock
-            addons.return-youtube-dislikes
-            # addons."7tv"
-            addons.control-panel-for-youtube
-            addons.control-panel-for-twitter
-          ];
+          extraExtensions = mkExtensions (
+            with addons;
+            [
+              gopass-bridge
+              clearurls
+              sponsorblock
+              return-youtube-dislikes
+              control-panel-for-youtube
+              control-panel-for-twitter
+            ]
+          );
         };
 
         misc = {
@@ -172,6 +173,7 @@
         settings = {
           "browser.translations.automaticallyPopup" = false;
           "browser.display.use_system_colors" = true;
+          "browser.nova.enabled" = false;
           "privacy.resistFingerprinting.letterboxing" = false;
           "general.autoScroll" = true;
         };
@@ -179,26 +181,21 @@
         security.sandbox = {
           enable = true;
 
-          # gopass-jsonapi runs inside the sandbox and decrypts from these paths.
+          # `gopass-jsonapi` is sandboxed and decrypts from these paths.
           extraBinds = [
-            "${config.home.homeDirectory}/.password-store" # the secrets
-            "${config.home.homeDirectory}/.config/gopass" # gopass config
-            "/run/user/1000/gnupg" # gpg-agent socket
+            "${config.home.homeDirectory}/.password-store"
+            "${config.home.homeDirectory}/.config/gopass"
+            "/run/user/1000/gnupg"
           ];
         };
 
-        theme = lib.optionalAttrs (osConfig != null) (
-          let
-            inherit (osConfig.lib.stylix) colors;
-          in
-          {
-            colors = {
-              background-darker = colors.base01;
-              background = colors.base00;
-              foreground = colors.base05;
-            };
-          }
-        );
+        theme.colors = with self.themeNoHash; {
+          background-darker = base01;
+          background = base00;
+          foreground = base05;
+          primary = base0D;
+          border = base03;
+        };
       };
 
       xdg.mimeApps = {
