@@ -13,7 +13,6 @@
         alacritty
         firefox
         nixcord
-        noctalia
         obsidian
         spicetify
         torBrowser

@@ -99,7 +99,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    noctalia.url = "github:noctalia-dev/noctalia";
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     website = {
       url = "git+ssh://git@codeberg.org/BastianA/website.git";
       inputs.nixpkgs.follows = "nixpkgs";

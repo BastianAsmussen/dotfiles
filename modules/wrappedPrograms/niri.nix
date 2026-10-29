@@ -20,7 +20,10 @@
       config = {
         settings =
           let
-            noctaliaExe = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-shell;
+            noctaliaExe = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia;
+
+            mkNoctaliaMsg = cmd: "${noctaliaExe} msg ${cmd}";
+            mkNoctaliaPanel = panel: mkNoctaliaMsg "panel-toggle ${panel}";
 
             # Capture with grim into ~/Pictures/Screenshots/<host> and also copy to the clipboard.
             mkScreenshot =
@@ -43,6 +46,7 @@
           {
             hotkey-overlay.skip-at-startup = _: { };
             prefer-no-csd = _: { };
+            debug.honor-xdg-activation-with-invalid-serial = _: { };
             input = {
               focus-follows-mouse = _: { };
               keyboard = {
@@ -115,8 +119,7 @@
               "Mod+Shift+Comma".move-column-to-monitor-previous = _: { };
               "Mod+Shift+Period".move-column-to-monitor-next = _: { };
 
-              "Mod+S".spawn-sh = "${noctaliaExe} ipc call launcher toggle";
-              "Mod+V".spawn-sh = "${pkgs.alsa-utils}/bin/amixer sset Capture toggle";
+              "Mod+S".spawn-sh = mkNoctaliaPanel "launcher";
 
               "XF86AudioRaiseVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+";
               "XF86AudioLowerVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-";
@@ -142,12 +145,12 @@
                 {
                   key = "b";
                   desc = "Bluetooth";
-                  cmd = "${noctaliaExe} ipc call bluetooth togglePanel";
+                  cmd = mkNoctaliaPanel "control-center bluetooth";
                 }
                 {
                   key = "w";
                   desc = "Wifi";
-                  cmd = "${noctaliaExe} ipc call wifi togglePanel";
+                  cmd = mkNoctaliaPanel "control-center network";
                 }
                 {
                   key = "f";
@@ -167,7 +170,7 @@
                 {
                   key = "l";
                   desc = "Lock Screen";
-                  cmd = "${noctaliaExe} ipc call lockScreen lock";
+                  cmd = mkNoctaliaMsg "session lock";
                 }
               ];
             };
@@ -182,7 +185,7 @@
 
             layer-rules = [
               {
-                matches = [ { namespace = "^noctalia-overview*"; } ];
+                matches = [ { namespace = "^noctalia-backdrop"; } ];
                 place-within-backdrop = true;
               }
             ];
@@ -192,6 +195,12 @@
                 excludes = [ { is-floating = true; } ];
                 clip-to-geometry = true;
                 geometry-corner-radius = 10.0;
+              }
+              {
+                matches = [ { app-id = "^dev\\.noctalia\\.Noctalia$"; } ];
+                open-floating = true;
+                default-column-width.fixed = 1080;
+                default-window-height.fixed = 920;
               }
               {
                 matches = [ { app-id = "steam"; } ];
