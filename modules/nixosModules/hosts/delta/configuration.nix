@@ -87,7 +87,6 @@
       preferences.noctalia.useIpLocation = true;
       acmeShared.enable = true;
 
-      environment.memoryAllocator.provider = "graphene-hardened";
       topology.self =
         let
           inherit (config.lib.topology) mkConnection;

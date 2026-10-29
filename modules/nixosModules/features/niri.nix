@@ -19,16 +19,8 @@
         else
           "${pkgs.writeShellScript "autostart-${toString i}" entry}";
 
-      noctaliaPackage = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
-        inherit pkgs;
-
-        imports = [
-          self.wrapperModules.noctalia-shell
-          {
-            useIpLocation = config.preferences.noctalia.useIpLocation;
-            idleEnabled = config.preferences.noctalia.idleEnabled;
-          }
-        ];
+      noctaliaPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia.wrap {
+        inherit (config.preferences.noctalia) useIpLocation idleEnabled;
       };
 
       autostartEntries = lib.imap0 toStartupEntry config.preferences.autostart;
