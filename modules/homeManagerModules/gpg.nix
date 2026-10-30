@@ -15,6 +15,7 @@
         length
         concatStringsSep
         ;
+
       inherit (lib)
         hasAttr
         mkEnableOption
@@ -120,12 +121,11 @@
         ];
 
         programs.gpg = {
+          inherit publicKeys;
+
           enable = true;
           mutableKeys = false;
           mutableTrust = false;
-
-          inherit publicKeys;
-
           scdaemonSettings.disable-ccid = true;
           settings = {
             personal-cipher-preferences = "AES256 AES192 AES";

@@ -9,24 +9,24 @@
     }:
     let
       cfg = config.programs;
-      fd = lib.getExe pkgs.fd;
 
-      fileCommand = "${fd} --type=f --exclude=.git --hidden";
+      fdWithArgs = args: "${lib.getExe pkgs.fd} ${args}";
+      fdCmd = fdWithArgs "--type=f --exclude=.git --hidden";
 
       # home-manager master nests the widget settings; the release branch still
       # uses the flat name. Writing the flat one everywhere works, but trips the
       # rename warning on every unstable host.
       fileWidget =
         if options.programs.fzf ? fileWidget then
-          { fileWidget.command = fileCommand; }
+          { fileWidget.command = fdCmd; }
         else
-          { fileWidgetCommand = fileCommand; };
+          { fileWidgetCommand = fdCmd; };
     in
     {
       programs.fzf = {
         enable = true;
         tmux.enableShellIntegration = cfg.tmux.enable;
-        defaultCommand = "${fd} --type=d --exclude=.git --hidden";
+        defaultCommand = fdWithArgs "--type=d --exclude=.git --hidden";
         defaultOptions = [
           "--exact" # Use substring matching by default.
           "--info=inline"

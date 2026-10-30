@@ -6,7 +6,7 @@
     programs.ripgrep = {
       enable = true;
       arguments = [
-        # Don't let ripgrep vomit really long lines to my terminal, and show a preview.
+        # Don't let rg vomit long lines to my terminal, and show a preview.
         "--max-columns=128"
         "--max-columns-preview"
 
