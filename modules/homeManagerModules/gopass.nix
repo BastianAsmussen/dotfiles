@@ -11,10 +11,9 @@
       gopassBridgeId = "{eec37db0-22ad-4bf1-9068-5ae08df8c7e9}";
 
       goPassWrapper = pkgs.writeShellScript "gopass_wrapper.sh" ''
-        # Export GPG_TTY only for a real TTY; otherwise use graphical pinentry.
+        # Bogus TTY values derail gpg/pinentry on decrypt.
         tty=$(tty 2>/dev/null) && export GPG_TTY="$tty"
 
-        # gpg forwards this to pinentry, which runs outside the sandbox.
         unset DBUS_SESSION_BUS_ADDRESS
 
         export GNUPGHOME="''${GNUPGHOME:-$HOME/.gnupg}"
@@ -31,7 +30,6 @@
         exec ${pkgs.gopass-jsonapi}/bin/gopass-jsonapi listen
       '';
 
-      # Declarative replacement for the manifest written by `gopass-jsonapi configure`.
       nativeMessagingManifest = (pkgs.formats.json { }).generate "com.justwatch.gopass.json" {
         name = "com.justwatch.gopass";
         description = "Gopass wrapper to search and return passwords";
@@ -55,17 +53,13 @@
 
       xdg.configFile."gopass/config".source = (pkgs.formats.ini { }).generate "gopass-config" {
         mounts.path = "${config.home.homeDirectory}/.password-store";
-
         core = {
           autosync = true;
-
-          # No clipboard manager clears secrets, so set a 45-second timeout.
           cliptimeout = 45;
         };
       };
 
       persistence.directories = [
-        # The encrypted store itself, and gopass's index beside it.
         ".password-store"
         ".local/share/gopass"
       ];
