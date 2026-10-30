@@ -16,12 +16,12 @@
           enable = true;
           repositories =
             let
-              makePath = dir: config.home.homeDirectory + dir;
+              mkPath = dir: config.home.homeDirectory + dir;
             in
             [
-              (makePath "/Projects/*/*")
-              (makePath "/dotfiles")
-              (makePath "/nix-secrets")
+              (mkPath "/Projects/*/*")
+              (mkPath "/dotfiles")
+              (mkPath "/nix-secrets")
             ];
         };
 
@@ -57,15 +57,15 @@
             };
 
             fetch = {
-              prune = true; # Automatically delete dead branches.
+              prune = true; # Auto-remove dead branches.
               writeCommitGraph = true; # Incrementally build commit graph.
             };
 
             pull = {
-              ff = "only"; # Force linear commit history by disallowing unmergable fast-forwards.
+              ff = "only"; # Force linear commit history.
               commit = false;
               rebase = true;
-              prune = true; # Automatically delete dead branches.
+              prune = true; # Auto-remove dead branches.
             };
 
             merge = {
@@ -78,7 +78,7 @@
               autoStash = true;
             };
 
-            # Automatically resolve merge conflicts if they've been seen before.
+            # Auto-resolve merge conflicts if seen before.
             rerere = {
               enabled = true;
               autoupdate = true;

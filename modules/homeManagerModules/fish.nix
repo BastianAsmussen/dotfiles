@@ -7,14 +7,14 @@
       ...
     }:
     let
-      # Pass upstream fish plugin trees; built derivations use vendor
-      # directories.
+      inherit (lib) concatStringsSep mapAttrsToList;
+
       plugin = name: {
         inherit name;
+
         src = pkgs.fishPlugins.${name}.src;
       };
 
-      # Directory shorthands, expanded anywhere on the line: `mv ~dl/foo .`.
       namedDirs = {
         cfg = "~/dotfiles";
         sec = "~/nix-secrets";
@@ -58,7 +58,6 @@
 
         fish = {
           enable = true;
-
           plugins = map plugin [
             "fzf-fish" # Ctrl-T files, Ctrl-R history, Ctrl-Alt-F git status.
             "plugin-git"
@@ -75,7 +74,7 @@
             run-help = "man";
             grep = "grep --color=auto";
 
-            # The eza integration provides ls/ll/la/lt/lla but not this one.
+            # Eza integration misses this useful alias.
             l = "eza -lah";
 
             myip = "curl --silent --write-out '\n' https://ifconfig.me/";
@@ -89,7 +88,7 @@
             md = "mkdir --parents";
             "-" = "cd -";
 
-            # plugin-git leaves these undefined.
+            # Undefined by plugin-git.
             gpr = "git pull --rebase";
             grhs = "git reset --soft";
             gstaa = "git stash apply";
@@ -99,17 +98,12 @@
             glgp = "git log --stat --patch";
             glgm = "git log --graph --max-count=10";
 
-            # plugin-git defines these, but not equivalently.
-            gcl = "git clone --recurse-submodules";
-            gtv = "git tag | sort -V";
-
             named_dirs = {
               position = "anywhere";
-              regex = "~(${lib.concatStringsSep "|" (lib.attrNames namedDirs)})(/.*)?";
+              regex = "~(${concatStringsSep "|" (lib.attrNames namedDirs)})(/.*)?";
               function = "expand_named_dir";
             };
 
-            # Pipes and redirections, expanded mid-line.
             G = {
               position = "anywhere";
               expansion = "| grep";
@@ -163,8 +157,8 @@
                   set -l rest (string replace -r '^~[^/]+' "" -- $token)
 
                   switch $name
-                  ${lib.concatStringsSep "\n" (
-                    lib.mapAttrsToList (name: path: ''
+                  ${concatStringsSep "\n" (
+                    mapAttrsToList (name: path: ''
                       case ${name}
                           echo "${path}$rest"'') namedDirs
                   )}
@@ -179,7 +173,7 @@
                 commandline -f repaint
               '';
 
-            # Activate a .venv found at or above $PWD, deactivate on leaving it.
+            # .venv activated at or above `$PWD`, deactivate upon leaving it.
             auto_venv = {
               onVariable = "PWD";
               body =
@@ -233,8 +227,8 @@
 
               # `set -q` short-circuits, so on the host this is one variable test.
               if set -q CONTAINER_ID; and type -q pacman
-              ${lib.concatStringsSep "\n" (
-                lib.mapAttrsToList (
+              ${concatStringsSep "\n" (
+                mapAttrsToList (
                   name: expansion: "    abbr --add ${name} ${lib.escapeShellArg expansion}"
                 ) pacmanAbbrs
               )}

@@ -8,12 +8,18 @@
     {
       home.shellAliases.cat = "${lib.getExe pkgs.bat} --plain --no-paging";
 
-      programs.bat = {
-        enable = true;
-        themes.catppuccin-mocha.src = pkgs.fetchurl {
-          url = "https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme";
-          sha256 = "0xxashmrrj81y99ia4hvcpmplkzr1rlpgh4idf9inc7bikq6cm9r";
+      programs.bat =
+        let
+          theme = pkgs.fetchFromGitHub {
+            owner = "catppuccin";
+            repo = "bat";
+            rev = "6810349b28055dce54076712fc05fc68da4b8ec0";
+            hash = "sha256-lJapSgRVENTrbmpVyn+UQabC9fpV1G1e+CdlJ090uvg=";
+          };
+        in
+        {
+          enable = true;
+          themes.catppuccin-mocha.src = "${theme}/themes/Catppuccin Mocha.tmTheme";
         };
-      };
     };
 }
