@@ -163,9 +163,9 @@
                   cmd = "vesktop";
                 }
                 {
-                  key = "s";
-                  desc = "Signal";
-                  cmd = "signal-desktop";
+                  key = "t";
+                  desc = "Microslop Teams";
+                  cmd = "teams-for-linux";
                 }
                 {
                   key = "l";
