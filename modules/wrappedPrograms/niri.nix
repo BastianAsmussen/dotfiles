@@ -176,10 +176,10 @@
             };
 
             layout = {
-              gaps = 5;
+              gaps = 7.5;
               focus-ring = {
                 width = 2;
-                active-color = "#${self.themeNoHash.base0D}";
+                active-color = self.theme.base0D;
               };
             };
 
@@ -256,7 +256,7 @@
             workspaces =
               let
                 settings = {
-                  layout.gaps = 5;
+                  layout.gaps = 7.5;
                 };
               in
               {
