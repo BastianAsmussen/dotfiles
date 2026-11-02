@@ -50,6 +50,8 @@
                 # Applies to every cert on the host.
                 reloadServices = mkDefault [ "nginx.service" ];
                 email = mkDefault config.preferences.user.email;
+                # Resolver caching outlasts lego's propagation timeout.
+                extraLegoFlags = mkDefault [ "--dns.propagation.disable-rns" ];
               };
 
               certs."asmussen.tech" = {
