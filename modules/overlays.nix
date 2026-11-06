@@ -20,6 +20,7 @@
             clone-project
             copy-file
             kimi-code
+            learnharness
             neovim
             neovim-minimal
             repo-cloner

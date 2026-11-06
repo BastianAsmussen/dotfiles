@@ -12,6 +12,7 @@
       imports = with self.homeModules; [
         alacritty
         firefox
+        learnharness
         nixcord
         obsidian
         spicetify
