@@ -208,6 +208,44 @@ in
       }
       // lib.optionalAttrs (system == "x86_64-linux") {
         # VM tests: runtime behaviour (x86_64 only)
+        nixos-vm-jellyfin-patched = pkgs.testers.nixosTest {
+          name = "jellyfin-patched";
+          nodes.machine =
+            { lib, ... }:
+            {
+              imports = [
+                self.nixosModules.base
+                self.nixosModules.jellyfin
+              ];
+
+              preferences.user = {
+                name = lib.mkForce "alice";
+                fullName = lib.mkForce "Alice Test";
+                email = lib.mkForce "alice@test.com";
+                authorizedKeyFiles = [ ];
+              };
+
+              jellyfin.enable = true;
+              services = {
+                meilisearch.enable = lib.mkForce false;
+                shoko.enable = lib.mkForce false;
+              };
+
+              virtualisation = {
+                graphics = false;
+                # Jellyfin requires at least 2 GiB of free space in its data directory.
+                diskSize = 3 * 1024;
+              };
+            };
+
+          testScript = ''
+            machine.wait_for_unit("jellyfin.service")
+            machine.wait_for_open_port(8096)
+            machine.wait_until_succeeds("journalctl --since -1m --unit jellyfin --grep 'Startup complete'")
+            machine.succeed("curl --fail --silent --max-time 10 http://localhost:8096/System/Info/Public | grep -q 'Jellyfin Server'")
+          '';
+        };
+
         nixos-vm-user-created = pkgs.testers.nixosTest {
           name = "user-created";
           nodes.machine =

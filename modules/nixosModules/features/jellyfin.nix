@@ -83,6 +83,13 @@
               jellyfin = {
                 enable = true;
                 openFirewall = false;
+                package = pkgs.jellyfin.overrideAttrs (old: {
+                  patches = (old.patches or [ ]) ++ [
+                    ./jellyfin/CVE-2026-119549.patch
+                    ./jellyfin/CVE-2026-119550.patch
+                    ./jellyfin/CVE-2026-119551.patch
+                  ];
+                });
               };
 
               meilisearch.enable = true;
@@ -90,7 +97,7 @@
             };
 
             environment.systemPackages = with pkgs; [
-              jellyfin
+              svc.package
               jellyfin-web
               jellyfin-ffmpeg
               shoko
