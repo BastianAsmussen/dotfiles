@@ -6,8 +6,7 @@
 
       services.goxlr-utility = {
         enable = true;
-        # Only niri starts the daemon; XDG autostart races it and resets
-        # settings.
+        # XDG autostart races niri and resets settings.
         autoStart.xdg = false;
       };
 

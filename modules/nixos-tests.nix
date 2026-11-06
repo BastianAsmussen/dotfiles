@@ -280,7 +280,7 @@ in
                   }
                 ];
 
-                # Unreachable ACME server; caddy serves the self-signed placeholders.
+                # Use unreachable ACME with self-signed certificates.
                 security.acme = {
                   acceptTerms = true;
                   defaults = {
@@ -358,7 +358,7 @@ in
                   '';
                 };
 
-                # Unreachable ACME server; caddy serves the self-signed placeholders.
+                # Use unreachable ACME with self-signed certificates.
                 security.acme = {
                   acceptTerms = true;
                   defaults = {
@@ -396,7 +396,7 @@ in
                     extraConfig = "reverse_proxy localhost:8096";
                   };
 
-                  # Only :8443 requires a client certificate; loopback is exempt.
+                  # Only port 8443 requires a client certificate.
                   "shoko.asmussen.tech:8443" = {
                     clientCA = "${mtlsCerts}/ca.crt";
                     extraConfig = "reverse_proxy localhost:8096";

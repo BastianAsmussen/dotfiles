@@ -48,8 +48,7 @@
         done
       '';
 
-      # The forced command accepts only feed files; `remoteDir` is
-      # receive-user-owned.
+      # The forced command only accepts feed files.
       receiveScript = pkgs.writeShellScript "news-sync-receive" ''
         set -euo pipefail
 
@@ -59,8 +58,7 @@
             tmp="$dst.tmp"
             trap '${getExe' pkgs.coreutils "rm"} -f "$tmp"' EXIT
 
-            # Rename each uploaded feed into place so readers never see partial
-            # files.
+            # Rename uploads into place atomically.
             ${getExe' pkgs.coreutils "install"} -m 0644 /dev/stdin "$tmp"
             ${getExe' pkgs.coreutils "mv"} -f "$tmp" "$dst"
             ;;
@@ -223,7 +221,7 @@
 
           systemd = {
             tmpfiles.rules = [
-              # A dynamic uid drifts; re-own files a previous uid left behind.
+              # Re-own files left by a previous dynamic UID.
               "Z ${config.services.news.dataDir} - ${config.services.news.user} ${config.services.news.group} - -"
             ];
 
@@ -241,8 +239,7 @@
 
               timerConfig = {
                 OnCalendar = cfg.push.refreshTime;
-                # Catch up after downtime and jitter boot-time runs away from
-                # login.
+                # Catch up after downtime and delay login-time runs.
                 Persistent = true;
                 RandomizedDelaySec = "5min";
               };
@@ -295,16 +292,14 @@
             };
           };
 
-          # Match preservation's rule exactly; duplicate tmpfiles lines must
-          # agree.
+          # Keep this rule consistent with preservation.
           systemd.tmpfiles.rules = [
             "d ${remoteDir} 0755 news-sync ${cfg.receive.sshGroup} -"
           ];
 
           services.website.newsFile = "${remoteDir}/news.json";
 
-          # Persist the latest feed and its receive-user ownership across
-          # reboots.
+          # Preserve the feed with receive-user ownership.
           persistence.directories = [
             {
               directory = remoteDir;

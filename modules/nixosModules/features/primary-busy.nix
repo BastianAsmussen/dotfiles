@@ -60,13 +60,13 @@
       };
 
       config = mkIf cfg.enable {
-        # Hooks give the immediate switch; the timer corrects a missed hook.
+        # Use hooks immediately and a timer as backup.
         gamemode = {
           startHooks = [ "${systemctl} stop ${unit}" ];
           endHooks = [ "${systemctl} start ${unit}" ];
         };
 
-        # gamemoded runs the hooks as the user; allow exactly these two verbs.
+        # Only let the user start and stop this unit.
         security.polkit.extraConfig = ''
           polkit.addRule(function (action, subject) {
             if (action.id == "org.freedesktop.systemd1.manage-units" &&

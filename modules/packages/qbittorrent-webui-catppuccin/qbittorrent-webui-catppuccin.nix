@@ -9,8 +9,7 @@
     let
       inherit (self) theme;
 
-      # Map WebUI tokens to base16; unsupported colors use the nearest palette
-      # slot.
+      # Map WebUI colors to the base16 palette.
       colors = {
         BG_PRIMARY = theme.base00; # base
         BG_SECONDARY = theme.base01; # surface0

@@ -23,7 +23,7 @@ in
   config.flake = {
     lib = withCustom inputs.nixpkgs.lib;
 
-    # Stable hosts need matching nixpkgs lib; unstable lib makes pkgs recurse.
+    # Stable hosts must use their matching nixpkgs lib.
     libStable = withCustom inputs.nixpkgs-stable.lib;
   };
 }

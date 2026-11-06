@@ -19,7 +19,7 @@
       cfg = config.caddy;
       vhosts = lib.attrValues config.services.caddy.virtualHosts;
 
-      # "https://a.example.org:8443" -> "a.example.org"; null for plain HTTP or bare ports.
+      # Extract a hostname from HTTPS virtual-host addresses.
       hostOf =
         address:
         let
@@ -31,7 +31,7 @@
         else
           bare;
 
-      # Last two labels; no multi-label public suffix is in use.
+      # Use the last two labels as the apex domain.
       apexOf =
         host:
         let

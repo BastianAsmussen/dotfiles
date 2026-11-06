@@ -85,7 +85,7 @@
           kernelModules = [ "ntsync" ];
 
           kernel.sysctl = {
-            # Keep game working sets in RAM; plenty of headroom before swap matters.
+            # Keep game working sets in RAM.
             "vm.swappiness" = 10;
 
             # Modern games/launchers mmap far beyond the kernel default.
@@ -99,7 +99,7 @@
             gamescopeSession.enable = true;
             protontricks.enable = true;
 
-            # Bypass fcitx5 in Proton; its IME mangles non-Japanese layouts.
+            # Bypass fcitx5 in Proton for non-Japanese layouts.
             package = lib.mkIf config.japanese.enable (
               pkgs.steam.overrideAttrs (old: {
                 nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
@@ -136,8 +136,7 @@
                 nv_powermizer_mode = 1;
               };
 
-              # Background hooks to avoid gamemode's 10s timeout; update the
-              # marker last so the .path unit fires promptly.
+              # Run hooks in the background and update the marker last.
               custom = {
                 start = concatStringsSep " & " (
                   cfg.startHooks ++ [ "${lib.getExe' pkgs.coreutils "touch"} ${cfg.pauseMarker}" ]
@@ -150,7 +149,7 @@
             };
           };
 
-          # Available for per-game launch configs; not forced globally.
+          # Keep Gamescope opt-in per game.
           gamescope = {
             enable = true;
             capSysNice = true;
@@ -193,8 +192,7 @@
               Type = "oneshot";
               ExecStart = toggleScript;
 
-              # Keep resume markers out of the watched directory to avoid a
-              # loop.
+              # Keep resume markers outside the watched directory.
               RuntimeDirectory = "gamemode-busy";
               RuntimeDirectoryPreserve = "yes";
             };

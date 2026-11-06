@@ -87,7 +87,7 @@
         }:
         modExp cipher d n;
 
-      # Extended Euclidean inverse; inputs must be coprime.
+      # Modular inverse for coprime inputs.
       modInv =
         a: m:
         builtins.seq

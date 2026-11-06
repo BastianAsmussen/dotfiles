@@ -134,7 +134,7 @@
         ];
       };
 
-      # Serve browsers on loopback; upstream TLS uses the system trust store.
+      # Serve browsers on loopback with system TLS trust upstream.
       caddy.listenAddresses = [
         "127.0.0.1"
         "::1"

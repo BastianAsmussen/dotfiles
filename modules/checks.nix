@@ -9,8 +9,7 @@
       ...
     }:
     let
-      # `caddy adapt` catches syntax and unknown-directive errors without
-      # needing certificates.
+      # Validate a rendered Caddyfile without certificates.
       caddyfile =
         host:
         pkgs.runCommandLocal "caddyfile-${host}" { } ''
@@ -60,8 +59,7 @@
             '';
       }
       // lib.optionalAttrs (system == "x86_64-linux") {
-        # Adapt each host's rendered Caddyfile. eta's Caddyfile is formatted
-        # by its own aarch64 caddy, so it is adapted with the x86_64 one.
+        # Cross-check eta's Caddyfile with the x86_64 caddy package.
         caddyfile-epsilon = caddyfile "epsilon";
         caddyfile-eta = caddyfile "eta";
         caddyfile-delta = caddyfile "delta";

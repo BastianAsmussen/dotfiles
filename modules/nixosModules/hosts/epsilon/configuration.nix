@@ -304,7 +304,7 @@
       services = {
         caddy.virtualHosts =
           let
-            # Only :8443 requires a client certificate; loopback is exempt.
+            # Only port 8443 requires a client certificate.
             mtlsServices = {
               shoko = 8111;
               qbittorrent = config.services.qbittorrent.webuiPort;
@@ -329,7 +329,7 @@
               };
             }) mtlsServices;
 
-            # 5 attempts per client per minute; PROXY gives the real client address.
+            # Limit each client to five requests per minute.
             rateLimit = zone: pattern: ''
               rate_limit {
                 zone ${zone} {
@@ -348,7 +348,7 @@
           // {
             "www.asmussen.tech".extraConfig = "redir https://asmussen.tech{uri} permanent";
 
-            # Preserve legacy bookmarks; Covenant now lives at its domain root.
+            # Redirect legacy Jellyfin and Covenant bookmarks.
             "asmussen.tech".extraConfig = ''
               redir /jellyfin* https://jellyfin.asmussen.tech/ permanent
               redir /covenant* https://covenantofearth.org/ permanent
@@ -365,9 +365,7 @@
 
               ${rateLimit "jellyfin_auth" "(?i)^/Users/AuthenticateByName"}
 
-              # Clients hardcode image quality and expose no setting for it.
-              # -Quality drops a client-sent Quality=, which binds just like
-              # the injected quality=.
+              # Replace the client-sent Quality parameter.
               @thumb {
                 path_regexp (?i)^/Items/[^/]+/Images/
                 expression `{query.fillWidth}.matches("^[0-9]{1,3}$") || {query.fillwidth}.matches("^[0-9]{1,3}$") || {query.fillHeight}.matches("^[0-9]{1,3}$") || {query.fillheight}.matches("^[0-9]{1,3}$")`
@@ -419,8 +417,7 @@
             sonarr-anime.path = animePath;
             radarr-anime.path = animePath;
 
-            # ATM relocates imported torrents on category changes; keep paths
-            # aligned.
+            # Keep import paths aligned with ATM's category moves.
             sonarr-anime-imported.path = animePath;
             shows-imported.path = showsPath;
             radarr-anime-imported.path = animePath;
@@ -449,7 +446,7 @@
           torrentFileIndexers = [ "AnimeTosho" ];
         };
 
-        # Seerr skips root overrides for admins; reconcile admin anime requests.
+        # Reconcile anime root overrides skipped by Seerr for admins.
         radarr.syncAnimeRoot = true;
 
         # Keep both *arr copies of the WebUI password synchronized.
@@ -488,8 +485,7 @@
           ];
         };
 
-        # The extraInputRules below only take effect with the nftables backend;
-        # PIA also enables it, but the rules must not depend on that.
+        # Enable nftables independently of PIA.
         nftables.enable = mkDefault true;
 
         firewall = {
@@ -595,8 +591,7 @@
         recipients = map (f: lib.strings.trim (builtins.readFile f)) lib.custom.keys.default.agePaths;
       };
 
-      # Manage the router declaratively; apply changes with `just
-      # router-restore`.
+      # Apply router changes with `just router-restore`.
       router = {
         enable = true;
         adminPasswordFile = config.sops.secrets."router/admin-password".path;

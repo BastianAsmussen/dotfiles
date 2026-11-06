@@ -19,7 +19,7 @@
             efiSupport = true;
             useOSProber = config.grub.isMultiboot;
             device = "nodev";
-            # Prevent kernel cmdline editing at boot (does not protect against evil-maid; use lanzaboote for that).
+            # Disable kernel command-line editing at boot.
             extraConfig = ''set superusers=""'';
           };
         };

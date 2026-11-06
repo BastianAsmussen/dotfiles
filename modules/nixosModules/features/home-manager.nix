@@ -34,8 +34,7 @@
           useGlobalPkgs = true;
           backupFileExtension = "backup";
           users = mapAttrs (username: modules: {
-            # Import persistence so preservation can read user state
-            # declarations.
+            # Let preservation read user persistence declarations.
             imports = modules ++ [ self.homeModules.persistence ];
 
             home = {

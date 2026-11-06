@@ -26,7 +26,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        # Use a newer macOS SDK; the default fails to compile Go projects.
+        # Go builds require the newer macOS SDK.
         callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
 
         application = callPackage ./. {

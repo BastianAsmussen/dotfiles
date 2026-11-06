@@ -63,12 +63,11 @@
                 dnsProvider = mkDefault "cloudflare";
                 environmentFile = mkDefault config.sops.templates."cloudflare-acme-env".path;
 
-                # Check renewal every six hours; lego's ARI determines when it
-                # is due.
+                # Check renewal every six hours using lego's ARI.
                 renewInterval = mkDefault "*-*-* 00/6:00:00";
                 renewJitter = mkDefault "1h";
 
-                # Use a fixed DNS propagation wait; lego 5 renamed the flag.
+                # lego 5 renamed the DNS propagation wait flag.
                 extraLegoFlags = mkDefault [
                   (
                     if lib.versionOlder pkgs.lego.version "5.0.0" then

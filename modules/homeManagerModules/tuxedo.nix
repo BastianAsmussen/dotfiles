@@ -8,8 +8,7 @@
     {
       home.packages = [ pkgs.tuxedo ];
 
-      # Tuxedo replaces its config symlink at runtime; force restores it on
-      # rebuild.
+      # Restore the config symlink that Tuxedo replaces at runtime.
       xdg.configFile."tuxedo/config.toml" = {
         force = true;
         text = ''

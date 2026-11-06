@@ -11,14 +11,14 @@
       imports = [ inputs.lanzaboote.nixosModules.lanzaboote ];
 
       config = lib.mkMerge [
-        # Persist the signing keys; without them the next rebuild cannot sign.
+        # Persist signing keys for future rebuilds.
         (lib.optionalAttrs (options ? persistence) {
           persistence.directoriesWithMode."/var/lib/sbctl".mode = "0700";
         })
 
         {
           boot.loader = {
-            # Lanzaboote manages systemd-boot; disable the stock installer.
+            # Lanzaboote replaces the stock systemd-boot installer.
             systemd-boot.enable = lib.mkForce false;
 
             efi = {
@@ -30,8 +30,7 @@
           boot.lanzaboote = {
             enable = true;
 
-            # PK/KEK/db and the root-only secret key. Microsoft keys stay
-            # enrolled (the default) so option ROMs still run under Secure Boot.
+            # Keep Microsoft keys enrolled for option ROMs.
             pkiBundle = "/var/lib/sbctl";
           };
 

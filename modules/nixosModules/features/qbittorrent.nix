@@ -483,16 +483,14 @@
               (_: {
                 owner = svc.user;
 
-                # Restart the reconcilers immediately when their shared secret
-                # rotates.
+                # Restart reconcilers when the shared secret rotates.
                 restartUnits = [ "qbittorrent-sync-categories.service" ];
               });
 
           templates."qbittorrent.conf" = {
             owner = svc.user;
 
-            # sops placeholders never change; restart on changes to the rendered
-            # file.
+            # Restart qBittorrent when the rendered config changes.
             restartUnits = [ "qbittorrent.service" ];
 
             content = ''

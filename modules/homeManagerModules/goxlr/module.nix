@@ -262,8 +262,7 @@
         home = {
           packages = lib.optional (cfg.export.directory != null) goxlr-export;
 
-          # Profile directories must be writable for the UI's Save Profile
-          # button.
+          # The Save Profile button needs writable directories.
           activation.goxlrProfiles =
             let
               mkInstallCmd =

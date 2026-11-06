@@ -22,7 +22,7 @@
         showmode = false;
         undofile = true;
 
-        # Persisted undo history must exclude secret files; see autocmds.nix.
+        # Undo history excludes secret files.
         undodir.__raw = ''vim.fn.stdpath("state") .. "/undo"'';
 
         backup = false;

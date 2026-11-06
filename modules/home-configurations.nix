@@ -9,8 +9,6 @@ let
       hostName,
       system,
       modules,
-
-      # Defaults track unstable; eta overrides them to match its host channel.
       nixpkgs ? inputs.nixpkgs,
       homeManager ? inputs.home-manager,
       stylix ? inputs.stylix,

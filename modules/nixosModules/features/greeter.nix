@@ -16,7 +16,7 @@
           services.displayManager.noctalia-greeter = {
             enable = true;
 
-            # Appearance-only sync helper; the polkit rule is pinned to it.
+            # The polkit rule only permits this appearance sync.
             passwordlessSyncUsers = [ user ];
             cursorTheme = {
               inherit (config.stylix.cursor) package name;

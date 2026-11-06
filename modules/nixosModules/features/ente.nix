@@ -146,8 +146,7 @@
                     web.domains.photos
                   ];
                 in
-                # Use epsilon's shared wildcard certificate for Ente's virtual
-                # hosts.
+                # Use epsilon's wildcard certificate for Ente.
                 builtins.listToAttrs (
                   map (host: {
                     name = host;
@@ -187,8 +186,7 @@
 
                     node_id="$(${garage} node id -q | cut -d@ -f1)"
 
-                    # `layout show` lists nodes whose layout has already been
-                    # applied.
+                    # Check whether the node already has a layout.
                     if ! ${garage} layout show 2>/dev/null | grep -qi "''${node_id:0:10}"; then
                       ${garage} layout assign -z dc1 -c 1TB "$node_id"
                       ${garage} layout apply --version 1
@@ -224,8 +222,7 @@
                   };
                 in
                 {
-                  # Museum and Garage's bootstrap service share these
-                  # credentials.
+                  # Museum and Garage bootstrap share these credentials.
                   "services/ente/garage-access-key" = enteOwned;
                   "services/ente/garage-secret-key" = enteOwned;
 
@@ -257,8 +254,7 @@
                 user = "postgres";
                 group = "postgres";
               }
-              # Garage's DynamicUser stores state under
-              # `/var/lib/private/garage`.
+              # Garage stores its DynamicUser state here.
               "/var/lib/private/garage"
             ];
           })

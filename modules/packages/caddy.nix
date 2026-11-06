@@ -2,10 +2,7 @@
   perSystem =
     { pkgs, lib, ... }:
     let
-      # Layer 4 routing for eta's SNI passthrough, rate limiting for epsilon.
-      # caddy-l4 is pinned past v0.1.2: its active health check rewrote the
-      # upstream's dial port to health_port, so passthrough hit the probe
-      # socket instead of the real listener (fixed in mholt/caddy-l4#458).
+      # caddy-l4 is pinned past v0.1.2 for the health-check dial-port fix.
       withPlugins =
         caddy:
         caddy.withPlugins {
@@ -22,7 +19,7 @@
         caddy-extended = withPlugins pkgs.caddy;
       }
       // lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
-        # epsilon builds eta's closure; a native cross toolchain beats binfmt QEMU.
+        # A native cross toolchain beats binfmt QEMU.
         caddy-extended-aarch64 = withPlugins pkgs.pkgsCross.aarch64-multiplatform.caddy;
       };
     };

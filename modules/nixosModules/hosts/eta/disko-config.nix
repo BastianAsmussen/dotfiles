@@ -33,7 +33,7 @@
                 content = {
                   type = "luks";
                   name = "cryptroot";
-                  # This key is only for disko; boot unlocks over initrd SSH.
+                  # The temporary key is only used during installation.
                   passwordFile = "/tmp/disk-1.key";
                   settings.allowDiscards = true;
                   content = {

@@ -125,7 +125,7 @@
         ${ip} -6 rule add uidrange "$QBT_UID-$QBT_UID" unreachable priority 100
         log "Kill switch active (UID $QBT_UID via $INTERFACE)"
 
-        # Tries validated hostname first; falls back to bare VPN_GW without TLS verification.
+        # Try the validated hostname before an insecure VPN_GW fallback.
         pf_api() {
           local path="$1"; shift
           ${curl} -sG --max-time 30 --interface "$INTERFACE" \

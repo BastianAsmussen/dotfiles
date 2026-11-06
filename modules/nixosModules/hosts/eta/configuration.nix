@@ -185,7 +185,7 @@
         ];
       };
 
-      # Closures arrive via `just deploy`; eta never builds.
+      # eta only runs closures built elsewhere.
       nix.settings.max-jobs = lib.mkForce 0;
       btrfs.scrub.fileSystems = [
         "/persist"
@@ -209,7 +209,7 @@
         dkRedirects.enable = true;
       };
 
-      # Bind fallback sites to loopback; Covenant terminates locally on :443.
+      # Keep fallback sites on loopback for local Covenant termination.
       caddy = {
         extended = true;
         openFirewall = true;

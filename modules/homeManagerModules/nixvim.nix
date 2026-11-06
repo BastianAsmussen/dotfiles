@@ -60,8 +60,7 @@
                 flake-parts.expr = flakeParts.opts;
                 flake-parts-perSystem.expr = flakeParts.perSystemOpts;
 
-                # Expose narrower option roots without creating new module
-                # systems.
+                # Expose narrower option roots to nixd.
                 lib.expr = "${nixos.cfg}.lib";
                 nixvim.expr = "${homeManager.opts}.programs.nixvim";
                 stylix-nixos.expr = "${nixos.opts}.stylix";
@@ -72,7 +71,7 @@
             }
           );
 
-          # RUSTFLAGS is set via home.sessionVariables, only available inside HM.
+          # RUSTFLAGS comes from home.sessionVariables.
           rustaceanvim.settings.server.default_settings.rust-analyzer.check.extraArgs = [
             "--"
           ]
@@ -81,8 +80,6 @@
       };
 
       persistence.directories = [
-        # Persist Neovim data and state; secret files are excluded from
-        # undo/shada.
         ".local/share/nvim"
         ".local/state/nvim"
       ];

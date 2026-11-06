@@ -35,8 +35,7 @@
 
               trusted-users = [ "root" ];
 
-              # Epsilon builds every host's closure; the others accept only
-              # paths its key has signed.
+              # Trust epsilon's cache on every host.
               trusted-public-keys = lib.mkBefore [
                 inputs.nix-secrets.hosts.epsilon.cache-public-key
               ];

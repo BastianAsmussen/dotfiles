@@ -73,7 +73,7 @@
 
       config = mkIf cfg.enable {
         caddy.servers = {
-          # Routes run in order; anything unmatched is terminated by this host.
+          # Terminate requests that match no route.
           ":443" = ''
             listener_wrappers {
               layer4 {

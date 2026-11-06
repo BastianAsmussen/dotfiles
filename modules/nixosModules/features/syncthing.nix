@@ -114,7 +114,7 @@
         }
 
         (lib.optionalAttrs (options ? persistence) {
-          # Index only; cert/key are re-copied from sops on every start.
+          # Only persist the index.
           persistence.user.cache.directories = [
             {
               directory = ".config/syncthing/index-v2";

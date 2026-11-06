@@ -135,7 +135,7 @@
         '') cfg.prowlarr.torrentFileIndexers}
       '';
 
-      # Synchronize both *arr password copies; masked API reads prevent diffing.
+      # Overwrite both *arr passwords because API reads are masked.
       clientSyncScript = pkgs.writeShellScript "servarr-sync-download-clients" ''
         set -euo pipefail
 
@@ -173,8 +173,7 @@
             | while read -r client; do
                 id="$(echo "$client" | ${jq} -r .id)"
 
-                # Skip the connection test so broken credentials can be
-                # repaired.
+                # Save even when the connection test fails.
                 if ! response="$(echo "$client" \
                   | ${jq} -c --arg u ${lib.escapeShellArg cfg.downloadClient.username} --arg p "$password" \
                       '([.fields[]
@@ -202,8 +201,7 @@
         sync_one radarr ${toString config.services.radarr.settings.server.port} ${config.services.radarr.dataDir}/config.xml
       '';
 
-      # Move admin-requested anime afterward; Seerr skips root overrides for
-      # admins.
+      # Apply anime root changes after Seerr requests.
       animeRootSyncScript = pkgs.writeShellScript "radarr-sync-anime-root" ''
         set -euo pipefail
 
@@ -246,8 +244,7 @@
 
         movies="$(api "$base/movie")"
 
-        # Select Radarr's `anime` keyword exactly, matching Seerr's override
-        # rule.
+        # Match Radarr's exact anime keyword.
         select_ids() {
           echo "$movies" | ${jq} -c --arg root ${lib.escapeShellArg animeRoot} --argjson t "$tag_id" "$1"
         }
@@ -390,8 +387,7 @@
           config.services.radarr.user
         ];
 
-        # Keep acquisition-only anime roots outside Jellyfin; Shoko catalogs
-        # them.
+        # Keep acquisition-only anime roots outside Jellyfin.
         systemd = {
           tmpfiles.rules =
             let
@@ -404,12 +400,11 @@
               "d /srv/media/radarr        2775 root         media - -"
               "d ${animeRoot}  2770 ${radarr.user} media - -"
 
-              # Holds the API key and plaintext client password; keep it 0700.
+              # These directories contain API keys and passwords.
               "d ${sonarr.dataDir} 0700 ${sonarr.user} ${sonarr.group} - -"
               "d ${radarr.dataDir} 0700 ${radarr.user} ${radarr.group} - -"
 
-              # `~` limits the mode mask, producing 0700 directories and 0600
-              # files.
+              # The ~ mask produces 0700 directories and 0600 files.
               "Z ${sonarr.dataDir} ~0700 ${sonarr.user} ${sonarr.group} - -"
               "Z ${radarr.dataDir} ~0700 ${radarr.user} ${radarr.group} - -"
             ];
@@ -457,8 +452,7 @@
                 serviceConfig = {
                   Type = "oneshot";
 
-                  # The script reads each service's 0700-owned config.xml as
-                  # root.
+                  # The script reads config.xml as root.
                   ExecStart = clientSyncScript;
                 };
               };

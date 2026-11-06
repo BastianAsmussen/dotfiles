@@ -18,8 +18,7 @@
           enable = true;
           autocd = true;
 
-          # Distrobox maps the store to nobody, so disable oh-my-zsh compaudit
-          # there.
+          # Disable oh-my-zsh compaudit inside Distrobox.
           envExtra = ''
             if [[ -n "$CONTAINER_ID" ]]; then
               export ZSH_DISABLE_COMPFIX=true

@@ -14,7 +14,7 @@
           };
         };
 
-        # Prevent the OpenSSH agent from starting; gpg-agent serves SSH keys.
+        # Use gpg-agent instead of the OpenSSH agent.
         ssh.startAgent = false;
       };
 
@@ -53,8 +53,7 @@
           "L+ /home/${name}/.gnupg-fwd/pubring.kbx - - - - /home/${name}/.gnupg/pubring.kbx"
           "L+ /home/${name}/.gnupg-fwd/trustdb.gpg - - - - /home/${name}/.gnupg/trustdb.gpg"
 
-          # Server hosts need this directory for the second RemoteForward
-          # socket.
+          # Create the second RemoteForward socket directory.
           "d /home/${name}/.ssh 0700 ${name} ${name} -"
         ];
     };
