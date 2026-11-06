@@ -17,6 +17,7 @@
             absolute-episode
             calculator
             caveman-cli
+            clone-project
             copy-file
             kimi-code
             neovim
