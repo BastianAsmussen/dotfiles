@@ -8,6 +8,9 @@
       ...
     }:
     {
+      # Per-repo config and metadata; `config.toml` beside it is HM-managed.
+      persistence.directories = [ ".config/jj/repos" ];
+
       programs.jujutsu = {
         enable = true;
 
