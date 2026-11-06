@@ -31,6 +31,10 @@
                 "nix-command"
                 "cgroups"
                 "auto-allocate-uids"
+                "ca-derivations"
+                "dynamic-derivations"
+                "recursive-nix"
+                "pipe-operators"
               ];
 
               trusted-users = [ "root" ];
