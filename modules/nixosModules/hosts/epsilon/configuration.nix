@@ -388,6 +388,25 @@
             "requests.asmussen.tech".extraConfig = ''
               import hsts
               ${rateLimit "seerr_auth" "(?i)^/api/v1/auth/(local|jellyfin)"}
+
+              @seerr_image_proxy path_regexp (?i)^/(imageproxy|avatarproxy)/
+
+              rate_limit {
+                zone seerr_images {
+                  match {
+                    path_regexp (?i)^/(imageproxy|avatarproxy)/
+                  }
+                  key {remote_host}
+                  events 120
+                  window 1m
+                }
+              }
+
+              forward_auth @seerr_image_proxy localhost:${toString config.services.seerr.port} {
+                # Do not forward image cache-busting queries to the auth API.
+                uri /api/v1/auth/me?
+              }
+
               reverse_proxy localhost:${toString config.services.seerr.port}
             '';
           };
