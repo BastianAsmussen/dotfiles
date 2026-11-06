@@ -264,6 +264,11 @@
         caddy.virtualHosts =
           let
             covenant = config.covenant-extras.domain;
+            allowedRedirectHosts = [
+              covenant
+              "www.${covenant}"
+            ]
+            ++ config.acmeShared.dkRedirects.domains;
           in
           {
             # Covenant traffic falls through the layer4 routes and terminates here.
@@ -285,7 +290,14 @@
 
             "http://" = {
               listenAddresses = [ ];
-              extraConfig = "redir https://{host}{uri} permanent";
+              extraConfig = ''
+                @allowed_asmussen vars_regexp {host} (?i)^(?:[a-z0-9-]+\.)*asmussen\.tech$
+                @allowed_other host ${lib.concatStringsSep " " allowedRedirectHosts}
+
+                redir @allowed_asmussen https://{host}{uri} permanent
+                redir @allowed_other https://{host}{uri} permanent
+                respond 421
+              '';
             };
 
             # Serve this fallback while epsilon is down or busy.
