@@ -34,7 +34,7 @@
               # sh
               ''
                 echo "Pruning snapshots older than ${toString cfg.retention} months..."
-                findutils "${cfg.mountpoint}" \
+                find "${cfg.mountpoint}" \
                   -maxdepth 1 \
                   -name 'vault-*.tar.zst.age' \
                   -mtime +${toString (cfg.retention * 31)} \
@@ -195,7 +195,7 @@
               trees, which are large, rebuildable, and churn every commit.
 
               Cargo tags its own `target` directories with CACHEDIR.TAG, which
-              `--exclude-caching` already catches; the literal entry here only
+              `--exclude-caches` already catches. The literal entry here only
               covers directories left by versions predating that.
             '';
           };
@@ -242,7 +242,7 @@
         # Restic re-reads the pack index without its cache.
         persistence.directories = lib.optionals cfg.incremental.enable [
           {
-            directory = "/root/.cache/restic";
+            directory = "/var/cache/restic-backups-arctic-vault";
             mode = "0700";
           }
         ];
