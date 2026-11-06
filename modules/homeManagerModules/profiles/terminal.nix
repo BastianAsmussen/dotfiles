@@ -16,6 +16,7 @@
       git
       gpg
       jujutsu
+      kimiCode
       nixIndex
       nixvim
       ohMyPosh

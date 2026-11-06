@@ -838,6 +838,27 @@
         "type": "github"
       }
     },
+    "kimi-code": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793950871,
+        "narHash": "sha256-3kdFQQQdSjDfVFNxMs1B+G2HhUMbbYsDT5rUx57R2lE=",
+        "owner": "MoonshotAI",
+        "repo": "kimi-code",
+        "rev": "1c142a007c10e881602690def96057c23a2baa12",
+        "type": "github"
+      },
+      "original": {
+        "owner": "MoonshotAI",
+        "ref": "@moonshot-ai/kimi-code@2.5.2",
+        "repo": "kimi-code",
+        "type": "github"
+      }
+    },
     "lanzaboote": {
       "inputs": {
         "crane": "crane_2",
@@ -1375,6 +1396,7 @@
         "home-manager": "home-manager",
         "home-manager-stable": "home-manager-stable",
         "import-tree": "import-tree",
+        "kimi-code": "kimi-code",
         "lanzaboote": "lanzaboote",
         "news": "news",
         "nix-index-database": "nix-index-database",

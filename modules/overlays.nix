@@ -18,6 +18,7 @@
             calculator
             caveman-cli
             copy-file
+            kimi-code
             neovim
             neovim-minimal
             repo-cloner
