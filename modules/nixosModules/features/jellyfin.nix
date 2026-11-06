@@ -71,11 +71,33 @@
               services = {
                 jellyfin = {
                   unitConfig.RequiresMountsFor = [ "/srv/media" ];
-                  serviceConfig.UMask = lib.mkForce "0002";
+                  serviceConfig = {
+                    UMask = lib.mkForce "0002";
+                    MemoryMax = "4G";
+                  };
+
                   environment.LC_ALL = config.i18n.defaultLocale;
                 };
 
                 shoko.unitConfig.RequiresMountsFor = [ "/srv/media" ];
+              };
+            };
+
+            # Limit SSRF impact without blocking inbound reverse-proxy connections.
+            networking.nftables = {
+              enable = true;
+              tables."jellyfin-egress" = {
+                family = "inet";
+                content = ''
+                  chain output {
+                    type filter hook output priority filter; policy accept;
+                    meta skuid ${toString cfg.uid} ct state { established, related } accept
+                    meta skuid ${toString cfg.uid} ip daddr 127.0.0.53 udp dport 53 accept
+                    meta skuid ${toString cfg.uid} ip daddr 127.0.0.53 tcp dport 53 accept
+                    meta skuid ${toString cfg.uid} ip daddr { 127.0.0.0/8, 10.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16 } drop
+                    meta skuid ${toString cfg.uid} ip6 daddr { ::1/128, fc00::/7, fe80::/10 } drop
+                  }
+                '';
               };
             };
 

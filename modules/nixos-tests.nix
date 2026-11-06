@@ -193,6 +193,22 @@ in
           testUser
         ] (cfg: cfg.services.openssh.settings.AuthenticationMethods == "publickey");
 
+        # Jellyfin Module.
+        nixos-eval-jellyfin-security =
+          mkEvalTest "jellyfin-security"
+            [
+              self.nixosModules.base
+              self.nixosModules.jellyfin
+              testUser
+              { jellyfin.enable = true; }
+            ]
+            (
+              cfg:
+              builtins.length cfg.services.jellyfin.package.patches == 3
+              && cfg.systemd.services.jellyfin.serviceConfig.MemoryMax == "4G"
+              && lib.hasInfix "169.254.0.0/16" cfg.networking.nftables.tables."jellyfin-egress".content
+            );
+
         # Bluetooth Module.
         nixos-eval-bluetooth-enabled = mkEvalTest "bluetooth-enabled" [
           self.nixosModules.base
