@@ -202,3 +202,39 @@ infra *args:
     nix develop .#infra -c \
         sops exec-env ~/nix-secrets/infra/hetzner.yaml \
         'tofu -chdir=tofu {{ args }}'
+
+# Unlock eta's disk over initrd SSH as soon as it reboots (start before or after the reboot).
+[group("infra")]
+eta-unlock:
+    #!/usr/bin/env bash
+
+    set -euo pipefail
+
+    # Fetch first so pinentry prompts before eta goes down.
+    passphrase="$(gopass show -o security/drives/eta)"
+    opts=(-o ConnectTimeout=5 -o ConnectionAttempts=1 -o BatchMode=yes)
+
+    echo "Waiting for eta's initrd SSH..."
+    sent=0
+    while :; do
+        rc=0
+        ssh "${opts[@]}" eta-initrd <<< "$passphrase" > /dev/null 2>&1 || rc=$?
+        if [ "$rc" -ne 255 ]; then
+            # The agent exits if no prompt is pending yet, so resend until initrd SSH goes away.
+            [ "$sent" -eq 0 ] && echo "Connected, sending passphrase..."
+            sent=$((sent + 1))
+            if [ "$sent" -ge 30 ]; then
+                echo "Initrd SSH still up after $sent attempts, check eta's console." >&2
+                exit 1
+            fi
+        elif [ "$sent" -gt 0 ]; then
+            break
+        fi
+        sleep 2
+    done
+
+    echo "Initrd SSH closed, waiting for eta to come up..."
+    until ssh "${opts[@]}" -o ClearAllForwardings=yes eta true 2> /dev/null; do
+        sleep 2
+    done
+    echo "eta is up."
