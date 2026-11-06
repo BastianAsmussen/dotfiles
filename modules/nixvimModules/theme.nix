@@ -1,6 +1,5 @@
 {
-  # Colorscheme.
-  flake.nixvimModules.theme = _: {
+  flake.nixvimModules.theme = {
     colorschemes.catppuccin = {
       enable = true;
       settings = {

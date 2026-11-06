@@ -1,6 +1,6 @@
 {
   # Fuzzy finder and its pickers.
-  flake.nixvimModules.telescope = _: {
+  flake.nixvimModules.telescope = {
     plugins = {
       telescope = {
         enable = true;

@@ -1,6 +1,6 @@
 {
   # OSC 52 clipboard, so yanks reach the host over SSH.
-  flake.nixvimModules.clipboard = _: {
+  flake.nixvimModules.clipboard = {
     extraConfigLuaPost = ''
       if os.getenv("SSH_TTY") or os.getenv("SSH_CONNECTION") then
         vim.g.clipboard = {

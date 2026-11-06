@@ -1,6 +1,6 @@
 {
   # Autocommands and their groups.
-  flake.nixvimModules.autocmds = _: {
+  flake.nixvimModules.autocmds = {
     autoGroups = {
       highlight-yank.clear = true;
       secret-buffers.clear = true;
