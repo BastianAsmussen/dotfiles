@@ -50,6 +50,42 @@
       };
     in
     {
+      # Its base16-fish script writes universals, which die with the tmpfs root.
+      stylix.targets.fish.enable = false;
+
+      xdg.configFile."fish/themes/stylix.theme".text =
+        let
+          inherit (config.lib.stylix.colors) base02 base03 base04;
+        in
+        ''
+          fish_color_autosuggestion ${base03}
+          fish_color_cancel -r
+          fish_color_command green
+          fish_color_comment ${base03}
+          fish_color_cwd green
+          fish_color_cwd_root red
+          fish_color_end brblack
+          fish_color_error red
+          fish_color_escape yellow
+          fish_color_history_current --bold
+          fish_color_host normal
+          fish_color_match --background=brblue
+          fish_color_normal normal
+          fish_color_operator blue
+          fish_color_param ${base04}
+          fish_color_quote yellow
+          fish_color_redirection cyan
+          fish_color_search_match bryellow --background=${base02}
+          fish_color_selection white --bold --background=${base02}
+          fish_color_status red
+          fish_color_user brgreen
+          fish_color_valid_path --underline
+          fish_pager_color_completion normal
+          fish_pager_color_description yellow --dim
+          fish_pager_color_prefix white --bold
+          fish_pager_color_progress brwhite --background=cyan
+        '';
+
       programs = {
         nix-your-shell = {
           enable = true;
@@ -224,6 +260,9 @@
             # fish
             ''
               set -g fish_greeting
+
+              # Globals, so the theme overrides fish's default theme at startup.
+              fish_config theme choose stylix
 
               # `set -q` short-circuits, so on the host this is one variable test.
               if set -q CONTAINER_ID; and type -q pacman
