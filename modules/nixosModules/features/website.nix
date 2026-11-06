@@ -18,33 +18,21 @@
       options.website-extras.exposePublicly = lib.mkOption {
         type = lib.types.bool;
         default = true;
-        description = ''
-          Whether to expose the website through an nginx reverse proxy with HTTPS.
-          Set to false when the host handles TLS termination separately (e.g. stream passthrough fallback).
-        '';
+        description = "Whether to serve the website at asmussen.tech through Caddy.";
       };
 
       imports = [ inputs.website.nixosModules.default ];
 
       config = {
-        services.website = {
-          enable = true;
-          port = lib.mkDefault 8080;
-        };
-
-        services.website.package = lib.mkIf (
-          pkgs.stdenv.hostPlatform.system == "aarch64-linux"
-        ) crossPackage;
-
-        nginx.reverseProxies.website = lib.mkIf config.website-extras.exposePublicly {
-          enable = true;
-          domain = "asmussen.tech";
-          location = "/";
-          upstream = "http://localhost:${toString config.services.website.port}/";
-          ssl = {
-            dnsProvider = "cloudflare";
-            environmentFile = config.sops.templates."cloudflare-acme-env".path;
+        services = {
+          website = {
+            enable = true;
+            port = lib.mkDefault 8080;
+            package = lib.mkIf (pkgs.stdenv.hostPlatform.system == "aarch64-linux") crossPackage;
           };
+
+          caddy.virtualHosts."asmussen.tech".extraConfig =
+            lib.mkIf config.website-extras.exposePublicly "reverse_proxy localhost:${toString config.services.website.port}";
         };
       };
     };

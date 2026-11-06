@@ -25,7 +25,7 @@
       ...
     }:
     let
-      inherit (lib) mkForce;
+      inherit (lib) mkDefault mkForce;
     in
     {
       imports = [
@@ -78,9 +78,8 @@
         self.nixosModules.monero
         self.nixosModules.dns
         self.nixosModules.networkManager
-        self.nixosModules.nginx
+        self.nixosModules.caddy
         self.nixosModules.router
-        self.nixosModules.nix-serve
         self.nixosModules.buildHost
         self.nixosModules.nvidia
         self.nixosModules.topology
@@ -286,162 +285,107 @@
 
       ssh.fail2ban.enable = false;
 
-      nginx = {
-        acme.sharedHost = "asmussen.tech";
+      caddy = {
+        extended = true;
+        listenAddresses = [ "10.10.0.2" ];
 
-        reverseProxies = {
-          jellyfin = {
-            enable = true;
-            domain = "jellyfin.asmussen.tech";
-            location = "/";
-            upstream = "http://localhost:8096";
-            ssl = {
-              dnsProvider = "cloudflare";
-              environmentFile = config.sops.templates."cloudflare-acme-env".path;
-            };
-          };
+        # Only eta may reach this listener (firewall) or assert client addresses.
+        servers."10.10.0.2:443" = ''
+          listener_wrappers {
+            proxy_protocol {
+              allow 10.10.0.1/32
+            }
 
-          shoko = {
-            enable = true;
-            domain = "shoko.asmussen.tech";
-            location = "/";
-            upstream = "http://localhost:8111";
-            mtls = {
-              enable = true;
-              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-              localhostBypass = true;
-            };
-          };
-
-          qbittorrent = {
-            enable = true;
-            domain = "qbittorrent.asmussen.tech";
-            location = "/";
-            upstream = "http://localhost:${toString config.services.qbittorrent.webuiPort}";
-            mtls = {
-              enable = true;
-              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-              localhostBypass = true;
-            };
-          };
-
-          radarr = {
-            enable = true;
-            domain = "radarr.asmussen.tech";
-            location = "/";
-            upstream = "http://localhost:${toString config.services.radarr.settings.server.port}";
-            mtls = {
-              enable = true;
-              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-              localhostBypass = true;
-            };
-          };
-
-          sonarr = {
-            enable = true;
-            domain = "sonarr.asmussen.tech";
-            location = "/";
-            upstream = "http://localhost:${toString config.services.sonarr.settings.server.port}";
-            mtls = {
-              enable = true;
-              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-              localhostBypass = true;
-            };
-          };
-
-          seerr = {
-            enable = true;
-            domain = "requests.asmussen.tech";
-            location = "/";
-            upstream = "http://localhost:${toString config.services.seerr.port}";
-            ssl = {
-              dnsProvider = "cloudflare";
-              environmentFile = config.sops.templates."cloudflare-acme-env".path;
-            };
-          };
-
-          prowlarr = {
-            enable = true;
-            domain = "prowlarr.asmussen.tech";
-            location = "/";
-            upstream = "http://localhost:${toString config.services.prowlarr.settings.server.port}";
-            mtls = {
-              enable = true;
-              caCertificate = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
-              localhostBypass = true;
-            };
-          };
-        };
+            tls
+          }
+        '';
       };
 
       services = {
-        nginx = {
-          # Allow 5 login attempts per minute per IP; reject bursts with
-          # nodelay.
-          appendHttpConfig = ''
-            limit_req_zone $binary_remote_addr zone=jellyfin_auth:10m rate=5r/m;
-            limit_req_zone $binary_remote_addr zone=seerr_auth:10m rate=5r/m;
-
-            # Clients hardcode image quality and expose no setting for it.
-            map $arg_fillwidth $jellyfin_thumb_w {
-              default 0;
-              "~^[0-9]{1,3}$" 1;
-            }
-
-            map $arg_fillheight $jellyfin_thumb_h {
-              default 0;
-              "~^[0-9]{1,3}$" 1;
-            }
-
-            map "$jellyfin_thumb_w$jellyfin_thumb_h:$args" $jellyfin_image_args {
-              default $args;
-              "~^(?:01|10|11):(?<pre>.*)quality=\d+(?<post>.*)$" "''${pre}quality=70''${post}";
-              "~^(?:01|10|11):(?<all>.+)$" "''${all}&quality=70";
-            }
-          '';
-
-          virtualHosts = {
-            "www.asmussen.tech" = {
-              useACMEHost = "asmussen.tech";
-              forceSSL = true;
-              locations."/".return = "301 https://asmussen.tech$request_uri";
+        caddy.virtualHosts =
+          let
+            # Only :8443 requires a client certificate; loopback is exempt.
+            mtlsServices = {
+              shoko = 8111;
+              qbittorrent = config.services.qbittorrent.webuiPort;
+              radarr = config.services.radarr.settings.server.port;
+              sonarr = config.services.sonarr.settings.server.port;
+              prowlarr = config.services.prowlarr.settings.server.port;
             };
+
+            mtlsVhosts = lib.concatMapAttrs (name: port: {
+              "${name}.asmussen.tech" = {
+                listenAddresses = [
+                  "127.0.0.1"
+                  "::1"
+                ];
+
+                extraConfig = "reverse_proxy localhost:${toString port}";
+              };
+
+              "${name}.asmussen.tech:8443" = {
+                clientCA = lib.custom.keys.selectCertPath "mtls-ca.crt" lib.custom.keys.default;
+                extraConfig = "reverse_proxy localhost:${toString port}";
+              };
+            }) mtlsServices;
+
+            # 5 attempts per client per minute; PROXY gives the real client address.
+            rateLimit = zone: pattern: ''
+              rate_limit {
+                zone ${zone} {
+                  match {
+                    path_regexp ${pattern}
+                  }
+
+                  key {remote_host}
+                  events 5
+                  window 1m
+                }
+              }
+            '';
+          in
+          mtlsVhosts
+          // {
+            "www.asmussen.tech".extraConfig = "redir https://asmussen.tech{uri} permanent";
 
             # Preserve legacy bookmarks; Covenant now lives at its domain root.
-            "asmussen.tech".locations = {
-              "/jellyfin".return = "301 https://jellyfin.asmussen.tech/";
-              "/covenant".return = "301 https://covenantofearth.org/";
-            };
+            "asmussen.tech".extraConfig = ''
+              redir /jellyfin* https://jellyfin.asmussen.tech/ permanent
+              redir /covenant* https://covenantofearth.org/ permanent
+            '';
 
-            "jellyfin.asmussen.tech".locations = {
-              # Block pre-auth endpoints exposed by eta's TLS passthrough.
-              "~* ^/Users/ForgotPassword".return = "403";
-              "~* ^/QuickConnect".return = "403";
-              "~* ^/Startup".return = "403";
-              "~* ^/ClientLog".return = "403";
+            "jellyfin.asmussen.tech".extraConfig = ''
+              # Pre-auth endpoints no remote client needs.
+              @blocked path_regexp (?i)^/(Users/ForgotPassword|QuickConnect|Startup|ClientLog)
+              respond @blocked 403
 
-              "~* ^/Users/Public".extraConfig = ''
-                default_type application/json;
-                return 200 "[]";
-              '';
+              @public path_regexp (?i)^/Users/Public
+              header @public Content-Type application/json
+              respond @public "[]" 200
 
-              "~* ^/Users/AuthenticateByName" = {
-                proxyPass = "http://localhost:8096";
-                extraConfig = "limit_req zone=jellyfin_auth burst=3 nodelay;";
-              };
+              ${rateLimit "jellyfin_auth" "(?i)^/Users/AuthenticateByName"}
 
-              "~* ^/Items/[^/]+/Images/" = {
-                proxyPass = "http://localhost:8096";
-                extraConfig = "set $args $jellyfin_image_args;";
-              };
-            };
+              # Clients hardcode image quality and expose no setting for it.
+              # -Quality drops a client-sent Quality=, which binds just like
+              # the injected quality=.
+              @thumb {
+                path_regexp (?i)^/Items/[^/]+/Images/
+                expression `{query.fillWidth}.matches("^[0-9]{1,3}$") || {query.fillwidth}.matches("^[0-9]{1,3}$") || {query.fillHeight}.matches("^[0-9]{1,3}$") || {query.fillheight}.matches("^[0-9]{1,3}$")`
+              }
 
-            "requests.asmussen.tech".locations."~* ^/api/v1/auth/(local|jellyfin)" = {
-              proxyPass = "http://localhost:${toString config.services.seerr.port}";
-              extraConfig = "limit_req zone=seerr_auth burst=3 nodelay;";
-            };
+              uri @thumb query {
+                quality 70
+                -Quality
+              }
+
+              reverse_proxy localhost:8096
+            '';
+
+            "requests.asmussen.tech".extraConfig = ''
+              ${rateLimit "seerr_auth" "(?i)^/api/v1/auth/(local|jellyfin)"}
+              reverse_proxy localhost:${toString config.services.seerr.port}
+            '';
           };
-        };
 
         openssh.openFirewall = false;
 
@@ -544,11 +488,21 @@
           ];
         };
 
-        # Allow WireGuard peers (eta, delta) to reach proxied services on epsilon.
-        firewall.interfaces.wg0.allowedTCPPorts = config.services.openssh.ports ++ [
-          config.services.website.port
-          443 # nginx, WG peers reach epsilon directly
-        ];
+        # The extraInputRules below only take effect with the nftables backend;
+        # PIA also enables it, but the rules must not depend on that.
+        nftables.enable = mkDefault true;
+
+        firewall = {
+          interfaces.wg0.allowedTCPPorts = config.services.openssh.ports ++ [
+            config.services.website.port
+          ];
+
+          # Allow eta on :443 and eta or delta on the mTLS port.
+          extraInputRules = ''
+            iifname "wg0" ip saddr 10.10.0.1 tcp dport 443 accept
+            iifname "wg0" ip saddr { 10.10.0.1, 10.10.0.3 } tcp dport 8443 accept
+          '';
+        };
       };
 
       preferences = {
@@ -703,7 +657,7 @@
         servarr.enable = mkForce false;
         seerr.enable = mkForce false;
 
-        nginx.enable = mkForce false;
+        caddy.enable = mkForce false;
 
         primaryBusy.enable = mkForce false;
         monero.node.enable = mkForce false;
@@ -719,7 +673,6 @@
         services = {
           forgejo-runner.instances.epsilon.enable = mkForce false;
           syncthing.enable = mkForce false;
-          nix-serve.enable = mkForce false;
           website.enable = mkForce false;
           news.enable = mkForce false;
           tor.enable = mkForce false;

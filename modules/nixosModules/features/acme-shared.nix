@@ -5,6 +5,7 @@
       config,
       lib,
       options,
+      pkgs,
       ...
     }:
     let
@@ -14,15 +15,26 @@
     in
     {
       options.acmeShared = {
-        enable = lib.mkEnableOption "Shared Let's Encrypt wildcard cert for asmussen.tech";
+        enable = lib.mkEnableOption "Let's Encrypt DNS-01 defaults for the certificates the caddy module derives";
 
-        dkRedirects.enable = mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = ''
-            Register the .dk redirect domains (dotfiles.dk, fansly.dk,
-            tech-college.dk, harvard.dk) pointing at https://asmussen.tech.
-          '';
+        dkRedirects = {
+          enable = mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Whether to serve the .dk redirect domains pointing at https://asmussen.tech.";
+          };
+
+          domains = mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [
+              "dotfiles.dk"
+              "fansly.dk"
+              "tech-college.dk"
+              "harvard.dk"
+            ];
+
+            description = "Domains redirected to https://asmussen.tech.";
+          };
         };
       };
 
@@ -47,43 +59,32 @@
             security.acme = {
               acceptTerms = mkDefault true;
               defaults = {
-                # Applies to every cert on the host.
-                reloadServices = mkDefault [ "nginx.service" ];
                 email = mkDefault config.preferences.user.email;
-                # Resolver caching outlasts lego's propagation timeout.
-                extraLegoFlags = mkDefault [ "--dns.propagation.disable-rns" ];
-              };
+                dnsProvider = mkDefault "cloudflare";
+                environmentFile = mkDefault config.sops.templates."cloudflare-acme-env".path;
 
-              certs."asmussen.tech" = {
-                inherit (config.services.nginx) group;
+                # Check renewal every six hours; lego's ARI determines when it
+                # is due.
+                renewInterval = mkDefault "*-*-* 00/6:00:00";
+                renewJitter = mkDefault "1h";
 
-                extraDomainNames = [ "*.asmussen.tech" ];
-                dnsProvider = "cloudflare";
-                environmentFile = config.sops.templates."cloudflare-acme-env".path;
+                # Use a fixed DNS propagation wait; lego 5 renamed the flag.
+                extraLegoFlags = mkDefault [
+                  (
+                    if lib.versionOlder pkgs.lego.version "5.0.0" then
+                      "--dns.propagation-wait=120s"
+                    else
+                      "--dns.propagation.wait=120s"
+                  )
+                ];
               };
             };
           }
 
           (mkIf cfg.dkRedirects.enable {
-            nginx.redirects =
-              let
-                dkRedirect = domain: {
-                  inherit domain;
-
-                  enable = true;
-                  target = "https://asmussen.tech";
-                  ssl = {
-                    dnsProvider = "cloudflare";
-                    environmentFile = config.sops.templates."cloudflare-acme-env".path;
-                  };
-                };
-              in
-              {
-                dotfiles-dk = dkRedirect "dotfiles.dk";
-                fansly-dk = dkRedirect "fansly.dk";
-                tech-college-dk = dkRedirect "tech-college.dk";
-                harvard-dk = dkRedirect "harvard.dk";
-              };
+            services.caddy.virtualHosts = lib.genAttrs cfg.dkRedirects.domains (_: {
+              extraConfig = "redir https://asmussen.tech{uri} permanent";
+            });
           })
         ]
       );

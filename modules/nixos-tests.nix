@@ -45,6 +45,62 @@ in
         in
         assert lib.assertMsg ok "nixos-eval-${name}: assertion failed";
         pkgs.runCommandLocal "nixos-eval-${name}" { } "touch $out";
+
+      # Self-signed CA and client certificate for the mTLS listener.
+      mtlsCerts =
+        pkgs.runCommand "mtls-certs"
+          {
+            nativeBuildInputs = [ pkgs.openssl ];
+          }
+          ''
+            openssl req -x509 -newkey rsa:2048 -keyout ca.key -out ca.crt -days 1 -nodes -subj "/CN=test-ca"
+            openssl req -newkey rsa:2048 -keyout client.key -out client.csr -nodes -subj "/CN=test-client"
+            openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 1
+            mkdir $out
+            cp ca.crt ca.key client.crt client.key $out
+          '';
+
+      # Echoes every request header back as the response body.
+      headerEcho = pkgs.writers.writePython3 "header-echo" { } ''
+        import http.server
+
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                body = "".join(
+                    f"{field}: {value}\n" for field, value in self.headers.items()
+                ).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, format, *args):
+                pass
+
+
+        http.server.ThreadingHTTPServer(("127.0.0.1", 8096), Handler).serve_forever()
+      '';
+
+      # Stands in for the gaming module so primaryBusy's hook options exist.
+      gamemodeStub =
+        { lib, ... }:
+        {
+          options.gamemode = {
+            startHooks = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Commands to run when a gamemode session starts.";
+            };
+
+            endHooks = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Commands to run when a gamemode session ends.";
+            };
+          };
+        };
     in
     {
       checks = {
@@ -198,6 +254,283 @@ in
           testScript = ''
             machine.wait_for_unit("sshd.service")
             machine.succeed("ss -tlnp | grep -q :22")
+          '';
+        };
+
+        nixos-vm-caddy-edge = pkgs.testers.nixosTest {
+          name = "caddy-edge";
+          nodes = {
+            edge =
+              { pkgs, ... }:
+              {
+                imports = [
+                  self.nixosModules.caddy
+                  self.nixosModules.primaryMirror
+                ];
+
+                virtualisation = {
+                  graphics = false;
+                  vlans = [ 1 ];
+                };
+
+                networking.interfaces.eth1.ipv4.addresses = [
+                  {
+                    address = "10.10.0.1";
+                    prefixLength = 24;
+                  }
+                ];
+
+                # Unreachable ACME server; caddy serves the self-signed placeholders.
+                security.acme = {
+                  acceptTerms = true;
+                  defaults = {
+                    email = "test@example.com";
+                    dnsProvider = "cloudflare";
+                    environmentFile = pkgs.writeText "acme-env" "CF_DNS_API_TOKEN=stub";
+                    server = "https://acme.invalid/dir";
+                  };
+                };
+
+                caddy = {
+                  extended = true;
+                  openFirewall = true;
+                  listenAddresses = [ "127.0.0.1" ];
+                  defaultPort = 8443;
+                };
+
+                primaryMirror = {
+                  enable = true;
+
+                  # Keeps failover inside the test's bounded waits.
+                  healthInterval = "2s";
+                  mtlsNames = [ "shoko.asmussen.tech" ];
+                  passthroughNames = [
+                    "jellyfin.asmussen.tech"
+                    "asmussen.tech"
+                  ];
+                };
+
+                services.caddy.virtualHosts = {
+                  # Binds :443, the layer4 listener's fallthrough site.
+                  "covenantofearth.org:443" = {
+                    listenAddresses = [ ];
+                    extraConfig = ''respond "covenant-edge" 200'';
+                  };
+
+                  "jellyfin.asmussen.tech".extraConfig = "respond 503";
+                  "asmussen.tech".extraConfig = ''respond "asmussen-edge" 200'';
+                };
+              };
+
+            primary =
+              { pkgs, ... }:
+              {
+                imports = [
+                  self.nixosModules.base
+                  self.nixosModules.caddy
+                  self.nixosModules.primaryBusy
+                  gamemodeStub
+                  testUser
+                ];
+
+                virtualisation = {
+                  graphics = false;
+                  vlans = [ 1 ];
+                };
+
+                networking = {
+                  nftables.enable = true;
+
+                  interfaces.eth1.ipv4.addresses = [
+                    {
+                      address = "10.10.0.2";
+                      prefixLength = 24;
+                    }
+                  ];
+
+                  hosts."127.0.0.1" = [ "shoko.asmussen.tech" ];
+
+                  # The module's rules match wg0, which this VM does not have.
+                  firewall.extraInputRules = ''
+                    iifname "eth1" ip saddr 10.10.0.1 tcp dport 443 accept
+                    iifname "eth1" ip saddr { 10.10.0.1, 10.10.0.3 } tcp dport 8443 accept
+                    iifname "eth1" ip saddr 10.10.0.1 tcp dport 9444 accept
+                  '';
+                };
+
+                # Unreachable ACME server; caddy serves the self-signed placeholders.
+                security.acme = {
+                  acceptTerms = true;
+                  defaults = {
+                    email = "test@example.com";
+                    dnsProvider = "cloudflare";
+                    environmentFile = pkgs.writeText "acme-env" "CF_DNS_API_TOKEN=stub";
+                    server = "https://acme.invalid/dir";
+                  };
+                };
+
+                preferences.user.authorizedKeyFiles = [ ];
+
+                caddy = {
+                  extended = true;
+                  listenAddresses = [ "10.10.0.2" ];
+                  servers."10.10.0.2:443" = ''
+                    listener_wrappers {
+                      proxy_protocol {
+                        allow 10.10.0.1/32
+                      }
+
+                      tls
+                    }
+                  '';
+                };
+
+                primaryBusy.enable = true;
+
+                services.caddy.virtualHosts = {
+                  "jellyfin.asmussen.tech" = {
+                    extraConfig = "reverse_proxy localhost:8096";
+                  };
+
+                  "asmussen.tech" = {
+                    extraConfig = "reverse_proxy localhost:8096";
+                  };
+
+                  # Only :8443 requires a client certificate; loopback is exempt.
+                  "shoko.asmussen.tech:8443" = {
+                    clientCA = "${mtlsCerts}/ca.crt";
+                    extraConfig = "reverse_proxy localhost:8096";
+                  };
+
+                  "shoko.asmussen.tech" = {
+                    listenAddresses = [
+                      "127.0.0.1"
+                      "::1"
+                    ];
+                    extraConfig = "reverse_proxy localhost:8096";
+                  };
+                };
+
+                systemd.services.header-echo = {
+                  description = "Echoes request headers for the proxy assertions";
+                  wantedBy = [ "multi-user.target" ];
+                  serviceConfig.ExecStart = headerEcho;
+                };
+
+                environment.systemPackages = [ pkgs.curl ];
+              };
+
+            client =
+              { pkgs, ... }:
+              {
+                virtualisation = {
+                  graphics = false;
+                  vlans = [ 1 ];
+                };
+
+                networking = {
+                  interfaces.eth1.ipv4.addresses = [
+                    {
+                      address = "10.10.0.3";
+                      prefixLength = 24;
+                    }
+                  ];
+
+                  hosts = {
+                    "10.10.0.1" = [
+                      "jellyfin.asmussen.tech"
+                      "asmussen.tech"
+                      "covenantofearth.org"
+                    ];
+
+                    "10.10.0.2" = [ "shoko.asmussen.tech" ];
+                  };
+                };
+
+                environment = {
+                  systemPackages = [ pkgs.curl ];
+
+                  # The certificate must exist inside the VM image.
+                  etc = {
+                    "mtls-client.crt".source = "${mtlsCerts}/client.crt";
+                    "mtls-client.key".source = "${mtlsCerts}/client.key";
+                  };
+                };
+              };
+          };
+
+          testScript = ''
+            import datetime as dt
+
+            start_all()
+
+            edge.wait_for_unit("caddy.service")
+            primary.wait_for_unit("caddy.service")
+            primary.wait_for_unit("primary-available.socket")
+            primary.wait_for_unit("header-echo.service")
+
+            # Passthrough preserves the client address.
+            client.succeed(
+                "curl -k https://jellyfin.asmussen.tech/"
+                " | grep -q 'X-Forwarded-For: 10.10.0.3'"
+            )
+
+            # Covenant terminates on the edge.
+            client.succeed(
+                "curl -k https://covenantofearth.org/ | grep -q covenant-edge"
+            )
+
+            # The client-certificate listener refuses bare clients, directly and via the edge.
+            client.fail(
+                "curl -k --max-time 10 https://shoko.asmussen.tech:8443/"
+            )
+            client.succeed(
+                "curl -k --max-time 10 --cert /etc/mtls-client.crt --key /etc/mtls-client.key"
+                " -o /dev/null -w '%{http_code}' https://shoko.asmussen.tech:8443/"
+                " | grep -q 200"
+            )
+            client.fail(
+                "curl -k --max-time 10 --resolve shoko.asmussen.tech:443:10.10.0.1"
+                " https://shoko.asmussen.tech/"
+            )
+            client.succeed(
+                "curl -k --max-time 10 --cert /etc/mtls-client.crt --key /etc/mtls-client.key"
+                " --resolve shoko.asmussen.tech:443:10.10.0.1"
+                " -o /dev/null -w '%{http_code}' https://shoko.asmussen.tech/ | grep -q 200"
+            )
+
+            # Loopback on the primary bypasses the client-certificate requirement.
+            primary.succeed(
+                "curl -k https://shoko.asmussen.tech/ | grep -q 'X-Forwarded-For: 127.0.0.1'"
+            )
+
+            # The mirror fails over to its own sites while the primary is unavailable.
+            primary.succeed("systemctl stop primary-busy-sync.timer")
+            primary.succeed("systemctl stop primary-available.socket")
+            client.wait_until_succeeds(
+                "curl -k -o /dev/null -w '%{http_code}' https://jellyfin.asmussen.tech/"
+                " | grep -q 503",
+                timeout=dt.timedelta(seconds=15),
+            )
+            client.wait_until_succeeds(
+                "curl -k https://asmussen.tech/ | grep -q asmussen-edge",
+                timeout=dt.timedelta(seconds=15),
+            )
+
+            # The primary takes over once its availability port answers again.
+            primary.succeed("systemctl start primary-available.socket")
+            client.wait_until_succeeds(
+                "curl -k https://jellyfin.asmussen.tech/"
+                " | grep -q 'X-Forwarded-For: 10.10.0.3'",
+                timeout=dt.timedelta(seconds=15),
+            )
+            primary.succeed("systemctl start primary-busy-sync.timer")
+
+            # Only the mirror may reach the PROXY listener.
+            client.fail(
+                "curl -k --connect-timeout 3 --resolve jellyfin.asmussen.tech:443:10.10.0.2"
+                " https://jellyfin.asmussen.tech/"
+            )
           '';
         };
       };

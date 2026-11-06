@@ -1,4 +1,3 @@
-{ inputs, ... }:
 {
   flake.nixosModules.primaryBusy =
     {
@@ -17,91 +16,103 @@
 
       cfg = config.primaryBusy;
 
-      inherit (config.networking) hostName;
-
-      notifyScript = pkgs.writeShellScript "primary-notify-mirror" ''
-        ${lib.getExe pkgs.openssh} \
-          -o StrictHostKeyChecking=accept-new \
-          -o ConnectTimeout=5 \
-          -o BatchMode=yes \
-          -i "${config.sops.secrets.${cfg.sshKeySecret}.path}" \
-          "${cfg.sshUser}@${cfg.mirrorHost}" \
-          "$1"
-      '';
+      systemctl = lib.getExe' config.systemd.package "systemctl";
+      unit = "primary-available.socket";
 
       syncScript = pkgs.writeShellScript "primary-busy-sync" ''
         if [ -n "$(${lib.getExe' pkgs.gamemode "gamemodelist"} 2>/dev/null)" ]; then
-          ${notifyScript} busy
+          ${systemctl} stop ${unit}
         else
-          ${notifyScript} available
+          ${systemctl} start ${unit}
         fi
       '';
     in
     {
       options.primaryBusy = {
         enable = mkEnableOption ''
-          Signal the mirror host when this machine is busy so it stops proxying
-          traffic here.
+          Close the availability port the mirror health-checks while gamemode is
+          active, so the mirror stops proxying traffic here
         '';
 
         mirrorHost = mkOption {
           type = types.str;
           default = "10.10.0.1";
-          description = "WireGuard IP address of the mirror host.";
+          description = "WireGuard address of the mirror host, the only source allowed to probe.";
         };
 
-        sshUser = mkOption {
+        address = mkOption {
           type = types.str;
-          default = "primary-busy";
-          description = "Remote SSH user used to update primary mirror state.";
+          default = "10.10.0.2";
+          description = "WireGuard address the availability port listens on.";
         };
 
-        sshKeySecret = mkOption {
-          type = types.str;
-          default = "hosts/${hostName}/primary-busy-ssh-private-key";
-          description = "SOPS secret containing the SSH key used for busy-state updates.";
+        port = mkOption {
+          type = types.port;
+          default = 9444;
+          description = "Availability port; must match the mirror's primaryMirror.availabilityPort.";
         };
 
         syncInterval = mkOption {
           type = types.ints.positive;
           default = 60;
-          description = "How often, in seconds, to sync gamemode state to the mirror host.";
+          description = "How often, in seconds, to reconcile the port with gamemode state.";
         };
-
       };
 
       config = mkIf cfg.enable {
-        programs.ssh.knownHosts."eta-wg" = {
-          hostNames = [ cfg.mirrorHost ];
-          publicKey = inputs.nix-secrets.hosts.eta.ssh-public-key;
-        };
-
-        sops.secrets.${cfg.sshKeySecret} = {
-          owner = config.preferences.user.name;
-          mode = "0400";
-        };
-
+        # Hooks give the immediate switch; the timer corrects a missed hook.
         gamemode = {
-          startHooks = [ "${notifyScript} busy" ];
-          endHooks = [ "${notifyScript} available" ];
+          startHooks = [ "${systemctl} stop ${unit}" ];
+          endHooks = [ "${systemctl} start ${unit}" ];
         };
+
+        # gamemoded runs the hooks as the user; allow exactly these two verbs.
+        security.polkit.extraConfig = ''
+          polkit.addRule(function (action, subject) {
+            if (action.id == "org.freedesktop.systemd1.manage-units" &&
+                action.lookup("unit") == "${unit}" &&
+                (action.lookup("verb") == "start" || action.lookup("verb") == "stop") &&
+                subject.user == "${config.preferences.user.name}") {
+              return polkit.Result.YES;
+            }
+          });
+        '';
+
+        networking.firewall.extraInputRules = ''
+          iifname "wg0" ip saddr ${cfg.mirrorHost} tcp dport ${toString cfg.port} accept
+        '';
 
         systemd = {
-          services.primary-busy-sync = {
-            description = "Sync gamemode busy state to mirror host";
-            after = [
-              "network-online.target"
-              "wireguard-wg0.service"
-            ];
-            wants = [ "network-online.target" ];
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = syncScript;
+          sockets.primary-available = {
+            description = "Availability probe for the mirror";
+            wantedBy = [ "sockets.target" ];
+            listenStreams = [ "${cfg.address}:${toString cfg.port}" ];
+            socketConfig = {
+              Accept = true;
+              FreeBind = true;
+            };
+          };
+
+          services = {
+            "primary-available@" = {
+              description = "Close an availability probe";
+              serviceConfig = {
+                ExecStart = lib.getExe' pkgs.coreutils "true";
+                StandardInput = "socket";
+              };
+            };
+
+            primary-busy-sync = {
+              description = "Reconcile the availability port with gamemode state";
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = syncScript;
+              };
             };
           };
 
           timers.primary-busy-sync = {
-            description = "Periodic gamemode state sync to mirror host";
+            description = "Periodic availability reconciliation";
             wantedBy = [ "timers.target" ];
             timerConfig = {
               OnBootSec = "30s";

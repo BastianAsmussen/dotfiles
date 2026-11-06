@@ -51,7 +51,7 @@
           ];
 
           settings = {
-            # CI jobs use the host Nix store and warm cache.asmussen.tech.
+            # CI jobs use the host Nix store.
             runner.labels = [ "nix:host" ];
             server.connections.default = {
               url = "https://codeberg.org/";

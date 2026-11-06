@@ -49,19 +49,6 @@
             geometry.
           '';
         };
-
-        exposePublicly = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = ''
-            Whether to expose the Covenant through an nginx reverse proxy with
-            HTTPS.  Off by default because the only host serving it (eta) runs
-            nginx in TLS stream-passthrough mode, where a reverse-proxy virtual
-            host would fight the stream listener for port 443.  Such a host
-            declares its own virtual host on the internal fallback listener and
-            routes SNI to it instead.
-          '';
-        };
       };
 
       imports = [ inputs.covenant.nixosModules.default ];
@@ -114,18 +101,6 @@
           "/var/lib/private/covenant"
           "/var/lib/covenant-publish"
         ];
-
-        nginx.reverseProxies.covenant = lib.mkIf config.covenant-extras.exposePublicly {
-          inherit (config.covenant-extras) domain;
-
-          enable = true;
-          location = "/";
-          upstream = "http://localhost:${toString config.services.covenant.port}/";
-          ssl = {
-            dnsProvider = "cloudflare";
-            environmentFile = config.sops.templates."cloudflare-acme-env".path;
-          };
-        };
       };
     };
 }

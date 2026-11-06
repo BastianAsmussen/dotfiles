@@ -18,7 +18,11 @@
   };
 
   flake.nixosModules.hostDelta =
-    { config, ... }:
+    {
+      config,
+      lib,
+      ...
+    }:
     {
       imports = [
         # External modules.
@@ -67,7 +71,7 @@
         self.nixosModules.kanata
         self.nixosModules.dns
         self.nixosModules.networkManager
-        self.nixosModules.nginx
+        self.nixosModules.caddy
         self.nixosModules.remoteBuilder
         self.nixosModules.syncthing
         self.nixosModules.topology
@@ -130,81 +134,40 @@
         ];
       };
 
-      nginx = {
-        openFirewall = false;
-        acme.sharedHost = "asmussen.tech";
-        reverseProxies = {
-          qbittorrent = {
-            enable = true;
-            domain = "qbittorrent.asmussen.tech";
-            location = "/";
-            upstream = "https://10.10.0.1";
-            proxySSL = {
-              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-              serverName = "qbittorrent.asmussen.tech";
-              verify = false;
-            };
-          };
+      # Serve browsers on loopback; upstream TLS uses the system trust store.
+      caddy.listenAddresses = [
+        "127.0.0.1"
+        "::1"
+      ];
 
-          shoko = {
-            enable = true;
-            domain = "shoko.asmussen.tech";
-            location = "/";
-            upstream = "https://10.10.0.1";
-            proxySSL = {
-              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-              serverName = "shoko.asmussen.tech";
-              verify = false;
-            };
-          };
+      services.caddy.virtualHosts =
+        let
+          mtlsNames = [
+            "qbittorrent"
+            "shoko"
+            "sonarr"
+            "radarr"
+            "prowlarr"
+          ];
 
-          sonarr = {
-            enable = true;
-            domain = "sonarr.asmussen.tech";
-            location = "/";
-            upstream = "https://10.10.0.1";
-            proxySSL = {
-              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-              serverName = "sonarr.asmussen.tech";
-              verify = false;
-            };
-          };
-
-          radarr = {
-            enable = true;
-            domain = "radarr.asmussen.tech";
-            location = "/";
-            upstream = "https://10.10.0.1";
-            proxySSL = {
-              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-              serverName = "radarr.asmussen.tech";
-              verify = false;
-            };
-          };
-
-          prowlarr = {
-            enable = true;
-            domain = "prowlarr.asmussen.tech";
-            location = "/";
-            upstream = "https://10.10.0.1";
-            proxySSL = {
-              clientCertificate = config.sops.secrets."mtls/delta-client-cert".path;
-              clientCertificateKey = config.sops.secrets."mtls/delta-client-key".path;
-              serverName = "prowlarr.asmussen.tech";
-              verify = false;
-            };
-          };
-        };
-      };
+          clientCert = config.sops.secrets."mtls/delta-client-cert".path;
+          clientKey = config.sops.secrets."mtls/delta-client-key".path;
+        in
+        lib.genAttrs (map (name: "${name}.asmussen.tech") mtlsNames) (name: {
+          extraConfig = ''
+            reverse_proxy https://10.10.0.2:8443 {
+              transport http {
+                tls_client_auth ${clientCert} ${clientKey}
+                tls_server_name ${name}
+              }
+            }
+          '';
+        });
 
       sops.secrets = {
         "wireguard/psk-eta-delta" = { };
-        "mtls/delta-client-cert".owner = "nginx";
-        "mtls/delta-client-key".owner = "nginx";
+        "mtls/delta-client-cert".owner = config.services.caddy.user;
+        "mtls/delta-client-key".owner = config.services.caddy.user;
       };
 
       # Route mTLS services through the local proxy instead of eta.

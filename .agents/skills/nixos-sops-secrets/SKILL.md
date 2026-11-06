@@ -141,8 +141,8 @@ sops.templates."cloudflare-acme-env" = {
 **mTLS client certificates**:
 
 ```nix
-sops.secrets."mtls/delta-client-cert" = { owner = "nginx"; };
-sops.secrets."mtls/delta-client-key" = { owner = "nginx"; };
+sops.secrets."mtls/delta-client-cert" = { owner = config.services.caddy.user; };
+sops.secrets."mtls/delta-client-key" = { owner = config.services.caddy.user; };
 ```
 
 **WireGuard pre-shared keys**:

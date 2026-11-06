@@ -9,252 +9,128 @@
     let
       inherit (lib)
         concatStringsSep
-        mapAttrsToList
         mkEnableOption
         mkIf
         mkOption
+        optionalString
         types
         ;
 
       cfg = config.primaryMirror;
 
-      stateDir = "/var/lib/primary-mirror";
-      busyFlag = "${stateDir}/busy";
-      streamStateFile = "${stateDir}/stream-upstream.conf";
-
-      upstream = "${cfg.primaryHost}:${toString cfg.primaryPort}";
-
-      sniEntriesUp = mapAttrsToList (sni: route: "${sni} ${route.primaryAddress};") cfg.sniRoutes;
-      sniEntriesDown = mapAttrsToList (
-        sni: route:
-        "${sni} ${if route.fallbackAddress != null then route.fallbackAddress else cfg.fallbackAddress};"
-      ) cfg.sniRoutes;
-
-      upStateFile = pkgs.writeText "stream-upstream-up.conf" (
-        concatStringsSep "\n" (sniEntriesUp ++ [ "default ${upstream};" ]) + "\n"
-      );
-
-      downStateFile = pkgs.writeText "stream-upstream-down.conf" (
-        concatStringsSep "\n" (sniEntriesDown ++ [ "default ${cfg.fallbackAddress};" ]) + "\n"
-      );
-
-      healthCheckScript = pkgs.writeShellScript "primary-mirror-health-check" ''
-        set -euo pipefail
-
-        if [ ! -f "${busyFlag}" ] && \
-           ${lib.getExe pkgs.curl} -sf --max-time 5 \
-             --resolve "${cfg.healthCheckHost}:${toString cfg.primaryPort}:${cfg.primaryHost}" \
-             "https://${cfg.healthCheckHost}${cfg.healthCheckPath}" > /dev/null 2>&1; then
-          target_conf="${upStateFile}"
-        else
-          target_conf="${downStateFile}"
-        fi
-
-        if ! cmp -s "$target_conf" "${streamStateFile}"; then
-          cat "$target_conf" > "${streamStateFile}"
-          ${lib.getExe' pkgs.systemd "systemctl"} reload nginx 2>/dev/null || true
-        fi
-      '';
-
-      ctlScript = pkgs.writeShellScriptBin "primary-mirror-ctl" ''
-        set -euo pipefail
-
-        case "''${1:-}" in
-          busy)
-            touch "${busyFlag}" || {
-              echo "error: permission denied, run with sudo or as ${cfg.busyUser}" >&2
-              exit 1
-            }
-            echo "Primary marked as busy"
-            ;;
-
-          available)
-            rm -f "${busyFlag}" || {
-              echo "error: permission denied, run with sudo or as ${cfg.busyUser}" >&2
-              exit 1
-            }
-            echo "Primary marked as available"
-            ;;
-
-          status)
-            if [ -f "${busyFlag}" ]; then
-              echo "BUSY"
-            else
-              echo "AVAILABLE"
-            fi
-            ;;
-
-          *)
-            echo "Usage: primary-mirror-ctl {busy|available|status}" >&2
-            exit 1
-            ;;
-        esac
-      '';
-
-      busyRemoteScript = pkgs.writeShellScript "primary-mirror-remote" ''
-        set -euo pipefail
-
-        case "''${SSH_ORIGINAL_COMMAND:-}" in
-          busy|available|status)
-            exec ${ctlScript}/bin/primary-mirror-ctl "$SSH_ORIGINAL_COMMAND"
-            ;;
-
-          *)
-            echo "error: unsupported primary-mirror command" >&2
-            exit 1
-            ;;
-        esac
-      '';
+      fallbackAddress = "127.0.0.1:${toString config.caddy.defaultPort}";
     in
     {
       options.primaryMirror = {
         enable = mkEnableOption ''
-          Stream-level TLS passthrough mirror. Forwards all HTTPS traffic to the
-          primary host when available, falling back to a local nginx on the
-          configured fallback port otherwise.
+          SNI passthrough to the primary host, failing over to this host's own
+          Caddy on the loopback fallback listener while the primary is down or
+          busy
         '';
 
         primaryHost = mkOption {
           type = types.str;
           default = "10.10.0.2";
-          description = "WireGuard IP of the primary host.";
+          description = "WireGuard address of the primary host.";
         };
 
         primaryPort = mkOption {
           type = types.port;
           default = 443;
-          description = "HTTPS port on the primary host.";
+          description = "Primary listener that accepts PROXY headers from this host.";
         };
 
-        fallbackAddress = mkOption {
+        mtlsPort = mkOption {
+          type = types.port;
+          default = 8443;
+          description = "Primary listener that requires client certificates and takes no PROXY header.";
+        };
+
+        availabilityPort = mkOption {
+          type = types.port;
+          default = 9444;
+          description = "Port the health check dials; the primary closes it while busy.";
+        };
+
+        healthInterval = mkOption {
           type = types.str;
-          description = "Address (host:port) to use in the state file when the primary is unavailable or busy.";
+          default = "10s";
+          description = "How often to dial the availability port.";
         };
 
-        healthCheckHost = mkOption {
-          type = types.str;
-          description = "Hostname used for SNI/cert verification in the health check.";
-        };
-
-        healthCheckPath = mkOption {
-          type = types.str;
-          default = "/";
-          description = "Path to request during the health check.";
-        };
-
-        checkInterval = mkOption {
-          type = types.ints.positive;
-          default = 30;
-          description = "How often, in seconds, to check primary host availability.";
-        };
-
-        busyUser = mkOption {
-          type = types.str;
-          default = "primary-busy";
-          description = "SSH user allowed to update primary mirror busy state.";
-        };
-
-        busyGroup = mkOption {
-          type = types.str;
-          default = "primary-busy";
-          description = "Group allowed to update primary mirror busy state.";
-        };
-
-        busyAuthorizedKeys = mkOption {
+        mtlsNames = mkOption {
           type = types.listOf types.str;
           default = [ ];
-          description = "SSH public keys allowed to update primary mirror busy state.";
+          description = "SNI names passed through to the client-certificate listener, with no failover.";
         };
 
-        sniRoutes = mkOption {
-          type = types.attrsOf (
-            types.submodule {
-              options = {
-                primaryAddress = mkOption {
-                  type = types.str;
-                  description = "Upstream (host:port) written into the state file when the primary is up.";
-                };
-
-                fallbackAddress = mkOption {
-                  type = types.nullOr types.str;
-                  default = null;
-                  description = "Upstream (host:port) when the primary is down. Defaults to primaryMirror.fallbackAddress.";
-                };
-              };
-            }
-          );
-
-          default = { };
-
-          description = ''
-            Per-SNI routes whose upstreams the health check controls. Each entry
-            is written into the stream state file pointing to primaryAddress when
-            the primary is available, and fallbackAddress (or
-            primaryMirror.fallbackAddress) when it is not.
-          '';
+        passthroughNames = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "SNI names passed through to the primary with a PROXY header, failing over locally.";
         };
       };
 
       config = mkIf cfg.enable {
-        users = {
-          groups.${cfg.busyGroup} = { };
+        caddy.servers = {
+          # Routes run in order; anything unmatched is terminated by this host.
+          ":443" = ''
+            listener_wrappers {
+              layer4 {
+                ${optionalString (cfg.mtlsNames != [ ]) ''
+                  @mtls tls sni ${concatStringsSep " " cfg.mtlsNames}
+                  route @mtls {
+                    proxy ${cfg.primaryHost}:${toString cfg.mtlsPort}
+                  }
+                ''}
 
-          users.${cfg.busyUser} = {
-            description = "Primary mirror busy-state controller";
-            isSystemUser = true;
-            createHome = false;
-            group = cfg.busyGroup;
-            useDefaultShell = true;
-            hashedPassword = "*";
+                @primary tls sni ${concatStringsSep " " cfg.passthroughNames}
+                route @primary {
+                  proxy {
+                    proxy_protocol v2
+                    lb_policy first
+                    health_port ${toString cfg.availabilityPort}
+                    health_interval ${cfg.healthInterval}
+                    health_timeout 3s
+                    fail_duration 30s
+                    upstream ${cfg.primaryHost}:${toString cfg.primaryPort}
+                    upstream ${fallbackAddress}
+                  }
+                }
+              }
 
-            openssh.authorizedKeys.keys = map (
-              key: ''restrict,from="${cfg.primaryHost}",command="${busyRemoteScript}" ${key}''
-            ) cfg.busyAuthorizedKeys;
-          };
+              tls
+            }
+          '';
+
+          ${fallbackAddress} = ''
+            listener_wrappers {
+              proxy_protocol {
+                allow 127.0.0.1/32
+              }
+
+              tls
+            }
+          '';
         };
 
-        # Persist the busy state used to select SNI routing after reboot.
-        persistence.directories = [
-          {
-            directory = stateDir;
-            user = "root";
-            group = cfg.busyGroup;
-            mode = "2775";
-          }
-        ];
-
+        # The health check covers every upstream, the local fallback included.
         systemd = {
-          tmpfiles.rules = [
-            "d ${stateDir}        2775 root ${cfg.busyGroup} -"
-            "C ${streamStateFile} 0644 root root             - ${downStateFile}"
-          ];
-
-          services.primary-mirror-health = {
-            description = "Check primary host availability for stream passthrough";
-            after = [
-              "network-online.target"
-              "wireguard-wg0.service"
-            ];
-            wants = [ "network-online.target" ];
-
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = healthCheckScript;
-            };
+          sockets.primary-mirror-fallback = {
+            description = "Always-open availability probe for the local fallback";
+            wantedBy = [ "sockets.target" ];
+            listenStreams = [ "127.0.0.1:${toString cfg.availabilityPort}" ];
+            socketConfig.Accept = true;
           };
 
-          timers.primary-mirror-health = {
-            description = "Periodic primary host availability check";
-            wantedBy = [ "timers.target" ];
-
-            timerConfig = {
-              OnBootSec = "15s";
-              OnUnitActiveSec = "${toString cfg.checkInterval}s";
+          services."primary-mirror-fallback@" = {
+            description = "Close a local fallback availability probe";
+            serviceConfig = {
+              ExecStart = lib.getExe' pkgs.coreutils "true";
+              StandardInput = "socket";
             };
           };
         };
-
-        environment.systemPackages = [ ctlScript ];
       };
     };
 }

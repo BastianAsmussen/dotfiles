@@ -34,12 +34,6 @@
               ];
 
               trusted-users = [ "root" ];
-              substituters = lib.mkBefore [ "https://cache.asmussen.tech/" ];
-              trusted-substituters = [ "https://cache.asmussen.tech/" ];
-              trusted-public-keys = lib.mkBefore [
-                inputs.nix-secrets.hosts.epsilon.cache-public-key
-                inputs.nix-secrets.hosts.eta.cache-public-key
-              ];
 
               http-connections = 32;
               connect-timeout = 5;

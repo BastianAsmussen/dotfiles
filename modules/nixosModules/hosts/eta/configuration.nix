@@ -61,8 +61,7 @@
         self.nixosModules.dns
         self.nixosModules.homeManager
         self.nixosModules.networkManager
-        self.nixosModules.nginx
-        self.nixosModules.nix-serve
+        self.nixosModules.caddy
         self.nixosModules.primaryMirror
         self.nixosModules.topology
         self.nixosModules.website
@@ -210,37 +209,29 @@
         dkRedirects.enable = true;
       };
 
-      nginx.streamProxy = {
-        enable = true;
-        stateFile = "/var/lib/primary-mirror/stream-upstream.conf";
-
-        # Terminate Covenant locally; it has no epsilon failover.
-        sniRoutes = {
-          "covenantofearth.org" = "127.0.0.1:8443";
-          "www.covenantofearth.org" = "127.0.0.1:8443";
-        };
-
-        # Local vhosts get the client address; epsilon's 443 does not speak PROXY.
-        proxyProtocol = {
-          enable = true;
-          strip = lib.unique (
-            [ "${config.primaryMirror.primaryHost}:${toString config.primaryMirror.primaryPort}" ]
-            ++ lib.mapAttrsToList (_: route: route.primaryAddress) config.primaryMirror.sniRoutes
-          );
-        };
+      # Bind fallback sites to loopback; Covenant terminates locally on :443.
+      caddy = {
+        extended = true;
+        openFirewall = true;
+        listenAddresses = [ "127.0.0.1" ];
+        defaultPort = 8443;
       };
 
       primaryMirror = {
         enable = true;
-        fallbackAddress = "127.0.0.1:8443";
-        healthCheckHost = "cache.asmussen.tech";
-        healthCheckPath = "/nix-cache-info";
-        sniRoutes = {
-          "jellyfin.asmussen.tech".primaryAddress = "10.10.0.2:443";
-          "requests.asmussen.tech".primaryAddress = "10.10.0.2:443";
-        };
+        mtlsNames = map (name: "${name}.asmussen.tech") [
+          "shoko"
+          "qbittorrent"
+          "radarr"
+          "sonarr"
+          "prowlarr"
+        ];
 
-        busyAuthorizedKeys = [ inputs.nix-secrets.hosts.epsilon.primary-busy-ssh-public-key ];
+        passthroughNames = [
+          "asmussen.tech"
+          "*.asmussen.tech"
+        ]
+        ++ config.acmeShared.dkRedirects.domains;
       };
 
       # Serve epsilon's pushed feed while epsilon is offline.
@@ -259,17 +250,6 @@
         "covenant/deploy-key" = { };
       };
 
-      nix-serve-extras.exposePublicly = false;
-      website-extras.exposePublicly = false;
-
-      # Issue a separate Cloudflare DNS-01 certificate with www as a SAN.
-      security.acme.certs."covenantofearth.org" = {
-        extraDomainNames = [ "www.covenantofearth.org" ];
-        dnsProvider = "cloudflare";
-        environmentFile = config.sops.templates."cloudflare-acme-env".path;
-        inherit (config.services.nginx) group;
-      };
-
       services = {
         openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
         chrony = {
@@ -281,107 +261,60 @@
           ];
         };
 
-        nginx = {
-          appendHttpConfig = ''
-            # Add HSTS header with preloading to HTTPS requests.
-            map $scheme $hsts_header {
-                https   "max-age=63072000; includeSubDomains; preload";
-            }
-
-            add_header Strict-Transport-Security $hsts_header always;
-
-            # Client address from the stream hop's PROXY header.
-            set_real_ip_from 127.0.0.1;
-            real_ip_header proxy_protocol;
-          '';
-
-          virtualHosts =
-            let
-              acmeDir = "/var/lib/acme/asmussen.tech";
-              fallbackListen = {
-                addr = "127.0.0.1";
-                port = 8443;
-                ssl = true;
-                proxyProtocol = true;
-              };
-
-              sslConfig = ''
-                ssl_certificate ${acmeDir}/fullchain.pem;
-                ssl_certificate_key ${acmeDir}/key.pem;
+        caddy.virtualHosts =
+          let
+            covenant = config.covenant-extras.domain;
+          in
+          {
+            # Covenant traffic falls through the layer4 routes and terminates here.
+            "${covenant}:443" = {
+              listenAddresses = [ ];
+              extraConfig = ''
+                import hsts
+                reverse_proxy localhost:${toString config.services.covenant.port}
               '';
-
-              covenantSsl =
-                let
-                  dir = "/var/lib/acme/${config.covenant-extras.domain}";
-                in
-                ''
-                  ssl_certificate ${dir}/fullchain.pem;
-                  ssl_certificate_key ${dir}/key.pem;
-                '';
-            in
-            {
-              "_" = {
-                listen = [
-                  (
-                    fallbackListen
-                    // {
-                      extraParameters = [ "default_server" ];
-                    }
-                  )
-                ];
-
-                extraConfig = sslConfig;
-                locations."/".return = "421";
-              };
-
-              "asmussen.tech" = {
-                listen = [ fallbackListen ];
-                extraConfig = sslConfig;
-                locations = {
-                  "/" = {
-                    proxyPass = "http://localhost:${toString config.services.website.port}";
-                    proxyWebsockets = true;
-                  };
-
-                  # Match epsilon's legacy Covenant redirect.
-                  "/covenant".return = "301 https://${config.covenant-extras.domain}/";
-                };
-              };
-
-              ${config.covenant-extras.domain} = {
-                listen = [ fallbackListen ];
-                extraConfig = covenantSsl;
-                locations."/" = {
-                  proxyPass = "http://localhost:${toString config.services.covenant.port}";
-                  extraConfig = "proxy_set_header X-Forwarded-For $remote_addr;";
-                };
-              };
-
-              "www.${config.covenant-extras.domain}" = {
-                listen = [ fallbackListen ];
-                extraConfig = covenantSsl;
-                locations."/".return = "301 https://${config.covenant-extras.domain}$request_uri";
-              };
-
-              "jellyfin.asmussen.tech" = {
-                listen = [ fallbackListen ];
-                extraConfig = sslConfig;
-                locations."/".return = "503";
-              };
-
-              "requests.asmussen.tech" = {
-                listen = [ fallbackListen ];
-                extraConfig = sslConfig;
-                locations."/".return = "503";
-              };
-
-              "cache.asmussen.tech" = {
-                listen = [ fallbackListen ];
-                extraConfig = sslConfig;
-                locations."/".proxyPass = "http://localhost:${toString config.services.nix-serve.port}";
-              };
             };
-        };
+
+            "www.${covenant}:443" = {
+              listenAddresses = [ ];
+              extraConfig = ''
+                import hsts
+                redir https://${covenant}{uri} permanent
+              '';
+            };
+
+            "http://" = {
+              listenAddresses = [ ];
+              extraConfig = "redir https://{host}{uri} permanent";
+            };
+
+            # Serve this fallback while epsilon is down or busy.
+            "asmussen.tech".extraConfig = ''
+              import hsts
+              redir /covenant* https://${covenant}/ permanent
+            '';
+
+            "www.asmussen.tech".extraConfig = ''
+              import hsts
+              redir https://asmussen.tech{uri} permanent
+            '';
+
+            "jellyfin.asmussen.tech".extraConfig = ''
+              import hsts
+              respond 503
+            '';
+
+            "requests.asmussen.tech".extraConfig = ''
+              import hsts
+              respond 503
+            '';
+
+            # Everything else epsilon serves has no stand-in here.
+            "*.asmussen.tech".extraConfig = ''
+              import hsts
+              respond 421
+            '';
+          };
       };
 
       users.users.root.openssh.authorizedKeys.keyFiles = lib.custom.keys.selectSshPaths [
