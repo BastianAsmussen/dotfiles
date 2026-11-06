@@ -342,6 +342,14 @@ just secureboot-verify
 > just rebuild kappa --show-trace
 > ```
 
+> [!TIP]
+> `just deploy` passes extra flags to deploy-rs. Preview with `--dry-activate`,
+> or reach eta on its public IPv4 with `--hostname` when WireGuard is down:
+>
+> ```sh
+> just deploy eta --dry-activate
+> ```
+
 ### Recipe Reference
 
 | Recipe | Purpose |
@@ -350,7 +358,7 @@ just secureboot-verify
 | `just upgrade` | Update flake.lock + rebuild |
 | `just update [input]` | Update flake.lock without rebuilding |
 | `just build <host>` | Build a host without switching |
-| `just deploy <host> <target>` | Remote deploy via SSH with password auth |
+| `just deploy [node] [args]` | Push a node (eta) with deploy-rs and magic rollback |
 | `just clean` | Remove old generations (keeps 3, plus 7 days) |
 | `just rollback` | Restore flake.lock and rebuild |
 | `just check` | Full flake check (statix, deadnix, eval tests, VM tests) |

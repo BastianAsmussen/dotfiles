@@ -19,7 +19,8 @@ WireGuard mesh in a star, eta is the hub.
 - epsilon: *arr stack, Jellyfin, Monero node, qBittorrent bound to PIA,
   arctic vault backups, news sync to eta, primary-busy health check.
 - eta: caddy layer4 SNI passthrough to epsilon (health checks fail over to a
-  local fallback), website. Never builds; deploys are pushed.
+  local fallback), website. Never builds; deploys are pushed with deploy-rs
+  (`modules/deploy.nix`).
 - delta: niri desktop, WireGuard client, kanata, `max-jobs=0` so builds go to
   the build host.
 

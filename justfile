@@ -55,15 +55,10 @@ upgrade *args:
 build host=HOST *args:
     nh os build . --hostname {{ HOST }} {{ args }}
 
-# Deploy a configuration to a target.
+# Deploy a node with deploy-rs.
 [group("building")]
-deploy host=HOST target=host: pre-commit
-    nixos-rebuild switch \
-        --no-reexec \
-        --target-host {{ target }} \
-        --sudo \
-        --ask-sudo-password \
-        --flake .#{{ host }}
+deploy node="eta" *args: pre-commit
+    nix run --inputs-from . deploy-rs -- --skip-checks .#{{ node }} {{ args }}
 
 # Roll back a bad upgrade by restoring flake.lock and rebuilding.
 [group("update")]
