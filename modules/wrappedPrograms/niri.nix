@@ -226,7 +226,10 @@
               }
               {
                 # Enable VRR for games.
-                matches = [ { app-id = "^steam_app_"; } ];
+                matches = [
+                  { app-id = "^steam_app_"; }
+                  { app-id = "^overwatch\\.exe$"; }
+                ];
                 variable-refresh-rate = true;
               }
               {
