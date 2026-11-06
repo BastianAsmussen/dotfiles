@@ -353,6 +353,7 @@
             # Redirect legacy Jellyfin and Covenant bookmarks.
             "asmussen.tech".extraConfig = ''
               import hsts
+              ${rateLimit "news" "(?i)^/news$"}
               redir /jellyfin* https://jellyfin.asmussen.tech/ permanent
               redir /covenant* https://covenantofearth.org/ permanent
             '';
