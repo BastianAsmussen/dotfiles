@@ -345,15 +345,21 @@
           in
           mtlsVhosts
           // {
-            "www.asmussen.tech".extraConfig = "redir https://asmussen.tech{uri} permanent";
+            "www.asmussen.tech".extraConfig = ''
+              import hsts
+              redir https://asmussen.tech{uri} permanent
+            '';
 
             # Redirect legacy Jellyfin and Covenant bookmarks.
             "asmussen.tech".extraConfig = ''
+              import hsts
               redir /jellyfin* https://jellyfin.asmussen.tech/ permanent
               redir /covenant* https://covenantofearth.org/ permanent
             '';
 
             "jellyfin.asmussen.tech".extraConfig = ''
+              import hsts
+
               # Pre-auth endpoints no remote client needs.
               @blocked path_regexp (?i)^/(Users/ForgotPassword|QuickConnect|Startup|ClientLog)
               respond @blocked 403
@@ -379,6 +385,7 @@
             '';
 
             "requests.asmussen.tech".extraConfig = ''
+              import hsts
               ${rateLimit "seerr_auth" "(?i)^/api/v1/auth/(local|jellyfin)"}
               reverse_proxy localhost:${toString config.services.seerr.port}
             '';
