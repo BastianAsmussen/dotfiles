@@ -16,3 +16,4 @@ x 2026-09-10 2026-08-04 Split +nix-topology custom diagram declaration between m
 x 2026-09-10 2026-08-18 Fix +gamemode hook for +news to not start after game close on @epsilon
 x 2026-09-10 2026-08-27 Fix +arr torrent fetching.
 (A) 2026-11-07 Add deploy.rs to @eta server.
+(C) 2026-11-07 Add missing services to +nix-topology diagram.
