@@ -1,12 +1,15 @@
 { lib, ... }:
 let
+  inherit (builtins) match elemAt;
+  inherit (lib) hasPrefix;
+
   lock = lib.importJSON ../../flake.lock;
   root = ../..;
 
   # Root flake inputs fetched over ssh, i.e. private repos.
   privateInputs = builtins.attrNames (
     lib.filterAttrs (
-      _: node: builtins.isString node && lib.hasPrefix "ssh://" (lock.nodes.${node}.original.url or "")
+      _: node: builtins.isString node && hasPrefix "ssh://" (lock.nodes.${node}.original.url or "")
     ) lock.nodes.root.inputs
   );
 
@@ -15,11 +18,11 @@ let
 
   allowed =
     before: next: after:
-    (lib.hasPrefix "." next && next != ".outPath")
+    (hasPrefix "." next && next != ".outPath")
     || (
       next == ")"
-      && builtins.match ".*inherit[[:space:]]*\\([[:space:]]*" before != null
-      && builtins.match "[[:space:]]*[A-Za-z_\"].*" after != null
+      && match ".*inherit[[:space:]]*\\([[:space:]]*" before != null
+      && match "[[:space:]]*[A-Za-z_\"].*" after != null
     );
 
   lineHit =
@@ -30,10 +33,9 @@ let
     lib.any (
       i:
       let
-        part = builtins.elemAt parts i;
+        part = elemAt parts i;
       in
-      builtins.isList part
-      && !allowed (builtins.elemAt parts (i - 1)) (builtins.elemAt part 1) (builtins.elemAt parts (i + 1))
+      builtins.isList part && !allowed (elemAt parts (i - 1)) (elemAt part 1) (elemAt parts (i + 1))
     ) (lib.range 0 (builtins.length parts - 1));
 
   fileHits =
