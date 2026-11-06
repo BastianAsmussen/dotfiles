@@ -139,6 +139,7 @@
         files = [ ".claude.json" ];
         directoriesWithMode = {
           ".caveman" = "0700";
+          ".caveman-cloud" = "0700";
           ".claude" = "0700";
         };
       };
