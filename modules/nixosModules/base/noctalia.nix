@@ -1,6 +1,6 @@
 {
   flake.nixosModules.base =
-    { lib, ... }:
+    { config, lib, ... }:
     let
       inherit (lib) mkOption types;
     in
@@ -22,6 +22,13 @@
           type = types.bool;
           default = true;
           description = "Whether to show power profile controls in the bar and control center.";
+        };
+
+        screenshotDirectory = mkOption {
+          type = types.str;
+          default = "~/Pictures/Screenshots/${config.networking.hostName}";
+          defaultText = lib.literalExpression ''"~/Pictures/Screenshots/''${config.networking.hostName}"'';
+          description = "Folder screenshots are saved to, kept per host so synced Pictures folders never collide.";
         };
       };
     };

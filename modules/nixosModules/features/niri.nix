@@ -9,6 +9,7 @@
       pkgs,
       lib,
       config,
+      options,
       ...
     }:
     let
@@ -18,10 +19,6 @@
           lib.getExe entry
         else
           "${pkgs.writeShellScript "autostart-${toString i}" entry}";
-
-      noctaliaPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia.wrap {
-        inherit (config.preferences.noctalia) useIpLocation idleEnabled powerProfileEnabled;
-      };
 
       autostartEntries = lib.imap0 toStartupEntry config.preferences.autostart;
       monitorsToOutputs = lib.mapAttrs (
@@ -50,75 +47,97 @@
       ) (lib.filterAttrs (_: m: m.enabled) config.preferences.monitors);
     in
     {
-      config = {
-        preferences.autostart = [ noctaliaPackage ];
+      config = lib.mkMerge [
+        {
+          preferences.autostart = [ config.programs.noctalia.package ];
 
-        programs.niri = {
-          enable = true;
-          package = inputs.wrapper-modules.wrappers.niri.wrap {
-            inherit pkgs;
+          programs = {
+            niri = {
+              enable = true;
+              package = inputs.wrapper-modules.wrappers.niri.wrap {
+                inherit pkgs;
 
-            imports = [
-              self.wrapperModules.niri
-              {
-                settings = {
-                  spawn-at-startup = autostartEntries;
-                  outputs = monitorsToOutputs;
-                };
-              }
-            ];
+                imports = [
+                  self.wrapperModules.niri
+                  {
+                    settings = {
+                      spawn-at-startup = autostartEntries;
+                      outputs = monitorsToOutputs;
+                    };
+                  }
+                ];
+              };
+            };
+
+            noctalia = {
+              enable = true;
+              package = self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia.wrap {
+                inherit (config.preferences.noctalia)
+                  useIpLocation
+                  idleEnabled
+                  powerProfileEnabled
+                  screenshotDirectory
+                  ;
+              };
+            };
           };
-        };
 
-        systemd.user.services.noctalia-bar-watcher = {
-          wantedBy = [ "graphical-session.target" ];
-          partOf = [ "graphical-session.target" ];
-          after = [ "graphical-session.target" ];
-          path = [
-            config.programs.niri.package
-            noctaliaPackage
+          systemd.user.services.noctalia-bar-watcher = {
+            wantedBy = [ "graphical-session.target" ];
+            partOf = [ "graphical-session.target" ];
+            after = [ "graphical-session.target" ];
+            path = [
+              config.programs.niri.package
+              config.programs.noctalia.package
+            ];
+
+            serviceConfig = {
+              ExecStart = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-bar-watcher;
+              Restart = "on-failure";
+              RestartSec = 2;
+            };
+          };
+
+          environment.systemPackages = with pkgs; [
+            xwayland-satellite
+            awww
+            wl-clipboard
+            alsa-utils
           ];
 
-          serviceConfig = {
-            ExecStart = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia-bar-watcher;
-            Restart = "on-failure";
-            RestartSec = 2;
+          security.polkit.enable = true;
+          services = {
+            displayManager.defaultSession = lib.mkDefault "niri";
+            power-profiles-daemon.enable = true;
+            upower.enable = true;
           };
-        };
 
-        environment.systemPackages = [
-          noctaliaPackage
-          pkgs.xwayland-satellite
-          pkgs.awww
-          pkgs.grim
-          pkgs.slurp
-          pkgs.swappy
-          pkgs.wl-clipboard
-          pkgs.alsa-utils
-        ];
+          hardware.bluetooth = {
+            enable = lib.mkDefault true;
+            powerOnBoot = lib.mkDefault true;
+          };
 
-        security.polkit.enable = true;
-        services = {
-          displayManager.defaultSession = lib.mkDefault "niri";
-          power-profiles-daemon.enable = true;
-          upower.enable = true;
-        };
+          xdg.portal = {
+            enable = true;
+            extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+          };
 
-        hardware.bluetooth = {
-          enable = lib.mkDefault true;
-          powerOnBoot = lib.mkDefault true;
-        };
+          fonts.packages = with pkgs; [
+            nerd-fonts.jetbrains-mono
+          ];
 
-        xdg.portal = {
-          enable = true;
-          extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-        };
+          fonts.fontconfig.defaultFonts.monospace = [ "JetBrainsMono Nerd Font" ];
+        }
 
-        fonts.packages = with pkgs; [
-          nerd-fonts.jetbrains-mono
-        ];
+        # Noctalia replaces files by rename, so persist the whole directory.
+        (lib.optionalAttrs (options ? persistence) {
+          persistence.user.directoriesWithMode.".local/state/noctalia" = "0700";
 
-        fonts.fontconfig.defaultFonts.monospace = [ "JetBrainsMono Nerd Font" ];
-      };
+          # Remove GUI overrides so the generated config stays authoritative.
+          systemd.tmpfiles.rules = lib.mkIf config.persistence.enable [
+            "r ${config.users.users.${config.preferences.user.name}.home}/.local/state/noctalia/settings.toml"
+          ];
+        })
+      ];
     };
 }

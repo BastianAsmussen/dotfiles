@@ -63,6 +63,12 @@
           default = true;
           description = "Whether to show power profile controls in the bar and control center.";
         };
+
+        screenshotDirectory = mkOption {
+          type = types.str;
+          default = "";
+          description = "Folder screenshots are saved to; empty uses the XDG Pictures directory.";
+        };
       };
 
       config = {
@@ -157,6 +163,13 @@
             avatar_path = "${../../../assets/icons/bastian.png}";
             clipboard_enabled = false;
             telemetry_enabled = false;
+            setup_wizard_enabled = false;
+            greeter_sync.auto_sync = true;
+            screenshot = {
+              directory = config.screenshotDirectory;
+              filename_pattern = "screenshot-%Y%m%d-%H%M%S";
+            };
+
             shadow.direction = "down_right";
             privacy.mic_filter_regex = "^GoXLR Utility$";
             panel_anchor_bar = "main";
