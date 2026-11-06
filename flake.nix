@@ -132,6 +132,11 @@
       url = "github:BastianAsmussen/UnofficialEGGMouseConfig";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    deepseek-harness = {
+      url = "github:deepseek-ai/deepseek-harness";
+      flake = false;
+    };
   };
 
   # Import every Nix file under `./modules` as a flake-parts module.

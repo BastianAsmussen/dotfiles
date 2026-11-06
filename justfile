@@ -38,6 +38,12 @@ clean:
 update *input:
     nix flake update {{ input }}
 
+# Bump DeepSeek Harness to upstream master and print the pnpm deps hash it needs.
+[group("update")]
+dsh-bump:
+    nix flake update deepseek-harness
+    nix build .#dsh.pnpmDeps --no-link 2>&1 | grep -o 'got: *sha256-[^ ]*' || echo "pnpm deps hash unchanged"
+
 # Rebuild and switch, updating all flake inputs first.
 [group("update")]
 upgrade *args:
