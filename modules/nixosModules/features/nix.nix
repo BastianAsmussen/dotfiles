@@ -35,6 +35,12 @@
 
               trusted-users = [ "root" ];
 
+              # Epsilon builds every host's closure; the others accept only
+              # paths its key has signed.
+              trusted-public-keys = lib.mkBefore [
+                inputs.nix-secrets.hosts.epsilon.cache-public-key
+              ];
+
               http-connections = 32;
               connect-timeout = 5;
               stalled-download-timeout = 30;
