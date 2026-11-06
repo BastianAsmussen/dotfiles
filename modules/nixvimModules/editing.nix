@@ -4,18 +4,6 @@
     { pkgs, ... }:
     {
       plugins = {
-        claude-code = {
-          enable = true;
-          settings.keymaps.toggle = {
-            normal = "<leader>cc";
-            terminal = "<leader>cc";
-            variants = {
-              continue = "<leader>cC";
-              resume = "<leader>cR";
-              verbose = "<leader>cV";
-            };
-          };
-        };
         comment = {
           enable = true;
           settings.pre_hook =

@@ -72,16 +72,27 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    tuxedo-nvim = {
+      url = "github:IogaMaster/tuxedo.nvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    micro-harness-nvim = {
+      url = "github:BastianAsmussen/micro-harness.nvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    schizofox.url = "github:schizofox/schizofox";
     kimi-code = {
       url = "github:MoonshotAI/kimi-code/@moonshot-ai/kimi-code@2.5.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    schizofox.url = "github:schizofox/schizofox";
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -92,7 +103,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    eh.url = "github:NotAShelf/eh";
     pre-commit-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";

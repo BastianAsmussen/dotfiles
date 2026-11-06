@@ -1,6 +1,6 @@
 {
   # Every non-plugin-local keybinding.
-  flake.nixvimModules.keymaps = _: {
+  flake.nixvimModules.keymaps = {
     keymaps =
       let
         mapKey = mode: key: action: {
@@ -209,6 +209,13 @@
         # Preview markdown files.
         (mapKeyWithOpts "n" "<leader>mp" "<cmd>MarkdownPreviewToggle<CR>" {
           desc = "[M]arkdown [P]review";
+        })
+
+        (mapKeyWithOpts "n" "<leader>ma" "<cmd>MicroHarness<CR>" {
+          desc = "[M]icro-harness: [A]sk";
+        })
+        (mapKeyWithOpts "n" "<leader>mo" "<cmd>MicroHarnessOpen<CR>" {
+          desc = "[M]icro-harness: [O]pen report";
         })
 
         # Toggle Tuxedo TUI.

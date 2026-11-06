@@ -1,5 +1,4 @@
 {
-  # Statusline, gutter, indent guides, and other chrome.
   flake.nixvimModules.ui =
     { config, ... }:
     {
@@ -79,6 +78,9 @@
               ];
 
               lualine_x = [
+                {
+                  __unkeyed-1.__raw = "require('micro-harness').status";
+                }
                 {
                   __unkeyed-1 = "filetype";
                   icon_only = true;

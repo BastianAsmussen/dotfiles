@@ -24,6 +24,7 @@
       self.nixvimModules.ui
       self.nixvimModules.editing
       self.nixvimModules.extra-plugins
+      self.nixvimModules.micro-harness
     ];
   };
 
