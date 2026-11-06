@@ -17,6 +17,8 @@
           lib.mkAfter
             # sh
             ''
+              [ -r /etc/bashrc ] && source /etc/bashrc
+
               if ! type -t bind >/dev/null; then
                 unset PROMPT_COMMAND
                 PS1='\n\033[1;32m[\u@\h:\w]\$\033[0m '

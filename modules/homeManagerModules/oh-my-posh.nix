@@ -38,7 +38,7 @@
                 style = "plain";
                 foreground = "p:grey";
                 background = "transparent";
-                template = " {{ if .ClosestBookmarks }}{{ .ClosestBookmarks }}{{ else }}@{{ .ChangeID }}{{ end }}{{ if .Working.Changed }}*{{ end }}";
+                template = " {{ if .ClosestBookmarks }}{{ first (splitList \" \" .ClosestBookmarks) }}{{ else }}@{{ .ChangeID }}{{ end }}{{ if .Working.Changed }}*{{ end }}";
                 properties.fetch_status = true;
               }
               {
