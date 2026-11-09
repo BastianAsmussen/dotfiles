@@ -1950,10 +1950,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1794229724,
-        "narHash": "sha256-Q0jIs+1ll7Us70p20n++DaEckUDBVakfkG9ARKWXu0c=",
+        "lastModified": 1794232566,
+        "narHash": "sha256-2Jvix40v4REnkCh9uHIgk6gf+QqFqx8e2haAHrJ0FSg=",
         "ref": "refs/heads/master",
-        "rev": "079e516c49803481489a64d7e28e6f6e4bd02b76",
+        "rev": "cca46465153e282e90b564bebfab072cfa46925d",
         "revCount": 123,
         "type": "git",
         "url": "ssh://git@codeberg.org/BastianA/website.git"
