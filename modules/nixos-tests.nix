@@ -204,7 +204,10 @@ in
             ]
             (
               cfg:
-              builtins.length cfg.services.jellyfin.package.patches == 3
+              builtins.length cfg.services.jellyfin.package.patches == 4
+              && lib.any (
+                p: lib.hasInfix "unauthenticated-stream-endpoints" (toString p)
+              ) cfg.services.jellyfin.package.patches
               && cfg.systemd.services.jellyfin.serviceConfig.MemoryMax == "4G"
               && lib.hasInfix "169.254.0.0/16" cfg.networking.nftables.tables."jellyfin-egress".content
             );
@@ -259,6 +262,12 @@ in
             machine.wait_for_open_port(8096)
             machine.wait_until_succeeds("journalctl --since -1m --unit jellyfin --grep 'Startup complete'")
             machine.succeed("curl --fail --silent --max-time 10 http://localhost:8096/System/Info/Public | grep -q 'Jellyfin Server'")
+
+            # Item IDs are predictable, so progressive stream endpoints must
+            # reject anonymous requests even for well-formed IDs.
+            machine.succeed("test \"$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost:8096/Videos/4774f6f7e4ceff509cc82a6c50bb1b98/stream?static=true')\" = 401")
+            machine.succeed("test \"$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost:8096/Audio/4774f6f7e4ceff509cc82a6c50bb1b98/stream?static=true')\" = 401")
+            machine.succeed("test \"$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost:8096/Videos/4774f6f7e4ceff509cc82a6c50bb1b98/4774f6f7e4ceff509cc82a6c50bb1b98/Subtitles/0/Stream.vtt')\" = 401")
           '';
         };
 

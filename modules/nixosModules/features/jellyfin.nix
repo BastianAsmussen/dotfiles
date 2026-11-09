@@ -110,6 +110,11 @@
                     ./jellyfin/CVE-2026-119549.patch
                     ./jellyfin/CVE-2026-119550.patch
                     ./jellyfin/CVE-2026-119551.patch
+                    # Progressive video/audio/subtitle streaming must require
+                    # authentication; item IDs are deterministic (MD5 of type +
+                    # path), so anonymous access let anyone enumerate and
+                    # download archive files.
+                    ./jellyfin/unauthenticated-stream-endpoints.patch
                   ];
                 });
               };

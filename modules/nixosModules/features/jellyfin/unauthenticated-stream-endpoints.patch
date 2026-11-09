@@ -1,0 +1,68 @@
+diff --git a/Jellyfin.Api/Controllers/AudioController.cs b/Jellyfin.Api/Controllers/AudioController.cs
+index 77bb6ee..a265217 100644
+--- a/Jellyfin.Api/Controllers/AudioController.cs
++++ b/Jellyfin.Api/Controllers/AudioController.cs
+@@ -8,6 +8,7 @@ using Jellyfin.Api.Models.StreamingDtos;
+ using MediaBrowser.Controller.MediaEncoding;
+ using MediaBrowser.Controller.Streaming;
+ using MediaBrowser.Model.Dlna;
++using Microsoft.AspNetCore.Authorization;
+ using Microsoft.AspNetCore.Http;
+ using Microsoft.AspNetCore.Mvc;
+ 
+@@ -87,6 +88,7 @@ public class AudioController : BaseJellyfinApiController
+     /// <returns>A <see cref="FileResult"/> containing the audio file.</returns>
+     [HttpGet("{itemId}/stream", Name = "GetAudioStream")]
+     [HttpHead("{itemId}/stream", Name = "HeadAudioStream")]
++    [Authorize]
+     [ProducesResponseType(StatusCodes.Status200OK)]
+     [ProducesAudioFile]
+     public async Task<ActionResult> GetAudioStream(
+@@ -251,6 +253,7 @@ public class AudioController : BaseJellyfinApiController
+     /// <returns>A <see cref="FileResult"/> containing the audio file.</returns>
+     [HttpGet("{itemId}/stream.{container}", Name = "GetAudioStreamByContainer")]
+     [HttpHead("{itemId}/stream.{container}", Name = "HeadAudioStreamByContainer")]
++    [Authorize]
+     [ProducesResponseType(StatusCodes.Status200OK)]
+     [ProducesAudioFile]
+     public async Task<ActionResult> GetAudioStreamByContainer(
+diff --git a/Jellyfin.Api/Controllers/SubtitleController.cs b/Jellyfin.Api/Controllers/SubtitleController.cs
+index 6721cd6..280644a 100644
+--- a/Jellyfin.Api/Controllers/SubtitleController.cs
++++ b/Jellyfin.Api/Controllers/SubtitleController.cs
+@@ -206,6 +206,7 @@ public class SubtitleController : BaseJellyfinApiController
+     /// <response code="200">File returned.</response>
+     /// <returns>A <see cref="FileContentResult"/> with the subtitle file.</returns>
+     [HttpGet("Videos/{routeItemId}/{routeMediaSourceId}/Subtitles/{routeIndex}/Stream.{routeFormat}")]
++    [Authorize]
+     [ProducesResponseType(StatusCodes.Status200OK)]
+     [ProducesFile("text/*")]
+     public async Task<ActionResult> GetSubtitle(
+@@ -292,6 +293,7 @@ public class SubtitleController : BaseJellyfinApiController
+     /// <response code="200">File returned.</response>
+     /// <returns>A <see cref="FileContentResult"/> with the subtitle file.</returns>
+     [HttpGet("Videos/{routeItemId}/{routeMediaSourceId}/Subtitles/{routeIndex}/{routeStartPositionTicks}/Stream.{routeFormat}")]
++    [Authorize]
+     [ProducesResponseType(StatusCodes.Status200OK)]
+     [ProducesFile("text/*")]
+     public Task<ActionResult> GetSubtitleWithTicks(
+diff --git a/Jellyfin.Api/Controllers/VideosController.cs b/Jellyfin.Api/Controllers/VideosController.cs
+index 29a92cd..b8e7990 100644
+--- a/Jellyfin.Api/Controllers/VideosController.cs
++++ b/Jellyfin.Api/Controllers/VideosController.cs
+@@ -313,6 +313,7 @@ public class VideosController : BaseJellyfinApiController
+     /// <returns>A <see cref="FileResult"/> containing the audio file.</returns>
+     [HttpGet("{itemId}/stream")]
+     [HttpHead("{itemId}/stream", Name = "HeadVideoStream")]
++    [Authorize]
+     [ProducesResponseType(StatusCodes.Status200OK)]
+     [ProducesVideoFile]
+     public async Task<ActionResult> GetVideoStream(
+@@ -551,6 +552,7 @@ public class VideosController : BaseJellyfinApiController
+     /// <returns>A <see cref="FileResult"/> containing the audio file.</returns>
+     [HttpGet("{itemId}/stream.{container}")]
+     [HttpHead("{itemId}/stream.{container}", Name = "HeadVideoStreamByContainer")]
++    [Authorize]
+     [ProducesResponseType(StatusCodes.Status200OK)]
+     [ProducesVideoFile]
+     public Task<ActionResult> GetVideoStreamByContainer(
