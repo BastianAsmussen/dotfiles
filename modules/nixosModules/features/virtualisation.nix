@@ -4,7 +4,7 @@
     { pkgs, ... }:
     {
       imports = [
-        self.nixosModules.android
+        # self.nixosModules.android
         self.nixosModules.podman
         self.nixosModules.qemu
       ];
