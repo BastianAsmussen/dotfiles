@@ -18,6 +18,8 @@
             hash = "sha256-hUhTUsblmdnkgD7DM6oEEQCFFNPoPUX1zotCgl+hKCY=";
           };
 
+          patches = [ ./mcp.patch ];
+
           npmDepsHash = "sha256-+OlIwC9UD7T15Z03IJjF2cNt9wk0/kqcBbviylWdRIA=";
 
           nativeBuildInputs = with pkgs; [

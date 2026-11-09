@@ -1,0 +1,2073 @@
+diff --git a/app/api/mcp/credentials/[id]/route.ts b/app/api/mcp/credentials/[id]/route.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6cd7782a85b740ddbc3809662589b0d16e843302
+--- /dev/null
++++ b/app/api/mcp/credentials/[id]/route.ts
+@@ -0,0 +1,11 @@
++import { mcpCredentialsGet, mcpCredentialsPut } from "@/src/server";
++
++export const dynamic = "force-dynamic";
++
++export async function GET(request: Request, ctx: { params: Promise<{ id: string }> }) {
++	return mcpCredentialsGet(request, (await ctx.params).id);
++}
++
++export async function PUT(request: Request, ctx: { params: Promise<{ id: string }> }) {
++	return mcpCredentialsPut(request, (await ctx.params).id);
++}
+diff --git a/app/api/mcp/test/[id]/route.ts b/app/api/mcp/test/[id]/route.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..ac477dc492e0b4a92b394624d6f2c7ffa717549c
+--- /dev/null
++++ b/app/api/mcp/test/[id]/route.ts
+@@ -0,0 +1,7 @@
++import { mcpTestPost } from "@/src/server";
++
++export const dynamic = "force-dynamic";
++
++export async function POST(request: Request, ctx: { params: Promise<{ id: string }> }) {
++	return mcpTestPost(request, (await ctx.params).id);
++}
+diff --git a/app/api/settings/[section]/route.ts b/app/api/settings/[section]/route.ts
+index 89295206ea26dd9893068172b17b72bf97c3acf6..01e2a1adf35edf8f0cb2066a365d3c931cffdde2 100644
+--- a/app/api/settings/[section]/route.ts
++++ b/app/api/settings/[section]/route.ts
+@@ -43,6 +43,7 @@ import {
+ 	validateChatSettings,
+ 	validateModelsSettings,
+ 	writeSettingsRecord,
++	deleteMcpCredentials,
+ 	type SettingsBodyResult,
+ } from "@/src/server";
+ 
+@@ -129,7 +130,12 @@ export async function PUT(request: Request, ctx: { params: Promise<{ section: st
+ 	// Read-modify-write ONE section of the record; everything else rides
+ 	// along untouched (other sections, unknown keys — sanitize preserves).
+ 	const next = { ...record, [section]: sectionOut };
++	const previousMcpIds = section === "mcp" ? new Set((record.mcp?.servers ?? []).map((server) => server.id)) : new Set<string>();
+ 	const stored = writeSettingsRecord(next);
++	if (section === "mcp") {
++		const retained = new Set((stored?.mcp?.servers ?? []).map((server) => server.id));
++		deleteMcpCredentials([...previousMcpIds].filter((id) => !retained.has(id)));
++	}
+ 	const fileAccessError = fileAccessConfigurationError();
+ 	return Response.json({ settings: stored, ...(fileAccessError ? { fileAccessError } : {}) });
+ }
+diff --git a/components/artifacts/index.ts b/components/artifacts/index.ts
+index fd060077533151e9bc6f1edcaf9cb94c67daa5f3..0cee5618db60b0acee9d7d928b96cb5c376199ac 100644
+--- a/components/artifacts/index.ts
++++ b/components/artifacts/index.ts
+@@ -54,3 +54,10 @@ export const artifactRenderers: Record<string, ComponentType<ArtifactPartProps>>
+ 	list_sessions: ToolCallCard,
+ 	list_propositions: ToolCallCard,
+ };
++
++/** Dynamic MCP names cannot be enumerated in the static registry. They retain
++ * the same quiet, expandable input/output presentation as local tools. */
++export function artifactRendererFor(toolName: string): ComponentType<ArtifactPartProps> | undefined {
++	return artifactRenderers[toolName]
++		?? (toolName.startsWith("mcp__") || toolName.startsWith("mcp_") ? ToolCallCard : undefined);
++}
+diff --git a/components/chat.tsx b/components/chat.tsx
+index 10761cec30ad6b13147b0646668ebafa0d108e36..b52fda4c21e609de14b67a8d358c3a15add88d9b 100644
+--- a/components/chat.tsx
++++ b/components/chat.tsx
+@@ -22,7 +22,7 @@ import { LiveToolCard } from "@/components/artifacts/live-tool-card";
+ import { Separator } from "@/components/ui/separator";
+ import { AnsweredCard } from "@/components/answered-card";
+ import { MalformedQuestion } from "@/components/malformed-question";
+-import { artifactRenderers } from "@/components/artifacts";
++import { artifactRendererFor } from "@/components/artifacts";
+ import { SubagentSteerCard } from "@/components/artifacts/steer-card";
+ import { ChatSessionComposer } from "@/components/composer";
+ import { useEnterSubmits } from "@/components/enter-submits";
+@@ -1618,7 +1618,7 @@ export function Chat({
+ 														// parts and future artifacts render via the
+ 														// registry — add renderers there, not here.
+ 														if (part.type.startsWith("tool-")) {
+-															const Renderer = artifactRenderers[part.type.slice("tool-".length)];
++															const Renderer = artifactRendererFor(part.type.slice("tool-".length));
+ 															if (Renderer) return <Renderer key={pi} part={part as ArtifactPartProps["part"]} />;
+ 														}
+ 														return null;
+diff --git a/components/settings-signal.ts b/components/settings-signal.ts
+index da4dddfdade8b15c05fe391a56f4b8687ac7a3a8..bc4388f136ec0a2f292e8f2de56d2a806d0e2886 100644
+--- a/components/settings-signal.ts
++++ b/components/settings-signal.ts
+@@ -20,7 +20,7 @@ export const SETTINGS_SAVED_EVENT = "lh:settings-saved";
+ // "keys" joined the roster (zero-keys wave, 2026-09-25): keys-section
+ // dispatches it after save AND delete — deletions used to be invisible to
+ // the zero-keys pill and the setup dialog's auto-advance.
+-export type SettingsSection = "general" | "keys" | "agent" | "models" | "appearance" | "graph" | "compaction" | "dictation" | "claudeCode";
++export type SettingsSection = "general" | "keys" | "agent" | "models" | "mcp" | "appearance" | "graph" | "compaction" | "dictation" | "claudeCode";
+ 
+ /** Writers call this after the PUT resolves ok — never before (a failed
+  *  write notifies nothing; the record is unchanged). */
+diff --git a/components/settings/mcp-section.tsx b/components/settings/mcp-section.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..9a5e0878ff167b11d19f7cddbf7edeea8650a268
+--- /dev/null
++++ b/components/settings/mcp-section.tsx
+@@ -0,0 +1,252 @@
++"use client";
++
++import { useEffect, useState } from "react";
++import { Button } from "@/components/ui/button";
++import type { McpCredentialSettings, McpServerSettings, McpSettings } from "@/src/core";
++import { SettingsGroup, ThinSelect, Toggle } from "./controls.tsx";
++
++interface CredentialRow {
++	name: string;
++	value: string;
++	saved: boolean;
++}
++
++interface CredentialPatch {
++	headers: Record<string, string | null>;
++	env: Record<string, string | null>;
++}
++
++/** Only changed values cross the browser boundary. Blank saved values mean
++ * keep; omitted originals are explicitly deleted with null. */
++export function mcpCredentialPatch(rows: CredentialRow[], originalNames: string[]): CredentialPatch {
++	const patch: CredentialPatch = { headers: {}, env: {} };
++	for (const name of originalNames) patch.headers[name] = null;
++	for (const row of rows) {
++		const name = row.name.trim();
++		if (!name) continue;
++		if (!row.saved || row.value !== "") patch.headers[name] = row.value;
++		else if (originalNames.includes(name)) delete patch.headers[name];
++	}
++	return patch;
++}
++
++const inputClass = "w-full rounded-sm border border-border bg-background px-2 py-1.5 font-ui text-xs text-foreground outline-none focus:border-muted-foreground/50";
++const emptyServer = (): McpServerSettings => ({
++	id: crypto.randomUUID(),
++	name: "",
++	enabled: true,
++	transport: "http",
++	url: "",
++});
++
++function ServerEditor({
++	initial,
++	onCancel,
++	onSave,
++}: {
++	initial: McpServerSettings | null;
++	onCancel: () => void;
++	onSave: (server: McpServerSettings, patch: CredentialPatch) => Promise<void>;
++}) {
++	const [server, setServer] = useState<McpServerSettings>(() => initial ?? emptyServer());
++	const [argsText, setArgsText] = useState(initial?.args?.join("\n") ?? "");
++	const [rows, setRows] = useState<CredentialRow[]>([]);
++	const [originalNames, setOriginalNames] = useState<string[]>([]);
++	const [loading, setLoading] = useState(Boolean(initial));
++	const [saving, setSaving] = useState(false);
++	const [error, setError] = useState<string | null>(null);
++	const credentialKind = server.transport === "http" ? "headers" : "env";
++
++	useEffect(() => {
++		if (!initial) return;
++		let live = true;
++		fetch(`/api/mcp/credentials/${encodeURIComponent(initial.id)}`)
++			.then(async (response) => {
++				const body = await response.json() as { headers?: string[]; env?: string[]; error?: string };
++				if (!response.ok) throw new Error(body.error ?? `status ${response.status}`);
++				if (!live) return;
++				const names = server.transport === "http" ? body.headers ?? [] : body.env ?? [];
++				setOriginalNames(names);
++				setRows(names.map((name) => ({ name, value: "", saved: true })));
++				setLoading(false);
++			})
++			.catch((error: unknown) => {
++				if (live) setError(error instanceof Error ? error.message : "Could not load credentials");
++				if (live) setLoading(false);
++			});
++		return () => { live = false; };
++		// The editor is remounted by id; transport changes must not reload secrets.
++	}, [initial?.id]);
++
++	const update = (patch: Partial<McpServerSettings>) => setServer((current) => ({ ...current, ...patch }));
++	const updateRow = (index: number, patch: Partial<CredentialRow>) => setRows((current) => current.map((row, i) => i === index ? { ...row, ...patch } : row));
++	const save = async () => {
++		setSaving(true);
++		setError(null);
++		const next: McpServerSettings = server.transport === "http"
++			? { id: server.id, name: server.name.trim(), enabled: server.enabled, transport: "http", url: server.url?.trim() ?? "" }
++			: {
++				id: server.id,
++				name: server.name.trim(),
++				enabled: server.enabled,
++				transport: "stdio",
++				command: server.command?.trim() ?? "",
++				args: argsText.split("\n").map((arg) => arg.replace(/\r$/, "")).filter((arg) => arg.length > 0),
++				...(server.cwd?.trim() ? { cwd: server.cwd.trim() } : {}),
++			};
++		const currentNames = new Set(rows.map((row) => row.name.trim()).filter(Boolean));
++		const normalizedNames = server.transport === "http" ? [...currentNames].map((name) => name.toLowerCase()) : [...currentNames];
++		if (new Set(normalizedNames).size !== normalizedNames.length) {
++			setError("Credential names must be unique.");
++			setSaving(false);
++			return;
++		}
++		const patch = mcpCredentialPatch(rows, originalNames);
++		try {
++			await onSave(next, server.transport === "http" ? patch : { headers: {}, env: patch.headers });
++		} catch (cause) {
++			setError(cause instanceof Error ? cause.message : "Could not save MCP server");
++			setSaving(false);
++		}
++	};
++
++	return (
++		<div className="space-y-3 rounded-md border border-border p-4" data-testid="mcp-editor">
++			<div className="grid gap-3 sm:grid-cols-2">
++				<label className="text-xs text-muted-foreground">Name
++					<input aria-label="MCP server name" className={`${inputClass} mt-1`} value={server.name} onChange={(event) => update({ name: event.target.value })} placeholder="Covenant of Earth" />
++				</label>
++				<label className="text-xs text-muted-foreground">Transport
++					<ThinSelect ariaLabel="MCP transport" value={server.transport} onChange={(transport) => update({
++						transport: transport as McpServerSettings["transport"],
++						...(transport === "http" ? { url: server.url ?? "" } : { command: server.command ?? "" }),
++					})}>
++						<option value="http">Streamable HTTP</option>
++						<option value="stdio">stdio</option>
++					</ThinSelect>
++				</label>
++			</div>
++			{server.transport === "http" ? (
++				<label className="block text-xs text-muted-foreground">Endpoint URL
++					<input aria-label="MCP endpoint URL" className={`${inputClass} mt-1`} value={server.url ?? ""} onChange={(event) => update({ url: event.target.value })} placeholder="https://covenantofearth.org/mcp" />
++				</label>
++			) : (
++				<>
++					<label className="block text-xs text-muted-foreground">Command
++						<input aria-label="MCP command" className={`${inputClass} mt-1`} value={server.command ?? ""} onChange={(event) => update({ command: event.target.value })} placeholder="node" />
++					</label>
++					<label className="block text-xs text-muted-foreground">Arguments, one per line
++						<textarea aria-label="MCP arguments" className={`${inputClass} mt-1 min-h-16`} value={argsText} onChange={(event) => setArgsText(event.target.value)} placeholder="server.mjs" />
++					</label>
++					<label className="block text-xs text-muted-foreground">Working directory (optional)
++						<input aria-label="MCP working directory" className={`${inputClass} mt-1`} value={server.cwd ?? ""} onChange={(event) => update({ cwd: event.target.value })} />
++					</label>
++				</>
++			)}
++			<div className="space-y-2">
++				<div className="flex items-center justify-between">
++					<span className="text-xs text-muted-foreground">{credentialKind === "headers" ? "HTTP headers" : "Environment variables"}</span>
++					<Button type="button" size="xs" variant="outline" onClick={() => setRows((current) => [...current, { name: "", value: "", saved: false }])}>Add {credentialKind === "headers" ? "header" : "variable"}</Button>
++				</div>
++				{loading ? <p className="text-xs text-muted-foreground">Loading credential names…</p> : rows.map((row, index) => (
++					<div className="flex gap-2" key={`${index}-${row.saved}`}>
++						<input aria-label={`${credentialKind} name ${index + 1}`} className={inputClass} value={row.name} placeholder="Authorization" onChange={(event) => updateRow(index, { name: event.target.value })} />
++						<input aria-label={`${credentialKind} value ${index + 1}`} className={inputClass} type="password" value={row.value} placeholder={row.saved ? "Saved; leave blank to keep" : "Value"} onChange={(event) => updateRow(index, { value: event.target.value })} />
++						<Button type="button" size="xs" variant="outline" aria-label={`Remove ${credentialKind} row ${index + 1}`} onClick={() => setRows((current) => current.filter((_, i) => i !== index))}>Remove</Button>
++					</div>
++				))}
++				<p className="text-xs text-muted-foreground/70">Values stay in the private credential store and are never loaded back into this form.</p>
++			</div>
++			{error && <p role="alert" className="text-xs text-red-500">{error}</p>}
++			<div className="flex justify-end gap-2">
++				<Button type="button" size="xs" variant="outline" onClick={onCancel}>Cancel</Button>
++				<Button type="button" size="xs" disabled={saving || loading} onClick={() => void save()}>{saving ? "Saving…" : "Save server"}</Button>
++			</div>
++		</div>
++	);
++}
++
++export function McpSection({
++	mcp,
++	onSave,
++}: {
++	mcp?: McpSettings;
++	onSave: (next: McpSettings) => Promise<boolean>;
++}) {
++	const servers = mcp?.servers ?? [];
++	const [editing, setEditing] = useState<string | "new" | null>(null);
++	const [error, setError] = useState<string | null>(null);
++	const [statuses, setStatuses] = useState<Record<string, string>>({});
++	const [testing, setTesting] = useState<string | null>(null);
++	const serverBeingEdited = editing && editing !== "new" ? servers.find((server) => server.id === editing) ?? null : null;
++
++	const saveServers = async (next: McpServerSettings[]) => {
++		setError(null);
++		const saved = await onSave({ servers: next });
++		if (!saved) setError("The server configuration could not be saved.");
++		return saved;
++	};
++	const saveServer = async (server: McpServerSettings, patch: CredentialPatch) => {
++		const next = servers.some((candidate) => candidate.id === server.id)
++			? servers.map((candidate) => candidate.id === server.id ? server : candidate)
++			: [...servers, server];
++		if (!await saveServers(next)) throw new Error("The server configuration could not be saved.");
++		const response = await fetch(`/api/mcp/credentials/${encodeURIComponent(server.id)}`, {
++			method: "PUT",
++			headers: { "content-type": "application/json" },
++			body: JSON.stringify(patch),
++		});
++		const body = await response.json() as { error?: string };
++		if (!response.ok) throw new Error(body.error ?? "The server was saved, but its credentials were not.");
++		setEditing(null);
++	};
++	const test = async (server: McpServerSettings) => {
++		setTesting(server.id);
++		setStatuses((current) => ({ ...current, [server.id]: "Testing…" }));
++		try {
++			const response = await fetch(`/api/mcp/test/${encodeURIComponent(server.id)}`, { method: "POST" });
++			const body = await response.json() as { error?: string; server?: { tools: number; resources: number; resourceTemplates: number; prompts: number } };
++			if (!response.ok || !body.server) throw new Error(body.error ?? `status ${response.status}`);
++			const summary = body.server;
++			setStatuses((current) => ({ ...current, [server.id]: `${summary.tools} tools · ${summary.resources} resources · ${summary.resourceTemplates} templates · ${summary.prompts} prompts` }));
++		} catch (cause) {
++			setStatuses((current) => ({ ...current, [server.id]: cause instanceof Error ? cause.message : "Connection failed" }));
++		} finally {
++			setTesting(null);
++		}
++	};
++
++	return (
++		<>
++			<p className="text-xs text-muted-foreground">Connect external MCP servers. Adding or enabling a server trusts its tools to run in probing, teaching, and practice.</p>
++			{error && <p role="alert" className="text-xs text-red-500">{error}</p>}
++			<SettingsGroup label="Servers" testid="mcp-server-list">
++				{servers.length === 0 && <p className="py-2 text-xs text-muted-foreground">No MCP servers configured.</p>}
++				{servers.map((server) => (
++					<div key={server.id} className="rounded-md border border-border/70 p-3" data-testid={`mcp-server-${server.id}`}>
++						<div className="flex items-center gap-3">
++							<div className="min-w-0 flex-1">
++								<p className="font-prose text-(length:--lh-prose-size)">{server.name}</p>
++								<p className="truncate text-xs text-muted-foreground">{server.transport === "http" ? server.url : [server.command, ...(server.args ?? [])].join(" ")}</p>
++							</div>
++							<Toggle checked={server.enabled} label={`Enable ${server.name}`} onChange={(enabled) => void saveServers(servers.map((candidate) => candidate.id === server.id ? { ...candidate, enabled } : candidate))} />
++						</div>
++						{statuses[server.id] && <p role="status" className="mt-2 text-xs text-muted-foreground">{statuses[server.id]}</p>}
++						<div className="mt-2 flex gap-2">
++							<Button type="button" size="xs" variant="outline" onClick={() => setEditing(server.id)}>Edit</Button>
++							<Button type="button" size="xs" variant="outline" disabled={testing !== null} onClick={() => void test(server)}>{testing === server.id ? "Testing…" : "Test connection"}</Button>
++							<Button type="button" size="xs" variant="outline" onClick={() => {
++								if (window.confirm(`Remove ${server.name} and its saved credentials?`)) void saveServers(servers.filter((candidate) => candidate.id !== server.id));
++							}}>Delete</Button>
++						</div>
++					</div>
++				))}
++				{editing === null ? (
++					<Button type="button" size="xs" variant="outline" className="self-start" data-testid="mcp-add" onClick={() => setEditing("new")}>Add MCP server</Button>
++				) : (
++					<ServerEditor key={editing} initial={editing === "new" ? null : serverBeingEdited} onCancel={() => setEditing(null)} onSave={saveServer} />
++				)}
++			</SettingsGroup>
++		</>
++	);
++}
+diff --git a/components/settings/settings-dialog.tsx b/components/settings/settings-dialog.tsx
+index 35ecac577f10bc0ca8ea71196b5d03b0fa05bc99..a8c0d54d9759170b3b39568ff62f1cb9ef6fda2c 100644
+--- a/components/settings/settings-dialog.tsx
++++ b/components/settings/settings-dialog.tsx
+@@ -43,6 +43,7 @@ import { useAppearance } from "./appearance.tsx";
+ import { SettingsSection } from "./controls.tsx";
+ import { UpdateSettings } from "./update-settings.tsx";
+ import { AgentSection } from "./agent-section.tsx";
++import { McpSection } from "./mcp-section.tsx";
+ import type { ModelsSettings } from "@/src/core";
+ import { MENU_CLOSE_EVENT, MENU_OPEN_EVENT } from "@/components/menu-shell";
+ import { notifySettingsSaved } from "@/components/settings-signal";
+@@ -59,6 +60,7 @@ import { NativeSubscriptionUIProvider } from "./subscription-connections.tsx";
+ const SECTIONS = [
+ 	{ id: "keys", label: "Providers" },
+ 	{ id: "agent", label: "Agent" },
++	{ id: "mcp", label: "MCP" },
+ 	{ id: "appearance", label: "Appearance" },
+ 	{ id: "graph", label: "Graph" },
+ 	{ id: "keyboard", label: "Keyboard", hint: "Stored on this device" },
+@@ -228,9 +230,9 @@ export function SettingsDialogBody({
+ 	 *  schema mistake caught by the validation surface). */
+ 	const write = useCallback(
+ 		async (
+-			section: "general" | "agent" | "models" | "appearance" | "graph" | "compaction",
++			section: "general" | "agent" | "models" | "mcp" | "appearance" | "graph" | "compaction",
+ 			body: object,
+-		) => {
++		): Promise<boolean> => {
+ 			setError(null);
+ 			const res = await fetch(`/api/settings/${section}`, {
+ 				method: "PUT",
+@@ -242,7 +244,7 @@ export function SettingsDialogBody({
+ 					error?: string;
+ 				};
+ 				setError(`${section}: ${detail.error ?? res.status}`);
+-				return;
++				return false;
+ 			}
+ 			// Server truth, never the request body (fix wave, owner repro):
+ 			// the models section clamps pinned thinking levels on write
+@@ -259,6 +261,7 @@ export function SettingsDialogBody({
+ 			notifySettingsSaved(section);
+ 			if (section === "appearance")
+ 				onAppearanceChange(body as AppearanceSettings);
++			return true;
+ 		},
+ 		[onAppearanceChange],
+ 	);
+@@ -398,6 +401,11 @@ export function SettingsDialogBody({
+ 									/>
+ 								</SettingsSection>
+ 							)}
++							{active === "mcp" && (
++								<SettingsSection title="MCP" testid="section-mcp">
++									<McpSection mcp={record.mcp} onSave={(next) => write("mcp", next)} />
++								</SettingsSection>
++							)}
+ 							{active === "appearance" && (
+ 								<SettingsSection
+ 									title="Appearance"
+diff --git a/docs/README.md b/docs/README.md
+index 93c7be75ed18adff60ef33ab925e5a42f8edcdd5..6821275ef64ea467f762b053cb2cf6275de7a6da 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -6,6 +6,7 @@
+ - [Keyboard shortcuts](keyboard.md) — defaults, rebinding, and navigation.
+ - [Claude Code](claude-code.md) — use an installed CLI and troubleshoot its connection.
+ - [Custom and local models](custom-providers.md) — configure an OpenAI-compatible endpoint.
++- [MCP servers](mcp.md) — connect stdio or Streamable HTTP tools, resources, and prompts.
+ - [Context, caching, and costs](compaction-accounting.md) — understand the session meters and advanced cache preferences.
+ - [Learning-data skill](../skills/learnharness/SKILL.md) — a read-only guide and standalone readers for local learning records.
+ 
+diff --git a/docs/architecture.md b/docs/architecture.md
+index afcde9179808fe979586f85284039608bc19e94b..91b34cb0e83582c01392eaba713a795622c36dfc 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -138,8 +138,8 @@ Extraction is the construction writer, not the only mutation: source/session/nod
+ | Worker computation and delivery obligations | `jobs/*.json` |
+ | Propositions, chains, checkpoints, coverage | `graph/{nodes,chains,sessions,coverage}.jsonl` |
+ | Sources, organization, positions, render preferences | JSON maps under `graph/` |
+-| Preferences and prompt overrides | `settings.json`, `prompts/` |
+-| Keys and custom-endpoint binding | Separate `auth.json`, selected by `LH_AUTH_FILE` |
++| Preferences, MCP server definitions, and prompt overrides | `settings.json`, `prompts/` |
++| Keys, custom-endpoint binding, and MCP header/environment values | Separate `auth.json`, selected by `LH_AUTH_FILE` |
+ 
+ Adapters use synchronous filesystem operations. JSONL reads skip corrupt/invalid lines; graph derivation merges repeated assertions. Some replacements use temp-file rename, but ordinary whole-file writes are not database transactions. Same-event-loop serialization is not cross-process locking or crash atomicity. Use **one server owner per data/auth profile**.
+ 
+diff --git a/docs/development.md b/docs/development.md
+index dfb081ca457832f114fa2367cdefaa4343d82e71..c1b88b8dd5b3d1a7afc37a4fb6cae4666dc68cfa 100644
+--- a/docs/development.md
++++ b/docs/development.md
+@@ -23,7 +23,7 @@ npm start              # serve the production build with Next
+ 
+ ## Configuration
+ 
+-Nonsecret settings are deltas in `<data root>/settings.json`; absent values resolve through `src/core/settings.ts` and `settings-resolution.ts`. Models and role overrides are settings, not environment variables. [Prompt overrides](../src/agent/prompts/README.md) live under `<data root>/prompts/` and require explicit enable switches.
++Nonsecret settings are deltas in `<data root>/settings.json`; absent values resolve through `src/core/settings.ts` and `settings-resolution.ts`. Models and role overrides are settings, not environment variables. MCP transport definitions also live there, while MCP header/environment values stay in `auth.json`; see [MCP servers](mcp.md). [Prompt overrides](../src/agent/prompts/README.md) live under `<data root>/prompts/` and require explicit enable switches.
+ 
+ | Variable | Purpose |
+ | --- | --- |
+diff --git a/docs/mcp.md b/docs/mcp.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..7fd2bf7bf0a55f60f032206bea47085b6063dd49
+--- /dev/null
++++ b/docs/mcp.md
+@@ -0,0 +1,46 @@
++# MCP servers
++
++LearnHarness can connect to external [Model Context Protocol](https://modelcontextprotocol.io/) servers. Their tools, resources, resource templates, and prompts are available to the prober, teacher, and practice agents. Background workers do not receive MCP connections.
++
++## Add a server
++
++Open **Settings → MCP → Add MCP server**, choose a transport, and save. Use **Test connection** to check the saved configuration and see how many capabilities the server exposes.
++
++### Streamable HTTP
++
++Enter the absolute HTTP(S) endpoint URL. Optional static headers, such as `Authorization`, are edited below the URL.
++
++For example, to connect the public, read-only Covenant of Earth server:
++
++- **Name:** `Covenant`
++- **Transport:** `Streamable HTTP`
++- **Endpoint URL:** `https://covenantofearth.org/mcp`
++
++No headers are required. Covenant's tools can then resolve references, search and read sections, inspect cross-references, and query its governance graph. Its resources are available through `mcp_list_resources` and `mcp_read_resource`.
++
++### stdio
++
++Enter the executable, its arguments (one per line), and an optional working directory. LearnHarness spawns the command directly with an argument array; it does not construct a shell command. Optional environment variables can supply API keys or other process configuration.
++
++For example:
++
++- **Command:** `node`
++- **Arguments:** `/absolute/path/to/server.mjs`
++
++A relative command such as `./mcp-server.sh` runs relative to the configured working directory, or the LearnHarness server process's working directory when none is set.
++
++## Credentials
++
++HTTP header values and stdio environment values are stored in the existing owner-only `auth.json` credential file, not in `settings.json`. The settings UI reads back only their names. Leave a saved value blank to keep it, enter a new value to replace it, or remove its row to delete it. This is restrictive-permission plaintext storage, not an encrypted vault.
++
++Server names, enable switches, commands, arguments, working directories, and URLs are nonsecret settings. Renaming a server does not change its stable credential identity. Deleting a server deletes its saved MCP credentials.
++
++## Agent behavior and trust
++
++Remote tools appear as `mcp__server__tool`. Shared operations list and read resources, list resource templates, and list or resolve prompts. Tool calls and results appear in the session transcript as quiet, expandable cards.
++
++**Adding or enabling a server trusts all of its tools.** They run without per-call approval, just like LearnHarness's built-in tools. Only enable servers you trust with the context and side effects those tools expose.
++
++Connections and discovery are rebuilt from current settings at the start of each conversation turn and closed when the turn settles. Configuration changes affect the next turn. If an enabled server cannot connect or complete discovery, LearnHarness refuses the turn with an error naming that server instead of silently running without its capabilities. Disable or repair the server to continue. **Test connection** can probe a saved server even while it is disabled.
++
++Static HTTP headers are supported; remote OAuth authorization and the legacy SSE transport are not. LearnHarness is an MCP client here; this feature does not expose LearnHarness itself as an MCP server.
+diff --git a/src/agent/mcp.ts b/src/agent/mcp.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..565ca4b708833c3dfb77f1e34cfd279f04dcb29f
+--- /dev/null
++++ b/src/agent/mcp.ts
+@@ -0,0 +1,360 @@
++import { createHash } from "node:crypto";
++import { Client } from "@modelcontextprotocol/sdk/client/index.js";
++import { StdioClientTransport, getDefaultEnvironment } from "@modelcontextprotocol/sdk/client/stdio.js";
++import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
++import type { Tool as McpTool } from "@modelcontextprotocol/sdk/types.js";
++import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
++import { Type, type TSchema } from "typebox";
++import type { McpCredentialSettings, McpServerSettings } from "../core/mcp.ts";
++import { normalizeMcpServerName } from "../core/mcp.ts";
++import { serverExecute } from "./tool-execute.ts";
++import { withArgumentHeal } from "./tools/heal.ts";
++
++export const MCP_CONNECT_TIMEOUT_MS = 10_000;
++export const MCP_REQUEST_TIMEOUT_MS = 30_000;
++const MAX_TOOL_NAME_LENGTH = 64;
++
++type McpRecord = Record<string, unknown>;
++type McpContent = { type?: string; [key: string]: unknown };
++
++export interface McpConnection {
++	server: McpServerSettings;
++	client: Client;
++	tools: McpTool[];
++	resourceCount: number;
++	resourceTemplateCount: number;
++	promptCount: number;
++}
++
++export interface McpServerSummary {
++	id: string;
++	name: string;
++	tools: number;
++	resources: number;
++	resourceTemplates: number;
++	prompts: number;
++}
++
++export interface McpSession {
++	tools: Record<string, AgentTool<any>>;
++	connections: McpConnection[];
++	summaries(): McpServerSummary[];
++	close(): Promise<void>;
++}
++
++export class McpConnectionError extends Error {
++	readonly serverName: string;
++	constructor(serverName: string, cause: unknown) {
++		const detail = cause instanceof Error ? cause.message : String(cause);
++		super(`MCP server "${serverName}" is unavailable: ${detail}`, { cause });
++		this.name = "McpConnectionError";
++		this.serverName = serverName;
++	}
++}
++
++function requestOptions(signal?: AbortSignal) {
++	return { signal, timeout: MCP_REQUEST_TIMEOUT_MS, maxTotalTimeout: MCP_REQUEST_TIMEOUT_MS };
++}
++
++function asRecord(value: unknown): McpRecord {
++	return value !== null && typeof value === "object" && !Array.isArray(value) ? value as McpRecord : {};
++}
++
++function text(text: string): { type: "text"; text: string } {
++	return { type: "text", text };
++}
++
++function json(value: unknown): string {
++	try { return JSON.stringify(value, null, 2) ?? String(value); }
++	catch { return String(value); }
++}
++
++/** Convert protocol content into Pi's native text/image channel. Audio has no
++ * Pi representation, so it gets an explicit model-visible notice instead of
++ * disappearing. Other structured content remains available as JSON text. */
++function convertContent(parts: unknown): AgentToolResult<unknown>["content"] {
++	if (!Array.isArray(parts)) return [];
++	const out: AgentToolResult<unknown>["content"] = [];
++	for (const value of parts) {
++		const part = asRecord(value) as McpContent;
++		if (part.type === "text" && typeof part.text === "string") {
++			out.push(text(part.text));
++		} else if (part.type === "image" && typeof part.data === "string" && typeof part.mimeType === "string") {
++			out.push({ type: "image", data: part.data, mimeType: part.mimeType });
++		} else if (part.type === "resource") {
++			const resource = asRecord(part.resource);
++			const label = `Embedded MCP resource${typeof resource.uri === "string" ? `: ${resource.uri}` : ""}`;
++			if (typeof resource.text === "string") {
++				out.push(text(`${label}\n${resource.text}`));
++			} else if (typeof resource.blob === "string" && typeof resource.mimeType === "string" && resource.mimeType.startsWith("image/")) {
++				out.push(text(label), { type: "image", data: resource.blob, mimeType: resource.mimeType });
++			} else {
++				out.push(text(json(part)));
++			}
++		} else if (part.type === "audio") {
++			const mime = typeof part.mimeType === "string" ? part.mimeType : "unknown MIME type";
++			out.push(text(`MCP audio content (${mime}) is not supported by this client.`));
++		} else {
++			// Resource links and future content forms retain all their metadata.
++			out.push(text(json(part)));
++		}
++	}
++	return out;
++}
++
++function toolResult(raw: unknown): AgentToolResult<unknown> {
++	const result = asRecord(raw);
++	const content = convertContent(result.content);
++	if (content.length === 0 && result.structuredContent !== undefined) content.push(text(json(result.structuredContent)));
++	return {
++		content: content.length ? content : [text(json(result))],
++		details: result,
++		...(result.structuredContent !== undefined ? { structuredContent: result.structuredContent as never } : {}),
++		...(result.isError === true ? { isError: true } : {}),
++	};
++}
++
++function resourceResult(raw: unknown): AgentToolResult<unknown> {
++	const result = asRecord(raw);
++	const contents = Array.isArray(result.contents) ? result.contents : [];
++	const content = contents.flatMap((entry) => {
++		const resource = asRecord(entry);
++		const label = `MCP resource${typeof resource.uri === "string" ? `: ${resource.uri}` : ""}`;
++		if (typeof resource.text === "string") return [text(`${label}\n${resource.text}`)];
++		if (typeof resource.blob === "string" && typeof resource.mimeType === "string" && resource.mimeType.startsWith("image/")) {
++			return [text(label), { type: "image" as const, data: resource.blob, mimeType: resource.mimeType }];
++		}
++		return [text(json(resource))];
++	});
++	return { content: content.length ? content : [text(json(result))], details: result };
++}
++
++function promptResult(raw: unknown): AgentToolResult<unknown> {
++	const result = asRecord(raw);
++	const messages = Array.isArray(result.messages) ? result.messages : [];
++	const content = messages.flatMap((entry) => {
++		const message = asRecord(entry);
++		const role = message.role === "assistant" ? "assistant" : "user";
++		const converted = convertContent([message.content]);
++		return [text(`MCP prompt message (${role})`), ...converted];
++	});
++	return { content: content.length ? content : [text(json(result))], details: result };
++}
++
++function normalizedToolPart(name: string): string {
++	return name.replace(/[^A-Za-z0-9_-]+/g, "_").replace(/^_+|_+$/g, "") || "tool";
++}
++
++/** Providers commonly cap function names at 64 characters. Preserve readable
++ * prefixes and add a stable digest only when truncation is necessary. */
++export function mcpToolName(serverName: string, toolName: string): string {
++	const base = `mcp__${normalizeMcpServerName(serverName)}__${normalizedToolPart(toolName)}`;
++	if (base.length <= MAX_TOOL_NAME_LENGTH) return base;
++	const digest = createHash("sha256").update(base).digest("hex").slice(0, 8);
++	return `${base.slice(0, MAX_TOOL_NAME_LENGTH - 9)}_${digest}`;
++}
++
++async function listAll<T>(
++	list: (cursor?: string) => Promise<McpRecord>,
++	property: string,
++): Promise<T[]> {
++	const out: T[] = [];
++	const seen = new Set<string>();
++	let cursor: string | undefined;
++	do {
++		const page = await list(cursor);
++		const values = page[property];
++		if (!Array.isArray(values)) throw new Error(`MCP response is missing ${property}`);
++		out.push(...values as T[]);
++		cursor = typeof page.nextCursor === "string" ? page.nextCursor : undefined;
++		if (cursor !== undefined && seen.has(cursor)) throw new Error(`MCP pagination repeated cursor ${cursor}`);
++		if (cursor !== undefined) seen.add(cursor);
++	} while (cursor !== undefined);
++	return out;
++}
++
++async function connectOne(server: McpServerSettings, credentials: McpCredentialSettings): Promise<McpConnection> {
++	const client = new Client({ name: "learnharness", version: "1" });
++	const transport = server.transport === "http"
++		? new StreamableHTTPClientTransport(new URL(server.url!), {
++			requestInit: { headers: credentials.headers ?? {} },
++		})
++		: new StdioClientTransport({
++			command: server.command!,
++			args: server.args ?? [],
++			...(server.cwd ? { cwd: server.cwd } : {}),
++			env: { ...getDefaultEnvironment(), ...credentials.env },
++			stderr: "inherit",
++		});
++	try {
++		await client.connect(transport, { timeout: MCP_CONNECT_TIMEOUT_MS, maxTotalTimeout: MCP_CONNECT_TIMEOUT_MS });
++		const capabilities = client.getServerCapabilities() ?? {};
++		const tools = capabilities.tools
++			? await listAll<McpTool>((cursor) => client.listTools(cursor ? { cursor } : undefined, requestOptions()) as Promise<McpRecord>, "tools")
++			: [];
++		const resources = capabilities.resources
++			? await listAll<McpRecord>((cursor) => client.listResources(cursor ? { cursor } : undefined, requestOptions()) as Promise<McpRecord>, "resources")
++			: [];
++		const resourceTemplates = capabilities.resources
++			? await listAll<McpRecord>((cursor) => client.listResourceTemplates(cursor ? { cursor } : undefined, requestOptions()) as Promise<McpRecord>, "resourceTemplates")
++			: [];
++		const prompts = capabilities.prompts
++			? await listAll<McpRecord>((cursor) => client.listPrompts(cursor ? { cursor } : undefined, requestOptions()) as Promise<McpRecord>, "prompts")
++			: [];
++		return {
++			server,
++			client,
++			tools,
++			resourceCount: resources.length,
++			resourceTemplateCount: resourceTemplates.length,
++			promptCount: prompts.length,
++		};
++	} catch (error) {
++		await client.close().catch(() => {});
++		throw new McpConnectionError(server.name, error);
++	}
++}
++
++function connectionFor(connections: McpConnection[], name: string): McpConnection {
++	const connection = connections.find((candidate) => candidate.server.name === name);
++	if (!connection) throw new Error(`MCP server "${name}" is not connected`);
++	return connection;
++}
++
++function serverNameSchema(connections: McpConnection[]) {
++	return Type.Union(connections.map((connection) => Type.Literal(connection.server.name)), {
++		description: "The configured MCP server name",
++	});
++}
++
++function sharedTools(connections: McpConnection[]): Record<string, AgentTool<any>> {
++	const tools: Record<string, AgentTool<any>> = {};
++	const resourceServers = connections.filter((connection) => connection.client.getServerCapabilities()?.resources);
++	const promptServers = connections.filter((connection) => connection.client.getServerCapabilities()?.prompts);
++	if (resourceServers.length) {
++		const listInput = Type.Object({ server: serverNameSchema(resourceServers), cursor: Type.Optional(Type.String()) });
++		tools.mcp_list_resources = {
++			name: "mcp_list_resources",
++			label: "List MCP resources",
++			description: "List resources exposed by a configured MCP server. Use nextCursor from the result as cursor for another page.",
++			parameters: listInput,
++			execute: serverExecute("mcp_list_resources", listInput, async (input, ctx) =>
++				connectionFor(resourceServers, input.server).client.listResources(input.cursor ? { cursor: input.cursor } : undefined, requestOptions(ctx.signal))),
++		};
++		tools.mcp_list_resource_templates = {
++			name: "mcp_list_resource_templates",
++			label: "List MCP resource templates",
++			description: "List parameterized resource URI templates exposed by a configured MCP server.",
++			parameters: listInput,
++			execute: serverExecute("mcp_list_resource_templates", listInput, async (input, ctx) =>
++				connectionFor(resourceServers, input.server).client.listResourceTemplates(input.cursor ? { cursor: input.cursor } : undefined, requestOptions(ctx.signal))),
++		};
++		const readInput = Type.Object({
++			server: serverNameSchema(resourceServers),
++			uri: Type.String({ description: "A resource URI from mcp_list_resources, or an expanded resource template URI" }),
++		});
++		tools.mcp_read_resource = {
++			name: "mcp_read_resource",
++			label: "Read MCP resource",
++			description: "Read a resource by URI from a configured MCP server.",
++			parameters: readInput,
++			execute: async (_id, rawInput, signal) => {
++				const input = rawInput as { server: string; uri: string };
++				return resourceResult(await connectionFor(resourceServers, input.server).client.readResource({ uri: input.uri }, requestOptions(signal)));
++			},
++		};
++	}
++	if (promptServers.length) {
++		const listInput = Type.Object({ server: serverNameSchema(promptServers), cursor: Type.Optional(Type.String()) });
++		tools.mcp_list_prompts = {
++			name: "mcp_list_prompts",
++			label: "List MCP prompts",
++			description: "List reusable prompts exposed by a configured MCP server, including their argument descriptions.",
++			parameters: listInput,
++			execute: serverExecute("mcp_list_prompts", listInput, async (input, ctx) =>
++				connectionFor(promptServers, input.server).client.listPrompts(input.cursor ? { cursor: input.cursor } : undefined, requestOptions(ctx.signal))),
++		};
++		const getInput = Type.Object({
++			server: serverNameSchema(promptServers),
++			name: Type.String({ description: "Prompt name from mcp_list_prompts" }),
++			arguments: Type.Optional(Type.Record(Type.String(), Type.String(), { description: "Prompt argument values; all MCP prompt arguments are strings" })),
++		});
++		tools.mcp_get_prompt = {
++			name: "mcp_get_prompt",
++			label: "Get MCP prompt",
++			description: "Resolve a reusable MCP prompt with optional string arguments and return its messages.",
++			parameters: getInput,
++			execute: async (_id, rawInput, signal) => {
++				const input = rawInput as { server: string; name: string; arguments?: Record<string, string> };
++				return promptResult(await connectionFor(promptServers, input.server).client.getPrompt({
++					name: input.name,
++					...(input.arguments ? { arguments: input.arguments } : {}),
++				}, requestOptions(signal)));
++			},
++		};
++	}
++	return tools;
++}
++
++function agentTools(connections: McpConnection[]): Record<string, AgentTool<any>> {
++	const tools = sharedTools(connections);
++	for (const connection of connections) {
++		for (const remote of connection.tools) {
++			const name = mcpToolName(connection.server.name, remote.name);
++			if (tools[name]) throw new Error(`MCP tool name collision: ${name}`);
++			const parameters = Type.Unsafe({ ...remote.inputSchema }) as TSchema;
++			const tool: AgentTool<any> = {
++				name,
++				label: `${connection.server.name}: ${remote.title ?? remote.name}`,
++				description: remote.description ?? `Call the ${remote.name} tool on the ${connection.server.name} MCP server.`,
++				parameters,
++				...(remote.outputSchema ? { outputSchema: Type.Unsafe({ ...remote.outputSchema }) as TSchema } : {}),
++				execute: async (_id, input, signal) => toolResult(await connection.client.callTool({
++					name: remote.name,
++					arguments: asRecord(input),
++				}, undefined, requestOptions(signal))),
++			};
++			tools[name] = withArgumentHeal(tool);
++		}
++	}
++	return tools;
++}
++
++/** Connect a snapshot of enabled servers. No store reads happen here; the
++ * server composition root supplies settings and credentials explicitly. */
++export async function connectMcpServers(
++	servers: McpServerSettings[],
++	credentials: Record<string, McpCredentialSettings> = {},
++): Promise<McpSession> {
++	const connections: McpConnection[] = [];
++	let tools: Record<string, AgentTool<any>> = {};
++	let closePromise: Promise<void> | undefined;
++	const close = () => {
++		closePromise ??= Promise.all(connections.map(async (connection) => {
++			await connection.client.close();
++		})).then(() => {});
++		return closePromise;
++	};
++	try {
++		for (const server of servers.filter((candidate) => candidate.enabled)) {
++			connections.push(await connectOne(server, credentials[server.id] ?? {}));
++		}
++		tools = agentTools(connections);
++	} catch (error) {
++		await close().catch(() => {});
++		throw error;
++	}
++	return {
++		tools,
++		connections,
++		summaries: () => connections.map((connection) => ({
++			id: connection.server.id,
++			name: connection.server.name,
++			tools: connection.tools.length,
++			resources: connection.resourceCount,
++			resourceTemplates: connection.resourceTemplateCount,
++			prompts: connection.promptCount,
++		})),
++		close,
++	};
++}
+diff --git a/src/agent/teacher-agent.ts b/src/agent/teacher-agent.ts
+index 5023af2546552d7b803423299746eb83a2b95d50..d5452fa3702f5d29f541433e4c31b5285a506fc1 100644
+--- a/src/agent/teacher-agent.ts
++++ b/src/agent/teacher-agent.ts
+@@ -111,6 +111,9 @@ export interface AgentBuildOptions {
+ 	/** Tests may pass a bare tool registry to drive deterministic flows.
+ 	 *  An explicit registry is NEVER toggle-filtered — the caller owns it. */
+ 	tools?: Record<string, AgentTool<any>>;
++	/** Dynamically discovered external tools, shared by every conversation
++	 * agent kind. Names are namespaced by the MCP adapter. */
++	additionalTools?: Record<string, AgentTool<any>>;
+ 	/** The resolved per-user tool toggles (core/pending EnabledTools — the
+ 	 *  2026-09-19 P2 bridge: Platform's chat-handler passes
+ 	 *  effective.agent.tools; the factories drop any tool explicitly false.
+@@ -193,6 +196,20 @@ function baseAgentOptions(kind: AgentKind, opts: AgentBuildOptions, tools: Agent
+ 	// the normal no-observer path (tests, env-off).
+ 	const providerEvents = opts.chatId ? providerEventObserver(opts.chatId, kind) : undefined;
+ 	const seenInputs = new Set((opts.messages ?? []).map((m) => (m as { id?: string }).id).filter(Boolean));
++	const allTools = [
++		...tools.map((tool) => tool.name === "read" && tool.execute === readTool.execute
++			? { ...tool, execute: createReadTool(engine.model).execute as AgentTool<any>["execute"] }
++			: tool),
++		...(sendToUserApplies(kind, engine.model, opts.tools !== undefined)
++			? [withArgumentHeal(sendToUserTool)]
++			: []),
++		...Object.values(opts.additionalTools ?? {}),
++	];
++	const seenToolNames = new Set<string>();
++	for (const tool of allTools) {
++		if (seenToolNames.has(tool.name)) throw new Error(`Duplicate agent tool name: ${tool.name}`);
++		seenToolNames.add(tool.name);
++	}
+ 	const agent = new Agent({
+ 		identity: APP_IDENTITY,
+ 		sessionId: opts.chatId,
+@@ -204,14 +221,7 @@ function baseAgentOptions(kind: AgentKind, opts: AgentBuildOptions, tools: Agent
+ 			// closed, neither the tool nor its usage instructions reach the model.
+ 			// Match Claude across providers (including OpenRouter), not the API
+ 			// transport. Explicit test registries remain caller-owned.
+-			tools: [
+-				...tools.map((tool) => tool.name === "read" && tool.execute === readTool.execute
+-					? { ...tool, execute: createReadTool(engine.model).execute as AgentTool<any>["execute"] }
+-					: tool),
+-				...(sendToUserApplies(kind, engine.model, opts.tools !== undefined)
+-					? [withArgumentHeal(sendToUserTool)]
+-					: []),
+-			],
++			tools: allTools,
+ 			messages: opts.messages ?? [],
+ 		},
+ 		streamFn: engine.streamFn,
+diff --git a/src/core/index.ts b/src/core/index.ts
+index 9f93cb2c079f2a47f9a743c8cfa2ac9ce383d429..5e8514fc26c0dc4b05c6abac30d300a9cbab1bdb 100644
+--- a/src/core/index.ts
++++ b/src/core/index.ts
+@@ -66,6 +66,7 @@ export * from "./fuzzy.ts";
+ // the user-settings record's shape/sanitizer (pure) and its fully-resolved
+ // view. Browser-safe — the Wave-4 panel imports these directly.
+ export * from "./settings.ts";
++export * from "./mcp.ts";
+ export * from "./file-access.ts";
+ export * from "./dictation.ts";
+ // graph-deletion.ts (wave 6): the whole module is PURE but storage-port
+diff --git a/src/core/mcp.ts b/src/core/mcp.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..be4d0a02054575360907b534321c511dcb0112ec
+--- /dev/null
++++ b/src/core/mcp.ts
+@@ -0,0 +1,92 @@
++/** User-configurable Model Context Protocol servers. This module is pure and
++ * browser-safe: credential values never belong in this settings shape. */
++
++export interface McpServerSettings {
++	/** Stable credential/runtime identity; display renames do not change it. */
++	id: string;
++	name: string;
++	enabled: boolean;
++	transport: "stdio" | "http";
++	/** stdio only. Spawned directly, never interpolated into a shell command. */
++	command?: string;
++	args?: string[];
++	cwd?: string;
++	/** Streamable HTTP only. Static headers live in the private auth store. */
++	url?: string;
++}
++
++export interface McpSettings {
++	servers?: McpServerSettings[];
++}
++
++export interface McpCredentialSettings {
++	headers?: Record<string, string>;
++	env?: Record<string, string>;
++}
++
++export const MCP_SERVER_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
++
++/** Provider-safe namespace fragment. Uniqueness is validated separately. */
++export function normalizeMcpServerName(name: string): string {
++	return name.trim().replace(/[^A-Za-z0-9_-]+/g, "_").replace(/^_+|_+$/g, "") || "server";
++}
++
++/** Accept only absolute HTTP(S) URLs without URL-embedded credentials. */
++export function normalizeMcpHttpUrl(raw: string): string {
++	try {
++		const url = new URL(raw.trim());
++		if ((url.protocol !== "http:" && url.protocol !== "https:") || url.username || url.password) return "";
++		return url.toString();
++	} catch {
++		return "";
++	}
++}
++
++function stringArray(raw: unknown): string[] | undefined {
++	if (!Array.isArray(raw) || raw.some((value) => typeof value !== "string")) return undefined;
++	return [...raw];
++}
++
++/** Lenient disk/read projection. Invalid entries drop; duplicates never make
++ * runtime tool namespaces ambiguous. The settings PUT parser is strict. */
++export function sanitizeMcpSettings(raw: unknown): McpSettings {
++	if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return {};
++	const serversRaw = (raw as Record<string, unknown>).servers;
++	if (!Array.isArray(serversRaw)) return {};
++	const servers: McpServerSettings[] = [];
++	const ids = new Set<string>();
++	const names = new Set<string>();
++	for (const entry of serversRaw) {
++		if (entry === null || typeof entry !== "object" || Array.isArray(entry)) continue;
++		const value = entry as Record<string, unknown>;
++		if (typeof value.id !== "string" || !MCP_SERVER_ID_PATTERN.test(value.id)) continue;
++		if (typeof value.name !== "string" || !value.name.trim()) continue;
++		const name = value.name.trim();
++		const normalized = normalizeMcpServerName(name);
++		if (ids.has(value.id) || names.has(normalized)) continue;
++		if (value.transport !== "stdio" && value.transport !== "http") continue;
++		const server: McpServerSettings = {
++			id: value.id,
++			name,
++			enabled: typeof value.enabled === "boolean" ? value.enabled : true,
++			transport: value.transport,
++		};
++		if (value.transport === "stdio") {
++			if (typeof value.command !== "string" || !value.command.trim()) continue;
++			server.command = value.command.trim();
++			const args = value.args === undefined ? [] : stringArray(value.args);
++			if (args === undefined) continue;
++			server.args = args;
++			if (typeof value.cwd === "string" && value.cwd.trim()) server.cwd = value.cwd.trim();
++		} else {
++			if (typeof value.url !== "string") continue;
++			const url = normalizeMcpHttpUrl(value.url);
++			if (!url) continue;
++			server.url = url;
++		}
++		ids.add(server.id);
++		names.add(normalized);
++		servers.push(server);
++	}
++	return { servers };
++}
+diff --git a/src/core/settings-resolution.ts b/src/core/settings-resolution.ts
+index e99525778d1e38180d5636ec57c368b38254783d..9a7c1760e4a0504d34d3114ee289ab032cd8a7bf 100644
+--- a/src/core/settings-resolution.ts
++++ b/src/core/settings-resolution.ts
+@@ -26,6 +26,7 @@ import type { ThinkingLevel } from "@earendil-works/pi-agent-core";
+ import type { ModelRole } from "../../config.ts";
+ import type { ChatSettings } from "./contracts/chat.ts";
+ import type { SearchEngineId } from "./search.ts";
++import type { McpServerSettings } from "./mcp.ts";
+ import {
+ 	BACKGROUND_MODEL_ROLES,
+ 	FACTORY_SETTINGS,
+@@ -101,6 +102,8 @@ export interface EffectiveSettings {
+ 	/** Custom endpoint, resolved concrete: baseUrl defaults "", models and
+ 	 *  user pins default to empty. */
+ 	customProvider: { baseUrl: string; models: CustomModel[]; overrides: Record<string, CustomModelOverride>; manualModels: string[] };
++	/** Configured MCP servers; credential values are deliberately absent. */
++	mcp: { servers: McpServerSettings[] };
+ }
+ 
+ /** The conversation pair's chain (BYOK, owner 2026-09-22): the chat's own
+@@ -236,6 +239,7 @@ export function resolveSettings(record: UserSettings | null): EffectiveSettings
+ 			overrides: record?.customProvider?.overrides ?? {},
+ 			manualModels: record?.customProvider?.manualModels ?? [],
+ 		},
++		mcp: { servers: record?.mcp?.servers ?? [] },
+ 	};
+ }
+ 
+diff --git a/src/core/settings.ts b/src/core/settings.ts
+index e7dcf36ce97f7a1ae60dc82cae72c4235328edba..398f603cc8195d80cdbb62d38caf2db22ffe348a 100644
+--- a/src/core/settings.ts
++++ b/src/core/settings.ts
+@@ -37,6 +37,7 @@ import type { ChatSettings } from "./contracts/chat.ts";
+ import { isSearchEngineId, type SearchEngineId } from "./search.ts";
+ import { isDictationLanguage, type DictationLanguage } from "./dictation.ts";
+ import { parseFileAccessSettings, type FileAccessSettings } from "./file-access.ts";
++import { sanitizeMcpSettings, type McpSettings } from "./mcp.ts";
+ 
+ /** The schema version this code understands. Bump ONLY for breaking shape
+  *  changes (a field renamed/meaning changed); pure additions never bump. */
+@@ -481,6 +482,8 @@ export interface UserSettings {
+ 	models?: ModelsSettings;
+ 	/** The custom OpenAI-compatible endpoint (non-secret config only). */
+ 	customProvider?: CustomProviderSettings;
++	/** External MCP servers; credentials remain in the separate auth store. */
++	mcp?: McpSettings;
+ 	appearance?: AppearanceSettings;
+ 	graph?: GraphSettings;
+ 	compaction?: CompactionSettings;
+@@ -846,6 +849,7 @@ export function sanitizeUserSettings(raw: unknown): UserSettings | null {
+ 	if (r.customProvider !== null && typeof r.customProvider === "object" && !Array.isArray(r.customProvider)) {
+ 		out.customProvider = sanitizeCustomProvider(r.customProvider as Record<string, unknown>);
+ 	}
++	if (r.mcp !== undefined) out.mcp = sanitizeMcpSettings(r.mcp);
+ 	if (r.graph !== null && typeof r.graph === "object" && !Array.isArray(r.graph)) {
+ 		out.graph = sanitizeGraph(r.graph as Record<string, unknown>);
+ 		if (r.compaction !== undefined && r.compaction !== null && typeof r.compaction === "object") {
+diff --git a/src/server/chat-handler.ts b/src/server/chat-handler.ts
+index 2007bffdbb8faf90d58ea1debe9fff3ebf7bfd63..3670a1fce12e84da699b5d296d844103650bcd41 100644
+--- a/src/server/chat-handler.ts
++++ b/src/server/chat-handler.ts
+@@ -33,6 +33,8 @@ import { fileAccessPolicy } from "./file-access.ts";
+ import { collectToolCallIds } from "./pi/call-ids.ts";
+ import { providerEventNote } from "../agent/provider-events.ts";
+ import { effectiveSettings, stores } from "./stores.ts";
++import { openMcpSession } from "./mcp.ts";
++import { McpConnectionError } from "../agent/mcp.ts";
+ import { searchAvailable, searchProvider } from "./search.ts";
+ import { providerKeyPresent } from "./keys.ts";
+ import { CLAUDE_CODE_PROVIDER } from "../core/contracts/claude-code.ts";
+@@ -446,7 +448,27 @@ export async function handleChatInput(
+ 		},
+ 		restoreAutomatic: (automaticIds, retainedIds) => restoreUncommittedAutomatic(chatId, constructed, automaticIds, retainedIds),
+ 	});
++	let mcpSession: Awaited<ReturnType<typeof openMcpSession>> | null = null;
++	// Test-injected agents own their complete registry and never trigger ambient
++	// external connections. Production turns fail clearly rather than silently
++	// dropping an enabled server's capabilities.
++	if (!buildAgent && effective.mcp.servers.some((server) => server.enabled)) {
++		try {
++			mcpSession = await openMcpSession(effective.mcp.servers);
++		} catch (error) {
++			endTurn(chatId);
++			const message = error instanceof McpConnectionError ? error.message : "MCP configuration or credentials could not be read.";
++			return Response.json({ error: message }, { status: 503 });
++		}
++	}
++	const closeMcp = () => {
++		if (!mcpSession) return;
++		const session = mcpSession;
++		mcpSession = null;
++		void session.close().catch((error) => console.error(`[chat ${chatId}] MCP cleanup failed:`, error));
++	};
+ 	const agentOpts: AgentBuildOptions = {
++		additionalTools: mcpSession?.tools,
+ 		engine,
+ 		callPurpose,
+ 		requestCycle,
+@@ -466,7 +488,9 @@ export async function handleChatInput(
+ 	// split, no plan/question/job tools; the whole registry is
+ 	// problem + conclude. buildAgent stays honored (the test seam is
+ 	// uniform across kinds).
+-	const constructed: TeachingAgent = buildAgent
++	let constructed: TeachingAgent;
++	try {
++		constructed = buildAgent
+ 		? buildAgent({ ...agentOpts, teaching })
+ 		: record.kind === "practice"
+ 			? createPracticeAgent(
+@@ -527,7 +551,6 @@ export async function handleChatInput(
+ 	// A test-injected agent gets no usage collector (tests assert the
+ 	// transcript, not the money channel); when it's ours, usage flows through
+ 	// the factory's subscription (wired above via onUsage).
+-	try {
+ 		// THE TURN AS A BACKGROUND OBJECT (owner ruling, 2026-09-25):
+ 		// runPiTurn executes decoupled from this response — the POST stream
+ 		// is just the FIRST subscriber (a view). A client disconnect can no
+@@ -572,6 +595,7 @@ export async function handleChatInput(
+ 			},
+ 			onSettleError: settlementErrorText,
+ 			onSettleFailure: (error, reportedErrorText) => {
++				closeMcp();
+ 				// POST only acknowledges acceptance; the submitter may attach
+ 				// after this turn has already failed and left the registry.
+ 				rememberTurnFailure(chatId, reportedErrorText ?? settlementErrorText(error));
+@@ -586,6 +610,7 @@ export async function handleChatInput(
+ 				settleSteers(chatId, persisted, true, constructed);
+ 			},
+ 			onFinish: (turnMessages, isAborted) => {
++				closeMcp();
+ 				// Wave B: append only messages past the temporary agent prefix.
+ 				// Retry's saved record still includes its earlier failed attempts.
+ 				const stamped = persistTurn(stores.chatStore, chatId, persistBaseCount, turnMessages, isAborted);
+@@ -692,6 +717,7 @@ export async function handleChatInput(
+ 		if (stagedAutomatic && requestCycle && !(await requestCycle.admission)) return Response.json({ error: "Automatic follow-up remains deferred in its queue." }, { status: 403 });
+ 		return Response.json({ ok: true });
+ 	} catch (err) {
++		closeMcp();
+ 		// The stream never started, so no onFinish will fire — clear the registry
+ 		// or a malformed request would lock the chat until the TTL eviction.
+ 		endTurn(chatId);
+diff --git a/src/server/index.ts b/src/server/index.ts
+index e5e07f4ff104b5daa72f9638d64a780c262ffec8..01e2399d08b484661c7797afc4a65fba0b60d594 100644
+--- a/src/server/index.ts
++++ b/src/server/index.ts
+@@ -38,8 +38,10 @@ export { effectivePromptSegments, allSegmentPaths, readPromptOverride } from "..
+ // keeps its plain process.env reads (that seam is the point).
+ export * from "./keys.ts";
+ export * from "./search.ts";
+-export { authStore } from "../store/auth.ts";
++export { authStore, deleteMcpCredentials, readMcpCredentials, writeMcpCredentials } from "../store/auth.ts";
+ export * from "./settings-body.ts";
++export * from "./mcp.ts";
++export { mcpCredentialsGet, mcpCredentialsPut, mcpTestPost } from "./mcp-http.ts";
+ export { fileAccessConfigurationError } from "./file-access.ts";
+ export * from "./turn-liveness.ts";
+ export * from "./turn-runs.ts";
+diff --git a/src/server/mcp-http.ts b/src/server/mcp-http.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..fa91c1f8dbfe3a9b18b838f559de2fa303eecad5
+--- /dev/null
++++ b/src/server/mcp-http.ts
+@@ -0,0 +1,110 @@
++import type { McpCredentialSettings } from "../core/mcp.ts";
++import { McpConnectionError } from "../agent/mcp.ts";
++import { readMcpCredentials, writeMcpCredentials } from "../store/auth.ts";
++import { desktopAPIAuthorized } from "./desktop-access.ts";
++import { subscriptionRequestOrigin } from "./web-subscription-http.ts";
++import { CustomBodyLimitError, readBoundedJson } from "./custom-provider-body.ts";
++import { effectiveSettings } from "./stores.ts";
++import { testMcpServer } from "./mcp.ts";
++
++function response(body: object, status = 200): Response {
++	return Response.json(body, { status, headers: { "cache-control": "no-store" } });
++}
++
++function authorized(request: Request): boolean {
++	const desktop = process.env.LH_DESKTOP_SERVER === "1" || Boolean(process.env.LH_DESKTOP_API_SECRET);
++	if (desktop) return desktopAPIAuthorized(request.headers);
++	const origin = request.headers.get("origin");
++	if (!origin || origin === "null") return false;
++	try {
++		return origin === subscriptionRequestOrigin(request)
++			&& (!request.headers.has("sec-fetch-site") || request.headers.get("sec-fetch-site") === "same-origin");
++	} catch { return false; }
++}
++
++function credentialNames(credentials: McpCredentialSettings | undefined) {
++	return {
++		headers: Object.keys(credentials?.headers ?? {}),
++		env: Object.keys(credentials?.env ?? {}),
++	};
++}
++
++function serverExists(id: string): boolean {
++	return effectiveSettings().mcp.servers.some((server) => server.id === id);
++}
++
++export function mcpCredentialsGet(_request: Request, id: string): Response {
++	if (!serverExists(id)) return response({ error: "Unknown MCP server" }, 404);
++	try {
++		return response(credentialNames(readMcpCredentials()[id]));
++	} catch {
++		return response({ error: "MCP credential storage is unavailable." }, 500);
++	}
++}
++
++type CredentialPatch = Record<string, string | null>;
++
++function parsePatch(raw: unknown, field: string): { patch?: CredentialPatch; error?: string } {
++	if (raw === undefined) return { patch: {} };
++	if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return { error: `${field} must be an object` };
++	const patch: CredentialPatch = {};
++	for (const [name, value] of Object.entries(raw)) {
++		if (!name || (typeof value !== "string" && value !== null)) return { error: `${field}.${name} must be a string or null to delete` };
++		if (name.includes("\0") || name.includes("=")) return { error: `${field} contains an invalid name` };
++		if (value !== null) {
++			try { new Headers({ [name]: value }); } catch { return { error: `${field} contains an invalid name or value` }; }
++		}
++		patch[name] = value;
++	}
++	return { patch };
++}
++
++/** Apply a credential patch. Omitted keys stay untouched; null explicitly
++ * deletes. The response contains names only, never credential values. */
++export async function mcpCredentialsPut(request: Request, id: string): Promise<Response> {
++	if (!authorized(request)) return response({ error: "MCP credentials require a trusted same-origin request." }, 403);
++	if (request.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() !== "application/json") {
++		return response({ error: "JSON content-type is required." }, 415);
++	}
++	const server = effectiveSettings().mcp.servers.find((candidate) => candidate.id === id);
++	if (!server) return response({ error: "Unknown MCP server" }, 404);
++	try {
++		const body = await readBoundedJson(request, 64 * 1024);
++		if (body === null || typeof body !== "object" || Array.isArray(body)) return response({ error: "Invalid JSON body" }, 400);
++		const raw = body as Record<string, unknown>;
++		const headers = parsePatch(raw.headers, "headers");
++		if (headers.error) return response({ error: headers.error }, 400);
++		const env = parsePatch(raw.env, "env");
++		if (env.error) return response({ error: env.error }, 400);
++		if (server.transport === "http" && Object.keys(env.patch!).length) return response({ error: "env is only valid for stdio servers" }, 400);
++		if (server.transport === "stdio" && Object.keys(headers.patch!).length) return response({ error: "headers are only valid for HTTP servers" }, 400);
++		const current = readMcpCredentials()[id] ?? {};
++		const next: McpCredentialSettings = {
++			headers: { ...current.headers },
++			env: { ...current.env },
++		};
++		for (const [name, value] of Object.entries(headers.patch!)) {
++			if (value === null) delete next.headers![name]; else next.headers![name] = value;
++		}
++		for (const [name, value] of Object.entries(env.patch!)) {
++			if (value === null) delete next.env![name]; else next.env![name] = value;
++		}
++		writeMcpCredentials(id, next);
++		return response({ ok: true, ...credentialNames(next) });
++	} catch (error) {
++		if (error instanceof CustomBodyLimitError) return response({ error: "Credential body exceeds 64 KiB." }, 413);
++		if (error instanceof SyntaxError) return response({ error: "Invalid JSON body." }, 400);
++		return response({ error: "Unable to save MCP credentials. No success was reported." }, 500);
++	}
++}
++
++export async function mcpTestPost(request: Request, id: string): Promise<Response> {
++	if (!authorized(request)) return response({ error: "MCP connection tests require a trusted same-origin request." }, 403);
++	if (!serverExists(id)) return response({ error: "Unknown MCP server" }, 404);
++	try {
++		return response({ ok: true, server: await testMcpServer(id) });
++	} catch (error) {
++		if (error instanceof McpConnectionError) return response({ error: error.message }, 502);
++		return response({ error: "MCP configuration or credentials could not be read." }, 500);
++	}
++}
+diff --git a/src/server/mcp.ts b/src/server/mcp.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..0e851892fa304bc3ed01dc8b4007eb2a652595f2
+--- /dev/null
++++ b/src/server/mcp.ts
+@@ -0,0 +1,23 @@
++import type { McpServerSettings } from "../core/mcp.ts";
++import { connectMcpServers, type McpServerSummary } from "../agent/mcp.ts";
++import { readMcpCredentials } from "../store/auth.ts";
++import { effectiveSettings } from "./stores.ts";
++
++/** Compose a turn's MCP session from the current nonsecret settings snapshot
++ * and a fresh private credential read. */
++export function openMcpSession(servers: McpServerSettings[]) {
++	return connectMcpServers(servers, readMcpCredentials());
++}
++
++/** Explicitly testing a saved server also works while its runtime switch is
++ * disabled; only the discovery connection is forced on. */
++export async function testMcpServer(id: string): Promise<McpServerSummary> {
++	const server = effectiveSettings().mcp.servers.find((candidate) => candidate.id === id);
++	if (!server) throw new Error("Unknown MCP server");
++	const session = await openMcpSession([{ ...server, enabled: true }]);
++	try {
++		return session.summaries()[0]!;
++	} finally {
++		await session.close();
++	}
++}
+diff --git a/src/server/settings-body.ts b/src/server/settings-body.ts
+index 181c82859aafbe17daa0998c210446f303ff5ee3..346eb383bdd2a71fdb4279b0428ff55ad0c88a01 100644
+--- a/src/server/settings-body.ts
++++ b/src/server/settings-body.ts
+@@ -32,6 +32,7 @@ import { WRITABLE_TOOL_KEYS } from "../core/pending.ts";
+ import { isSearchEngineId, SEARCH_ENGINES } from "../core/search.ts";
+ import { isDictationLanguage } from "../core/dictation.ts";
+ import { parseFileAccessSettings } from "../core/file-access.ts";
++import { MCP_SERVER_ID_PATTERN, normalizeMcpHttpUrl, normalizeMcpServerName, type McpSettings, type McpServerSettings } from "../core/mcp.ts";
+ 
+ /** Parsed-or-rejected — `ok: false` carries the 400's error message. */
+ export type SettingsBodyResult<T> =
+@@ -96,6 +97,71 @@ export function parseGeneralSettingsBody(body: unknown): SettingsBodyResult<Gene
+ 	return { ok: true, settings };
+ }
+ 
++/** mcp: replace the complete nonsecret server list. Credential values use the
++ * separate MCP credential route and never appear in this body. */
++export function parseMcpSettingsBody(body: unknown): SettingsBodyResult<McpSettings> {
++	const raw = asRecord(body);
++	if (!raw) return { ok: false, error: "Invalid JSON body" };
++	if (raw.servers === undefined) return { ok: true, settings: {} };
++	if (!Array.isArray(raw.servers)) return { ok: false, error: "servers must be an array" };
++	const servers: McpServerSettings[] = [];
++	const ids = new Set<string>();
++	const names = new Set<string>();
++	for (const [index, entry] of raw.servers.entries()) {
++		const value = asRecord(entry);
++		if (!value) return { ok: false, error: `servers[${index}] must be an object` };
++		if (typeof value.id !== "string" || !MCP_SERVER_ID_PATTERN.test(value.id)) {
++			return { ok: false, error: `servers[${index}].id must be a stable 8–64 character id` };
++		}
++		if (typeof value.name !== "string" || !value.name.trim()) {
++			return { ok: false, error: `servers[${index}].name must be non-empty` };
++		}
++		if (value.enabled !== undefined && typeof value.enabled !== "boolean") {
++			return { ok: false, error: `servers[${index}].enabled must be a boolean` };
++		}
++		if (value.transport !== "stdio" && value.transport !== "http") {
++			return { ok: false, error: `servers[${index}].transport must be stdio or http` };
++		}
++		const normalized = normalizeMcpServerName(value.name);
++		if (ids.has(value.id) || names.has(normalized)) {
++			return { ok: false, error: "MCP server ids and normalized names must be unique" };
++		}
++		const server: McpServerSettings = {
++			id: value.id,
++			name: value.name.trim(),
++			enabled: value.enabled ?? true,
++			transport: value.transport,
++		};
++		if (value.transport === "stdio") {
++			if (value.url !== undefined) return { ok: false, error: `${server.name}: url is only valid for HTTP servers` };
++			if (typeof value.command !== "string" || !value.command.trim()) {
++				return { ok: false, error: `${server.name}: command must be non-empty` };
++			}
++			server.command = value.command.trim();
++			if (value.args !== undefined && (!Array.isArray(value.args) || value.args.some((arg) => typeof arg !== "string"))) {
++				return { ok: false, error: `${server.name}: args must be an array of strings` };
++			}
++			server.args = (value.args as string[] | undefined) ?? [];
++			if (value.cwd !== undefined) {
++				if (typeof value.cwd !== "string" || !value.cwd.trim()) return { ok: false, error: `${server.name}: cwd must be a non-empty string` };
++				server.cwd = value.cwd.trim();
++			}
++		} else {
++			if (value.command !== undefined || value.args !== undefined || value.cwd !== undefined) {
++				return { ok: false, error: `${server.name}: command, args and cwd are only valid for stdio servers` };
++			}
++			if (typeof value.url !== "string") return { ok: false, error: `${server.name}: url must be an absolute HTTP(S) URL` };
++			const url = normalizeMcpHttpUrl(value.url);
++			if (!url) return { ok: false, error: `${server.name}: url must be absolute HTTP(S) without embedded credentials` };
++			server.url = url;
++		}
++		ids.add(server.id);
++		names.add(normalized);
++		servers.push(server);
++	}
++	return { ok: true, settings: { servers } };
++}
++
+ /** claudeCode: explicit app-wide opt-in. Empty section resets to off. */
+ export function parseClaudeCodeSettingsBody(body: unknown): SettingsBodyResult<{ enabled?: boolean }> {
+ 	const raw = asRecord(body);
+@@ -465,6 +531,7 @@ export const SETTINGS_SECTIONS = {
+ 	graph: parseGraphSettingsBody,
+ 	compaction: parseCompactionSettingsBody,
+ 	models: parseModelsSettingsBody,
++	mcp: parseMcpSettingsBody,
+ 	dictation: parseDictationSettingsBody,
+ 	claudeCode: parseClaudeCodeSettingsBody,
+ } as const;
+diff --git a/src/store/auth.ts b/src/store/auth.ts
+index f7d48467e058a31f37de819ab7e229f0cc106d6a..d62181333cb629d4b39aad5a9ccf76871076fd30 100644
+--- a/src/store/auth.ts
++++ b/src/store/auth.ts
+@@ -21,6 +21,7 @@ import { AUTH_FILE } from "../../config.ts";
+ import type { AuthStore } from "../core/ports.ts";
+ import { CUSTOM_PROVIDER } from "../core/auth-keys.ts";
+ import { CUSTOM_AUTH_BINDING, parseCustomAuthBinding, type CustomAuthBinding } from "../core/custom-provider-auth.ts";
++import { MCP_SERVER_ID_PATTERN, type McpCredentialSettings } from "../core/mcp.ts";
+ import { writeFileAtomicSync } from "./atomic-write.ts";
+ 
+ /** The flat string→string map, or {} for absent/corrupt/non-object. */
+@@ -79,8 +80,11 @@ function readCustomMap(): Record<string, unknown> {
+ 	if (Object.hasOwn(map, CUSTOM_PROVIDER.envVar) && typeof map[CUSTOM_PROVIDER.envVar] !== "string") throw new Error("Invalid custom credential record");
+ 	return map;
+ }
++export const MCP_CREDENTIALS_AUTH_KEY = "MCP_CREDENTIALS";
++
+ function assertOrdinaryVar(name: string): void {
+ 	if (name === CUSTOM_AUTH_BINDING || name === CUSTOM_PROVIDER.envVar) throw new Error("Use the custom endpoint editor");
++	if (name === MCP_CREDENTIALS_AUTH_KEY) throw new Error("Use the MCP credential editor");
+ }
+ /** One immutable file snapshot. Keyless callers never invoke fileKey(). */
+ export function readCustomAuth() {
+@@ -97,3 +101,64 @@ export function writeCustomAuth(binding: CustomAuthBinding | undefined, fileKey:
+ 	else Object.defineProperty(map, CUSTOM_AUTH_BINDING, { value: JSON.stringify(binding), enumerable: true, configurable: true, writable: true });
+ 	writeMap(map);
+ }
++
++function parseCredentialMap(raw: unknown): Record<string, string> | undefined {
++	if (raw === undefined) return undefined;
++	if (raw === null || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Invalid MCP credential record");
++	const entries = Object.entries(raw);
++	if (entries.some(([name, value]) => !name || typeof value !== "string")) throw new Error("Invalid MCP credential record");
++	return Object.fromEntries(entries) as Record<string, string>;
++}
++
++function parseMcpCredentials(raw: unknown): Record<string, McpCredentialSettings> {
++	if (raw === undefined) return {};
++	if (typeof raw !== "string") throw new Error("Invalid MCP credential record");
++	let parsed: unknown;
++	try { parsed = JSON.parse(raw); } catch { throw new Error("Invalid MCP credential record"); }
++	if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Invalid MCP credential record");
++	const out: Record<string, McpCredentialSettings> = {};
++	for (const [id, value] of Object.entries(parsed)) {
++		if (!MCP_SERVER_ID_PATTERN.test(id) || value === null || typeof value !== "object" || Array.isArray(value)) {
++			throw new Error("Invalid MCP credential record");
++		}
++		const raw = value as Record<string, unknown>;
++		const headers = parseCredentialMap(raw.headers);
++		const env = parseCredentialMap(raw.env);
++		out[id] = { ...(headers ? { headers } : {}), ...(env ? { env } : {}) };
++	}
++	return out;
++}
++
++/** Read all MCP credentials for runtime injection. Callers must never serialize
++ * this return value into an HTTP response. */
++export function readMcpCredentials(): Record<string, McpCredentialSettings> {
++	return parseMcpCredentials(readCustomMap()[MCP_CREDENTIALS_AUTH_KEY]);
++}
++
++export function writeMcpCredentials(id: string, credentials: McpCredentialSettings): void {
++	if (!MCP_SERVER_ID_PATTERN.test(id)) throw new Error("Invalid MCP server id");
++	// Validate and clone before touching the private record.
++	const cleaned = parseMcpCredentials(JSON.stringify({ [id]: credentials }))[id]!;
++	const normalized: McpCredentialSettings = {
++		...(Object.keys(cleaned.headers ?? {}).length ? { headers: cleaned.headers } : {}),
++		...(Object.keys(cleaned.env ?? {}).length ? { env: cleaned.env } : {}),
++	};
++	const map = readCustomMap();
++	const all = parseMcpCredentials(map[MCP_CREDENTIALS_AUTH_KEY]);
++	if (Object.keys(normalized).length) all[id] = normalized;
++	else delete all[id];
++	if (Object.keys(all).length) map[MCP_CREDENTIALS_AUTH_KEY] = JSON.stringify(all);
++	else delete map[MCP_CREDENTIALS_AUTH_KEY];
++	writeMap(map);
++}
++
++export function deleteMcpCredentials(ids: Iterable<string>): void {
++	const map = readCustomMap();
++	const all = parseMcpCredentials(map[MCP_CREDENTIALS_AUTH_KEY]);
++	let changed = false;
++	for (const id of ids) changed = delete all[id] || changed;
++	if (!changed) return;
++	if (Object.keys(all).length) map[MCP_CREDENTIALS_AUTH_KEY] = JSON.stringify(all);
++	else delete map[MCP_CREDENTIALS_AUTH_KEY];
++	writeMap(map);
++}
+diff --git a/tests/chatgpt-connection-ui.test.tsx b/tests/chatgpt-connection-ui.test.tsx
+index 2d3c1be942a572cf9f46688bd08ae4c2174c5ed6..228bd206b09ba792c0abcb53bdcc1a6fd9abcd47 100644
+--- a/tests/chatgpt-connection-ui.test.tsx
++++ b/tests/chatgpt-connection-ui.test.tsx
+@@ -72,7 +72,7 @@ afterEach(async () => { await act(async () => root?.unmount()); host?.remove();
+ test("Providers is the first/default page; General is last and other pages keep relative order", () => {
+  const html = renderToStaticMarkup(<SettingsDialogBody onClose={() => {}} />);
+  const ids = [...html.matchAll(/data-testid="settings-nav-([^"]+)"/g)].map((m) => m[1]);
+- assert.deepEqual(ids, ["keys", "agent", "appearance", "graph", "keyboard", "general"]);
++ assert.deepEqual(ids, ["keys", "agent", "mcp", "appearance", "graph", "keyboard", "general"]);
+  assert.match(html, /settings-nav-keys[^>]*aria-current="true"/); assert.match(html, />Providers<\/button>/);
+  assert.doesNotMatch(html, />Model providers<\/button>/);
+ });
+diff --git a/tests/fixtures/mcp/server.mjs b/tests/fixtures/mcp/server.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..3b587a59d23aaefa2a74826a17260b91cc8d7546
+--- /dev/null
++++ b/tests/fixtures/mcp/server.mjs
+@@ -0,0 +1,5 @@
++import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
++import { createMcpFixtureServer } from "../../helpers/mcp-fixture.ts";
++
++const server = createMcpFixtureServer();
++await server.connect(new StdioServerTransport());
+diff --git a/tests/helpers/mcp-fixture.ts b/tests/helpers/mcp-fixture.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..90ac92659bce9173b89032f4fe7b9b95d3ba1008
+--- /dev/null
++++ b/tests/helpers/mcp-fixture.ts
+@@ -0,0 +1,76 @@
++import { Server } from "@modelcontextprotocol/sdk/server/index.js";
++import {
++	CallToolRequestSchema,
++	GetPromptRequestSchema,
++	ListPromptsRequestSchema,
++	ListResourcesRequestSchema,
++	ListResourceTemplatesRequestSchema,
++	ListToolsRequestSchema,
++	ReadResourceRequestSchema,
++} from "@modelcontextprotocol/sdk/types.js";
++
++const PIXEL = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
++
++export function createMcpFixtureServer(): Server {
++	const server = new Server({ name: "fixture", version: "1" }, {
++		capabilities: { tools: {}, resources: {}, prompts: {} },
++	});
++	server.setRequestHandler(ListToolsRequestSchema, (request) => {
++		if (request.params?.cursor !== "second") return {
++			tools: [{
++				name: "echo",
++				description: "Echo a message",
++				inputSchema: { type: "object", properties: { message: { type: "string", minLength: 1 } }, required: ["message"] },
++			}],
++			nextCursor: "second",
++		};
++		return {
++			tools: [
++				{ name: "image", inputSchema: { type: "object", properties: {} } },
++				{ name: "failure", inputSchema: { type: "object", properties: {} } },
++				{ name: "slow", inputSchema: { type: "object", properties: {} } },
++			],
++		};
++	});
++	server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
++		const args = request.params.arguments ?? {};
++		switch (request.params.name) {
++			case "echo": return {
++				content: [{ type: "text", text: `${String(args.message)}:${process.env.MCP_FIXTURE_TOKEN ?? "missing"}` }],
++				structuredContent: { echoed: String(args.message) },
++			};
++			case "image": return { content: [{ type: "image", data: PIXEL, mimeType: "image/png" }] };
++			case "failure": return { content: [{ type: "text", text: "synthetic failure" }], isError: true };
++			case "slow":
++				await new Promise<void>((resolve, reject) => {
++					const timer = setTimeout(resolve, 30_000);
++					extra.signal.addEventListener("abort", () => {
++						clearTimeout(timer);
++						reject(new Error("fixture aborted"));
++					}, { once: true });
++				});
++				return { content: [{ type: "text", text: "finished" }] };
++			default: throw new Error("Unknown fixture tool");
++		}
++	});
++	server.setRequestHandler(ListResourcesRequestSchema, () => ({
++		resources: [{ uri: "fixture://note", name: "Note", description: "A text note", mimeType: "text/plain" }],
++	}));
++	server.setRequestHandler(ListResourceTemplatesRequestSchema, () => ({
++		resourceTemplates: [{ uriTemplate: "fixture://notes/{id}", name: "Parameterized note" }],
++	}));
++	server.setRequestHandler(ReadResourceRequestSchema, (request) => ({
++		contents: [{ uri: request.params.uri, text: `Contents for ${request.params.uri}`, mimeType: "text/plain" }],
++	}));
++	server.setRequestHandler(ListPromptsRequestSchema, () => ({
++		prompts: [{ name: "greeting", description: "A greeting", arguments: [{ name: "name", required: true }] }],
++	}));
++	server.setRequestHandler(GetPromptRequestSchema, (request) => ({
++		description: "Rendered greeting",
++		messages: [{
++			role: "user",
++			content: { type: "text", text: `Hello ${request.params.arguments?.name ?? "nobody"}` },
++		}],
++	}));
++	return server;
++}
+diff --git a/tests/mcp-agent.test.ts b/tests/mcp-agent.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..648703c1bab028241b5a65e48e1f61b63d7549f9
+--- /dev/null
++++ b/tests/mcp-agent.test.ts
+@@ -0,0 +1,47 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import { Type } from "typebox";
++import { createFauxCore } from "@earendil-works/pi-ai";
++import { createPracticeAgent, createProberAgent, createTeacherAgent } from "../src/agent/teacher-agent.ts";
++import type { PiEngine } from "../src/agent/models.ts";
++import type { AgentTool } from "@earendil-works/pi-agent-core";
++import type { JobStore } from "../src/core/ports.ts";
++
++function engine(): PiEngine {
++	const faux = createFauxCore({});
++	return { model: faux.getModel(), streamFn: faux.streamSimple };
++}
++
++const externalInput = Type.Object({});
++const external: AgentTool<typeof externalInput> = {
++	name: "mcp__Fixture__echo",
++	label: "Fixture echo",
++	description: "Synthetic MCP tool",
++	parameters: externalInput,
++	execute: async () => ({ content: [], details: null }),
++};
++
++const record = { messages: [], kind: undefined };
++const chatStore = { getChat: () => record };
++
++test("additional MCP tools reach prober, teacher and practice", () => {
++	const prober = createProberAgent({
++		chatId: "chat",
++		chatStore: chatStore as never,
++		deliver: () => {},
++		jobStore: {} as JobStore,
++		spawn: () => {},
++	}, { engine: engine(), additionalTools: { [external.name]: external } });
++	const teacher = createTeacherAgent(undefined, { engine: engine(), additionalTools: { [external.name]: external } });
++	const practice = createPracticeAgent({ chatId: "chat", chatStore }, { engine: engine(), additionalTools: { [external.name]: external } });
++	for (const agent of [prober, teacher, practice]) {
++		assert.ok(agent.state.tools.some((tool) => tool.name === external.name));
++	}
++});
++
++test("additional tool collisions with built-ins fail before inference", () => {
++	assert.throws(() => createTeacherAgent(undefined, {
++		engine: engine(),
++		additionalTools: { quiz: { ...external, name: "quiz" } as AgentTool<any> },
++	}), /Duplicate agent tool name: quiz/);
++});
+diff --git a/tests/mcp-auth.test.ts b/tests/mcp-auth.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..c93d26570f945f52349d33a5ba31022932a5959c
+--- /dev/null
++++ b/tests/mcp-auth.test.ts
+@@ -0,0 +1,42 @@
++import assert from "node:assert/strict";
++import fs from "node:fs";
++import os from "node:os";
++import path from "node:path";
++import test, { after } from "node:test";
++
++const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "lh-mcp-auth-"));
++process.env.LH_AUTH_FILE = path.join(TMP, "auth.json");
++const auth = await import("../src/store/auth.ts");
++const { AUTH_FILE } = await import("../config.ts");
++
++after(() => fs.rmSync(TMP, { recursive: true, force: true }));
++
++test("MCP credentials round-trip privately by stable server id", () => {
++	auth.authStore.setAuthVar("EXISTING_KEY", "keep");
++	auth.writeMcpCredentials("server_one", { headers: { Authorization: "Bearer secret" } });
++	auth.writeMcpCredentials("server_two", { env: { API_KEY: "also-secret" } });
++	assert.deepEqual(auth.readMcpCredentials(), {
++		server_one: { headers: { Authorization: "Bearer secret" } },
++		server_two: { env: { API_KEY: "also-secret" } },
++	});
++	assert.equal(auth.authStore.authVars().EXISTING_KEY, "keep");
++	assert.equal(fs.statSync(AUTH_FILE).mode & 0o777, 0o600);
++});
++
++test("empty credentials and server deletion remove only the intended record", () => {
++	auth.writeMcpCredentials("server_one", {});
++	assert.deepEqual(auth.readMcpCredentials(), { server_two: { env: { API_KEY: "also-secret" } } });
++	auth.deleteMcpCredentials(["server_two"]);
++	assert.deepEqual(auth.readMcpCredentials(), {});
++	assert.equal(auth.authStore.authVars().EXISTING_KEY, "keep");
++	assert.throws(() => auth.authStore.setAuthVar(auth.MCP_CREDENTIALS_AUTH_KEY, "not allowed"), /MCP credential editor/);
++});
++
++test("corrupt MCP credentials fail closed instead of being overwritten", () => {
++	const raw = JSON.parse(fs.readFileSync(AUTH_FILE, "utf8")) as Record<string, unknown>;
++	raw[auth.MCP_CREDENTIALS_AUTH_KEY] = "not json";
++	fs.writeFileSync(AUTH_FILE, JSON.stringify(raw), { mode: 0o600 });
++	assert.throws(() => auth.readMcpCredentials(), /Invalid MCP credential record/);
++	assert.throws(() => auth.writeMcpCredentials("server_three", { env: { KEY: "value" } }), /Invalid MCP credential record/);
++	assert.equal(raw[auth.MCP_CREDENTIALS_AUTH_KEY], "not json");
++});
+diff --git a/tests/mcp-client.test.ts b/tests/mcp-client.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..414004cf0cea6811ecb1cfdac6a0ecc61447c8f4
+--- /dev/null
++++ b/tests/mcp-client.test.ts
+@@ -0,0 +1,112 @@
++import assert from "node:assert/strict";
++import http from "node:http";
++import type { AddressInfo } from "node:net";
++import { fileURLToPath } from "node:url";
++import test from "node:test";
++import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
++import { Value } from "typebox/value";
++import { connectMcpServers, McpConnectionError, type McpSession } from "../src/agent/mcp.ts";
++import type { McpServerSettings } from "../src/core/mcp.ts";
++import { createMcpFixtureServer } from "./helpers/mcp-fixture.ts";
++
++const FIXTURE = fileURLToPath(new URL("./fixtures/mcp/server.mjs", import.meta.url));
++
++async function exercise(session: McpSession, abort = false, expectedToken = "synthetic-token") {
++	assert.deepEqual(session.summaries(), [{ id: "fixture_1", name: "Fixture", tools: 4, resources: 1, resourceTemplates: 1, prompts: 1 }]);
++	assert.ok(session.tools.mcp__Fixture__echo);
++	assert.ok(session.tools.mcp_list_resources);
++	assert.ok(session.tools.mcp_list_resource_templates);
++	assert.ok(session.tools.mcp_read_resource);
++	assert.ok(session.tools.mcp_list_prompts);
++	assert.ok(session.tools.mcp_get_prompt);
++
++	const echo = session.tools.mcp__Fixture__echo!;
++	assert.ok(Value.Check(echo.parameters, { message: "hello" }));
++	assert.ok(!Value.Check(echo.parameters, { message: "" }));
++	const result = await echo.execute("call", { message: "hello" });
++	assert.equal(result.content[0]?.type, "text");
++	assert.equal((result.content[0] as { text: string }).text, `hello:${expectedToken}`);
++	assert.deepEqual(result.structuredContent, { echoed: "hello" });
++
++	const image = await session.tools.mcp__Fixture__image!.execute("image", {});
++	assert.equal(image.content[0]?.type, "image");
++	const failure = await session.tools.mcp__Fixture__failure!.execute("failure", {});
++	assert.equal(failure.isError, true);
++
++	const resources = await session.tools.mcp_list_resources!.execute("resources", { server: "Fixture" });
++	assert.match((resources.content[0] as { text: string }).text, /fixture:\/\/note/);
++	const templates = await session.tools.mcp_list_resource_templates!.execute("templates", { server: "Fixture" });
++	assert.match((templates.content[0] as { text: string }).text, /fixture:\/\/notes/);
++	const resource = await session.tools.mcp_read_resource!.execute("read", { server: "Fixture", uri: "fixture://note" });
++	assert.match((resource.content[0] as { text: string }).text, /Contents for fixture:\/\/note/);
++
++	const prompts = await session.tools.mcp_list_prompts!.execute("prompts", { server: "Fixture" });
++	assert.match((prompts.content[0] as { text: string }).text, /greeting/);
++	const prompt = await session.tools.mcp_get_prompt!.execute("prompt", { server: "Fixture", name: "greeting", arguments: { name: "learner" } });
++	assert.match(prompt.content.map((part) => part.type === "text" ? part.text : "").join("\n"), /Hello learner/);
++
++	if (abort) {
++		const controller = new AbortController();
++		const pending = session.tools.mcp__Fixture__slow!.execute("slow", {}, controller.signal);
++		controller.abort();
++		await assert.rejects(pending);
++	}
++}
++
++test("stdio MCP discovery, schemas, calls, resources, prompts, abort and cleanup", async () => {
++	const server: McpServerSettings = {
++		id: "fixture_1",
++		name: "Fixture",
++		enabled: true,
++		transport: "stdio",
++		command: process.execPath,
++		args: [FIXTURE],
++	};
++	const session = await connectMcpServers([server], { fixture_1: { env: { MCP_FIXTURE_TOKEN: "synthetic-token" } } });
++	try { await exercise(session, true); }
++	finally { await session.close(); }
++	await session.close();
++});
++
++test("Streamable HTTP MCP passes static headers and supports every capability", async () => {
++	const mcpServer = createMcpFixtureServer();
++	const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => crypto.randomUUID() });
++	await mcpServer.connect(transport);
++	const httpServer = http.createServer((request, response) => {
++		if (request.headers["x-fixture-token"] !== "synthetic-token") {
++			response.writeHead(401).end();
++			return;
++		}
++		void transport.handleRequest(request, response).catch((error) => {
++			console.error("MCP HTTP fixture request failed", error);
++			if (!response.headersSent) response.writeHead(500);
++			response.end();
++		});
++	});
++	await new Promise<void>((resolve) => httpServer.listen(0, "127.0.0.1", resolve));
++	const address = httpServer.address() as AddressInfo;
++	const server: McpServerSettings = {
++		id: "fixture_1",
++		name: "Fixture",
++		enabled: true,
++		transport: "http",
++		url: `http://127.0.0.1:${address.port}/mcp`,
++	};
++	const session = await connectMcpServers([server], { fixture_1: { headers: { "X-Fixture-Token": "synthetic-token" } } });
++	try { await exercise(session, false, "missing"); }
++	finally {
++		await session.close();
++		await mcpServer.close();
++		httpServer.closeAllConnections();
++		await new Promise<void>((resolve, reject) => httpServer.close((error) => error ? reject(error) : resolve()));
++	}
++});
++
++test("disabled servers do not connect and unavailable enabled servers fail clearly", async () => {
++	const disabled: McpServerSettings = { id: "disabled_1", name: "Disabled", enabled: false, transport: "http", url: "http://127.0.0.1:1/mcp" };
++	const empty = await connectMcpServers([disabled]);
++	assert.deepEqual(empty.summaries(), []);
++	assert.deepEqual(Object.keys(empty.tools), []);
++	await empty.close();
++	await assert.rejects(connectMcpServers([{ ...disabled, enabled: true }]), McpConnectionError);
++});
+diff --git a/tests/mcp-http.test.ts b/tests/mcp-http.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..1eb4a31c4e926437ced5e7bd080a5681c8457163
+--- /dev/null
++++ b/tests/mcp-http.test.ts
+@@ -0,0 +1,61 @@
++import assert from "node:assert/strict";
++import fs from "node:fs";
++import os from "node:os";
++import path from "node:path";
++import test, { after, before } from "node:test";
++
++const dir = fs.mkdtempSync(path.join(os.tmpdir(), "lh-mcp-http-"));
++process.env.LH_DATA_DIR = dir;
++process.env.LH_AUTH_FILE = path.join(dir, "auth.json");
++let credentials: typeof import("../app/api/mcp/credentials/[id]/route.ts");
++let settings: typeof import("../app/api/settings/[section]/route.ts");
++let auth: typeof import("../src/store/auth.ts");
++
++before(async () => {
++	credentials = await import("../app/api/mcp/credentials/[id]/route.ts");
++	settings = await import("../app/api/settings/[section]/route.ts");
++	auth = await import("../src/store/auth.ts");
++	const store = await import("../src/store/settings.ts");
++	store.writeSettings({ version: 1, mcp: { servers: [{
++		id: "covenant_1", name: "Covenant", enabled: true, transport: "http", url: "https://covenantofearth.org/mcp",
++	}] } });
++});
++
++after(() => {
++	fs.rmSync(dir, { recursive: true, force: true });
++	delete process.env.LH_DATA_DIR;
++	delete process.env.LH_AUTH_FILE;
++});
++
++function put(body: unknown, origin = "http://localhost") {
++	return credentials.PUT(new Request("http://localhost/api/mcp/credentials/covenant_1", {
++		method: "PUT",
++		headers: { "content-type": "application/json", origin },
++		body: JSON.stringify(body),
++	}), { params: Promise.resolve({ id: "covenant_1" }) });
++}
++
++test("MCP credential routes patch values but return only names", async () => {
++	const denied = await put({ headers: { Authorization: "secret" } }, "https://attacker.invalid");
++	assert.equal(denied.status, 403);
++	const saved = await put({ headers: { Authorization: "secret", "X-Remove": "delete-me" } });
++	assert.equal(saved.status, 200);
++	assert.deepEqual(auth.readMcpCredentials().covenant_1, { headers: { Authorization: "secret", "X-Remove": "delete-me" } });
++	assert.deepEqual(await saved.json(), { ok: true, headers: ["Authorization", "X-Remove"], env: [] });
++	const response = await credentials.GET(new Request("http://localhost/api/mcp/credentials/covenant_1"), { params: Promise.resolve({ id: "covenant_1" }) });
++	const text = await response.text();
++	assert.ok(text.includes("Authorization"));
++	assert.ok(!text.includes("secret"));
++	assert.ok(!text.includes("delete-me"));
++	const updated = await put({ headers: { "X-Remove": null, "X-New": "new-secret" } });
++	assert.equal(updated.status, 200);
++	assert.deepEqual(auth.readMcpCredentials().covenant_1, { headers: { Authorization: "secret", "X-New": "new-secret" } });
++});
++
++test("deleting an MCP settings server deletes its credentials", async () => {
++	const response = await settings.PUT(new Request("http://localhost/api/settings/mcp", {
++		method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ servers: [] }),
++	}), { params: Promise.resolve({ section: "mcp" }) });
++	assert.equal(response.status, 200);
++	assert.deepEqual(auth.readMcpCredentials(), {});
++});
+diff --git a/tests/mcp-settings-ui.test.tsx b/tests/mcp-settings-ui.test.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..1a37ee3259cfe5c52fdcf3b56045092ee93d9e6a
+--- /dev/null
++++ b/tests/mcp-settings-ui.test.tsx
+@@ -0,0 +1,38 @@
++import React from "react";
++(globalThis as Record<string, unknown>).React = React;
++
++import assert from "node:assert/strict";
++import test from "node:test";
++import { renderToStaticMarkup } from "react-dom/server";
++import { McpSection, mcpCredentialPatch } from "../components/settings/mcp-section.tsx";
++import { artifactRendererFor } from "../components/artifacts/index.ts";
++import { ToolCallCard } from "../components/artifacts/tool-call-card.tsx";
++
++const servers = [
++	{ id: "covenant_1", name: "Covenant", enabled: true, transport: "http" as const, url: "https://covenantofearth.org/mcp" },
++	{ id: "local_server", name: "Local", enabled: false, transport: "stdio" as const, command: "node", args: ["server.mjs"] },
++];
++
++test("MCP settings render servers without exposing credential values", () => {
++	const html = renderToStaticMarkup(<McpSection mcp={{ servers }} onSave={async () => true} />);
++	assert.ok(html.includes("Covenant"));
++	assert.ok(html.includes("https://covenantofearth.org/mcp"));
++	assert.ok(html.includes("Local"));
++	assert.ok(html.includes("Test connection"));
++	assert.ok(html.includes("Add MCP server"));
++	assert.ok(!html.includes("password"));
++});
++
++test("credential patches preserve blank saved values and explicitly delete removed rows", () => {
++	const patch = mcpCredentialPatch([
++		{ name: "Authorization", value: "", saved: true },
++		{ name: "X-New", value: "secret", saved: false },
++	], ["Authorization", "X-Remove"]);
++	assert.deepEqual(patch, { headers: { "X-Remove": null, "X-New": "secret" }, env: {} });
++});
++
++test("dynamic MCP calls use the generic tool card without changing other fallbacks", () => {
++	assert.equal(artifactRendererFor("mcp__Covenant__search"), ToolCallCard);
++	assert.equal(artifactRendererFor("mcp_read_resource"), ToolCallCard);
++	assert.equal(artifactRendererFor("unregistered"), undefined);
++});
+diff --git a/tests/mcp-settings.test.ts b/tests/mcp-settings.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6d2727add76491298f8effdbdc714f24faeb505d
+--- /dev/null
++++ b/tests/mcp-settings.test.ts
+@@ -0,0 +1,64 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import { normalizeMcpServerName, sanitizeMcpSettings } from "../src/core/mcp.ts";
++import { sanitizeUserSettings } from "../src/core/settings.ts";
++import { resolveSettings } from "../src/core/settings-resolution.ts";
++import { parseMcpSettingsBody } from "../src/server/settings-body.ts";
++
++const stdio = {
++	id: "server_stdio_1",
++	name: "Local tools",
++	enabled: true,
++	transport: "stdio",
++	command: "node",
++	args: ["server.mjs", "--safe"],
++	cwd: "/tmp",
++};
++const http = {
++	id: "server_http_1",
++	name: "Covenant",
++	enabled: true,
++	transport: "http",
++	url: "https://covenantofearth.org/mcp",
++};
++
++test("MCP settings parse both transports without credential fields", () => {
++	const parsed = parseMcpSettingsBody({ servers: [stdio, http] });
++	assert.ok(parsed.ok);
++	assert.equal(parsed.settings.servers?.length, 2);
++	assert.equal(parsed.settings.servers?.[1]?.url, "https://covenantofearth.org/mcp");
++	assert.ok(!("headers" in http));
++	assert.ok(!("env" in stdio));
++});
++
++test("MCP settings reject duplicate normalized names and mixed transports", () => {
++	const duplicate = parseMcpSettingsBody({ servers: [stdio, { ...http, id: "other_http_1", name: "Local tools!" }] });
++	assert.ok(!duplicate.ok);
++	assert.match(duplicate.error, /normalized names/);
++	const mixed = parseMcpSettingsBody({ servers: [{ ...stdio, url: "https://example.test/mcp" }] });
++	assert.ok(!mixed.ok);
++	assert.match(mixed.error, /only valid for HTTP/);
++});
++
++test("MCP settings reject URL credentials and malformed stdio arguments", () => {
++	const credentialUrl = parseMcpSettingsBody({ servers: [{ ...http, url: "https://user:secret@example.test/mcp" }] });
++	assert.ok(!credentialUrl.ok);
++	const args = parseMcpSettingsBody({ servers: [{ ...stdio, args: ["ok", 42] }] });
++	assert.ok(!args.ok);
++	assert.match(args.error, /array of strings/);
++});
++
++test("MCP disk sanitization drops malformed and ambiguous entries", () => {
++	const cleaned = sanitizeMcpSettings({
++		servers: [stdio, { ...http, id: stdio.id }, { ...http, id: "bad id" }, null],
++	});
++	assert.deepEqual(cleaned.servers?.map((server) => server.id), [stdio.id]);
++	assert.equal(normalizeMcpServerName("My local server"), "My_local_server");
++});
++
++test("user settings retain MCP configuration and resolution defaults to no servers", () => {
++	assert.deepEqual(resolveSettings(null).mcp, { servers: [] });
++	const record = sanitizeUserSettings({ version: 1, mcp: { servers: [http] } });
++	assert.equal(record?.mcp?.servers?.[0]?.name, "Covenant");
++	assert.deepEqual(resolveSettings(record).mcp.servers.map((server) => server.id), [http.id]);
++});
+diff --git a/tests/render-settings.test.tsx b/tests/render-settings.test.tsx
+index b265fbc8c53934ce089b2da224bea4badd4586b8..289ae6a8d4f9800397275b2bf72136c338f932a9 100644
+--- a/tests/render-settings.test.tsx
++++ b/tests/render-settings.test.tsx
+@@ -44,12 +44,12 @@ describe("SettingsDialog (the designed surface, SSR)", () => {
+ 		assert.ok(!html.includes("settings-dialog"));
+ 	});
+ 
+-	it("the dialog frame: role=dialog + the ✕ + the six-section nav, Providers first and General last", () => {
++	it("the dialog frame: role=dialog + the ✕ + the seven-section nav, Providers first and General last", () => {
+ 		const html = renderToStaticMarkup(<SettingsDialogBody onClose={() => {}} />);
+ 		assert.ok(html.includes('role="dialog"'));
+ 		assert.ok(html.includes('aria-modal="true"'));
+ 		assert.ok(html.includes('aria-label="Close settings"'));
+-		for (const id of ["general", "keys", "agent", "appearance", "graph", "keyboard"]) {
++		for (const id of ["general", "keys", "agent", "mcp", "appearance", "graph", "keyboard"]) {
+ 			assert.ok(html.includes(`data-testid="settings-nav-${id}"`), id);
+ 		}
+ 		// Providers is the first landing section; internal keys deep links survive.
+diff --git a/tests/settings-body.test.ts b/tests/settings-body.test.ts
+index 44f10bbae80748ecc87303842bd1cbf6c5bb7571..c879831e3303685ad564be84a9aa755d470eae16 100644
+--- a/tests/settings-body.test.ts
++++ b/tests/settings-body.test.ts
+@@ -245,14 +245,14 @@ describe("parseCompactionSettingsBody (owner round 14)", () => {
+ });
+ 
+ describe("SETTINGS_SECTIONS (the route's section map)", () => {
+-	it("maps exactly the eight record sections", () => {
++	it("maps exactly the nine record sections", () => {
+ 		// compaction joined (owner round 14): its own section PUT — the
+ 		// threshold is engine behavior, not an agent-section key. The custom
+ 		// endpoint is NOT a section: it is one more provider in the Keys list,
+ 		// connected through POST /api/custom-provider.
+ 		assert.deepEqual(
+ 			Object.keys(SETTINGS_SECTIONS),
+-			["general", "chat", "agent", "appearance", "graph", "compaction", "models", "dictation", "claudeCode"],
++			["general", "chat", "agent", "appearance", "graph", "compaction", "models", "mcp", "dictation", "claudeCode"],
+ 		);
+ 	});
+ });
