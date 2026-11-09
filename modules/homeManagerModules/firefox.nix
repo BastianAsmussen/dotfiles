@@ -73,17 +73,7 @@
         };
 
         search = {
-          defaultSearchEngine = "Kagi";
-          addEngines = [
-            {
-              Name = "Kagi";
-              Description = "Kagi Search";
-              Alias = "!k";
-              Method = "GET";
-              URLTemplate = "https://kagi.com/search?q={searchTerms}";
-            }
-          ];
-
+          defaultSearchEngine = "DuckDuckGo";
           removeEngines = [
             "Google"
             "Bing"
