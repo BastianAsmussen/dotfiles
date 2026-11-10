@@ -53,9 +53,9 @@ in
             nativeBuildInputs = [ pkgs.openssl ];
           }
           ''
-            openssl req -x509 -newkey rsa:2048 -keyout ca.key -out ca.crt -days 1 -nodes -subj "/CN=test-ca"
+            openssl req -x509 -newkey rsa:2048 -keyout ca.key -out ca.crt -days 3650 -nodes -subj "/CN=test-ca"
             openssl req -newkey rsa:2048 -keyout client.key -out client.csr -nodes -subj "/CN=test-client"
-            openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 1
+            openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 3650
             mkdir $out
             cp ca.crt ca.key client.crt client.key $out
           '';
