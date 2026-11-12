@@ -1,0 +1,147 @@
+;;; Sunaku's Glorious Engrammer (ColemakDH) for a row-staggered ISO laptop keyboard.
+;;; - https://github.com/sunaku/glove80-keymaps
+;;;
+;;; The Glove80's main block maps column by column (outer pinky to inner index),
+;;; skipping lsgt; its top and bottom rows have no laptop counterpart:
+;;;
+;;;   grv  1 2 3 4 5 | 6 7 8 9 0 -
+;;;   tab  q w e r t | y u i o p [
+;;;   caps a s d f g | h j k l ; '
+;;;   lsft z x c v b | n m , . / rsft
+;;;
+;;; Thumbs: lalt = LH_T4, lmet = LH_T5, spc = RH_T4, ralt = RH_T1, rctl = RH_T5.
+;;; caps stands in for LH_T1 on the base layer.
+;;;
+;;; The host layout is Danish, so symbols are typed with their Danish keys;
+;;; dead keys are followed by a space to type the plain character.
+;;; Timings ($*-hold, $*-idle, $*-repeat) are prepended by kanata.nix.
+
+(defsrc
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]
+  caps a    s    d    f    g    h    j    k    l    ;    '    \    ret
+  lsft lsgt z    x    c    v    b    n    m    ,    .    /    rsft
+  lctl lmet lalt           spc            ralt rctl
+)
+
+(defvar
+  ;; Same-hand keys that cancel a pending home row mod into a tap. The other
+  ;; home row mods are left out, so same-hand mod chords still work.
+  left-hand  (grv 1 2 3 4 5 tab q w e r t g lsgt z x c v b)
+  right-hand (6 7 8 9 0 - = bspc y u i o p [ ] h ' \ ret n m , . /)
+
+  sticky-decay 500
+)
+
+(defalias
+  ;; Home row mods (GACS): tap for the letter, hold for the modifier.
+  a (tap-hold-tap-keys $homey-repeat $pinky-hold a lmet $left-hand (require-prior-idle $homey-idle))
+  r (tap-hold-tap-keys $homey-repeat $ringy-hold r lalt $left-hand (require-prior-idle $homey-idle))
+  s (tap-hold-tap-keys $homey-repeat $middy-hold s lctl $left-hand (require-prior-idle $homey-idle))
+  t (tap-hold-tap-keys $homey-repeat $index-hold t lsft $left-hand (require-prior-idle $index-idle))
+  n (tap-hold-tap-keys $homey-repeat $index-hold n rsft $right-hand (require-prior-idle $index-idle))
+  e (tap-hold-tap-keys $homey-repeat $middy-hold e rctl $right-hand (require-prior-idle $homey-idle))
+  i (tap-hold-tap-keys $homey-repeat $ringy-hold i lalt $right-hand (require-prior-idle $homey-idle))
+  o (tap-hold-tap-keys $homey-repeat $pinky-hold o rmet $right-hand (require-prior-idle $homey-idle))
+
+  ;; Thumb layer access: tap for the key, hold for the layer.
+  fun (tap-hold-release $thumb-repeat $thumb-hold esc  (layer-while-held function))
+  num (tap-hold-release $thumb-repeat $thumb-hold del  (layer-while-held number))
+  cur (tap-hold-release $thumb-repeat $thumb-hold bspc (layer-while-held cursor))
+  sym (tap-hold-release $space-repeat $space-hold spc  (layer-while-held symbol))
+  ret (tap-hold-release $thumb-repeat $thumb-hold ret  ralt)
+
+  ;; Shift keys: tap for a one-shot shift, hold for a plain shift.
+  lsf (tap-hold 0 $sticky-hold (one-shot-press $sticky-decay lsft) lsft)
+  rsf (tap-hold 0 $sticky-hold (one-shot-press $sticky-decay rsft) rsft)
+
+  os-sft (one-shot-press $sticky-decay lsft)
+  os-ctl (one-shot-press $sticky-decay lctl)
+  os-alt (one-shot-press $sticky-decay lalt)
+  os-met (one-shot-press $sticky-decay lmet)
+
+  ;; Shift letters until a non-word key; æ ø å and - (shifted to _) count as word keys.
+  cw (caps-word-custom 3000
+       (a b c d e f g h i j k l m n o p q r s t u v w x y z ; ' [ /)
+       (1 2 3 4 5 6 7 8 9 0 bspc del))
+
+  ;; Flip the base layer between home row mods and plain letters.
+  typ (switch
+        ((base-layer typing)) (layer-switch base) break
+        () (layer-switch typing) break)
+
+  ;; Hold Ctrl and tap Tab once; keep holding to stay in the switcher.
+  ctab (multi lctl (macro tab))
+
+  ;; Select the word or line under the cursor; extend the selection by a word
+  ;; (Shift extends leftwards).
+  sw (macro C-rght C-left C-S-rght)
+  sl (macro home S-end)
+  ew (fork C-S-rght C-left (lsft rsft))
+
+  ;; Danish symbols behind AltGr or a dead key.
+  grave  (macro S-= spc)
+  caret  (macro S-] spc)
+  tilde  (macro RA-] spc)
+  lbrk   (macro RA-8)
+  rbrk   (macro RA-9)
+  lcurly (macro RA-7)
+  rcurly (macro RA-0)
+  at     (macro RA-2)
+  dol    (macro RA-4)
+  pipe   (macro RA-=)
+  bsl    (macro RA-lsgt)
+)
+
+(deflayer base
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    f    p    b    j    l    u    y    ;    [    ]
+  @fun @a   @r   @s   @t   g    m    @n   @e   @i   @o   '    \    ret
+  @lsf lsgt z    x    c    d    v    k    h    ,    .    /    @rsf
+  lctl @num @cur           @sym           @ret tab
+)
+
+;; Base without home row mods, toggled from the function layer.
+(deflayer typing
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    f    p    b    j    l    u    y    ;    [    ]
+  @fun a    r    s    t    g    m    n    e    i    o    '    \    ret
+  @lsf lsgt z    x    c    d    v    k    h    ,    .    /    @rsf
+  lctl @num @cur           @sym           @ret tab
+)
+
+;; Hold lalt: editing on the left, navigation on the right.
+(deflayer cursor
+  esc  ret     spc  tab  del  ins  ins  del  tab  spc  ret     esc  _    _
+  C-k  @os-sft C-y  C-z  bspc C-x  C-x  bspc C-z  C-y  @os-sft C-k  _
+  C-l  lmet    lalt lctl lsft C-c  C-c  left up   down rght    C-l  _    _
+  C-j  _       C-a  @sl  @sw  C-f  C-v  C-v  home pgup pgdn    end  C-j
+  _    @ctab   _              @sw            @ew  @sl
+)
+
+;; Hold lmet: hex digits on the left, number pad on the right.
+(deflayer number
+  esc  ret     spc  tab  del  ins  @tilde @caret S-3  @dol S-1  @at  _    _
+  a    @os-sft C-y  C-z  bspc d    S-g    7      8    9    S-.  S-5  ,
+  b    lmet    lalt lctl lsft e    k      4      5    6    /    -    _    _
+  c    _       C-a  @sl  @sw  x    f      j      1    2    3    S-7  S-\
+  _    _       XX             0                  S-0  .
+)
+
+;; Hold caps: function keys and media.
+(deflayer function
+  esc  ret     spc  tab  del  ins  XX   pp   prev next XX   eject _    _
+  XX   @os-sft C-y  C-z  bspc @typ calc f7   f8   f9   f10  f13   _
+  _    lmet    lalt lctl lsft XX   hmpg f4   f5   f6   f11  f14   _    _
+  @cw  _       C-a  @sl  @sw  XX   XX   XX   f1   f2   f3   f12   f15
+  _    XX      XX             volu           next voldwn
+)
+
+;; Hold space: symbols on the left, editing on the right.
+(deflayer symbol
+  @grave @lbrk S-8     S-9     @rbrk .    S-6    @os-sft @os-ctl @os-alt @os-met -    _    _
+  S-1    ,     @lcurly @rcurly S-,   S--  @grave left    up      down    rght    home @at
+  S-3    @caret S-0    S-/     @dol  S-\  S-2  bspc tab     spc     ret     end  _    _
+  @tilde @bsl  lsgt    @pipe   /     S-lsgt S-7 \   del     S-tab   @sw     @sl  C-a
+  _      S-.   S-5            _                   XX      XX
+)

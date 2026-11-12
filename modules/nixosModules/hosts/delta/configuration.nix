@@ -89,6 +89,9 @@
       preferences.noctalia.useIpLocation = true;
       acmeShared.enable = true;
 
+      # Only remap the built-in keyboard, not the YubiKey or external boards.
+      kanata.devices = [ "/dev/input/by-path/platform-i8042-serio-0-event-kbd" ];
+
       topology.self =
         let
           inherit (config.lib.topology) mkConnection;
