@@ -172,6 +172,11 @@ topology:
     nix build .#topology.x86_64-linux.config.output
     cp result/main.svg docs/topology.svg
 
+# Build the Glove80 firmware and flash it (run on epsilon; optional halves: lh rh).
+[group("glove80")]
+glove80 *halves:
+    nix run .#glove80-flash -- {{ halves }}
+
 # Trigger an arctic vault snapshot now.
 [group("backup")]
 vault:

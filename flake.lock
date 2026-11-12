@@ -708,6 +708,23 @@
         "type": "github"
       }
     },
+    "glove80-zmk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790846940,
+        "narHash": "sha256-dm/wCNTJblGUdgvFsh5NEQv5xP+a+P/idBNw2un3Enk=",
+        "owner": "moergo-sc",
+        "repo": "zmk",
+        "rev": "ce69e85f585c724142aae37ddf8a7e019ff19e93",
+        "type": "github"
+      },
+      "original": {
+        "owner": "moergo-sc",
+        "ref": "v26.09",
+        "repo": "zmk",
+        "type": "github"
+      }
+    },
     "gnome-shell": {
       "flake": false,
       "locked": {
@@ -1434,6 +1451,7 @@
         "egg-mouse-config": "egg-mouse-config",
         "firefox-addons": "firefox-addons",
         "flake-parts": "flake-parts_2",
+        "glove80-zmk": "glove80-zmk",
         "home-manager": "home-manager",
         "home-manager-stable": "home-manager-stable",
         "import-tree": "import-tree",
