@@ -32,9 +32,13 @@
           if [ -n "$SSH_CONNECTION" ] && [ -S "$HOME/.gnupg-fwd/S.gpg-agent" ]; then
             export GNUPGHOME="$HOME/.gnupg-fwd"
 
-            # Non-default GnuPG homes resolve agent sockets in a hashed runtime directory.
-            gpgconf --create-socketdir
-            ln -sfn "$GNUPGHOME/S.gpg-agent" "$(gpgconf --list-dirs socketdir)/S.gpg-agent"
+            # Non-default GnuPG homes use a hashed runtime directory when
+            # available.
+            socketdir=$(gpgconf --list-dirs socketdir)
+            if [ "$socketdir" != "$GNUPGHOME" ]; then
+              gpgconf --create-socketdir
+              ln -sfn "$GNUPGHOME/S.gpg-agent" "$socketdir/S.gpg-agent"
+            fi
           fi
 
           if [ -z "$SSH_CONNECTION" ]; then
