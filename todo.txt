@@ -17,3 +17,6 @@ x 2026-09-10 2026-08-18 Fix +gamemode hook for +news to not start after game clo
 x 2026-09-10 2026-08-27 Fix +arr torrent fetching.
 x 2026-11-07 2026-11-07 Add deploy.rs to @eta server.
 (C) 2026-11-07 Add missing services to +nix-topology diagram.
+(C) 2026-11-13 Fix +tuxedo hover theme.
+(C) 2026-11-13 Fix +tmux right-click menu theme.
+(B) 2026-11-13 Add VCS status indicators to +oh-my-posh +jujutsu interface.
