@@ -148,11 +148,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    deepseek-harness = {
-      url = "github:deepseek-ai/deepseek-harness";
-      flake = false;
-    };
-
     glove80-zmk = {
       url = "github:moergo-sc/zmk/v26.09";
       flake = false;
