@@ -9,7 +9,6 @@
       claudeCode
       direnv
       distrobox
-      dsh
       eza
       fastfetch
       fish
