@@ -11,6 +11,9 @@
       cfg = config.kanata;
       r = cfg.tappingResolution;
 
+      kanata = lib.getExe config.services.kanata.package;
+      inherit (config.services.kanata.keyboards.default) configFile;
+
       # Sunaku's Glorious Engrammer timings, derived from one resolution.
       timings = {
         pinky-hold = r + 110;
@@ -47,20 +50,51 @@
         };
       };
 
-      config.services.kanata = {
-        enable = true;
-        keyboards.default = {
-          inherit (cfg) devices;
-          extraDefCfg = ''
-            process-unmapped-keys yes
-            concurrent-tap-hold yes
-          '';
-          config = ''
-            (defvar
-            ${lib.concatStrings (lib.mapAttrsToList (name: ms: "  ${name} ${toString ms}\n") timings)})
+      config = {
+        services.kanata = {
+          enable = true;
+          keyboards.default = {
+            inherit (cfg) devices;
+            extraDefCfg = ''
+              process-unmapped-keys yes
+              concurrent-tap-hold yes
+            '';
+            config = ''
+              (defvar
+              ${lib.concatStrings (lib.mapAttrsToList (name: ms: "  ${name} ${toString ms}\n") timings)})
 
-            ${builtins.readFile ./glorious-engrammer.kbd}
-          '';
+              ${builtins.readFile ./glorious-engrammer.kbd}
+            '';
+          };
+        };
+
+        # Remap the keyboard at the LUKS password prompt too.
+        boot.initrd = {
+          kernelModules = [ "uinput" ];
+          systemd = {
+            storePaths = [
+              kanata
+              configFile
+            ];
+            services.kanata = {
+              description = "Kanata keyboard remapper";
+              wantedBy = [ "initrd.target" ];
+              wants = [ "cryptsetup-pre.target" ];
+              after = [
+                "systemd-modules-load.service"
+                "systemd-udev-trigger.service"
+              ];
+              before = [ "cryptsetup-pre.target" ];
+              unitConfig.DefaultDependencies = false;
+              serviceConfig = {
+                Type = "notify";
+                ExecStart = "${kanata} --cfg ${configFile} --nodelay";
+                # /dev/input may not exist yet on the first attempt.
+                Restart = "on-failure";
+                RestartSec = "100ms";
+              };
+            };
+          };
         };
       };
     };

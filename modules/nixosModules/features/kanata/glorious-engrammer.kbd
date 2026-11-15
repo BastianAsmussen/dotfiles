@@ -24,25 +24,40 @@
   lctl lmet lalt           spc            ralt rctl
 )
 
+;; Thumbs and unmapped keys belong to neither hand.
+(defhands
+  (left  grv 1 2 3 4 5 tab q w e r t caps a s d f g lsft lsgt z x c v b)
+  (right 6 7 8 9 0 - = bspc y u i o p [ ] h j k l ; ' \ ret n m , . / rsft))
+
 (defvar
-  ;; Same-hand keys that cancel a pending home row mod into a tap. The other
-  ;; home row mods are left out, so same-hand mod chords still work.
-  left-hand  (grv 1 2 3 4 5 tab q w e r t g lsgt z x c v b)
-  right-hand (6 7 8 9 0 - = bspc y u i o p [ ] h ' \ ret n m , . /)
+  ;; Same-hand modifiers stay neutral, so same-hand mod chords still work.
+  left-mods  (neutral-keys caps a s d f lsft)
+  right-mods (neutral-keys j k l ; rsft)
 
   sticky-decay 500
 )
 
 (defalias
-  ;; Home row mods (GACS): tap for the letter, hold for the modifier.
-  a (tap-hold-tap-keys $homey-repeat $pinky-hold a lmet $left-hand (require-prior-idle $homey-idle))
-  r (tap-hold-tap-keys $homey-repeat $ringy-hold r lalt $left-hand (require-prior-idle $homey-idle))
-  s (tap-hold-tap-keys $homey-repeat $middy-hold s lctl $left-hand (require-prior-idle $homey-idle))
-  t (tap-hold-tap-keys $homey-repeat $index-hold t lsft $left-hand (require-prior-idle $index-idle))
-  n (tap-hold-tap-keys $homey-repeat $index-hold n rsft $right-hand (require-prior-idle $index-idle))
-  e (tap-hold-tap-keys $homey-repeat $middy-hold e rctl $right-hand (require-prior-idle $homey-idle))
-  i (tap-hold-tap-keys $homey-repeat $ringy-hold i lalt $right-hand (require-prior-idle $homey-idle))
-  o (tap-hold-tap-keys $homey-repeat $pinky-hold o rmet $right-hand (require-prior-idle $homey-idle))
+  ;; Home row mods (GACS): tap for the letter, hold for the modifier. The
+  ;; modifier engages as soon as a key on the other hand (or a thumb) is
+  ;; tapped, or when the hold timeout runs out; any other same-hand key
+  ;; resolves it as a tap.
+  a (tap-hold-opposite-hand-release $pinky-hold a lmet $left-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $homey-idle))
+  r (tap-hold-opposite-hand-release $ringy-hold r lalt $left-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $homey-idle))
+  s (tap-hold-opposite-hand-release $middy-hold s lctl $left-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $homey-idle))
+  t (tap-hold-opposite-hand-release $index-hold t lsft $left-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $index-idle))
+  n (tap-hold-opposite-hand-release $index-hold n rsft $right-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $index-idle))
+  e (tap-hold-opposite-hand-release $middy-hold e rctl $right-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $homey-idle))
+  i (tap-hold-opposite-hand-release $ringy-hold i lalt $right-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $homey-idle))
+  o (tap-hold-opposite-hand-release $pinky-hold o rmet $right-mods (timeout hold) (unknown-hand hold)
+      (tap-repress-timeout $homey-repeat) (require-prior-idle $homey-idle))
 
   ;; Thumb layer access: tap for the key, hold for the layer.
   fun (tap-hold-release $thumb-repeat $thumb-hold esc  (layer-while-held function))
