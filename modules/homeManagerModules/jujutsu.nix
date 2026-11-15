@@ -34,10 +34,9 @@
             diff-editor = ":builtin";
           };
 
-          git = {
-            sign-on-push = true;
-            write-change-id-header = true;
-          };
+          git.write-change-id-header = true;
+
+          revsets.git-sign-on-push = "~signed() & mine()";
         };
       };
     };
