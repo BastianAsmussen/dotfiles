@@ -158,6 +158,9 @@
         lib.genAttrs (map (name: "${name}.asmussen.tech") mtlsNames) (name: {
           extraConfig = ''
             reverse_proxy https://10.10.0.2:8443 {
+              # Epsilon's mTLS listener rejects a Host that differs from SNI.
+              header_up Host ${name}
+
               transport http {
                 tls_client_auth ${clientCert} ${clientKey}
                 tls_server_name ${name}
