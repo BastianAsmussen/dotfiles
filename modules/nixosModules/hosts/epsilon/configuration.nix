@@ -59,7 +59,6 @@
         self.nixosModules.wireguard
 
         # Features.
-        self.nixosModules.japanese
         self.nixosModules.bluetooth
         self.nixosModules.btop
         self.nixosModules.btrfs
@@ -238,9 +237,6 @@
 
             # No imported home module owns this zsh history path.
             ".local/share/zsh"
-            ".local/share/lutris"
-            ".local/share/Steam"
-            ".local/share/umu"
 
             ".local/state/home-manager"
             ".local/state/nix"

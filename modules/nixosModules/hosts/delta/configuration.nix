@@ -66,6 +66,7 @@
         self.nixosModules.btop
         self.nixosModules.btrfs
         self.nixosModules.ccache
+        self.nixosModules.gaming
         self.nixosModules.homeManager
         self.nixosModules.kanata
         self.nixosModules.dns

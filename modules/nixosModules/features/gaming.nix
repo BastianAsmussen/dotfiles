@@ -4,12 +4,14 @@
       pkgs,
       lib,
       config,
+      options,
       ...
     }:
     let
       inherit (lib) mkOption types concatStringsSep;
 
       cfg = config.gamemode;
+      hasNvidia = lib.elem "nvidia" config.services.xserver.videoDrivers;
 
       # A root .path unit reacts to the user-writable marker without polling.
       toggleScript = pkgs.writeShellScript "gamemode-busy-toggle" ''
@@ -79,137 +81,129 @@
         };
       };
 
-      config = {
-        boot = {
-          # Load `ntsync` for Wine/Proton synchronization.
-          kernelModules = [ "ntsync" ];
+      config = lib.mkMerge [
+        (lib.optionalAttrs (options ? persistence) {
+          persistence.user.directories = [
+            ".local/share/Steam"
+            ".local/share/lutris"
+            ".local/share/umu"
+          ];
+        })
 
-          kernel.sysctl = {
-            # Keep game working sets in RAM.
-            "vm.swappiness" = 10;
+        {
+          boot = {
+            # Load `ntsync` for Wine/Proton synchronization.
+            kernelModules = [ "ntsync" ];
 
-            # Modern games/launchers mmap far beyond the kernel default.
-            "vm.max_map_count" = 2147483642;
-          };
-        };
+            kernel.sysctl = {
+              # Keep game working sets in RAM.
+              "vm.swappiness" = 10;
 
-        programs = {
-          steam = {
-            enable = true;
-            gamescopeSession.enable = true;
-            protontricks.enable = true;
-
-            # Bypass fcitx5 in Proton for non-Japanese layouts.
-            package = lib.mkIf config.japanese.enable (
-              pkgs.steam.overrideAttrs (old: {
-                nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
-                postFixup = (old.postFixup or "") + ''
-                  wrapProgram $out/bin/steam \
-                    --unset XMODIFIERS \
-                    --unset GTK_IM_MODULE \
-                    --unset QT_IM_MODULE \
-                    --unset SDL_IM_MODULE
-                '';
-              })
-            );
+              # Modern games/launchers mmap far beyond the kernel default.
+              "vm.max_map_count" = 2147483642;
+            };
           };
 
-          gamemode = {
-            enable = true;
-            enableRenice = true;
+          programs = {
+            steam = {
+              enable = true;
+              gamescopeSession.enable = true;
+              protontricks.enable = true;
+            };
 
-            settings = {
-              general = {
-                # Raise clocks and priority only while a game is registered.
-                desiredgov = "performance";
-                softrealtime = "auto";
-                renice = 10;
-                ioprio = 0;
-                inhibit_screensaver = 1;
-              };
+            gamemode = {
+              enable = true;
+              enableRenice = true;
 
-              gpu = {
-                apply_gpu_optimisations = "accept-responsibility";
-                gpu_device = 0;
+              settings = {
+                general = {
+                  # Raise clocks and priority only while a game is registered.
+                  desiredgov = "performance";
+                  softrealtime = "auto";
+                  renice = 10;
+                  ioprio = 0;
+                  inhibit_screensaver = 1;
+                };
 
                 # NVIDIA PowerMizer: prefer maximum performance while active.
-                nv_powermizer_mode = 1;
-              };
+                gpu = lib.mkIf hasNvidia {
+                  apply_gpu_optimisations = "accept-responsibility";
+                  gpu_device = 0;
+                  nv_powermizer_mode = 1;
+                };
 
-              # Run hooks in the background and update the marker last.
-              custom = {
-                start = concatStringsSep " & " (
-                  cfg.startHooks ++ [ "${lib.getExe' pkgs.coreutils "touch"} ${cfg.pauseMarker}" ]
-                );
+                # Run hooks in the background and update the marker last.
+                custom = {
+                  start = concatStringsSep " & " (
+                    cfg.startHooks ++ [ "${lib.getExe' pkgs.coreutils "touch"} ${cfg.pauseMarker}" ]
+                  );
 
-                end = concatStringsSep " & " (
-                  cfg.endHooks ++ [ "${lib.getExe' pkgs.coreutils "rm"} -f ${cfg.pauseMarker}" ]
-                );
+                  end = concatStringsSep " & " (
+                    cfg.endHooks ++ [ "${lib.getExe' pkgs.coreutils "rm"} -f ${cfg.pauseMarker}" ]
+                  );
+                };
               };
+            };
+
+            # Keep Gamescope opt-in per game.
+            gamescope = {
+              enable = true;
+              capSysNice = true;
             };
           };
 
-          # Keep Gamescope opt-in per game.
-          gamescope = {
-            enable = true;
-            capSysNice = true;
-          };
-        };
+          users.extraGroups.gamemode.members = [ config.preferences.user.name ];
 
-        users.extraGroups.gamemode.members = [ config.preferences.user.name ];
-
-        # Wine/Proton esync exhausts the default 1024 fd limit.
-        security.pam.loginLimits = [
-          {
-            domain = "*";
-            type = "soft";
-            item = "nofile";
-            value = "524288";
-          }
-          {
-            domain = "*";
-            type = "hard";
-            item = "nofile";
-            value = "524288";
-          }
-        ];
-
-        # Wine runs unprivileged and needs direct access to the ntsync device.
-        services.udev.extraRules = ''
-          KERNEL=="ntsync", MODE="0666"
-        '';
-
-        systemd = {
-          settings.Manager.DefaultLimitNOFILE = 524288;
-
-          tmpfiles.rules = [
-            "d ${builtins.dirOf cfg.pauseMarker} 0755 ${config.preferences.user.name} ${config.preferences.user.name} - -"
+          # Wine/Proton esync exhausts the default 1024 fd limit.
+          security.pam.loginLimits = [
+            {
+              domain = "*";
+              type = "soft";
+              item = "nofile";
+              value = "524288";
+            }
+            {
+              domain = "*";
+              type = "hard";
+              item = "nofile";
+              value = "524288";
+            }
           ];
 
-          services.gamemode-busy = {
-            description = "Pause and resume units around a gamemode session";
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = toggleScript;
+          # Wine runs unprivileged and needs direct access to the ntsync device.
+          services.udev.extraRules = ''
+            KERNEL=="ntsync", MODE="0666"
+          '';
 
-              # Keep resume markers outside the watched directory.
-              RuntimeDirectory = "gamemode-busy";
-              RuntimeDirectoryPreserve = "yes";
+          systemd = {
+            settings.Manager.DefaultLimitNOFILE = 524288;
+
+            tmpfiles.rules = [
+              "d ${builtins.dirOf cfg.pauseMarker} 0755 ${config.preferences.user.name} ${config.preferences.user.name} - -"
+            ];
+
+            services.gamemode-busy = {
+              description = "Pause and resume units around a gamemode session";
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = toggleScript;
+
+                # Keep resume markers outside the watched directory.
+                RuntimeDirectory = "gamemode-busy";
+                RuntimeDirectoryPreserve = "yes";
+              };
+            };
+
+            paths.gamemode-busy = {
+              description = "React to gamemode pause marker changes";
+              wantedBy = [ "multi-user.target" ];
+              pathConfig.PathChanged = cfg.pauseMarker;
             };
           };
 
-          paths.gamemode-busy = {
-            description = "React to gamemode pause marker changes";
-            wantedBy = [ "multi-user.target" ];
-            pathConfig.PathChanged = cfg.pauseMarker;
-          };
-        };
-
-        environment = {
-          systemPackages = with pkgs; [
+          environment.systemPackages = with pkgs; [
             protonup-rs
             lutris
-            bottles
             prismlauncher
             vulkan-tools
             mangohud
@@ -217,9 +211,7 @@
             # Run non-Nix binaries (game tools, mod managers) in an FHS env.
             steam-run
           ];
-
-          sessionVariables.STEAM_EXTRA_COMPAT_TOOLS_PATHS = "/home/${config.preferences.user.name}/.steam/root/compatibilitytools.d";
-        };
-      };
+        }
+      ];
     };
 }
