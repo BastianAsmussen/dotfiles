@@ -20,6 +20,24 @@
 
       mkDirWithMode = lib.mapAttrsToList (directory: mode: { inherit directory mode; });
 
+      # DynamicUser state: systemd owns it, tmpfiles must not reset it.
+      systemdOwned = lib.hasPrefix "/var/lib/private/";
+
+      leaveToSystemd = {
+        user = "-";
+        group = "-";
+        mode = "-";
+      };
+
+      forPreservation =
+        entry:
+        if builtins.isString entry then
+          if systemdOwned entry then leaveToSystemd // { directory = entry; } else entry
+        else if systemdOwned entry.directory then
+          leaveToSystemd // entry
+        else
+          entry;
+
       dirWithModeType = types.submodule {
         options = {
           mode = mkOption {
@@ -146,7 +164,7 @@
                 "/var/lib/systemd/timers"
                 "/var/lib/sops-nix"
               ]
-              ++ cfg.directories
+              ++ map forPreservation cfg.directories
               ++ lib.mapAttrsToList (directory: dir: {
                 inherit directory;
                 inherit (dir) mode user group;

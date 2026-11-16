@@ -98,12 +98,7 @@
 
         # The site's state, and the published bundle with its build status.
         persistence.directories = [
-          {
-            directory = "/var/lib/private/covenant";
-            user = "-";
-            group = "-";
-            mode = "-";
-          }
+          "/var/lib/private/covenant"
           "/var/lib/covenant-publish"
         ];
       };
