@@ -251,6 +251,64 @@ in
               && lib.hasInfix "10.0.0.0/8" rules
               && builtins.elem "nosuid" cfg.fileSystems."/srv/agents".options
             );
+
+        nixos-eval-agent-box-guest-contract =
+          mkEvalTest "agent-box-guest-contract"
+            [
+              self.nixosModules.agentBoxGuest
+              {
+                agentBoxGuest = {
+                  credentials = [ "LLM_API_KEY" ];
+
+                  harness = {
+                    enable = true;
+                    command = "/bin/true";
+                  };
+                };
+              }
+            ]
+            (
+              cfg:
+              let
+                contract = cfg.agentBoxGuest.contract;
+                unit = cfg.systemd.services.agent-harness;
+                env = unit.environment;
+              in
+              contract.AGENT_WORKSPACE == "/home/agent/workspace"
+              && contract.AGENT_STATE_DIR == "/var/lib/agent-box/state"
+              && contract.AGENT_CREDENTIALS_DIR == "/run/agent-credentials"
+              && contract.AGENT_TOKEN_FILE == "/var/lib/agent-box/agent-token"
+              && contract.AGENT_LLM_API_KEY_FILE == "/run/agent-credentials/LLM_API_KEY"
+              && contract.SEARXNG_URL == "http://127.0.0.1:8888"
+              && unit.serviceConfig.User == "agent"
+              && unit.serviceConfig.WorkingDirectory == "/home/agent/workspace"
+              && unit.serviceConfig.ExecStart == "/bin/true"
+              && env.AGENT_LLM_MODEL == "deepseek-v4-flash"
+              && env.AGENT_LLM_API_KEY_FILE == "/run/agent-credentials/LLM_API_KEY"
+              && cfg.services.searx.enable
+            );
+
+        nixos-eval-agent-box-guest-disabled =
+          mkEvalTest "agent-box-guest-disabled"
+            [
+              self.nixosModules.agentBoxGuest
+              {
+                agentBoxGuest = {
+                  llm.enable = false;
+                  searx.enable = false;
+                };
+              }
+            ]
+            (
+              cfg:
+              let
+                contract = cfg.agentBoxGuest.contract;
+              in
+              !(contract ? AGENT_LLM_API_KEY_FILE)
+              && !(contract ? SEARXNG_URL)
+              && !cfg.services.searx.enable
+              && !(cfg.systemd.services ? agent-harness)
+            );
       }
       // lib.optionalAttrs (system == "x86_64-linux") {
         # VM tests: runtime behaviour (x86_64 only)
@@ -664,7 +722,19 @@ in
               agentBox = {
                 enable = true;
                 credentials = { };
-                guest.agentBoxGuest.openclaw.enable = false;
+
+                guest.agentBoxGuest = {
+                  # The model endpoint is covered by the eval tests; no secrets are passed here.
+                  llm.enable = false;
+
+                  harness = {
+                    enable = true;
+                    command = "${pkgs.writeShellScript "fake-harness" ''
+                      ${pkgs.coreutils}/bin/env | ${pkgs.gnugrep}/bin/grep -E '^(AGENT_|SEARXNG_)' | ${pkgs.coreutils}/bin/sort > /home/agent/workspace/harness-env
+                      exec ${pkgs.coreutils}/bin/sleep infinity
+                    ''}";
+                  };
+                };
               };
 
               # A host service, open on every interface, that the box must not reach.
@@ -705,6 +775,20 @@ in
             machine.succeed("test \"$(stat -c %U /srv/agents/probe)\" = testuser")
             machine.succeed("findmnt -no OPTIONS /srv/agents | grep -q nosuid")
             machine.succeed("findmnt -no OPTIONS /srv/agents | grep -q nodev")
+
+            # The harness runs as the agent with the contract in its environment.
+            machine.wait_until_succeeds(box("systemctl is-active agent-harness.service"))
+            machine.wait_until_succeeds(
+                "grep -q '^AGENT_WORKSPACE=/home/agent/workspace$' /srv/agents/harness-env"
+            )
+            machine.succeed(
+                "grep -q '^AGENT_CREDENTIALS_DIR=/run/agent-credentials$' /srv/agents/harness-env"
+            )
+            machine.succeed(
+                "grep -q '^AGENT_TOKEN_FILE=/var/lib/agent-box/agent-token$' /srv/agents/harness-env"
+            )
+            machine.succeed("test \"$(stat -c %U /srv/agents/harness-env)\" = testuser")
+            machine.fail("grep -q '^AGENT_LLM_' /srv/agents/harness-env")
           '';
         };
       };

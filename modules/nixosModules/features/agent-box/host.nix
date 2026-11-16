@@ -1,12 +1,11 @@
 # An isolated nspawn container for long-running autonomous agents.
-{ inputs, self, ... }:
+{ self, ... }:
 {
   flake.nixosModules.agentBox =
     {
       config,
       lib,
       options,
-      pkgs,
       ...
     }:
     let
@@ -205,7 +204,6 @@
                 cfg.guest
               ];
 
-              nixpkgs.pkgs = pkgs.extend inputs.nix-openclaw.overlays.default;
               agentBoxGuest.credentials = attrNames cfg.credentials;
             };
           };

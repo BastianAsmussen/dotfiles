@@ -1,5 +1,6 @@
-# NixOS configuration inside the agent box container (see host.nix).
-{ inputs, self, ... }:
+# NixOS configuration inside the agent box container (see host.nix). It owns the
+# harness contract: paths in the environment, credentials as files.
+{ self, ... }:
 {
   flake.nixosModules.agentBoxGuest =
     {
@@ -12,44 +13,62 @@
       inherit (lib)
         concatMapStrings
         escapeShellArg
-        genAttrs
         mkEnableOption
         mkIf
         mkOption
+        optional
+        optionalAttrs
+        optionalString
         types
         ;
 
       cfg = config.agentBoxGuest;
 
-      user = "agent";
       uid = 1000;
-      home = "/home/${user}";
+      home = "/home/${cfg.user}";
 
       credentialDir = "/run/agent-credentials";
-      stateDir = "/var/lib/agent-box";
-      gatewayToken = "${stateDir}/gateway-token";
-      searxEnv = "${stateDir}/searx.env";
+      tokenFile = "${cfg.stateDir}/agent-token";
+      stateSubdir = "${cfg.stateDir}/state";
+      searxEnv = "${cfg.stateDir}/searx.env";
 
       openssl = lib.getExe pkgs.openssl;
     in
     {
       imports = [
         self.nixosModules.dns
-        inputs.home-manager.nixosModules.home-manager
+        self.nixosModules.agentBoxGuestHarness
       ];
 
       options.agentBoxGuest = {
+        user = mkOption {
+          type = types.str;
+          default = "agent";
+          readOnly = true;
+          description = "Container user the harness runs as. Fixed so the host's idmapped workspace keeps its ownership.";
+        };
+
+        stateDir = mkOption {
+          type = types.str;
+          default = "/var/lib/agent-box";
+          description = "Root-owned directory for generated secrets. The harness gets a writable `state` subdirectory.";
+        };
+
         credentials = mkOption {
           type = types.listOf types.str;
           default = [ ];
-          description = "Names of the credentials the host passes in. Each is exported to OpenClaw as an environment variable of the same name.";
+          description = "Names of the credentials the host passes in. Each is copied to `AGENT_CREDENTIALS_DIR`.";
         };
 
         llm = {
+          enable = mkEnableOption "an OpenAI-compatible LLM endpoint" // {
+            default = true;
+          };
+
           baseUrl = mkOption {
             type = types.str;
             default = "https://api.cheaperinference.com/v1";
-            description = "Base URL of the OpenAI-compatible endpoint OpenClaw talks to.";
+            description = "Base URL of the OpenAI-compatible endpoint the harness talks to.";
           };
 
           apiKeyEnv = mkOption {
@@ -77,37 +96,49 @@
           };
         };
 
-        searxPort = mkOption {
-          type = types.port;
-          default = 8888;
-          description = "Loopback port SearXNG listens on.";
-        };
+        searx = {
+          enable = mkEnableOption "SearXNG for the harness's web search" // {
+            default = true;
+          };
 
-        runtimePlugins = mkOption {
-          type = types.listOf types.str;
-          default = [ "searxng" ];
-          description = "OpenClaw runtime plugin ids that Nix packages and loads.";
+          port = mkOption {
+            type = types.port;
+            default = 8888;
+            description = "Loopback port SearXNG listens on.";
+          };
         };
 
         packages = mkOption {
           type = types.listOf types.package;
           default = [ ];
-          description = "Extra packages on the agent's PATH.";
+          description = "Extra packages on the harness's PATH.";
         };
 
-        openclaw.enable = mkEnableOption "the OpenClaw gateway" // {
-          default = true;
+        contract = mkOption {
+          type = types.attrsOf types.str;
+          readOnly = true;
+          description = "Environment handed to the harness. Values are paths, never secrets.";
+          default = {
+            AGENT_HOME = home;
+            AGENT_WORKSPACE = "${home}/workspace";
+            AGENT_STATE_DIR = stateSubdir;
+            AGENT_CREDENTIALS_DIR = credentialDir;
+            AGENT_TOKEN_FILE = tokenFile;
+          }
+          // optionalAttrs cfg.llm.enable {
+            AGENT_LLM_BASE_URL = cfg.llm.baseUrl;
+            AGENT_LLM_MODEL = cfg.llm.model;
+            AGENT_LLM_API_KEY_FILE = "${credentialDir}/${cfg.llm.apiKeyEnv}";
+            AGENT_LLM_CONTEXT_WINDOW = toString cfg.llm.contextWindow;
+            AGENT_LLM_MAX_TOKENS = toString cfg.llm.maxTokens;
+          }
+          // optionalAttrs cfg.searx.enable {
+            SEARXNG_URL = "http://127.0.0.1:${toString cfg.searx.port}";
+          };
         };
       };
 
       config = {
-        assertions = [
-          {
-            assertion = cfg.openclaw.enable -> lib.elem cfg.llm.apiKeyEnv cfg.credentials;
-            message = "agentBoxGuest.llm.apiKeyEnv (${cfg.llm.apiKeyEnv}) is not among the credentials the host passes in.";
-          }
-        ];
-
         system.stateVersion = "26.05";
 
         # The host's stub resolver is unreachable from the private network.
@@ -118,20 +149,23 @@
           "flakes"
         ];
 
+        # The container evaluates its own nixpkgs, so the host's config does not apply.
+        nixpkgs.config.allowUnfree = true;
+
         users = {
-          users.${user} = {
+          users.${cfg.user} = {
             inherit uid home;
 
             isNormalUser = true;
-            group = user;
+            group = cfg.user;
             description = "Autonomous agent";
 
-            # Keep the gateway running without a login session.
+            # Keep user services running without a login session.
             linger = true;
           };
 
           # Matches the host user, so the idmapped workspace stays theirs.
-          groups.${user}.gid = uid;
+          groups.${cfg.user}.gid = uid;
         };
 
         environment.systemPackages =
@@ -154,11 +188,7 @@
         systemd.services.agent-credentials = {
           description = "Agent credentials and generated secrets";
           wantedBy = [ "multi-user.target" ];
-          before = [
-            "searx-init.service"
-            "user@${toString uid}.service"
-            "home-manager-${user}.service"
-          ];
+          before = [ "user@${toString uid}.service" ] ++ optional cfg.searx.enable "searx-init.service";
 
           serviceConfig = {
             Type = "oneshot";
@@ -168,115 +198,47 @@
           };
 
           script = ''
-            install -d -m 0750 -g ${user} ${credentialDir}
+            install -d -m 0750 -g ${cfg.user} ${credentialDir}
             ${concatMapStrings (name: ''
-              install -m 0440 -g ${user} "$CREDENTIALS_DIRECTORY"/${escapeShellArg name} ${credentialDir}/${escapeShellArg name}
+              install -m 0440 -g ${cfg.user} "$CREDENTIALS_DIRECTORY"/${escapeShellArg name} ${credentialDir}/${escapeShellArg name}
             '') cfg.credentials}
 
-            install -d -m 0755 ${stateDir}
-            if [ ! -s ${gatewayToken} ]; then
-              ${openssl} rand -hex 32 > ${gatewayToken}
-            fi
-            chown ${user}:${user} ${gatewayToken}
-            chmod 0400 ${gatewayToken}
+            install -d -m 0755 ${cfg.stateDir}
+            install -d -m 0750 -o ${cfg.user} -g ${cfg.user} ${stateSubdir}
 
-            if [ ! -s ${searxEnv} ]; then
-              printf 'SEARX_SECRET_KEY=%s\n' "$(${openssl} rand -hex 32)" > ${searxEnv}
+            if [ ! -s ${tokenFile} ]; then
+              ${openssl} rand -hex 32 > ${tokenFile}
             fi
+            chown ${cfg.user}:${cfg.user} ${tokenFile}
+            chmod 0400 ${tokenFile}
+            ${optionalString cfg.searx.enable ''
+              if [ ! -s ${searxEnv} ]; then
+                printf 'SEARX_SECRET_KEY=%s\n' "$(${openssl} rand -hex 32)" > ${searxEnv}
+              fi
+            ''}
           '';
         };
 
-        systemd.services.searx-init = {
+        systemd.services.searx-init = mkIf cfg.searx.enable {
           after = [ "agent-credentials.service" ];
           requires = [ "agent-credentials.service" ];
         };
 
-        services.searx = {
+        services.searx = mkIf cfg.searx.enable {
           enable = true;
           environmentFile = searxEnv;
           settings = {
             server = {
               bind_address = "127.0.0.1";
-              port = cfg.searxPort;
+              port = cfg.searx.port;
               secret_key = "$SEARX_SECRET_KEY";
             };
 
-            # OpenClaw reads the JSON API.
+            # Harnesses query the JSON API.
             search.formats = [
               "html"
               "json"
             ];
-          };
-        };
-
-        home-manager = mkIf cfg.openclaw.enable {
-          useGlobalPkgs = true;
-          useUserPackages = true;
-
-          users.${user} = {
-            imports = [ inputs.nix-openclaw.homeManagerModules.openclaw ];
-
-            home.stateVersion = "26.05";
-            systemd.user = {
-              startServices = "sd-switch";
-
-              # nix-openclaw leaves the unit without an install target.
-              services.openclaw-gateway.Install.WantedBy = [ "default.target" ];
-            };
-
-            programs.openclaw = {
-              enable = true;
-              inherit (cfg) runtimePlugins;
-
-              # The shared host directory, so its memory and output stay visible.
-              workspaceDir = "${home}/workspace";
-
-              # Cameras and Sonos sit on a LAN the box cannot reach.
-              excludeTools = [
-                "camsnap"
-                "sonoscli"
-              ];
-
-              # File paths are read when the gateway starts.
-              environment = genAttrs cfg.credentials (name: "${credentialDir}/${name}") // {
-                OPENCLAW_GATEWAY_TOKEN = gatewayToken;
-              };
-
-              config = {
-                gateway = {
-                  mode = "local";
-                  auth.token = "\${OPENCLAW_GATEWAY_TOKEN}";
-                };
-
-                models = {
-                  mode = "merge";
-                  providers.llm = {
-                    inherit (cfg.llm) baseUrl;
-
-                    apiKey = "\${${cfg.llm.apiKeyEnv}}";
-                    api = "openai-completions";
-                    models = [
-                      {
-                        id = cfg.llm.model;
-                        name = cfg.llm.model;
-                        input = [ "text" ];
-                        inherit (cfg.llm) contextWindow maxTokens;
-                      }
-                    ];
-                  };
-                };
-
-                agents.defaults = {
-                  model.primary = "llm/${cfg.llm.model}";
-
-                  # The container is the sandbox, and it has no Docker.
-                  sandbox.mode = "off";
-                };
-
-                tools.web.search.provider = "searxng";
-                plugins.entries.searxng.config.webSearch.baseUrl = "http://127.0.0.1:${toString cfg.searxPort}";
-              };
-            };
           };
         };
       };
