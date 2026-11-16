@@ -55,10 +55,12 @@
           enable = true;
           keyboards.default = {
             inherit (cfg) devices;
+
             extraDefCfg = ''
               process-unmapped-keys yes
               concurrent-tap-hold yes
             '';
+
             config = ''
               (defvar
               ${lib.concatStrings (lib.mapAttrsToList (name: ms: "  ${name} ${toString ms}\n") timings)})
@@ -70,12 +72,17 @@
 
         # Remap the keyboard at the LUKS password prompt too.
         boot.initrd = {
-          kernelModules = [ "uinput" ];
+          kernelModules = [
+            "evdev"
+            "uinput"
+          ];
+
           systemd = {
             storePaths = [
               kanata
               configFile
             ];
+
             services.kanata = {
               description = "Kanata keyboard remapper";
               wantedBy = [ "initrd.target" ];
@@ -84,6 +91,7 @@
                 "systemd-modules-load.service"
                 "systemd-udev-trigger.service"
               ];
+
               before = [ "cryptsetup-pre.target" ];
               unitConfig.DefaultDependencies = false;
               serviceConfig = {
