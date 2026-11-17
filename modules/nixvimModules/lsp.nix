@@ -172,7 +172,14 @@
             formatting = {
               nixfmt.enable = true;
               stylua.enable = true;
-              shfmt.enable = true;
+              shfmt = {
+                enable = true;
+                settings.extra_args = [
+                  "--indent=4"
+                  "--case-indent"
+                ];
+              };
+
               google_java_format.enable = false;
               markdownlint.enable = true;
               prettier = {
