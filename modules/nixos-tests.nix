@@ -224,6 +224,33 @@ in
           self.nixosModules.bluetooth
           testUser
         ] (cfg: cfg.hardware.bluetooth.powerOnBoot);
+
+        # Agent Box Module.
+        nixos-eval-agent-box-isolation =
+          mkEvalTest "agent-box-isolation"
+            [
+              self.nixosModules.base
+              self.nixosModules.agentBox
+              inputs.sops-nix.nixosModules.sops
+              testUser
+              { agentBox.enable = true; }
+            ]
+            (
+              cfg:
+              let
+                box = cfg.containers.agents;
+                rules = cfg.networking.nftables.tables.agent-box.content;
+              in
+              box.privateUsers == "pick"
+              && box.privateNetwork
+              && box.bindMounts == { }
+              && builtins.elem "--bind=/srv/agents:/home/agent/workspace:idmap" box.extraFlags
+              && builtins.elem "--load-credential=LLM_API_KEY:/run/secrets/agents/llm-api-key" box.extraFlags
+              && lib.hasInfix ''iifname "ve-agents" drop'' rules
+              && lib.hasInfix "192.168.0.0/16" rules
+              && lib.hasInfix "10.0.0.0/8" rules
+              && builtins.elem "nosuid" cfg.fileSystems."/srv/agents".options
+            );
       }
       // lib.optionalAttrs (system == "x86_64-linux") {
         # VM tests: runtime behaviour (x86_64 only)
@@ -594,6 +621,90 @@ in
                 "curl -k --connect-timeout 3 --resolve jellyfin.asmussen.tech:443:10.10.0.2"
                 " https://jellyfin.asmussen.tech/"
             )
+          '';
+        };
+
+        nixos-vm-agent-box-isolation = pkgs.testers.nixosTest {
+          name = "agent-box-isolation";
+          nodes.machine =
+            { pkgs, ... }:
+            {
+              imports = [
+                self.nixosModules.base
+                self.nixosModules.agentBox
+                inputs.sops-nix.nixosModules.sops
+                testUser
+              ];
+
+              preferences.user.authorizedKeyFiles = [ ];
+              virtualisation = {
+                graphics = false;
+                memorySize = 2048;
+
+                # Idmapped binds of the store need a filesystem that supports them, not 9p.
+                useNixStoreImage = true;
+                writableStore = false;
+
+                # The VM replaces `fileSystems`; the eval test covers the module's own entry.
+                fileSystems."/srv/agents" = {
+                  device = "/srv/agents";
+                  fsType = "none";
+                  options = [
+                    "bind"
+                    "nosuid"
+                    "nodev"
+                    "x-mount.mkdir"
+                  ];
+                };
+              };
+
+              # nspawn binds the Nix database, which a read-only store image lacks.
+              systemd.tmpfiles.rules = [ "d /nix/var/nix/db 0755 root root -" ];
+
+              agentBox = {
+                enable = true;
+                credentials = { };
+                guest.agentBoxGuest.openclaw.enable = false;
+              };
+
+              # A host service, open on every interface, that the box must not reach.
+              networking.firewall.allowedTCPPorts = [ 8000 ];
+              systemd.services.host-http = {
+                wantedBy = [ "multi-user.target" ];
+                script = "${pkgs.python3}/bin/python -m http.server 8000 --bind 0.0.0.0";
+              };
+            };
+
+          testScript = ''
+            def box(cmd):
+                return f"nixos-container run agents -- {cmd}"
+
+            machine.wait_for_unit("container@agents.service")
+            machine.wait_for_unit("host-http.service")
+            machine.wait_for_open_port(8000)
+
+            # The container runs under a shifted UID range, not as host root.
+            leader = machine.succeed("machinectl show agents -p Leader --value").strip()
+            uid = int(machine.succeed(f"ps -o uid= -p {leader}").strip())
+            assert uid > 65535, f"container root is host UID {uid}"
+
+            # The host can reach the container, the container cannot reach the host.
+            machine.succeed("ping -c1 -W2 10.233.1.2")
+            machine.wait_until_succeeds(box("systemctl is-active searx.service"))
+            machine.fail(box("ping -c1 -W2 10.233.1.1"))
+            machine.fail(box("curl -sf --connect-timeout 3 http://10.233.1.1:8000"))
+            machine.fail(box("curl -sf --connect-timeout 3 http://192.168.1.1:8000"))
+
+            # SearXNG answers the JSON API on loopback.
+            machine.wait_until_succeeds(
+                box("curl -sf 'http://127.0.0.1:8888/search?q=nixos&format=json'")
+            )
+
+            # The agent's workspace files belong to the host user.
+            machine.succeed(box("runuser -u agent -- touch /home/agent/workspace/probe"))
+            machine.succeed("test \"$(stat -c %U /srv/agents/probe)\" = testuser")
+            machine.succeed("findmnt -no OPTIONS /srv/agents | grep -q nosuid")
+            machine.succeed("findmnt -no OPTIONS /srv/agents | grep -q nodev")
           '';
         };
       };

@@ -177,6 +177,16 @@ vault:
     sudo systemctl start arctic-vault.service
     journalctl -u arctic-vault.service --no-pager -n 20
 
+# Open a shell as the agent inside the agent box.
+[group("agents")]
+agent-shell:
+    sudo machinectl shell agent@agents
+
+# Apply a host switch to the agent box without restarting it.
+[group("agents")]
+agent-reload:
+    sudo systemctl reload container@agents.service
+
 # Render the declarative router backup locally without uploading it.
 [group("router")]
 router-generate:

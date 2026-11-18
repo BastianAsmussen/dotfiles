@@ -23,6 +23,10 @@ WireGuard mesh in a star, eta is the hub.
   (`modules/deploy.nix`).
 - delta: niri desktop, WireGuard client, kanata, `max-jobs=0` so builds go to
   the build host.
+- epsilon and delta: the `agents` nspawn container, which runs OpenClaw with
+  its own SearXNG, user-namespaced and firewalled off from the host, LAN and
+  mesh. It shares only `/srv/agents` (`features/agent-box/`,
+  `just agent-shell`).
 
 Less obvious inputs: niri (scrollable-tiling Wayland compositor),
 noctalia (bar, launcher, control center, notifications), schizofox

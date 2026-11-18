@@ -77,9 +77,11 @@
         self.nixosModules.topology
         self.nixosModules.virtualisation
         self.nixosModules.winapps
+        self.nixosModules.agentBox
       ];
 
       winapps.enable = true;
+      agentBox.enable = true;
 
       monero = {
         node.enable = false;

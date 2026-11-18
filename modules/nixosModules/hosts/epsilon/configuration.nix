@@ -88,6 +88,7 @@
         self.nixosModules.arcticVault
         self.nixosModules.pia
         self.nixosModules.forgejoRunner
+        self.nixosModules.agentBox
 
         # Host-specific hardware.
         self.diskoConfigurations.hostEpsilon
@@ -567,6 +568,7 @@
       };
 
       winapps.enable = true;
+      agentBox.enable = true;
 
       programs.egg-mouse-config.enable = true;
 
@@ -666,6 +668,7 @@
         pia.enable = mkForce false;
         acmeShared.enable = mkForce false;
         winapps.enable = mkForce false;
+        agentBox.enable = mkForce false;
 
         jellyfin.enable = mkForce false;
         youtubeArchive.enable = mkForce false;
